@@ -1,6 +1,8 @@
 // ฟอนต์ไทยที่อนุญาตทั้ง 7 ตัว (§4.2) โหลดผ่าน next/font/google (self-hosted)
 // - preload: false — บราวเซอร์จะดาวน์โหลดเฉพาะฟอนต์ที่ธีมใช้จริง
 // - แต่ละตัว expose CSS variable แล้ว preset อ้างผ่านชื่อฟอนต์ (FONT_VAR)
+// หมายเหตุ: next/font บังคับให้ argument เป็น literal ล้วน (compiler แกะค่า
+// ตอน build) — ห้ามใช้ตัวแปร/spread ในการเรียก
 
 import {
   Bai_Jamjuree,
@@ -13,60 +15,57 @@ import {
 } from 'next/font/google';
 import type { ThemeFontName } from './types';
 
-const WEIGHTS = ['400', '500', '600', '700'] as const;
-const SUBSETS = ['thai', 'latin'] as const;
-
 const prompt = Prompt({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-prompt',
 });
 
 const sarabun = Sarabun({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-sarabun',
 });
 
 const kanit = Kanit({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-kanit',
 });
 
 const notoSansThai = Noto_Sans_Thai({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-noto-sans-thai',
 });
 
 const mitr = Mitr({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-mitr',
 });
 
 const baiJamjuree = Bai_Jamjuree({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-bai-jamjuree',
 });
 
 const ibmPlexSansThai = IBM_Plex_Sans_Thai({
-  weight: [...WEIGHTS],
-  subsets: [...SUBSETS],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
   display: 'swap',
   preload: false,
   variable: '--font-ibm-plex-sans-thai',
