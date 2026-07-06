@@ -24,7 +24,8 @@
 - [x] 6. pnpm build ผ่าน ไม่มี type error (ตรวจซ้ำก่อนปิด Phase)
 
 ## Blockers / Notes
-- **R2 bucket ยังไม่มี CORS policy** — presign + checksum ฝั่งโค้ดแก้แล้ว เหลือผู้ใช้ตั้ง CORS ใน Cloudflare (R2 → bucket → Settings → CORS policy) อนุญาต origin `http://localhost:3000` methods PUT,GET แล้วรัน `.tmp-upload-test.mjs` ซ้ำเพื่อยืนยัน
+- R2 CORS ตั้งแล้ว (origin localhost:3000) — ทดสอบอัปโหลดรูปผ่านครบ flow: webp convert → presigned PUT → product_images → เสิร์ฟผ่าน next/image (2026-07-06) **ขึ้น production ต้องเพิ่ม origin โดเมนจริงใน CORS ด้วย**
+- ห้ามรัน `pnpm build` ขณะ dev server เปิดอยู่ — .next พังต้องลบแล้ว restart
 - Auth users ที่มีอยู่: `testdash@shopdash.com` (ผู้ใช้สร้างเองผ่าน Dashboard), `phase1-smoke-test@shopdash.local` (user ทดสอบอัตโนมัติ สร้างผ่าน service role — ลบได้เมื่อจบ Phase 1)
 - ข้อมูลทดสอบในร้าน demo: หมวด "เสื้อผ้าผู้หญิง" + สินค้า "เสื้อยืดทดสอบ" (299 บาท, published, 4 variants S/M × แดง/น้ำเงิน, ตัวแรก stock 15 ราคา override 319) — ใช้ต่อในงาน 1.6 ได้เลย
 - playwright ติดตั้งเป็น devDependency ไว้ใช้ smoke test งานถัดๆ ไป (สคริปต์ชั่วคราว `.tmp-e2e-smoke.mjs`, `.tmp-upload-test.mjs` ไม่ commit)
