@@ -1,0 +1,45 @@
+// Guest checkout (§3.3 ข้อ 3) — เขียนผ่าน service role เท่านั้น ไม่เปิด INSERT ให้ anon
+// server คำนวณราคา/ยอดจาก DB เองทั้งหมดใน lib/orders/create.ts
+
+import { NextResponse } from 'next/server';
+import { createOrder, type CheckoutCustomerInput, type CheckoutItemInput } from '@/lib/orders/create';
+import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
+
+interface CheckoutRequestBody {
+  items: CheckoutItemInput[];
+  customer: CheckoutCustomerInput;
+}
+
+export async function POST(req: Request) {
+  let body: CheckoutRequestBody;
+  try {
+    body = (await req.json()) as CheckoutRequestBody;
+  } catch {
+    return NextResponse.json({ error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 });
+  }
+
+  try {
+    const ctx = await getTenantContext();
+    const result = await createOrder(ctx, body.items ?? [], body.customer ?? ({} as CheckoutCustomerInput));
+
+    if (result.ok) {
+      return NextResponse.json({ orderNumber: result.orderNumber });
+    }
+    if ('priceChanged' in result) {
+      return NextResponse.json(
+        { error: result.error, priceChanged: true, items: result.items },
+        { status: result.status },
+      );
+    }
+    return NextResponse.json({ error: result.error }, { status: result.status });
+  } catch (err) {
+    if (err instanceof TenantNotFoundError) {
+      return NextResponse.json({ error: err.message }, { status: 404 });
+    }
+    console.error('[api/checkout]', err);
+    return NextResponse.json(
+      { error: 'เกิดข้อผิดพลาดในการสร้างคำสั่งซื้อ กรุณาลองใหม่อีกครั้ง' },
+      { status: 500 },
+    );
+  }
+}
