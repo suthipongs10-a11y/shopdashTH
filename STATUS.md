@@ -1,6 +1,7 @@
 # STATUS
-- Current phase: 1
+- Current phase: 2
 - Last session: 2026-07-07
+- **Phase 1 ผ่าน DoD ครบ 6 ข้อ — tag `phase-1-done`** (2026-07-07)
 
 ## Done
 - [x] 1.1 โครงโปรเจ็ค: Next.js 15.5 + Tailwind v4 + Supabase clients (`lib/supabase/{server,client,admin}.ts`) + `.env.example` — `pnpm build` ผ่าน, `.env.local` ผู้ใช้เติมค่าครบแล้ว
@@ -19,11 +20,16 @@
 - [x] 1.9 Store Admin: คิวตรวจสลิป `/admin/slips` (ยอดตัวใหญ่+รูปสลิป presigned 15 นาที+ชื่อบัญชีเทียบ, อนุมัติ→confirmed+ตัดสต๊อก, ปฏิเสธ→เหตุผลสำเร็จรูป §7.1), `/admin/orders` (filter สถานะ + detail + ปุ่มตาม state machine + carrier/tracking + ยกเลิกพร้อมเหตุผล)
 - [x] 1.10 หน้า `/track` (เลขออร์เดอร์+เบอร์ตรงทั้งคู่, timeline, เลขพัสดุ, เหตุผลสลิป), `/admin/settings` (ชื่อ/โลโก้/แบนเนอร์/PromptPay/ค่าส่ง/ส่งฟรีขั้นต่ำ), `/admin/customers` (+detail ประวัติ+ยอดสะสม), แถบเตือนสต๊อกใกล้หมดบน `/admin/products`
 
-## In progress
-- (Phase 1 ครบทุกงานแล้ว — เหลือปิด DoD ข้อ 1 ส่วน manual: สแกน QR ด้วยแอปธนาคารจริง)
+## In progress (Phase 2)
+- [ ] 2.1 Migration 002: เปิด RLS+FORCE ทุกตาราง + policies §3.5 (เขียนไฟล์แล้ว — รอ apply ใน SQL Editor: **รัน seed.sql ก่อน แล้วค่อย 002** เพราะ FORCE RLS จะบล็อก insert ของ role postgres)
+- [ ] 2.2 getTenantContext() ตัวจริง (x-tenant-slug + locked/archived)
+- [ ] 2.3 Middleware hostname routing (demo.localhost:3000)
+- [ ] 2.4 app_metadata tenant_id+role + scope login ตาม tenant
+- [ ] 2.5 ไล่ query ผ่าน context + seed ร้านที่ 2
+- [ ] 2.6 scripts/test-isolation.ts
 
 ## DoD checklist (Phase 1)
-- [~] 1. e2e loop ครบวงจร — **ผ่านอัตโนมัติ 2026-07-07** (สั่ง→QR ยอดตรง→สลิป→อนุมัติ→สต๊อกลด+stock_movements→packing→shipped+เลขพัสดุ→track เจอ) **เหลือ manual อย่างเดียว: สแกน QR ด้วยแอปธนาคารจริงเช็คยอด+ชื่อบัญชี**
+- [x] 1. e2e loop ครบวงจร — ผ่านอัตโนมัติ 13 ขั้น + ผู้ใช้สแกน QR ด้วยแอปธนาคารจริงยืนยันยอด/ชื่อบัญชีถูกต้อง (2026-07-07)
 - [x] 2. ปฏิเสธสลิปแล้วกลับ pending_payment + ลูกค้าเห็นเหตุผล / ยกเลิกออร์เดอร์ confirmed แล้วสต๊อกคืน (ผ่าน e2e 2026-07-07)
 - [x] 3. สลิปไฟล์ซ้ำถูกกันด้วย hash — "สลิปนี้ถูกใช้ไปแล้ว" (ผ่าน e2e)
 - [x] 4. variant สต๊อก 0: ปุ่ม disabled (UI) + ยิง API ตรงโดน 400 (ผ่าน e2e)
