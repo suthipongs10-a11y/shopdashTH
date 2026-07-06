@@ -1,0 +1,84 @@
+/* ============================================================
+   Design tokens (CLAUDE.md §4.2)
+   - :root = ค่า fallback (เท่ากับ preset basic-01)
+   - ค่าจริงต่อร้านถูก set ผ่าน inline style โดย <ThemeScope>
+     (preset + stores.theme_overrides) — ห้าม hardcode สีในคอมโพเนนต์
+   - @theme inline ด้านล่าง map token → Tailwind utilities
+     (bg-primary, text-text-muted, rounded-md, font-heading, ...)
+   ============================================================ */
+
+:root {
+  /* สี */
+  --color-primary: #171717;
+  --color-primary-fg: #ffffff;
+  --color-secondary: #f5f5f5;
+  --color-bg: #ffffff;
+  --color-surface: #f7f7f7;
+  --color-text: #171717;
+  --color-text-muted: #6b7280;
+  --color-accent: #404040;
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+
+  /* สีอนุพันธ์ — คำนวณอัตโนมัติจาก token หลัก (preset ไม่ต้อง set เอง) */
+  --color-border: color-mix(in oklab, var(--color-text) 12%, transparent);
+  --color-scrim: color-mix(in oklab, var(--color-text) 45%, transparent);
+  --color-danger-soft: color-mix(in oklab, var(--color-danger) 10%, transparent);
+  --color-success-soft: color-mix(in oklab, var(--color-success) 12%, transparent);
+
+  /* ตัวอักษร (ค่า var(--font-*) มาจาก next/font ใน themes/fonts.ts) */
+  --font-heading: var(--font-prompt, ui-sans-serif, system-ui, sans-serif);
+  --font-body: var(--font-sarabun, ui-sans-serif, system-ui, sans-serif);
+  --text-scale: 1;
+
+  /* รูปทรง / ระยะ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --space-unit: 4px;
+  --shadow-card: none;
+  --container-max: 1100px;
+}
+
+@theme inline {
+  /* สี → bg-primary, text-primary-fg, border-danger, ... */
+  --color-primary: var(--color-primary);
+  --color-primary-fg: var(--color-primary-fg);
+  --color-secondary: var(--color-secondary);
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-accent: var(--color-accent);
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
+  --color-border: var(--color-border);
+  --color-scrim: var(--color-scrim);
+  --color-danger-soft: var(--color-danger-soft);
+  --color-success-soft: var(--color-success-soft);
+
+  /* ฟอนต์ → font-heading, font-body */
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+
+  /* radius → rounded-sm/md/lg ตาม token ของธีม */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  /* เงา → shadow-card */
+  --shadow-card: var(--shadow-card);
+
+  /* spacing scale ฐาน 4px ตาม token */
+  --spacing: var(--space-unit);
+
+  /* text-scale คูณเข้ากับทุกขนาดตัวอักษรหลัก (1.0 | 1.05 | 1.1) */
+  --text-xs: calc(0.75rem * var(--text-scale));
+  --text-sm: calc(0.875rem * var(--text-scale));
+  --text-base: calc(1rem * var(--text-scale));
+  --text-lg: calc(1.125rem * var(--text-scale));
+  --text-xl: calc(1.25rem * var(--text-scale));
+  --text-2xl: calc(1.5rem * var(--text-scale));
+  --text-3xl: calc(1.875rem * var(--text-scale));
+  --text-4xl: calc(2.25rem * var(--text-scale));
+}
