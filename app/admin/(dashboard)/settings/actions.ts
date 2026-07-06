@@ -1,9 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { getStoreUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { getTenantContext } from '@/lib/tenant-context';
+import { getTenantContext, invalidateTenantCache } from '@/lib/tenant-context';
 
 export interface SettingsState {
   error?: string;
@@ -13,11 +13,8 @@ export interface SettingsState {
 const PROMPTPAY_PATTERN = /^[0-9]{10}$|^[0-9]{13}$/;
 
 async function requireUser(): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user !== null;
+  const ctx = await getTenantContext();
+  return (await getStoreUser(ctx)) !== null;
 }
 
 export async function updateStoreSettings(
@@ -65,6 +62,7 @@ export async function updateStoreSettings(
     .eq('tenant_id', ctx.tenantId);
 
   if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+  invalidateTenantCache(ctx.slug); // กัน LRU 60s เสิร์ฟค่าเก่า
   revalidatePath('/admin/settings');
   revalidatePath('/');
   return { success: true };
@@ -85,6 +83,7 @@ export async function updateBrandingKey(
     .eq('tenant_id', ctx.tenantId);
 
   if (error) return { error: 'บันทึกรูปไม่สำเร็จ' };
+  invalidateTenantCache(ctx.slug);
   revalidatePath('/admin/settings');
   revalidatePath('/');
   return { success: true };

@@ -26,5 +26,8 @@ supabase-js ไม่มี multi-statement transaction — `transitionOrder()` 
 ## 2026-07-07 — หน้า pay เข้าถึงได้ด้วยเลขออร์เดอร์อย่างเดียว
 สเปคกำหนด "เลขออร์เดอร์+เบอร์โทร" เฉพาะหน้าติดตามออร์เดอร์ ส่วนหน้า pay ลูกค้าถูก redirect มาทันทีหลัง checkout (ยังไม่มีบริบทอื่นให้ยืนยันตัว) — ข้อมูลที่เปิดเผยมีแค่ยอด+รายการสินค้า ไม่มีที่อยู่/เบอร์ลูกค้า และการอัปสลิปแปลกปลอมถูกกันด้วยกติกา §7.3 (สลิป pending ได้ทีละใบ + hash ซ้ำไม่ได้)
 
+## 2026-07-07 — dev: host `localhost` เปล่า = ร้าน demo
+middleware map `*.localhost` → slug ตรงๆ ส่วน `localhost` เปล่าใน development ให้เป็นร้าน demo (DX — curl/เปิดเร็ว) production root domain → `/domain-not-configured` (Phase 3 จะแทนด้วยหน้า public landing/signup ตามโครง §8.1)
+
 ## 2026-07-06 — order_items.variant_id / stock_movements.variant_id ไม่มี FK
 ตามตัวอักษรของ §3.4 (คอลัมน์อื่นเขียน references ชัดเจน แต่สองคอลัมน์นี้ไม่เขียน) — เจตนาคือ order_items เป็น snapshot ลบสินค้า/variant แล้วประวัติออร์เดอร์ต้องไม่พัง

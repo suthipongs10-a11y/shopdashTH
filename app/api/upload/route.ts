@@ -3,6 +3,7 @@
 // หมายเหตุ: สลิปไม่ผ่าน route นี้ — guest ส่งไฟล์เข้า /api/slips (งาน 1.8) ให้ server เขียนเอง
 
 import { NextResponse } from 'next/server';
+import { getStoreUser } from '@/lib/auth';
 import {
   brandingKey,
   IMAGE_MIME_EXT,
@@ -12,7 +13,6 @@ import {
   productImageKey,
   publicR2Url,
 } from '@/lib/r2';
-import { createClient } from '@/lib/supabase/server';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
 const KINDS = ['product_image', 'branding_logo', 'branding_banner'] as const;
@@ -33,16 +33,6 @@ function badRequest(message: string) {
 }
 
 export async function POST(req: Request) {
-  // Phase 1: สิทธิ์ = user ที่ login (มี user เดียวคือแอดมินร้าน demo)
-  // Phase 2 จะตรวจ role + tenant จาก app_metadata เพิ่ม
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'กรุณาเข้าสู่ระบบก่อนอัปโหลดไฟล์' }, { status: 401 });
-  }
-
   let body: UploadRequestBody;
   try {
     body = (await req.json()) as UploadRequestBody;
@@ -66,6 +56,12 @@ export async function POST(req: Request) {
 
   try {
     const ctx = await getTenantContext();
+
+    // ต้องเป็น owner/staff ของร้านนี้เท่านั้น (§2.4) — เช็คหลังได้ ctx เพื่อเทียบ tenant
+    const user = await getStoreUser(ctx);
+    if (!user) {
+      return NextResponse.json({ error: 'กรุณาเข้าสู่ระบบก่อนอัปโหลดไฟล์' }, { status: 401 });
+    }
 
     let key: string;
     if (body.kind === 'product_image') {

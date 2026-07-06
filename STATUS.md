@@ -1,7 +1,8 @@
 # STATUS
-- Current phase: 2
+- Current phase: 2 (เสร็จ — รอขึ้น Phase 3)
 - Last session: 2026-07-07
 - **Phase 1 ผ่าน DoD ครบ 6 ข้อ — tag `phase-1-done`** (2026-07-07)
+- **Phase 2 ผ่าน DoD ครบ 4 ข้อ — tag `phase-2-done`** (2026-07-07)
 
 ## Done
 - [x] 1.1 โครงโปรเจ็ค: Next.js 15.5 + Tailwind v4 + Supabase clients (`lib/supabase/{server,client,admin}.ts`) + `.env.example` — `pnpm build` ผ่าน, `.env.local` ผู้ใช้เติมค่าครบแล้ว
@@ -20,13 +21,19 @@
 - [x] 1.9 Store Admin: คิวตรวจสลิป `/admin/slips` (ยอดตัวใหญ่+รูปสลิป presigned 15 นาที+ชื่อบัญชีเทียบ, อนุมัติ→confirmed+ตัดสต๊อก, ปฏิเสธ→เหตุผลสำเร็จรูป §7.1), `/admin/orders` (filter สถานะ + detail + ปุ่มตาม state machine + carrier/tracking + ยกเลิกพร้อมเหตุผล)
 - [x] 1.10 หน้า `/track` (เลขออร์เดอร์+เบอร์ตรงทั้งคู่, timeline, เลขพัสดุ, เหตุผลสลิป), `/admin/settings` (ชื่อ/โลโก้/แบนเนอร์/PromptPay/ค่าส่ง/ส่งฟรีขั้นต่ำ), `/admin/customers` (+detail ประวัติ+ยอดสะสม), แถบเตือนสต๊อกใกล้หมดบน `/admin/products`
 
-## In progress (Phase 2)
-- [ ] 2.1 Migration 002: เปิด RLS+FORCE ทุกตาราง + policies §3.5 (เขียนไฟล์แล้ว — รอ apply ใน SQL Editor: **รัน seed.sql ก่อน แล้วค่อย 002** เพราะ FORCE RLS จะบล็อก insert ของ role postgres)
-- [ ] 2.2 getTenantContext() ตัวจริง (x-tenant-slug + locked/archived)
-- [ ] 2.3 Middleware hostname routing (demo.localhost:3000)
-- [ ] 2.4 app_metadata tenant_id+role + scope login ตาม tenant
-- [ ] 2.5 ไล่ query ผ่าน context + seed ร้านที่ 2
-- [ ] 2.6 scripts/test-isolation.ts
+## Done (Phase 2)
+- [x] 2.1 Migration 002 (RLS+FORCE 18 ตาราง + policies §3.5 + RPC `rls_status()`) — applied จริงแล้ว
+- [x] 2.2 `getTenantContext()` ตัวจริง: header `x-tenant-slug` + LRU TTL 60s (+`invalidateTenantCache()` หลังแก้ settings) + locked→หน้าปิดปรับปรุง / archived→404
+- [x] 2.3 `middleware.ts`: `{slug}.localhost` / `{slug}.{ROOT_DOMAIN}` → แนบ header, host แปลก→`/domain-not-configured`, dev localhost เปล่า = demo
+- [x] 2.4 `lib/auth.ts` (`setUserTenant`/`getStoreUser`) + login/actions/upload ตรวจ owner/staff ของร้านนั้น + `scripts/setup-tenant-users.mjs` รันแล้ว (demo 2 users, shop2-owner@shopdash.local / Shop2Test!2026)
+- [x] 2.5 ทุก query ผ่าน ctx.tenantId (RLS เป็น backstop) + seed shop2 (ธีม override สีม่วง + สินค้า 1 ชิ้น 2 variants)
+- [x] 2.6 `scripts/test-isolation.ts` — รัน: `node --experimental-strip-types scripts/test-isolation.ts`
+
+## DoD checklist (Phase 2) — ผ่านครบ 2026-07-07
+- [x] 1. test-isolation.ts ผ่าน 19/19: (ก) JWT ร้าน A เห็นเฉพาะของ A (ข) insert ข้าม tenant โดน RLS ปฏิเสธ (ค) anon เห็นตารางอ่อนไหว 0 แถว (ง) anon เห็นเฉพาะ published
+- [x] 2. demo.localhost / shop2.localhost คนละร้านคนละค่า token (#171717 vs #7c3aed), login ร้าน A ที่ host ร้าน B ถูกปฏิเสธ (e2e browser)
+- [x] 3. track เลขออร์เดอร์ร้าน A ที่ร้าน B → ไม่พบ (e2e browser)
+- [x] 4. ทุกตาราง relforcerowsecurity = true (เช็คใน test script ผ่าน RPC)
 
 ## DoD checklist (Phase 1)
 - [x] 1. e2e loop ครบวงจร — ผ่านอัตโนมัติ 13 ขั้น + ผู้ใช้สแกน QR ด้วยแอปธนาคารจริงยืนยันยอด/ชื่อบัญชีถูกต้อง (2026-07-07)
@@ -38,7 +45,8 @@
 
 ## Blockers / Notes
 - R2 CORS ตั้งแล้ว (origin localhost:3000) — ทดสอบอัปโหลดรูปผ่านครบ flow: webp convert → presigned PUT → product_images → เสิร์ฟผ่าน next/image (2026-07-06) **ขึ้น production ต้องเพิ่ม origin โดเมนจริงใน CORS ด้วย**
-- ห้ามรัน `pnpm build` ขณะ dev server เปิดอยู่ — .next พังต้องลบแล้ว restart
+- สลับระหว่าง `pnpm build` ↔ `pnpm dev` ให้ `rm -rf .next` ก่อนเสมอ — artifacts ปนกันแล้ว asset 404/ERR_ABORTED
+- dev เปิดร้านผ่าน `demo.localhost:3000` / `shop2.localhost:3000` (localhost เปล่า = demo)
 - Auth users ที่มีอยู่: `testdash@shopdash.com` (ผู้ใช้สร้างเองผ่าน Dashboard), `phase1-smoke-test@shopdash.local` (user ทดสอบอัตโนมัติ สร้างผ่าน service role — ลบได้เมื่อจบ Phase 1)
 - ข้อมูลทดสอบในร้าน demo: หมวด "เสื้อผ้าผู้หญิง" + สินค้า "เสื้อยืดทดสอบ" (299 บาท, published, 4 variants S/M × แดง/น้ำเงิน, ตัวแรก stock 15 ราคา override 319) — ใช้ต่อในงาน 1.6 ได้เลย
 - playwright ติดตั้งเป็น devDependency ไว้ใช้ smoke test งานถัดๆ ไป (สคริปต์ชั่วคราว `.tmp-e2e-smoke.mjs`, `.tmp-upload-test.mjs` ไม่ commit)

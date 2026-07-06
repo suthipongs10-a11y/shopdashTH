@@ -4,10 +4,10 @@
 // ทุกการเปลี่ยน status ผ่าน lib/orders/transition.ts เท่านั้น (§8.5 ข้อ 4)
 
 import { revalidatePath } from 'next/cache';
+import { getStoreUser } from '@/lib/auth';
 import { CARRIERS, type Carrier } from '@/lib/orders/status';
 import { transitionOrder, TransitionError } from '@/lib/orders/transition';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/tenant-context';
 
 export interface OrderActionState {
@@ -15,11 +15,10 @@ export interface OrderActionState {
   success?: string;
 }
 
+// server actions เรียกตรงได้โดยไม่ผ่าน layout — ต้องตรวจ owner/staff ของร้านนี้ทุกครั้ง
 async function requireAdminUser(): Promise<string> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const ctx = await getTenantContext();
+  const user = await getStoreUser(ctx);
   if (!user) throw new TransitionError('กรุณาเข้าสู่ระบบ');
   return user.id;
 }
