@@ -1,6 +1,6 @@
 # STATUS
 - Current phase: 1
-- Last session: 2026-07-06
+- Last session: 2026-07-07
 
 ## Done
 - [x] 1.1 โครงโปรเจ็ค: Next.js 15.5 + Tailwind v4 + Supabase clients (`lib/supabase/{server,client,admin}.ts`) + `.env.example` — `pnpm build` ผ่าน, `.env.local` ผู้ใช้เติมค่าครบแล้ว
@@ -14,16 +14,21 @@
 
 - [x] 1.6 Storefront (path ตรง `/` ผ่าน route group `(storefront)` + force-dynamic): หน้าแรกเรียง section ตาม preset, แคตตาล็อก+ตัวกรอง server-side (category/size/color/sort + pagination 24/หน้า), หน้าสินค้า (แกลเลอรี+variant selector ราคา/สต๊อกอัปเดตตาม variant, ปุ่ม disabled เมื่อสต๊อก 0), ตะกร้า localStorage `shopdash_cart_{slug}` (`lib/cart.ts` useSyncExternalStore) + CartDrawer ใน header — **E2E ผ่านหมด**: home → filter สี → หน้าสินค้า → variant หมดสต๊อก disabled → M/แดง ฿319 เพิ่ม 2 ชิ้น → drawer ฿638 → persist หลัง reload
 
+- [x] 1.7 Checkout: `lib/orders/create.ts` + `/api/checkout` (service role, ราคาคำนวณจาก DB, dedupe ลูกค้าด้วยเบอร์, gen order_number `{SLUG}-{YYMMDD}-{run4}` เวลาไทย + retry กันชน, ปฏิเสธสต๊อกไม่พอ, price-changed → 409 ให้ลูกค้ายืนยันยอดใหม่) + หน้า `/checkout`
+- [x] 1.8 Payment: `lib/promptpay.ts` (EMVCo payload + SVG QR จาก promptpay_id ของร้าน), หน้า `/orders/[num]/pay` (QR + ยอด + อัปสลิป + สถานะ + เหตุผลสลิปถูกปฏิเสธ), `/api/slips` (ไฟล์ต้นฉบับเข้า R2 path slips/, SHA-256 กันซ้ำ 2 ชั้น, กันสลิปค้างคิว §7.3), `lib/orders/transition.ts` (state machine §3.6 + ตัด/คืนสต๊อก + stock_movements + optimistic lock)
+- [x] 1.9 Store Admin: คิวตรวจสลิป `/admin/slips` (ยอดตัวใหญ่+รูปสลิป presigned 15 นาที+ชื่อบัญชีเทียบ, อนุมัติ→confirmed+ตัดสต๊อก, ปฏิเสธ→เหตุผลสำเร็จรูป §7.1), `/admin/orders` (filter สถานะ + detail + ปุ่มตาม state machine + carrier/tracking + ยกเลิกพร้อมเหตุผล)
+- [x] 1.10 หน้า `/track` (เลขออร์เดอร์+เบอร์ตรงทั้งคู่, timeline, เลขพัสดุ, เหตุผลสลิป), `/admin/settings` (ชื่อ/โลโก้/แบนเนอร์/PromptPay/ค่าส่ง/ส่งฟรีขั้นต่ำ), `/admin/customers` (+detail ประวัติ+ยอดสะสม), แถบเตือนสต๊อกใกล้หมดบน `/admin/products`
+
 ## In progress
-- [ ] 1.7 Checkout: สร้าง order (service role route), dedupe customer ด้วยเบอร์โทร, gen order_number — ยังไม่เริ่ม
+- (Phase 1 ครบทุกงานแล้ว — เหลือปิด DoD ข้อ 1 ส่วน manual: สแกน QR ด้วยแอปธนาคารจริง)
 
 ## DoD checklist (Phase 1)
-- [ ] 1. e2e loop ครบวงจร (ยังไม่ทดสอบ)
-- [ ] 2. ปฏิเสธสลิป/ยกเลิกออร์เดอร์คืนสต๊อก
-- [ ] 3. สลิปไฟล์ซ้ำถูกกันด้วย unique(file_hash)
-- [ ] 4. variant สต๊อก 0 กันทั้ง UI และ server
-- [x] 5. ไม่มี hex code ใน components/storefront (grep ผ่าน 2026-07-06 — ตรวจซ้ำก่อนปิด Phase)
-- [x] 6. pnpm build ผ่าน ไม่มี type error (ตรวจซ้ำก่อนปิด Phase)
+- [~] 1. e2e loop ครบวงจร — **ผ่านอัตโนมัติ 2026-07-07** (สั่ง→QR ยอดตรง→สลิป→อนุมัติ→สต๊อกลด+stock_movements→packing→shipped+เลขพัสดุ→track เจอ) **เหลือ manual อย่างเดียว: สแกน QR ด้วยแอปธนาคารจริงเช็คยอด+ชื่อบัญชี**
+- [x] 2. ปฏิเสธสลิปแล้วกลับ pending_payment + ลูกค้าเห็นเหตุผล / ยกเลิกออร์เดอร์ confirmed แล้วสต๊อกคืน (ผ่าน e2e 2026-07-07)
+- [x] 3. สลิปไฟล์ซ้ำถูกกันด้วย hash — "สลิปนี้ถูกใช้ไปแล้ว" (ผ่าน e2e)
+- [x] 4. variant สต๊อก 0: ปุ่ม disabled (UI) + ยิง API ตรงโดน 400 (ผ่าน e2e)
+- [x] 5. ไม่มี hex code ใน components/storefront + app/(storefront) (grep ผ่าน 2026-07-07)
+- [x] 6. pnpm build ผ่าน ไม่มี type error (2026-07-07)
 
 ## Blockers / Notes
 - R2 CORS ตั้งแล้ว (origin localhost:3000) — ทดสอบอัปโหลดรูปผ่านครบ flow: webp convert → presigned PUT → product_images → เสิร์ฟผ่าน next/image (2026-07-06) **ขึ้น production ต้องเพิ่ม origin โดเมนจริงใน CORS ด้วย**

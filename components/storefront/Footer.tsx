@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export function Footer({
   storeName,
   address,
@@ -20,6 +22,11 @@ export function Footer({
             </a>
           </p>
         )}
+        <p className="pt-2 text-sm">
+          <Link href="/track" className="underline underline-offset-2 hover:text-primary">
+            ติดตามคำสั่งซื้อ
+          </Link>
+        </p>
         <p className="pt-4 text-xs text-text-muted">ขับเคลื่อนโดย ShopDash</p>
       </div>
     </footer>

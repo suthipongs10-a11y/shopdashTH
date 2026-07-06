@@ -20,5 +20,11 @@ token ตาม §4.2 ประกาศเป็น CSS vars ที่ `:root` 
 ## 2026-07-06 — ปิด default checksum ของ AWS SDK ใน R2 client
 AWS SDK ≥3.729 แนบ `x-amz-checksum-crc32` (คำนวณจาก body ว่าง) ลง presigned PUT URL โดยดีฟอลต์ ทำให้ R2 ปฏิเสธไฟล์จริงเสมอ — ตั้ง `requestChecksumCalculation`/`responseChecksumValidation` = `WHEN_REQUIRED` ใน `lib/r2.ts` (พฤติกรรมเดิมของ SDK ก่อน 3.729)
 
+## 2026-07-07 — ตัด/คืนสต๊อกแบบ compensation แทน DB transaction
+supabase-js ไม่มี multi-statement transaction — `transitionOrder()` ตัดสต๊อกทีละ variant ด้วย optimistic lock (`eq('stock', current)` + เช็ค affected rows ตาม §7.6) ถ้าตัวใดไม่พอจะ "คืน" รายการที่ตัดไปแล้วทั้งหมดก่อน throw — ยอมรับ window เล็กๆ ที่ read-modify-write อาจชนกันแล้ว retry ผ่าน error ให้แอดมินกดใหม่ (ทางเลือกคือย้าย logic ลง Postgres function แต่สเปคเน้น state machine ใน code ชั้น service เดียว)
+
+## 2026-07-07 — หน้า pay เข้าถึงได้ด้วยเลขออร์เดอร์อย่างเดียว
+สเปคกำหนด "เลขออร์เดอร์+เบอร์โทร" เฉพาะหน้าติดตามออร์เดอร์ ส่วนหน้า pay ลูกค้าถูก redirect มาทันทีหลัง checkout (ยังไม่มีบริบทอื่นให้ยืนยันตัว) — ข้อมูลที่เปิดเผยมีแค่ยอด+รายการสินค้า ไม่มีที่อยู่/เบอร์ลูกค้า และการอัปสลิปแปลกปลอมถูกกันด้วยกติกา §7.3 (สลิป pending ได้ทีละใบ + hash ซ้ำไม่ได้)
+
 ## 2026-07-06 — order_items.variant_id / stock_movements.variant_id ไม่มี FK
 ตามตัวอักษรของ §3.4 (คอลัมน์อื่นเขียน references ชัดเจน แต่สองคอลัมน์นี้ไม่เขียน) — เจตนาคือ order_items เป็น snapshot ลบสินค้า/variant แล้วประวัติออร์เดอร์ต้องไม่พัง

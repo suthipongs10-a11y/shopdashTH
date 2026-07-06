@@ -15,19 +15,54 @@ const STATUS_BADGE: Record<string, string> = {
   hidden: 'bg-yellow-100 text-yellow-700',
 };
 
+interface LowStockRow {
+  stock: number;
+  low_stock_threshold: number;
+  size: string | null;
+  color: string | null;
+  products: { name: string };
+}
+
 export default async function ProductsPage() {
   const ctx = await getTenantContext();
   const supabase = await createClient();
-  const { data: products } = await supabase
-    .from('products')
-    .select('id, name, base_price, status, is_featured, categories(name)')
-    .eq('tenant_id', ctx.tenantId)
-    .order('created_at', { ascending: false });
+  const [{ data: products }, { data: lowStockData }] = await Promise.all([
+    supabase
+      .from('products')
+      .select('id, name, base_price, status, is_featured, categories(name)')
+      .eq('tenant_id', ctx.tenantId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('product_variants')
+      .select('stock, low_stock_threshold, size, color, products!inner(name, status)')
+      .eq('tenant_id', ctx.tenantId)
+      .eq('is_enabled', true)
+      .neq('products.status', 'draft'),
+  ]);
 
   const list = products ?? [];
+  // แถบเตือนสต๊อกใกล้หมด (§2.3): variant ที่ stock ต่ำกว่า threshold ของตัวเอง
+  const lowStock = ((lowStockData ?? []) as unknown as LowStockRow[]).filter(
+    (v) => v.stock <= v.low_stock_threshold,
+  );
 
   return (
     <div className="space-y-6">
+      {lowStock.length > 0 && (
+        <div className="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+          <p className="font-medium">⚠ สินค้าใกล้หมดสต๊อก {lowStock.length} รายการ</p>
+          <ul className="mt-1 list-disc pl-5">
+            {lowStock.slice(0, 5).map((v, i) => (
+              <li key={i}>
+                {v.products.name}
+                {(v.size || v.color) && ` (${[v.size, v.color].filter(Boolean).join(' / ')})`} —
+                เหลือ {v.stock} ชิ้น
+              </li>
+            ))}
+            {lowStock.length > 5 && <li>และอีก {lowStock.length - 5} รายการ…</li>}
+          </ul>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-gray-900">สินค้า</h1>
         <Link
