@@ -8,8 +8,10 @@
 
 - [x] 1.3 Token system (`themes/tokens.css` + `@theme inline` mapping) + preset `basic-01` + ฟอนต์ไทย 7 ตัว (next/font) + `ThemeScope` + component library storefront ครบ 14 ตัว (§4.3) + `lib/format.ts`, `lib/orders/status.ts` — build ผ่าน, ไม่มี hex ใน components/storefront
 
+- [x] 1.4 R2 helper (`lib/r2.ts`: presign PUT 5 นาที / GET สลิป 15 นาที / putObject / key builders) + `app/api/upload/route.ts` (auth + MIME webp + ≤5MB) + `lib/upload-client.ts` (แปลง webp ≤1600px ฝั่ง client) + `lib/tenant-context.ts` เวอร์ชัน Phase 1 (demo ตายตัว) + remotePatterns ใน next.config.ts — ยังไม่ได้ทดสอบกับ R2 จริง (จะทดสอบพร้อม UI งาน 1.5)
+
 ## In progress
-- [ ] 1.4 R2 helper + presigned upload route (`lib/r2.ts`, `app/api/upload/route.ts`) — ยังไม่เริ่ม (รวมเพิ่ม remotePatterns ใน next.config.ts)
+- [ ] 1.5 Store Admin: auth, layout, CRUD สินค้า + variant matrix + หมวดหมู่ + รูป — ยังไม่เริ่ม (ต้อง apply migration 001 + seed ก่อน)
 
 ## DoD checklist (Phase 1)
 - [ ] 1. e2e loop ครบวงจร (ยังไม่ทดสอบ)
