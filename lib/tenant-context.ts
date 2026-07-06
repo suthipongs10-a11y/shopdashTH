@@ -66,6 +66,7 @@ export const getTenantContext = cache(async (): Promise<TenantContext> => {
     .single();
 
   if (error || !data) {
+    console.error('[getTenantContext] query failed', error);
     throw new TenantNotFoundError(
       'ไม่พบร้าน demo — ตรวจว่ารัน migration 001_init.sql และ seed.sql ใน Supabase แล้ว',
     );

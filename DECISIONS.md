@@ -14,5 +14,11 @@ seed ใช้ UUID คงที่ (`00000000-...-0001/0002/0003`) เพื่
 ## 2026-07-06 — Token → Tailwind ผ่าน `@theme inline` + สีอนุพันธ์
 token ตาม §4.2 ประกาศเป็น CSS vars ที่ `:root` (fallback = basic-01) แล้ว map เข้า Tailwind utilities ด้วย `@theme inline` ชื่อเดียวกัน (ตรวจ CSS ที่ generate แล้ว utilities อ้าง `var(--token)` ถูกต้อง ไม่ inline ค่าคงที่) — ผลคือ `bg-primary`, `rounded-md`, `font-heading`, spacing, text-scale ตอบสนอง preset แบบ runtime ไม่ต้อง rebuild และเพิ่มสีอนุพันธ์ (`--color-border`, `--color-scrim`, `--color-danger-soft`, `--color-success-soft`) คำนวณด้วย color-mix จาก token หลัก เพื่อให้คอมโพเนนต์ไม่ต้องใช้ opacity modifier กับสีตรงๆ
 
+## 2026-07-06 — เพิ่ม GRANT ให้ anon/authenticated/service_role ท้าย migration 001
+ตารางที่สร้างผ่าน SQL Editor ในโปรเจ็คนี้ไม่ได้รับ default privileges ของ Supabase (service_role โดน "permission denied for table tenants" — เจอจากทดสอบ E2E จริง) จึงเพิ่มบล็อก `grant all on all tables/sequences/routines` + `alter default privileges` ท้าย 001_init.sql และรันกับฐานข้อมูลจริงแล้ว — RLS (Phase 2) คือขอบเขตสิทธิ์จริง GRANT เป็นแค่ฐานตาม default ของ Supabase
+
+## 2026-07-06 — ปิด default checksum ของ AWS SDK ใน R2 client
+AWS SDK ≥3.729 แนบ `x-amz-checksum-crc32` (คำนวณจาก body ว่าง) ลง presigned PUT URL โดยดีฟอลต์ ทำให้ R2 ปฏิเสธไฟล์จริงเสมอ — ตั้ง `requestChecksumCalculation`/`responseChecksumValidation` = `WHEN_REQUIRED` ใน `lib/r2.ts` (พฤติกรรมเดิมของ SDK ก่อน 3.729)
+
 ## 2026-07-06 — order_items.variant_id / stock_movements.variant_id ไม่มี FK
 ตามตัวอักษรของ §3.4 (คอลัมน์อื่นเขียน references ชัดเจน แต่สองคอลัมน์นี้ไม่เขียน) — เจตนาคือ order_items เป็น snapshot ลบสินค้า/variant แล้วประวัติออร์เดอร์ต้องไม่พัง

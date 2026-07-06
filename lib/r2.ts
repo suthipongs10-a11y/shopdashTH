@@ -36,6 +36,10 @@ function r2Client(): S3Client {
       accessKeyId: requiredEnv('R2_ACCESS_KEY_ID'),
       secretAccessKey: requiredEnv('R2_SECRET_ACCESS_KEY'),
     },
+    // AWS SDK ≥3.729 แนบ x-amz-checksum-crc32 (ของ body ว่าง) ลง presigned URL
+    // โดยดีฟอลต์ → R2 ปฏิเสธไฟล์จริงเพราะ checksum ไม่ตรง — ปิดไว้
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
   });
   return client;
 }

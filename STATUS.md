@@ -10,8 +10,10 @@
 
 - [x] 1.4 R2 helper (`lib/r2.ts`: presign PUT 5 นาที / GET สลิป 15 นาที / putObject / key builders) + `app/api/upload/route.ts` (auth + MIME webp + ≤5MB) + `lib/upload-client.ts` (แปลง webp ≤1600px ฝั่ง client) + `lib/tenant-context.ts` เวอร์ชัน Phase 1 (demo ตายตัว) + remotePatterns ใน next.config.ts — ยังไม่ได้ทดสอบกับ R2 จริง (จะทดสอบพร้อม UI งาน 1.5)
 
+- [x] 1.5 Store Admin: auth (login/forgot/reset ผ่าน Supabase Auth + PKCE `/auth/confirm`), layout+nav+logout, CRUD หมวดหมู่ (เพิ่ม/แก้ชื่อ/ลบ/เลื่อนลำดับ), CRUD สินค้า (ฟอร์ม+สถานะ+แนะนำ), variant matrix (generate ไซส์×สี, idempotent, แก้ SKU/ราคา override/สต๊อก/threshold/เปิด-ปิดต่อ variant), อัปโหลดรูปสินค้า (ลากเรียง+ลบ) — **ทดสอบ E2E ด้วย headless browser ผ่านหมด** (login → หมวดหมู่ → สินค้า → variant 4 ตัว → แก้สต๊อก persist → logout) ยกเว้นอัปโหลดรูปติด R2 CORS (ดู Blockers)
+
 ## In progress
-- [ ] 1.5 Store Admin: auth, layout, CRUD สินค้า + variant matrix + หมวดหมู่ + รูป — ยังไม่เริ่ม
+- [ ] 1.6 Storefront: หน้าแรก, แคตตาล็อก+ตัวกรอง, หน้าสินค้า, ตะกร้า localStorage — ยังไม่เริ่ม
 
 ## DoD checklist (Phase 1)
 - [ ] 1. e2e loop ครบวงจร (ยังไม่ทดสอบ)
@@ -22,8 +24,11 @@
 - [x] 6. pnpm build ผ่าน ไม่มี type error (ตรวจซ้ำก่อนปิด Phase)
 
 ## Blockers / Notes
+- **R2 bucket ยังไม่มี CORS policy** — presign + checksum ฝั่งโค้ดแก้แล้ว เหลือผู้ใช้ตั้ง CORS ใน Cloudflare (R2 → bucket → Settings → CORS policy) อนุญาต origin `http://localhost:3000` methods PUT,GET แล้วรัน `.tmp-upload-test.mjs` ซ้ำเพื่อยืนยัน
+- Auth users ที่มีอยู่: `testdash@shopdash.com` (ผู้ใช้สร้างเองผ่าน Dashboard), `phase1-smoke-test@shopdash.local` (user ทดสอบอัตโนมัติ สร้างผ่าน service role — ลบได้เมื่อจบ Phase 1)
+- ข้อมูลทดสอบในร้าน demo: หมวด "เสื้อผ้าผู้หญิง" + สินค้า "เสื้อยืดทดสอบ" (299 บาท, published, 4 variants S/M × แดง/น้ำเงิน, ตัวแรก stock 15 ราคา override 319) — ใช้ต่อในงาน 1.6 ได้เลย
+- playwright ติดตั้งเป็น devDependency ไว้ใช้ smoke test งานถัดๆ ไป (สคริปต์ชั่วคราว `.tmp-e2e-smoke.mjs`, `.tmp-upload-test.mjs` ไม่ commit)
 - helper functions อยู่ `public.*` ไม่ใช่ `auth.*` — ดู DECISIONS.md (Phase 2 policies ต้องเรียก `public.app_tenant_id()`)
-- ยังไม่มี Supabase Auth user สำหรับ login store admin — งาน 1.5 ต้องสร้าง user แรก (เช่นผ่าน Dashboard → Authentication → Add user หรือหน้า signup ชั่วคราว) ก่อนทดสอบ login ได้
 - Demo tenant fixed UUID: tenant `...0001`, store `...0002`, category `...0003` (slug `demo`, แพลน pro)
 - @supabase/ssr ต้องใช้ ^0.12.0 (0.6.x มีปัญหา type ของ cookies setAll กับ Next 15 + TS strict)
 - pnpm 11.5: อนุญาต build script ของ sharp ผ่าน `pnpm-workspace.yaml` (`allowBuilds`)

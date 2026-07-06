@@ -298,3 +298,20 @@ create table stock_movements (               -- audit ตัด/คืนสต�
   created_at timestamptz not null default now()
 );
 create index stock_movements_tenant_variant_idx on stock_movements (tenant_id, variant_id);
+
+-- ------------------------------------------------------------
+-- Grants — Postgres requires explicit table privileges independent
+-- of RLS. This project's `anon`/`authenticated`/`service_role` did
+-- not inherit default grants on tables created via the SQL Editor
+-- (verified: service_role got "permission denied for table tenants").
+-- Mirrors vanilla Supabase project defaults; RLS (Phase 2) is the
+-- real access boundary once enabled. See DECISIONS.md.
+-- ------------------------------------------------------------
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to anon, authenticated, service_role;
+grant all on all sequences in schema public to anon, authenticated, service_role;
+grant all on all routines in schema public to anon, authenticated, service_role;
+
+alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
+alter default privileges in schema public grant all on routines to anon, authenticated, service_role;
