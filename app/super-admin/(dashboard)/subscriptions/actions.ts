@@ -17,7 +17,7 @@ export async function approveSubscriptionAction(
   const user = await getSuperAdminUser();
   if (!user) return { error: 'ไม่มีสิทธิ์ดำเนินการ' };
 
-  const result = await approveSubscription(subscriptionId, user.email ?? user.id);
+  const result = await approveSubscription(subscriptionId, user.id, user.email ?? undefined);
   if (!result.ok) return { error: result.error };
 
   revalidatePath('/subscriptions');
@@ -34,7 +34,7 @@ export async function rejectSubscriptionAction(
   if (!user) return { error: 'ไม่มีสิทธิ์ดำเนินการ' };
 
   const reason = String(formData.get('reason') ?? '').trim();
-  const result = await rejectSubscription(subscriptionId, reason, user.email ?? user.id);
+  const result = await rejectSubscription(subscriptionId, reason, user.id, user.email ?? undefined);
   if (!result.ok) return { error: result.error };
 
   revalidatePath('/subscriptions');

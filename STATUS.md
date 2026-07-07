@@ -1,8 +1,9 @@
 # STATUS
-- Current phase: 3 (โค้ดครบ 3.1–3.6 — **รอผู้ใช้รัน migration 003 แล้วเทสต์ DoD ที่เหลือ**)
+- Current phase: 3 (เสร็จ — รอขึ้น Phase 4)
 - Last session: 2026-07-07
 - **Phase 1 ผ่าน DoD ครบ 6 ข้อ — tag `phase-1-done`** (2026-07-07)
 - **Phase 2 ผ่าน DoD ครบ 4 ข้อ — tag `phase-2-done`** (2026-07-07)
+- **Phase 3 ผ่าน DoD ครบ 6 ข้อ — tag `phase-3-done`** (2026-07-07, migration 003 applied แล้ว)
 
 ## Done (Phase 3)
 - [x] 3.1 middleware เพิ่ม host: `admin.{root}`→`/super-admin`, root/`www`→`/platform` (dev: `admin.localhost` / `www.localhost`), กันเปิด path ภายในตรงจาก host ร้าน, `/api/cron/*` ผ่านทุก host + **fix สำคัญ: อ่าน `x-forwarded-host` ก่อน `host`** (ดู DECISIONS) + super admin login/layout/guard + `scripts/setup-super-admin.mjs` (รันแล้ว: superadmin@shopdash.local / SuperAdmin!2026)
@@ -11,20 +12,15 @@
 - [x] 3.4 `lib/features.ts` (server: resolveFeatures/assertFeature/assertUnderProductLimit/assertUnderImageLimit) + `lib/features-shared.ts` (client-safe) — เสียบเข้า createProduct/addProductImage แล้ว; `TenantContext` มี `features` resolve จาก plan→theme→overrides
 - [x] 3.5 Billing: `lib/billing.ts` (คำขอ pending ทีละใบ, อนุมัติ→active+ต่ออายุจากวันหมดอายุเดิม, ปฏิเสธ+เหตุผล), `/admin/plan` (route group แยก เข้าได้แม้ locked, QR PromptPay แพลตฟอร์ม, อัปสลิป, ประวัติ), `/api/plan-slips`, super admin `/subscriptions` (คิว) + `/plans` (แก้ราคา/limit/ฟีเจอร์) — dashboard layout: locked→redirect `/admin/plan`, grace/trial banner
 - [x] 3.6 `/api/cron/subscription-sweep` (Bearer CRON_SECRET): trial หมด→locked, active หมด→grace, grace 7 วัน→locked (+locked_at), locked 60 วัน→archived + `vercel.json` cron 01:00 ไทย
-- [x] `supabase/migrations/003_phase3.sql` เขียนแล้ว — **ยังไม่ apply** (tenant_subscriptions.status/reject_reason_th + tenants.locked_at + indexes)
+- [x] `supabase/migrations/003_phase3.sql` — **apply แล้ว** (tenant_subscriptions.status/reject_reason_th + tenants.locked_at + indexes)
 
-## DoD checklist (Phase 3)
-- [x] 1. signup จบใน flow เดียว → `p3test.localhost:3000` ใช้ได้ทันที (trial+banner), provisioning_logs ครบทุก step (e2e ผ่าน 2026-07-07)
-- [x] 2. slug ซ้ำ/reserved/ผิดรูปแบบ → error ไทย + race 2 requests slug เดียวกัน → ผู้แพ้ rollback จริง (auth user ถูกลบ, มี log provision:rollback) (e2e ผ่าน)
-- [x] 3. Starter ครบ 50 ชิ้น → ชิ้นที่ 51 ถูกปฏิเสธพร้อมข้อความชวนอัปเกรด (e2e ผ่าน) — ครึ่งหลัง (super admin เปลี่ยนเป็น Pro แล้วเพิ่มได้ทันที) ติด migration 003 (หน้า detail ร้าน query locked_at)
-- [ ] 4. ดาวน์เกรดเตือน+ต้องยืนยัน — โค้ด+เทสต์พร้อม รอ 003
-- [ ] 5. cron: หมดอายุ→grace→locked (storefront ปิด/admin เหลือหน้าจ่ายเงิน) — โค้ด+เทสต์พร้อม รอ 003
-- [ ] 6. อนุมัติต่ออายุ→active ทันที — โค้ด+เทสต์พร้อม รอ 003
-
-## Next steps (เซสชันหน้า)
-1. ผู้ใช้รัน `supabase/migrations/003_phase3.sql` ใน SQL Editor
-2. `node .tmp-phase3-test.mjs` (DoD 1–4) แล้ว `node .tmp-phase3-billing-test.mjs` (DoD 5–6)
-3. ผ่านครบ → อัปเดต STATUS + tag `phase-3-done`
+## DoD checklist (Phase 3) — ผ่านครบ 2026-07-07 (e2e browser จริง)
+- [x] 1. signup จบใน flow เดียว → `p3test.localhost:3000` ใช้ได้ทันที (trial+banner), provisioning_logs ครบทุก step
+- [x] 2. slug ซ้ำ/reserved/ผิดรูปแบบ → error ไทย + race 2 requests slug เดียวกัน → ผู้แพ้ rollback จริง (auth user ถูกลบ, มี log provision:rollback)
+- [x] 3. Starter ครบ 50 ชิ้น → ชิ้นที่ 51 ถูกปฏิเสธพร้อมข้อความชวนอัปเกรด; super admin เปลี่ยนเป็น Pro → เพิ่มได้ทันทีไม่ต้อง redeploy
+- [x] 4. ดาวน์เกรด Pro→Starter ที่ 60 ชิ้น → pre-check เตือน + ไม่เปลี่ยนจนกดยืนยัน + สินค้าอยู่ครบ 60 ชิ้น
+- [x] 5. cron: หมดอายุ 1 วัน→grace (banner) / 8 วัน→locked (storefront "ปิดปรับปรุงชั่วคราว" ไม่บอกค้างจ่าย, admin ถูกบังคับไป /admin/plan หน้าเดียว) + trial หมด→locked + cron ไม่มี secret→401
+- [x] 6. อัปสลิปค่าแพลน→pending (กันส่งซ้ำ)→super admin อนุมัติ→active+ต่ออายุ 1 ปีทันที (storefront กลับมาใน ≤60s ตาม cache TTL §3.8) + ปฏิเสธแล้วร้านเห็นเหตุผล+ส่งใหม่ได้
 
 ## Done
 - [x] 1.1 โครงโปรเจ็ค: Next.js 15.5 + Tailwind v4 + Supabase clients (`lib/supabase/{server,client,admin}.ts`) + `.env.example` — `pnpm build` ผ่าน, `.env.local` ผู้ใช้เติมค่าครบแล้ว

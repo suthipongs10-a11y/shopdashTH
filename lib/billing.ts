@@ -92,7 +92,8 @@ export async function createSubscriptionRequest(
  */
 export async function approveSubscription(
   subscriptionId: string,
-  approvedBy: string,
+  approvedById: string, // auth user id (uuid) — คอลัมน์ approved_by เป็น uuid
+  actorLabel?: string, // ชื่อ/อีเมลไว้อ่านใน audit log
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const db = createAdminClient();
 
@@ -119,7 +120,7 @@ export async function approveSubscription(
     .from('tenant_subscriptions')
     .update({
       status: 'approved',
-      approved_by: approvedBy,
+      approved_by: approvedById,
       approved_at: now,
       period_start: period.start.toISOString(),
       period_end: period.end.toISOString(),
@@ -147,7 +148,7 @@ export async function approveSubscription(
     subscription_id: subscriptionId,
     plan_id: sub.plan_id,
     period_end: period.end.toISOString(),
-    actor: approvedBy,
+    actor: actorLabel ?? approvedById,
   });
   return { ok: true };
 }
@@ -156,7 +157,8 @@ export async function approveSubscription(
 export async function rejectSubscription(
   subscriptionId: string,
   reason: string,
-  rejectedBy: string,
+  rejectedById: string, // auth user id (uuid)
+  actorLabel?: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!reason.trim()) return { ok: false, error: 'กรุณากรอกเหตุผลที่ปฏิเสธ' };
 
@@ -166,7 +168,7 @@ export async function rejectSubscription(
     .update({
       status: 'rejected',
       reject_reason_th: reason.trim(),
-      approved_by: rejectedBy, // ผู้ตัดสิน (ใช้ช่องเดียวกัน — approved_at ว่างแยกแยะได้)
+      approved_by: rejectedById, // ผู้ตัดสิน (ใช้ช่องเดียวกัน — approved_at ว่างแยกแยะได้)
     })
     .eq('id', subscriptionId)
     .eq('status', 'pending')
@@ -178,7 +180,7 @@ export async function rejectSubscription(
   await logTenantEvent(updated![0].tenant_id, 'subscription_rejected', 'ok', {
     subscription_id: subscriptionId,
     reason: reason.trim(),
-    actor: rejectedBy,
+    actor: actorLabel ?? rejectedById,
   });
   return { ok: true };
 }
