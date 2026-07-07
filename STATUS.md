@@ -1,5 +1,5 @@
 # STATUS
-- Current phase: 4 (โค้ดครบ 4.1–4.9 — **รอผู้ใช้รัน migration 004 แล้วเทสต์ DoD**)
+- Current phase: 4 **ผ่าน DoD ครบ 7 ข้อ — tag `phase-4-done`** (พร้อมเริ่ม Phase 5)
 - Last session: 2026-07-07
 
 ## Done (Phase 4)
@@ -12,9 +12,18 @@
 - [x] 4.7 `lib/carriers.ts` tracking URL template (ไปรษณีย์/Kerry/Flash/J&T) + ปุ่มลิงก์ในหน้า track ลูกค้า และ order detail แอดมิน
 - [x] 4.8 custom domain: `lib/domains.ts` (TXT/CNAME/A/HTTPS เช็คแยกข้อ + ข้อความ "พบจริง vs ต้องเป็น") + `/admin/domain` + `/api/domain/verify` + middleware lookup (edge fetch + cache 60s) + cron `/api/cron/domain-recheck` (fail 3 วันติด → error)
 - [x] 4.9 staff: `lib/staff.ts` (invite/limit ตามแพลน/disable=ban/ลบ) + `/admin/staff` + staff ถูกกันจาก settings/plan/staff/domain (nav ซ่อน + server ตรวจซ้ำ) + ดาวน์เกรดแล้ว staff เกิน → disable อัตโนมัติ (§7.2)
-- [x] `supabase/migrations/004_phase4.sql` เขียนแล้ว — **ยังไม่ apply** (theme_registry 10 แถว, stores.announcement_text + line_channel_access_token, custom_domains.recheck_fail_count, RPC consume/release_discount_code)
-- [x] DoD 2 ผ่าน (static): ไม่มี `if (themeCode===...)` และไม่มี hex ใน components/storefront + app/(storefront)
+- [x] `supabase/migrations/004_phase4.sql` — **apply แล้ว** (2026-07-07: theme_registry 10 แถว, stores.announcement_text + line_channel_access_token, custom_domains.recheck_fail_count, RPC consume/release_discount_code)
 - [x] `pnpm build` ผ่านครบทุก route
+- **Phase 4 ผ่าน DoD ครบ 7 ข้อ — tag `phase-4-done`** (2026-07-07)
+
+## DoD checklist (Phase 4) — ผ่านครบ 2026-07-07 (e2e browser จริง 2 รอบตามโหมด mock)
+- [x] 1. Starter เห็นธีมเลือกได้ 3 / Premium เห็นครบ 10 ไม่มีล็อก — สลับเป็น pro-02 แล้ว storefront มืดทันที (`--color-bg=#0b0f14`) ไม่ต้อง deploy
+- [x] 2. (static) grep ไม่มี `if (themeCode===...)` และไม่มี hex ใน components/storefront + app/(storefront)
+- [x] 3. ส่วนลด: หมดอายุ→400 "โค้ดนี้หมดอายุแล้ว", ต่ำกว่าขั้นต่ำ→400, โควตา 1 ยิง checkout พร้อมกัน 2 → ผ่านแค่ 1 + used_count=1 (RPC atomic)
+- [x] 4. LINE token ปลอม + ออร์เดอร์ใหม่ → มี request ออกจริง (log line_notify เพิ่ม) และออร์เดอร์สร้างสำเร็จ ระบบไม่ล้ม
+- [x] 5. MockSlipVerifier โหมด pass → auto-approve: order confirmed + สต๊อกถูกตัด / โหมด amount_mismatch → ตกคิว manual สลิปยัง pending + badge "ตรวจอัตโนมัติไม่ผ่าน" พร้อมเหตุผล
+- [x] 6. ร้าน Starter ยิง API ฟีเจอร์ Pro ตรง → 403 ทั้ง /api/discounts/check และ /api/domain/verify
+- [x] 7. custom domain: DNS ผิด → error + ข้อความไทย "ไม่พบ TXT record — ต้องเพิ่มค่า…" / (DOMAIN_VERIFY_MOCK) เดินสถานะถึง active + middleware resolve โดเมนเข้า storefront ร้านถูกต้อง
 - **Phase 1 ผ่าน DoD ครบ 6 ข้อ — tag `phase-1-done`** (2026-07-07)
 - **Phase 2 ผ่าน DoD ครบ 4 ข้อ — tag `phase-2-done`** (2026-07-07)
 - **Phase 3 ผ่าน DoD ครบ 6 ข้อ — tag `phase-3-done`** (2026-07-07, migration 003 applied แล้ว)
