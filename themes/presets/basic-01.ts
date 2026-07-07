@@ -5,6 +5,7 @@ import type { ThemePreset } from '../types';
 
 export const preset: ThemePreset = {
   code: 'basic-01',
+  nameTh: 'มินิมอลขาว',
   tier: 1,
   tokens: {
     '--color-primary': '#171717',

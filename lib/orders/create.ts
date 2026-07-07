@@ -3,6 +3,11 @@
 // สต๊อกยัง "ไม่ตัด" ตอนสร้างออร์เดอร์ — ตัดตอน confirmed (§2.3) แต่ปฏิเสธถ้าสต๊อกไม่พอ ณ ตอนสั่ง
 
 import 'server-only';
+import {
+  consumeDiscountCode,
+  releaseDiscountCode,
+  validateDiscountCode,
+} from '@/lib/discounts';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { TenantContext } from '@/lib/tenant-context';
 import { variantLabel } from '@/lib/variants';
@@ -25,7 +30,7 @@ export interface CheckoutCustomerInput {
 }
 
 export type CreateOrderResult =
-  | { ok: true; orderNumber: string }
+  | { ok: true; orderNumber: string; totalAmount: number }
   | { ok: false; status: number; error: string }
   | {
       ok: false;
@@ -61,6 +66,7 @@ export async function createOrder(
   ctx: TenantContext,
   items: CheckoutItemInput[],
   customer: CheckoutCustomerInput,
+  discountCode?: string,
 ): Promise<CreateOrderResult> {
   // ---------- validate input ----------
   if (!Array.isArray(items) || items.length === 0) {
@@ -163,7 +169,26 @@ export async function createOrder(
   const freeShipping =
     ctx.store.free_shipping_min !== null && subtotal >= ctx.store.free_shipping_min;
   const shippingFee = freeShipping ? 0 : ctx.store.flat_shipping_fee;
-  const discount = 0; // โค้ดส่วนลดเป็นงาน Phase 4
+
+  // ---------- โค้ดส่วนลด (P4 §2.1 — validate ฝั่ง server + กันโควตา atomic) ----------
+  let discount = 0;
+  let discountCodeId: string | null = null;
+  if (discountCode?.trim()) {
+    const validation = await validateDiscountCode(ctx, discountCode, subtotal);
+    if (!validation.ok) return { ok: false, status: 400, error: validation.reason };
+
+    // กันโควตาก่อนสร้างออร์เดอร์ — ยิงพร้อมกันหลาย request ผ่านได้ตามโควตาเป๊ะ
+    const consumed = await consumeDiscountCode(ctx.tenantId, validation.discountId);
+    if (!consumed) return { ok: false, status: 400, error: 'โค้ดนี้ถูกใช้ครบจำนวนแล้ว' };
+    discount = validation.amount;
+    discountCodeId = validation.discountId;
+  }
+  // ถ้าออร์เดอร์สร้างไม่สำเร็จหลังจากนี้ ต้องคืนโควตา (compensation)
+  const failWithRelease = async (result: CreateOrderResult): Promise<CreateOrderResult> => {
+    if (discountCodeId) await releaseDiscountCode(ctx.tenantId, discountCodeId);
+    return result;
+  };
+
   const totalAmount = subtotal + shippingFee - discount;
 
   // ---------- dedupe ลูกค้าด้วยเบอร์โทร (§7.6: อัปเดตชื่อเป็นค่าล่าสุด) ----------
@@ -177,7 +202,11 @@ export async function createOrder(
     .single();
 
   if (customerError || !customerRow) {
-    return { ok: false, status: 500, error: 'บันทึกข้อมูลลูกค้าไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+    return failWithRelease({
+      ok: false,
+      status: 500,
+      error: 'บันทึกข้อมูลลูกค้าไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+    });
   }
 
   // ---------- gen order_number: {SLUGCAPS}-{YYMMDD}-{running 4 หลัก/วัน/ร้าน} ----------
@@ -202,6 +231,7 @@ export async function createOrder(
         subtotal,
         shipping_fee: shippingFee,
         discount,
+        discount_code_id: discountCodeId,
         total_amount: totalAmount,
         ship_name: shipName,
         ship_phone: shipPhone,
@@ -213,7 +243,11 @@ export async function createOrder(
 
     if (orderError) {
       if (orderError.code === '23505') continue; // เลขชนจาก race — ลองเลขถัดไป
-      return { ok: false, status: 500, error: 'สร้างคำสั่งซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+      return failWithRelease({
+        ok: false,
+        status: 500,
+        error: 'สร้างคำสั่งซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+      });
     }
 
     // snapshot ชื่อ/ราคา ณ เวลาสั่ง (§3.4)
@@ -231,11 +265,15 @@ export async function createOrder(
 
     if (itemsError) {
       await db.from('orders').delete().eq('id', order.id).eq('tenant_id', ctx.tenantId);
-      return { ok: false, status: 500, error: 'สร้างคำสั่งซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+      return failWithRelease({
+        ok: false,
+        status: 500,
+        error: 'สร้างคำสั่งซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+      });
     }
 
-    return { ok: true, orderNumber };
+    return { ok: true, orderNumber, totalAmount };
   }
 
-  return { ok: false, status: 500, error: 'ระบบหนาแน่น กรุณาลองใหม่อีกครั้ง' };
+  return failWithRelease({ ok: false, status: 500, error: 'ระบบหนาแน่น กรุณาลองใหม่อีกครั้ง' });
 }

@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { getStoreUser } from '@/lib/auth';
+import { getStoreUser, userRole } from '@/lib/auth';
 import { formatThaiDate } from '@/lib/format';
 import {
   getTenantContextAllowLocked,
@@ -36,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Nav storeName={ctx.store.name} />
+      <Nav storeName={ctx.store.name} isOwner={userRole(user) === 'store_owner'} />
       {ctx.status === 'grace' && (
         <div className="border-b border-yellow-300 bg-yellow-50 px-4 py-2 text-center text-sm text-yellow-800">
           แพลนหมดอายุแล้ว — อยู่ในช่วงผ่อนผัน กรุณา{' '}

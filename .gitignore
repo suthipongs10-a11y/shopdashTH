@@ -30,3 +30,6 @@ pnpm-debug.log*
 
 # local copies / scratch
 CLAUDE - Copy.md
+
+# graphify (generated knowledge graph)
+/graphify-out/

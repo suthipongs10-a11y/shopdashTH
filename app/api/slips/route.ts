@@ -4,13 +4,84 @@
 
 import { createHash } from 'crypto';
 import { NextResponse } from 'next/server';
+import { notifyNewSlip } from '@/lib/line';
 import { transitionOrder, TransitionError } from '@/lib/orders/transition';
+import { getSlipVerifier } from '@/lib/slip-verify';
+import type { TenantContext } from '@/lib/tenant-context';
 import { IMAGE_MIME_EXT, MAX_IMAGE_BYTES, putObject, slipKey } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
 function bad(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
+}
+
+/**
+ * Slip Verify อัตโนมัติ (§2.2 v1.1 + §7.1) — เฉพาะแพลนที่มี flag `slip_verify_api`
+ * ผ่าน → auto-approve (confirmed + ตัดสต๊อก) / ไม่ผ่านทุกกรณี → "ตกคิว manual" พร้อมเหตุผล
+ * (ห้าม reject อัตโนมัติ — กัน false negative ทำร้ายลูกค้าจริง)
+ * คืน true เมื่อ auto-approve สำเร็จ
+ */
+async function tryAutoVerify(
+  ctx: TenantContext,
+  input: {
+    slipId: string;
+    orderId: string;
+    orderNumber: string;
+    expectedAmount: number;
+    fileHash: string;
+    buffer: Buffer;
+    mimeType: string;
+  },
+): Promise<boolean> {
+  if (!ctx.features.slip_verify_api) return false;
+  const db = createAdminClient();
+
+  try {
+    const verifier = getSlipVerifier();
+    const result = await verifier.verify({
+      tenantId: ctx.tenantId,
+      orderId: input.orderId,
+      orderNumber: input.orderNumber,
+      expectedAmount: input.expectedAmount,
+      expectedPromptpayId: ctx.store.promptpay_id,
+      fileHash: input.fileHash,
+      fileBuffer: input.buffer,
+      mimeType: input.mimeType,
+    });
+
+    // เก็บผลลง payment_slips.auto_verify_result เสมอ (flag auto_verify_failed อ่านจากตรงนี้)
+    await db
+      .from('payment_slips')
+      .update({
+        auto_verify_result: {
+          provider: verifier.providerName,
+          verified: result.verified,
+          reason_th: result.reason_th ?? null,
+          transaction_ref: result.transactionRef ?? null,
+          checked_at: new Date().toISOString(),
+          raw: result.raw ?? null,
+        },
+      })
+      .eq('id', input.slipId)
+      .eq('tenant_id', ctx.tenantId);
+
+    if (!result.verified) return false; // ตกคิว manual พร้อมเหตุผล
+
+    // auto-approve: ตัดสต๊อกก่อน (transition อาจ fail ถ้าสต๊อกไม่พอ → ตกคิว manual)
+    await transitionOrder(ctx.tenantId, input.orderId, 'confirmed');
+    await db
+      .from('payment_slips')
+      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .eq('id', input.slipId)
+      .eq('tenant_id', ctx.tenantId)
+      .eq('status', 'pending');
+    return true;
+  } catch (err) {
+    // verify/transition ล้ม = ตกคิว manual — ห้ามทำให้การอัปสลิปล้ม
+    console.error('[api/slips] auto-verify failed', err);
+    return false;
+  }
 }
 
 export async function POST(req: Request) {
@@ -34,7 +105,7 @@ export async function POST(req: Request) {
 
     const { data: order } = await db
       .from('orders')
-      .select('id, status')
+      .select('id, status, total_amount')
       .eq('tenant_id', ctx.tenantId)
       .eq('order_number', orderNumber)
       .single();
@@ -73,16 +144,20 @@ export async function POST(req: Request) {
     const key = slipKey(ctx.tenantId, order.id, file.type);
     await putObject(key, buffer, file.type);
 
-    const { error: insertError } = await db.from('payment_slips').insert({
-      tenant_id: ctx.tenantId,
-      order_id: order.id,
-      r2_key: key,
-      file_hash: fileHash,
-      status: 'pending',
-    });
+    const { data: slipRow, error: insertError } = await db
+      .from('payment_slips')
+      .insert({
+        tenant_id: ctx.tenantId,
+        order_id: order.id,
+        r2_key: key,
+        file_hash: fileHash,
+        status: 'pending',
+      })
+      .select('id')
+      .single();
 
-    if (insertError) {
-      if (insertError.code === '23505') {
+    if (insertError || !slipRow) {
+      if (insertError?.code === '23505') {
         return bad('สลิปนี้ถูกใช้ไปแล้ว กรุณาตรวจสอบหรือติดต่อร้านค้า');
       }
       console.error('[api/slips] insert failed', insertError);
@@ -90,7 +165,22 @@ export async function POST(req: Request) {
     }
 
     await transitionOrder(ctx.tenantId, order.id, 'slip_uploaded');
-    return NextResponse.json({ ok: true });
+
+    // ---------- Slip Verify อัตโนมัติ (งาน 4.6 — เฉพาะแพลนที่มี slip_verify_api) ----------
+    const autoApproved = await tryAutoVerify(ctx, {
+      slipId: slipRow.id,
+      orderId: order.id,
+      orderNumber,
+      expectedAmount: order.total_amount,
+      fileHash,
+      buffer,
+      mimeType: file.type,
+    });
+
+    // แจ้งเตือน LINE (P4 — fire-and-forget, fail แล้วไม่กระทบสลิป)
+    await notifyNewSlip(ctx, orderNumber);
+
+    return NextResponse.json({ ok: true, autoApproved });
   } catch (err) {
     if (err instanceof TenantNotFoundError) return bad(err.message, 404);
     if (err instanceof TransitionError) return bad(err.message, 409);

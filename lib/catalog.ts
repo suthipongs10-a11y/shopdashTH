@@ -103,6 +103,33 @@ export async function fetchLatest(tenantId: string, limit = 8): Promise<ProductC
   return ((data ?? []) as unknown as ProductRow[]).map(toCard);
 }
 
+/** สินค้าที่เกี่ยวข้อง (P4 — หมวดเดียวกันก่อน ไม่พอเติมสินค้าล่าสุด) */
+export async function fetchRelated(
+  tenantId: string,
+  productId: string,
+  categoryId: string | null,
+  limit = 4,
+): Promise<ProductCardData[]> {
+  let rows: ProductRow[] = [];
+  if (categoryId) {
+    const { data } = await baseQuery(tenantId, { categoryId }, false)
+      .neq('id', productId)
+      .limit(limit);
+    rows = (data ?? []) as unknown as ProductRow[];
+  }
+  if (rows.length < limit) {
+    const { data } = await baseQuery(tenantId, {}, false)
+      .neq('id', productId)
+      .limit(limit + rows.length);
+    const seen = new Set(rows.map((r) => r.id));
+    for (const row of (data ?? []) as unknown as ProductRow[]) {
+      if (rows.length >= limit) break;
+      if (!seen.has(row.id)) rows.push(row);
+    }
+  }
+  return rows.slice(0, limit).map(toCard);
+}
+
 /** ตัวเลือกไซส์/สีทั้งหมดของร้าน (ไว้ทำ FilterBar) */
 export async function fetchFilterOptions(
   tenantId: string,

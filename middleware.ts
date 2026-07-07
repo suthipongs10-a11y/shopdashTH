@@ -1,11 +1,43 @@
 // Hostname routing (§1.4) — หัวใจ multi-tenancy ฝั่ง frontend
 // Phase 2: resolve slug จาก subdomain แล้วแนบ header x-tenant-slug
 // Phase 3: admin.{root} → /super-admin, root domain (+www) → /platform (landing/signup)
-// Phase 4 จะเพิ่ม custom domain lookup
+// Phase 4: custom domain → lookup ตาราง custom_domains (status=active) → slug
 
 import { NextResponse, type NextRequest } from 'next/server';
 
 const RESERVED_SLUGS = new Set(['admin', 'www', 'api', 'app', 'mail']);
+
+// ---------- custom domain lookup (edge-safe: fetch ตรงเข้า PostgREST + cache TTL 60s) ----------
+const DOMAIN_CACHE_TTL_MS = 60_000;
+const domainCache = new Map<string, { slug: string | null; expires: number }>();
+
+async function resolveCustomDomain(host: string): Promise<string | null> {
+  const cached = domainCache.get(host);
+  if (cached && cached.expires > Date.now()) return cached.slug;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+
+  let slug: string | null = null;
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/custom_domains?domain=eq.${encodeURIComponent(host)}&status=eq.active&select=tenants(slug)&limit=1`,
+      { headers: { apikey: key, authorization: `Bearer ${key}` } },
+    );
+    if (res.ok) {
+      const rows = (await res.json()) as { tenants: { slug: string } | null }[];
+      slug = rows[0]?.tenants?.slug ?? null;
+    }
+  } catch {
+    // DB ล่มชั่วคราว — อย่า cache ผลลบ ให้ลองใหม่ request หน้า
+    return null;
+  }
+
+  if (domainCache.size > 500) domainCache.clear();
+  domainCache.set(host, { slug, expires: Date.now() + DOMAIN_CACHE_TTL_MS });
+  return slug;
+}
 
 // path ภายในที่ต้องเข้าผ่าน host ที่ถูกต้องเท่านั้น — ห้ามเปิดตรงจาก host ร้านค้า
 const INTERNAL_PREFIXES = ['/super-admin', '/platform'];
@@ -43,11 +75,11 @@ function resolveHost(host: string): HostTarget {
       ? { kind: 'tenant', slug: 'demo' }
       : { kind: 'unknown' };
   }
-  // custom domain — Phase 4 (งาน 4.8) จะ lookup ตาราง custom_domains
+  // custom domain — middleware() จะ lookup ตาราง custom_domains ต่อ (async)
   return { kind: 'unknown' };
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   // server action redirect() ทำ internal fetch เข้า loopback (Host กลายเป็น localhost:3000)
   // host จริงของผู้ใช้อยู่ใน x-forwarded-host — ต้องอ่านตัวนั้นก่อน (proxy/Vercel ก็ตั้งให้เช่นกัน)
   const rawHost = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? '';
@@ -58,7 +90,13 @@ export function middleware(req: NextRequest) {
   // ปล่อยผ่านทุก host, route ตรวจ CRON_SECRET เอง
   if (path.startsWith('/api/cron/')) return NextResponse.next();
 
-  const target = resolveHost(host);
+  let target = resolveHost(host);
+
+  // host แปลกหน้า = อาจเป็น custom domain ของร้าน (งาน 4.8)
+  if (target.kind === 'unknown' && host.includes('.') && !host.endsWith('.localhost')) {
+    const slug = await resolveCustomDomain(host);
+    if (slug) target = { kind: 'tenant', slug };
+  }
 
   // /super-admin, /platform เข้าตรงจาก host อื่นไม่ได้ (กัน bypass hostname routing)
   const hitsInternal = INTERNAL_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));

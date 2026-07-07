@@ -61,6 +61,8 @@ export interface TrackedOrder {
   totalAmount: number;
   carrier?: Carrier | null;
   trackingNumber?: string | null;
+  /** ลิงก์หน้า tracking ของขนส่ง (P4 — null เมื่อ carrier ไม่รองรับ) */
+  trackingUrl?: string | null;
   /** เหตุผลที่สลิปล่าสุดถูกปฏิเสธ (แสดงเมื่อกลับมาเป็น pending_payment — §7.1) */
   lastSlipRejectReason?: string | null;
   /** เหตุผลยกเลิก (เมื่อ status = cancelled) */

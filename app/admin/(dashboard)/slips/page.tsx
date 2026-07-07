@@ -11,6 +11,7 @@ interface PendingSlipRow {
   id: string;
   r2_key: string;
   created_at: string;
+  auto_verify_result: { verified?: boolean; reason_th?: string | null } | null;
   orders: { order_number: string; total_amount: number; ship_name: string };
 }
 
@@ -20,7 +21,9 @@ export default async function SlipsQueuePage() {
 
   const { data } = await db
     .from('payment_slips')
-    .select('id, r2_key, created_at, orders!inner(order_number, total_amount, ship_name)')
+    .select(
+      'id, r2_key, created_at, auto_verify_result, orders!inner(order_number, total_amount, ship_name)',
+    )
     .eq('tenant_id', ctx.tenantId)
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
@@ -57,6 +60,11 @@ export default async function SlipsQueuePage() {
               imageUrl={imageUrl}
               accountName={ctx.store.promptpay_account_name}
               promptpayId={ctx.store.promptpay_id}
+              autoVerifyFailedReason={
+                slip.auto_verify_result?.verified === false
+                  ? (slip.auto_verify_result.reason_th ?? 'ไม่ทราบเหตุผล')
+                  : null
+              }
             />
           ))}
         </div>

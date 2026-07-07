@@ -89,6 +89,16 @@ export function OrderTracker({ order }: { order: TrackedOrder }) {
             ขนส่ง: {order.carrier ? CARRIER_TH[order.carrier] : '-'} · เลขพัสดุ:{' '}
             <span className="font-medium text-text">{order.trackingNumber}</span>
           </p>
+          {order.trackingUrl && (
+            <a
+              href={order.trackingUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-block rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-fg hover:opacity-90"
+            >
+              ติดตามพัสดุที่เว็บขนส่ง ↗
+            </a>
+          )}
         </div>
       )}
 

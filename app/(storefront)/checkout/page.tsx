@@ -12,6 +12,7 @@ export default async function CheckoutPage() {
         slug={ctx.slug}
         flatShippingFee={ctx.store.flat_shipping_fee}
         freeShippingMin={ctx.store.free_shipping_min}
+        discountEnabled={ctx.features.discount_codes}
       />
     </main>
   );

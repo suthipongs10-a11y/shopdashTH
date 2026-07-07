@@ -44,5 +44,20 @@ server action ที่เรียก redirect() ใน dev ทำ internal fet
 ## 2026-07-07 — ใช้ provisioning_logs เป็น audit log รวมของ tenant
 §7.4 สั่งให้ทุก transition เขียน audit log แต่สเปคไม่มีตาราง audit แยก — ใช้ provisioning_logs (tenant_id ไม่มี FK, รอด rollback) กับ step เช่น `tenant_status`, `plan_change`, `subscription_approved`, `feature_overrides` แสดงในหน้า detail ร้านของ super admin
 
+## 2026-07-07 — LINE OA ใช้ Messaging API broadcast
+สเปคให้ร้านกรอกแค่ channel access token แต่ push message ต้องมี userId ปลายทาง (schema ไม่มีที่เก็บ) และ LINE Notify ปิดบริการแล้ว — จึงใช้ broadcast ซึ่งส่งถึงผู้ติดตามทุกคนของ OA + เตือนใน UI ให้ร้านใช้ OA แยกสำหรับทีมงานภายใน (ไม่ใช่ OA ที่ลูกค้าติดตาม)
+
+## 2026-07-07 — staff ไม่มีตารางของตัวเอง — จัดการผ่าน Supabase Auth Admin API
+§3.4 ไม่มีตาราง staff และกฎ §8.5 เข้มเรื่องตารางใหม่ — ใช้ auth.users + app_metadata (tenant_id, role=store_staff) เป็น source of truth, นับ limit จาก listUsers, disable = ban_duration (ไม่ลบ ตาม §7.2)
+
+## 2026-07-07 — เปลี่ยนธีม = ล้าง theme_overrides
+ค่าที่ร้านปรับแต่ง (สี/ฟอนต์/radius) ผูกกับธีมเดิม — คงไว้ข้ามธีมจะทำให้ธีมใหม่เพี้ยนทันทีที่สลับ จึงล้างเมื่อเปลี่ยน theme_code
+
+## 2026-07-07 — custom domain: ตัดสถานะจาก TXT + CNAME/A, HTTPS เป็นข้อมูลประกอบ
+§7.5 ให้เช็ค 3 ข้อรวม HTTPS cert "จาก platform hosting" — เราไม่มี API ของ hosting จึงเช็คด้วย HEAD request จริง (แจ้งสถานะแต่ไม่ block การ active) + เพิ่มคอลัมน์ `recheck_fail_count` นับวันที่ cron re-check fail ติดกัน (ครบ 3 → error ตามสเปค) + เพิ่ม hook `DOMAIN_VERIFY_MOCK=pass` สำหรับ e2e เดิน state ครบโดยไม่มีโดเมนจริง (แบบเดียวกับ MockSlipVerifier — ห้ามตั้งใน production)
+
+## 2026-07-07 — โควตาโค้ดส่วนลดกันด้วย RPC (consume/release)
+supabase-js เขียน `used_count = used_count + 1` ตรงๆ ไม่ได้ — สร้าง function `consume_discount_code` (atomic `update ... where used_count < max_uses` ตาม §6 4.4) + `release_discount_code` คืนโควตาเมื่อสร้างออร์เดอร์ fail หลังกันโควตา, execute ได้เฉพาะ service role
+
 ## 2026-07-07 — คำขอชำระค่าแพลน = แถว pending ใน tenant_subscriptions (ทีละใบ)
 ปุ่ม "ขออัปเกรด" (§2.3) กับการต่ออายุ/จ่ายครั้งแรกใช้กลไกเดียว: ร้านเลือกแพลน + อัปสลิป → แถว pending → super admin อนุมัติแล้วระบบตั้ง plan_id + active + ขยายอายุ 1 ปีในจังหวะเดียว — จำกัด pending ทีละใบต่อร้าน (กันสับสน/กดรัว ตามหลัก §7.3) และ period ต่อจากวันหมดอายุเดิมถ้ายังไม่หมด (จ่ายก่อนกำหนดไม่เสียเศษวัน)

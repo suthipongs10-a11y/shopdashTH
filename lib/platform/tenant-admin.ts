@@ -210,6 +210,16 @@ export async function changeTenantPlan(
       .neq('status', 'suspended');
   }
 
+  // staff เกิน limit ใหม่ → disable login คนล่าสุดก่อน (ไม่ลบ §7.2)
+  if (plan.max_staff >= 0) {
+    const { listStaff, setStaffDisabled } = await import('@/lib/staff');
+    const staff = (await listStaff(tenantId)).filter((s) => !s.disabled);
+    const excess = staff.slice(plan.max_staff); // เรียงตามวันที่เพิ่ม — ตัดจากท้าย
+    for (const member of excess) {
+      await setStaffDisabled(tenantId, member.id, true);
+    }
+  }
+
   invalidateTenantCache(tenant.slug);
   await logTenantEvent(tenantId, 'plan_change', 'ok', {
     from_plan_id: tenant.plan_id,

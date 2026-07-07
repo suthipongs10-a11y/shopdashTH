@@ -8,23 +8,63 @@ import type { CheckoutFormData } from '@/components/storefront/types';
 import { cartStorageKey, useCart } from '@/lib/cart';
 import { formatBaht } from '@/lib/format';
 
+interface AppliedDiscount {
+  code: string;
+  amount: number;
+}
+
 export function CheckoutClient({
   slug,
   flatShippingFee,
   freeShippingMin,
+  discountEnabled = false,
 }: {
   slug: string;
   flatShippingFee: number;
   freeShippingMin: number | null;
+  /** ร้านมีฟีเจอร์โค้ดส่วนลด (แพลน Pro ขึ้นไป) — server ตรวจซ้ำเสมอ */
+  discountEnabled?: boolean;
 }) {
   const router = useRouter();
   const cart = useCart(slug);
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [discountInput, setDiscountInput] = useState('');
+  const [discount, setDiscount] = useState<AppliedDiscount | null>(null);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [checkingDiscount, setCheckingDiscount] = useState(false);
 
   const freeShipping = freeShippingMin !== null && cart.subtotal >= freeShippingMin;
   const shippingFee = freeShipping ? 0 : flatShippingFee;
-  const total = cart.subtotal + shippingFee;
+  const discountAmount = discount ? Math.min(discount.amount, cart.subtotal) : 0;
+  const total = cart.subtotal + shippingFee - discountAmount;
+
+  async function applyDiscount() {
+    if (!discountInput.trim()) return;
+    setCheckingDiscount(true);
+    setDiscountError(null);
+    try {
+      const res = await fetch('/api/discounts/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: discountInput,
+          items: cart.items.map((i) => ({ variantId: i.variantId, qty: i.qty })),
+        }),
+      });
+      const json = (await res.json()) as { ok?: boolean; code?: string; amount?: number; error?: string };
+      if (res.ok && json.ok && json.code !== undefined && json.amount !== undefined) {
+        setDiscount({ code: json.code, amount: json.amount });
+      } else {
+        setDiscount(null);
+        setDiscountError(json.error ?? 'ใช้โค้ดไม่สำเร็จ');
+      }
+    } catch {
+      setDiscountError('เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+      setCheckingDiscount(false);
+    }
+  }
 
   async function handleSubmit(data: CheckoutFormData) {
     setSubmitting(true);
@@ -40,6 +80,7 @@ export function CheckoutClient({
             expectedUnitPrice: i.unitPrice,
           })),
           customer: data,
+          discountCode: discount?.code,
         }),
       });
       const json = (await res.json()) as {
@@ -111,6 +152,47 @@ export function CheckoutClient({
               </li>
             ))}
           </ul>
+          {discountEnabled && (
+            <div className="mt-3 border-t border-border pt-3">
+              {discount ? (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-success">
+                    ใช้โค้ด <span className="font-medium">{discount.code}</span> แล้ว
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDiscount(null);
+                      setDiscountInput('');
+                    }}
+                    className="text-xs text-text-muted underline underline-offset-2"
+                  >
+                    เอาโค้ดออก
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    value={discountInput}
+                    onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                    placeholder="โค้ดส่วนลด"
+                    aria-label="โค้ดส่วนลด"
+                    className="min-w-0 flex-1 rounded-md border border-border bg-bg px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={applyDiscount}
+                    disabled={checkingDiscount || !discountInput.trim()}
+                    className="shrink-0 rounded-md border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary hover:text-primary-fg disabled:opacity-50"
+                  >
+                    {checkingDiscount ? 'กำลังตรวจ…' : 'ใช้โค้ด'}
+                  </button>
+                </div>
+              )}
+              {discountError && <p className="mt-1 text-xs text-danger">{discountError}</p>}
+            </div>
+          )}
+
           <dl className="mt-3 space-y-1 border-t border-border pt-3 text-sm">
             <div className="flex justify-between">
               <dt className="text-text-muted">ยอดรวมสินค้า</dt>
@@ -120,6 +202,12 @@ export function CheckoutClient({
               <dt className="text-text-muted">ค่าจัดส่ง</dt>
               <dd>{shippingFee === 0 ? 'ส่งฟรี' : formatBaht(shippingFee)}</dd>
             </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-success">
+                <dt>ส่วนลด ({discount?.code})</dt>
+                <dd>-{formatBaht(discountAmount)}</dd>
+              </div>
+            )}
             <div className="flex justify-between pt-1 font-heading text-base font-semibold">
               <dt>ยอดสุทธิ</dt>
               <dd>{formatBaht(total)}</dd>

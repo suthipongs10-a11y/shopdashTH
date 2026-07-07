@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { trackingUrl } from '@/lib/carriers';
 import { formatBaht, formatThaiDateTime } from '@/lib/format';
 import { CARRIER_TH, ORDER_STATUS_TH, type Carrier, type OrderStatus } from '@/lib/orders/status';
 import { presignGetUrl } from '@/lib/r2';
@@ -192,6 +193,16 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <p className="mt-2 text-gray-900">
                 ขนส่ง: {order.carrier ? CARRIER_TH[order.carrier as Carrier] : '-'} · เลขพัสดุ:{' '}
                 <span className="font-medium">{order.tracking_number}</span>
+                {trackingUrl(order.carrier, order.tracking_number) && (
+                  <a
+                    href={trackingUrl(order.carrier, order.tracking_number)!}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ml-2 text-xs text-blue-600 underline underline-offset-2"
+                  >
+                    เปิดหน้าติดตามของขนส่ง ↗
+                  </a>
+                )}
               </p>
             )}
           </section>

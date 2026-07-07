@@ -4,6 +4,7 @@
 // (§2.1 — กัน enumeration) ตอบ "ไม่พบ" แบบเดียวกันทุกกรณี ไม่บอกว่าผิดช่องไหน
 
 import type { TrackedOrder } from '@/components/storefront/types';
+import { trackingUrl } from '@/lib/carriers';
 import type { Carrier, OrderStatus } from '@/lib/orders/status';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext } from '@/lib/tenant-context';
@@ -100,6 +101,7 @@ export async function trackOrder(_prevState: TrackState, formData: FormData): Pr
       totalAmount: order.total_amount,
       carrier: order.carrier as Carrier | null,
       trackingNumber: order.tracking_number,
+      trackingUrl: trackingUrl(order.carrier, order.tracking_number),
       lastSlipRejectReason,
       cancelledReason: order.cancelled_reason,
     },

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { logout } from '@/app/admin/(dashboard)/actions';
-import { getStoreUser } from '@/lib/auth';
+import { getStoreUser, userRole } from '@/lib/auth';
 import {
   getTenantContextAllowLocked,
   TenantNotFoundError,
@@ -23,6 +23,22 @@ export default async function PlanLayout({ children }: { children: React.ReactNo
 
   const user = await getStoreUser(ctx);
   if (!user) redirect('/admin/login');
+
+  // หน้าแพลนเฉพาะเจ้าของร้าน (§2.3 P4) — staff เห็นข้อความแจ้งแทน
+  if (userRole(user) !== 'store_owner') {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <h1 className="text-lg font-semibold text-gray-900">
+            เฉพาะเจ้าของร้านเท่านั้นที่จัดการแพลนได้
+          </h1>
+          <p className="mt-2 text-sm text-gray-500">
+            กรุณาติดต่อเจ้าของร้านเพื่อดำเนินการต่ออายุหรือเปลี่ยนแพลน
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

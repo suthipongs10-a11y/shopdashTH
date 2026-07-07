@@ -50,6 +50,8 @@ export interface StoreRow {
   free_shipping_min: number | null;
   theme_code: string;
   theme_overrides: Record<string, unknown>;
+  announcement_text: string | null;
+  line_channel_access_token: string | null;
 }
 
 export interface TenantContext {

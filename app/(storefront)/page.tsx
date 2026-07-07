@@ -28,7 +28,7 @@ export default async function StorefrontHomePage() {
   ]);
 
   const sections: Record<ThemeSection, React.ReactNode> = {
-    announcement: <AnnouncementBar key="announcement" text={null} />, // เปิดใช้ธีมกลุ่ม Pro (P4)
+    announcement: <AnnouncementBar key="announcement" text={ctx.store.announcement_text} />,
     hero: (
       <HeroBanner
         key="hero"

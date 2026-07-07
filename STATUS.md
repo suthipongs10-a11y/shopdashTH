@@ -1,6 +1,20 @@
 # STATUS
-- Current phase: 3 (เสร็จ — รอขึ้น Phase 4)
+- Current phase: 4 (โค้ดครบ 4.1–4.9 — **รอผู้ใช้รัน migration 004 แล้วเทสต์ DoD**)
 - Last session: 2026-07-07
+
+## Done (Phase 4)
+- [x] 4.1 preset ครบ 10 ธีมตาม §4.5 (`themes/presets/*`) + `/admin/theme` เลือกธีมล็อกตาม tier (server ตรวจ tier ซ้ำ) + ฟอร์มข้อความประกาศ (AnnouncementBar)
+- [x] 4.2 variants มีครบตั้งแต่ P1 — เสียบ WishlistButton + RelatedProducts (fetchRelated) + announcement เข้าหน้า storefront ตาม flag
+- [x] 4.3 `/admin/theme/customize` (เฉพาะ prem-01/02): สีหลัก/สีเน้น/ฟอนต์/radius → theme_overrides (validate allowlist ฝั่ง server), ปุ่มคืนค่าธีมเดิม
+- [x] 4.4 ส่วนลด: `lib/discounts.ts` + RPC consume/release (atomic) + `/admin/discounts` CRUD (flag-gated) + ช่องโค้ดใน checkout + `/api/discounts/check` (403 เมื่อไม่มีฟีเจอร์) + เสียบ createOrder (กันโควตาก่อน insert + คืนเมื่อ fail)
+- [x] 4.5 LINE OA: `lib/line.ts` (broadcast, fire-and-forget, log ok/fail ลง provisioning_logs) + แจ้งออร์เดอร์ใหม่/สลิปใหม่ + ฟอร์ม token ใน settings (flag-gated)
+- [x] 4.6 `lib/slip-verify/` (interface + MockSlipVerifier อ่าน SLIP_VERIFY_MOCK_MODE) + เสียบ /api/slips: Premium → verify → ผ่าน=auto-approve+ตัดสต๊อก / ไม่ผ่าน=ตกคิว manual + badge เหตุผลใน SlipReviewCard
+- [x] 4.7 `lib/carriers.ts` tracking URL template (ไปรษณีย์/Kerry/Flash/J&T) + ปุ่มลิงก์ในหน้า track ลูกค้า และ order detail แอดมิน
+- [x] 4.8 custom domain: `lib/domains.ts` (TXT/CNAME/A/HTTPS เช็คแยกข้อ + ข้อความ "พบจริง vs ต้องเป็น") + `/admin/domain` + `/api/domain/verify` + middleware lookup (edge fetch + cache 60s) + cron `/api/cron/domain-recheck` (fail 3 วันติด → error)
+- [x] 4.9 staff: `lib/staff.ts` (invite/limit ตามแพลน/disable=ban/ลบ) + `/admin/staff` + staff ถูกกันจาก settings/plan/staff/domain (nav ซ่อน + server ตรวจซ้ำ) + ดาวน์เกรดแล้ว staff เกิน → disable อัตโนมัติ (§7.2)
+- [x] `supabase/migrations/004_phase4.sql` เขียนแล้ว — **ยังไม่ apply** (theme_registry 10 แถว, stores.announcement_text + line_channel_access_token, custom_domains.recheck_fail_count, RPC consume/release_discount_code)
+- [x] DoD 2 ผ่าน (static): ไม่มี `if (themeCode===...)` และไม่มี hex ใน components/storefront + app/(storefront)
+- [x] `pnpm build` ผ่านครบทุก route
 - **Phase 1 ผ่าน DoD ครบ 6 ข้อ — tag `phase-1-done`** (2026-07-07)
 - **Phase 2 ผ่าน DoD ครบ 4 ข้อ — tag `phase-2-done`** (2026-07-07)
 - **Phase 3 ผ่าน DoD ครบ 6 ข้อ — tag `phase-3-done`** (2026-07-07, migration 003 applied แล้ว)

@@ -2,12 +2,15 @@
 // server คำนวณราคา/ยอดจาก DB เองทั้งหมดใน lib/orders/create.ts
 
 import { NextResponse } from 'next/server';
+import { notifyNewOrder } from '@/lib/line';
 import { createOrder, type CheckoutCustomerInput, type CheckoutItemInput } from '@/lib/orders/create';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
 interface CheckoutRequestBody {
   items: CheckoutItemInput[];
   customer: CheckoutCustomerInput;
+  /** โค้ดส่วนลด (P4) — server validate + กันโควตาเองใน createOrder */
+  discountCode?: string;
 }
 
 export async function POST(req: Request) {
@@ -20,9 +23,16 @@ export async function POST(req: Request) {
 
   try {
     const ctx = await getTenantContext();
-    const result = await createOrder(ctx, body.items ?? [], body.customer ?? ({} as CheckoutCustomerInput));
+    const result = await createOrder(
+      ctx,
+      body.items ?? [],
+      body.customer ?? ({} as CheckoutCustomerInput),
+      typeof body.discountCode === 'string' ? body.discountCode : undefined,
+    );
 
     if (result.ok) {
+      // แจ้งเตือน LINE (P4 — fire-and-forget, fail แล้วไม่กระทบออร์เดอร์)
+      await notifyNewOrder(ctx, result.orderNumber, result.totalAmount);
       return NextResponse.json({ orderNumber: result.orderNumber });
     }
     if ('priceChanged' in result) {

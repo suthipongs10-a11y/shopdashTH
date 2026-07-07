@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getStoreUser } from '@/lib/auth';
+import { getStoreUser, userRole } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, invalidateTenantCache } from '@/lib/tenant-context';
 
@@ -12,9 +12,11 @@ export interface SettingsState {
 
 const PROMPTPAY_PATTERN = /^[0-9]{10}$|^[0-9]{13}$/;
 
+// ตั้งค่าร้านแก้ได้เฉพาะ "เจ้าของร้าน" (§2.3 P4: staff สิทธิ์เท่า owner ยกเว้น ตั้งค่าร้าน/แพลน/staff)
 async function requireUser(): Promise<boolean> {
   const ctx = await getTenantContext();
-  return (await getStoreUser(ctx)) !== null;
+  const user = await getStoreUser(ctx);
+  return user !== null && userRole(user) === 'store_owner';
 }
 
 export async function updateStoreSettings(
@@ -65,6 +67,30 @@ export async function updateStoreSettings(
   invalidateTenantCache(ctx.slug); // กัน LRU 60s เสิร์ฟค่าเก่า
   revalidatePath('/admin/settings');
   revalidatePath('/');
+  return { success: true };
+}
+
+/** ตั้งค่า LINE OA token (งาน 4.5 — feature flag `line_oa`, server ตรวจซ้ำ) */
+export async function updateLineToken(
+  _prevState: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const ctx = await getTenantContext();
+  if (!(await getStoreUser(ctx))) return { error: 'กรุณาเข้าสู่ระบบ' };
+  if (!ctx.features.line_oa) {
+    return { error: 'ฟีเจอร์แจ้งเตือน LINE OA ใช้ได้กับแพลน Pro ขึ้นไป' };
+  }
+
+  const token = String(formData.get('line_token') ?? '').trim();
+  const db = createAdminClient();
+  const { error } = await db
+    .from('stores')
+    .update({ line_channel_access_token: token || null })
+    .eq('tenant_id', ctx.tenantId);
+
+  if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+  invalidateTenantCache(ctx.slug);
+  revalidatePath('/admin/settings');
   return { success: true };
 }
 

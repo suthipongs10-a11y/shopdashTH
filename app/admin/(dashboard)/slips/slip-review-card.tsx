@@ -18,6 +18,7 @@ export function SlipReviewCard({
   imageUrl,
   accountName,
   promptpayId,
+  autoVerifyFailedReason,
 }: {
   slipId: string;
   orderNumber: string;
@@ -27,6 +28,8 @@ export function SlipReviewCard({
   imageUrl: string;
   accountName: string | null;
   promptpayId: string | null;
+  /** P4: ผลตรวจอัตโนมัติไม่ผ่าน — โชว์ flag + เหตุผลให้แอดมินพิจารณาเอง (§7.1) */
+  autoVerifyFailedReason?: string | null;
 }) {
   const [rejecting, setRejecting] = useState(false);
   const [approveState, approveAction, approvePending] = useActionState(
@@ -58,6 +61,11 @@ export function SlipReviewCard({
             <p className="text-3xl font-bold text-gray-900">{amount}</p>
             <p className="text-xs text-gray-400">อัปโหลดเมื่อ {uploadedAt}</p>
           </div>
+          {autoVerifyFailedReason && (
+            <p className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+              ⚠️ ตรวจอัตโนมัติไม่ผ่าน: {autoVerifyFailedReason}
+            </p>
+          )}
           <div className="rounded-md bg-gray-50 px-3 py-2 text-sm">
             <p className="text-gray-500">บัญชีที่ต้องได้รับเงิน (เทียบกับสลิป)</p>
             <p className="font-medium text-gray-900">{accountName ?? '-'}</p>

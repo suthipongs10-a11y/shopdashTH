@@ -61,10 +61,13 @@ export interface ThemeVariants {
 
 export interface ThemePreset {
   code: string;
+  nameTh: string;
   tier: 1 | 2 | 3;
   tokens: ThemeTokens;
   variants: ThemeVariants;
   featureDefaults: ThemeFeatureDefaults;
   /** ลำดับ section ของหน้าแรก storefront */
   sections: ThemeSection[];
+  /** ธีม 9–10 (§4.6): ร้านแก้ token หลักเองได้จากหน้า "ปรับแต่งธีม" */
+  customizable?: boolean;
 }

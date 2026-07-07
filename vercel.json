@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/subscription-sweep",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/domain-recheck",
+      "schedule": "30 18 * * *"
     }
   ]
 }
