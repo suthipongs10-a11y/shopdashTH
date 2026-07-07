@@ -5,6 +5,7 @@
 import 'server-only';
 import { headers } from 'next/headers';
 import { cache } from 'react';
+import { resolveFeatures, type FeatureMap } from '@/lib/features';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export class TenantNotFoundError extends Error {
@@ -55,14 +56,22 @@ export interface TenantContext {
   tenantId: string;
   slug: string;
   status: string;
+  trialEndsAt: string | null;
+  subscriptionEndsAt: string | null;
+  featureOverrides: Record<string, unknown>;
   store: StoreRow;
   plan: PlanRow;
+  /** flag ที่ resolve แล้ว (§3.7): plan → theme → override รายร้าน */
+  features: FeatureMap;
 }
 
 interface TenantRow {
   id: string;
   slug: string;
   status: string;
+  trial_ends_at: string | null;
+  subscription_ends_at: string | null;
+  feature_overrides: Record<string, unknown>;
   plans: PlanRow;
   stores: StoreRow;
 }
@@ -71,6 +80,11 @@ interface TenantRow {
 const TTL_MS = 60_000;
 const MAX_ENTRIES = 500;
 const tenantCache = new Map<string, { row: TenantRow; expires: number }>();
+// feature_defaults ของธีม (ใช้ resolve flag §3.7) — cache แยกเพราะหลายร้านใช้ธีมเดียวกัน
+const themeDefaultsCache = new Map<
+  string,
+  { defaults: Record<string, unknown> | null; expires: number }
+>();
 
 /** ล้าง cache ของร้าน — เรียกหลังแอดมินแก้ตั้งค่าร้าน เพื่อไม่ให้เห็นค่าเก่าค้าง 60s */
 export function invalidateTenantCache(slug: string): void {
@@ -84,7 +98,9 @@ async function loadTenant(slug: string): Promise<TenantRow | null> {
   const db = createAdminClient();
   const { data } = await db
     .from('tenants')
-    .select('id, slug, status, plans(*), stores(*)')
+    .select(
+      'id, slug, status, trial_ends_at, subscription_ends_at, feature_overrides, plans(*), stores(*)',
+    )
     .eq('slug', slug)
     .maybeSingle();
 
@@ -98,6 +114,22 @@ async function loadTenant(slug: string): Promise<TenantRow | null> {
   }
   tenantCache.set(slug, { row, expires: Date.now() + TTL_MS });
   return row;
+}
+
+async function loadThemeDefaults(themeCode: string): Promise<Record<string, unknown> | null> {
+  const cached = themeDefaultsCache.get(themeCode);
+  if (cached && cached.expires > Date.now()) return cached.defaults;
+
+  const db = createAdminClient();
+  const { data } = await db
+    .from('theme_registry')
+    .select('feature_defaults')
+    .eq('code', themeCode)
+    .maybeSingle();
+
+  const defaults = (data?.feature_defaults as Record<string, unknown> | null) ?? null;
+  themeDefaultsCache.set(themeCode, { defaults, expires: Date.now() + TTL_MS });
+  return defaults;
 }
 
 /**
@@ -115,11 +147,39 @@ export const getTenantContext = cache(async (): Promise<TenantContext> => {
   if (!tenant || tenant.status === 'archived') throw new TenantNotFoundError();
   if (tenant.status === 'locked') throw new TenantLockedError();
 
+  return buildContext(tenant);
+});
+
+/**
+ * เหมือน getTenantContext แต่ "ไม่โยน" เมื่อร้าน locked — ใช้เฉพาะ store admin
+ * (§7.4: ร้าน locked แอดมิน login ได้แต่ถูก redirect ไปหน้าจ่ายเงินหน้าเดียว)
+ */
+export const getTenantContextAllowLocked = cache(async (): Promise<TenantContext> => {
+  const headerList = await headers();
+  const slug = headerList.get('x-tenant-slug');
+  if (!slug) throw new TenantNotFoundError();
+
+  const tenant = await loadTenant(slug);
+  if (!tenant || tenant.status === 'archived') throw new TenantNotFoundError();
+
+  return buildContext(tenant);
+});
+
+async function buildContext(tenant: TenantRow): Promise<TenantContext> {
+  const themeDefaults = await loadThemeDefaults(tenant.stores.theme_code);
   return {
     tenantId: tenant.id,
     slug: tenant.slug,
     status: tenant.status,
+    trialEndsAt: tenant.trial_ends_at,
+    subscriptionEndsAt: tenant.subscription_ends_at,
+    featureOverrides: tenant.feature_overrides ?? {},
     store: tenant.stores,
     plan: tenant.plans,
+    features: resolveFeatures(
+      tenant.plans,
+      { feature_overrides: tenant.feature_overrides ?? {} },
+      { feature_defaults: themeDefaults },
+    ),
   };
-});
+}

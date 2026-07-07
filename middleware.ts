@@ -1,41 +1,91 @@
 // Hostname routing (§1.4) — หัวใจ multi-tenancy ฝั่ง frontend
 // Phase 2: resolve slug จาก subdomain แล้วแนบ header x-tenant-slug
-//   {slug}.shopdash.co / {slug}.localhost:3000 → storefront + store admin (path เดิม)
-// Phase 3 จะเพิ่ม admin.shopdash.co → super-admin / Phase 4 เพิ่ม custom domain lookup
+// Phase 3: admin.{root} → /super-admin, root domain (+www) → /platform (landing/signup)
+// Phase 4 จะเพิ่ม custom domain lookup
 
 import { NextResponse, type NextRequest } from 'next/server';
 
 const RESERVED_SLUGS = new Set(['admin', 'www', 'api', 'app', 'mail']);
 
-function resolveSlug(host: string): string | null {
+// path ภายในที่ต้องเข้าผ่าน host ที่ถูกต้องเท่านั้น — ห้ามเปิดตรงจาก host ร้านค้า
+const INTERNAL_PREFIXES = ['/super-admin', '/platform'];
+
+type HostTarget =
+  | { kind: 'super-admin' }
+  | { kind: 'platform' }
+  | { kind: 'tenant'; slug: string }
+  | { kind: 'unknown' };
+
+function resolveHost(host: string): HostTarget {
   const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdash.co';
 
+  // production: admin.shopdash.co / dev: admin.localhost
+  if (host === `admin.${rootDomain}` || host === 'admin.localhost') {
+    return { kind: 'super-admin' };
+  }
+  // production: shopdash.co + www / dev: www.localhost (localhost เปล่า = demo เพื่อ DX)
+  if (host === rootDomain || host === `www.${rootDomain}` || host === 'www.localhost') {
+    return { kind: 'platform' };
+  }
+
   if (host.endsWith(`.${rootDomain}`)) {
-    return host.slice(0, -(rootDomain.length + 1));
+    const slug = host.slice(0, -(rootDomain.length + 1));
+    return RESERVED_SLUGS.has(slug) ? { kind: 'unknown' } : { kind: 'tenant', slug };
   }
   // dev: demo.localhost, shop2.localhost
   if (host.endsWith('.localhost')) {
-    return host.slice(0, -'.localhost'.length);
+    const slug = host.slice(0, -'.localhost'.length);
+    return RESERVED_SLUGS.has(slug) ? { kind: 'unknown' } : { kind: 'tenant', slug };
   }
-  // dev convenience: localhost เปล่าๆ = ร้าน demo (production root domain = หน้า platform, Phase 3)
+  // dev convenience: localhost เปล่าๆ = ร้าน demo
   if (host === 'localhost' || host === '127.0.0.1') {
-    return process.env.NODE_ENV === 'development' ? 'demo' : null;
+    return process.env.NODE_ENV === 'development'
+      ? { kind: 'tenant', slug: 'demo' }
+      : { kind: 'unknown' };
   }
   // custom domain — Phase 4 (งาน 4.8) จะ lookup ตาราง custom_domains
-  return null;
+  return { kind: 'unknown' };
 }
 
 export function middleware(req: NextRequest) {
-  const host = (req.headers.get('host') ?? '').split(':')[0].toLowerCase();
-  const slug = resolveSlug(host);
+  // server action redirect() ทำ internal fetch เข้า loopback (Host กลายเป็น localhost:3000)
+  // host จริงของผู้ใช้อยู่ใน x-forwarded-host — ต้องอ่านตัวนั้นก่อน (proxy/Vercel ก็ตั้งให้เช่นกัน)
+  const rawHost = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? '';
+  const host = rawHost.split(':')[0].toLowerCase();
+  const path = req.nextUrl.pathname;
 
-  // admin.shopdash.co → super-admin (Phase 3) / slug สงวนอื่นๆ ไม่ใช่ร้าน
-  if (!slug || RESERVED_SLUGS.has(slug)) {
+  // cron ถูกเรียกจากโดเมน deployment (เช่น *.vercel.app) ไม่ใช่ host ร้าน —
+  // ปล่อยผ่านทุก host, route ตรวจ CRON_SECRET เอง
+  if (path.startsWith('/api/cron/')) return NextResponse.next();
+
+  const target = resolveHost(host);
+
+  // /super-admin, /platform เข้าตรงจาก host อื่นไม่ได้ (กัน bypass hostname routing)
+  const hitsInternal = INTERNAL_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
+
+  if (target.kind === 'super-admin') {
+    if (path.startsWith('/platform')) {
+      return NextResponse.rewrite(new URL('/domain-not-configured', req.url));
+    }
+    // /auth/confirm (PKCE) และ /api ใช้ path เดิม
+    if (path.startsWith('/auth/') || path.startsWith('/api/')) return NextResponse.next();
+    return NextResponse.rewrite(new URL(`/super-admin${path === '/' ? '' : path}`, req.url));
+  }
+
+  if (target.kind === 'platform') {
+    if (path.startsWith('/super-admin')) {
+      return NextResponse.rewrite(new URL('/domain-not-configured', req.url));
+    }
+    if (path.startsWith('/api/')) return NextResponse.next();
+    return NextResponse.rewrite(new URL(`/platform${path === '/' ? '' : path}`, req.url));
+  }
+
+  if (target.kind === 'unknown' || hitsInternal) {
     return NextResponse.rewrite(new URL('/domain-not-configured', req.url));
   }
 
   const requestHeaders = new Headers(req.headers);
-  requestHeaders.set('x-tenant-slug', slug);
+  requestHeaders.set('x-tenant-slug', target.slug);
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 

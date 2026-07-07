@@ -51,3 +51,13 @@ export async function getStoreUser(ctx: TenantContext): Promise<User | null> {
   if (userTenantId(user) !== ctx.tenantId) return null;
   return user;
 }
+
+/** user ปัจจุบันเป็น super admin ของแพลตฟอร์มหรือไม่ (ใช้ที่ admin.shopdash.co เท่านั้น) */
+export async function getSuperAdminUser(): Promise<User | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  return userRole(user) === 'super_admin' ? user : null;
+}

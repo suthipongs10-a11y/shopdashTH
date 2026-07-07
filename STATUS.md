@@ -1,8 +1,30 @@
 # STATUS
-- Current phase: 2 (เสร็จ — รอขึ้น Phase 3)
+- Current phase: 3 (โค้ดครบ 3.1–3.6 — **รอผู้ใช้รัน migration 003 แล้วเทสต์ DoD ที่เหลือ**)
 - Last session: 2026-07-07
 - **Phase 1 ผ่าน DoD ครบ 6 ข้อ — tag `phase-1-done`** (2026-07-07)
 - **Phase 2 ผ่าน DoD ครบ 4 ข้อ — tag `phase-2-done`** (2026-07-07)
+
+## Done (Phase 3)
+- [x] 3.1 middleware เพิ่ม host: `admin.{root}`→`/super-admin`, root/`www`→`/platform` (dev: `admin.localhost` / `www.localhost`), กันเปิด path ภายในตรงจาก host ร้าน, `/api/cron/*` ผ่านทุก host + **fix สำคัญ: อ่าน `x-forwarded-host` ก่อน `host`** (ดู DECISIONS) + super admin login/layout/guard + `scripts/setup-super-admin.mjs` (รันแล้ว: superadmin@shopdash.local / SuperAdmin!2026)
+- [x] 3.2 `/tenants` ตารางร้าน (แพลน/สถานะ/หมดอายุ/ยอดขาย 30 วัน/โดเมน) + detail: เปลี่ยนสถานะ (lock/unlock+เหตุผล), เปลี่ยนแพลน+pre-check ดาวน์เกรด §7.2 (เตือน→ยืนยัน, ธีมเกิน tier→fallback basic-01, โดเมน→suspended), feature_overrides UI (ตามแพลน/บังคับเปิด/บังคับปิด), ประวัติ subscription, audit log
+- [x] 3.3 `/platform` landing+pricing (การ์ดจากตาราง plans) + `/signup` (เช็ค slug realtime) + `POST/GET /api/signup` + `lib/provisioning.ts` (ทุก step ลง provisioning_logs, fail→rollback ลบทุกอย่างรวม auth user)
+- [x] 3.4 `lib/features.ts` (server: resolveFeatures/assertFeature/assertUnderProductLimit/assertUnderImageLimit) + `lib/features-shared.ts` (client-safe) — เสียบเข้า createProduct/addProductImage แล้ว; `TenantContext` มี `features` resolve จาก plan→theme→overrides
+- [x] 3.5 Billing: `lib/billing.ts` (คำขอ pending ทีละใบ, อนุมัติ→active+ต่ออายุจากวันหมดอายุเดิม, ปฏิเสธ+เหตุผล), `/admin/plan` (route group แยก เข้าได้แม้ locked, QR PromptPay แพลตฟอร์ม, อัปสลิป, ประวัติ), `/api/plan-slips`, super admin `/subscriptions` (คิว) + `/plans` (แก้ราคา/limit/ฟีเจอร์) — dashboard layout: locked→redirect `/admin/plan`, grace/trial banner
+- [x] 3.6 `/api/cron/subscription-sweep` (Bearer CRON_SECRET): trial หมด→locked, active หมด→grace, grace 7 วัน→locked (+locked_at), locked 60 วัน→archived + `vercel.json` cron 01:00 ไทย
+- [x] `supabase/migrations/003_phase3.sql` เขียนแล้ว — **ยังไม่ apply** (tenant_subscriptions.status/reject_reason_th + tenants.locked_at + indexes)
+
+## DoD checklist (Phase 3)
+- [x] 1. signup จบใน flow เดียว → `p3test.localhost:3000` ใช้ได้ทันที (trial+banner), provisioning_logs ครบทุก step (e2e ผ่าน 2026-07-07)
+- [x] 2. slug ซ้ำ/reserved/ผิดรูปแบบ → error ไทย + race 2 requests slug เดียวกัน → ผู้แพ้ rollback จริง (auth user ถูกลบ, มี log provision:rollback) (e2e ผ่าน)
+- [x] 3. Starter ครบ 50 ชิ้น → ชิ้นที่ 51 ถูกปฏิเสธพร้อมข้อความชวนอัปเกรด (e2e ผ่าน) — ครึ่งหลัง (super admin เปลี่ยนเป็น Pro แล้วเพิ่มได้ทันที) ติด migration 003 (หน้า detail ร้าน query locked_at)
+- [ ] 4. ดาวน์เกรดเตือน+ต้องยืนยัน — โค้ด+เทสต์พร้อม รอ 003
+- [ ] 5. cron: หมดอายุ→grace→locked (storefront ปิด/admin เหลือหน้าจ่ายเงิน) — โค้ด+เทสต์พร้อม รอ 003
+- [ ] 6. อนุมัติต่ออายุ→active ทันที — โค้ด+เทสต์พร้อม รอ 003
+
+## Next steps (เซสชันหน้า)
+1. ผู้ใช้รัน `supabase/migrations/003_phase3.sql` ใน SQL Editor
+2. `node .tmp-phase3-test.mjs` (DoD 1–4) แล้ว `node .tmp-phase3-billing-test.mjs` (DoD 5–6)
+3. ผ่านครบ → อัปเดต STATUS + tag `phase-3-done`
 
 ## Done
 - [x] 1.1 โครงโปรเจ็ค: Next.js 15.5 + Tailwind v4 + Supabase clients (`lib/supabase/{server,client,admin}.ts`) + `.env.example` — `pnpm build` ผ่าน, `.env.local` ผู้ใช้เติมค่าครบแล้ว
@@ -44,6 +66,9 @@
 - [x] 6. pnpm build ผ่าน ไม่มี type error (2026-07-07)
 
 ## Blockers / Notes
+- **Phase 3 dev hosts:** platform = `www.localhost:3000`, super admin = `admin.localhost:3000` (superadmin@shopdash.local / SuperAdmin!2026 — เปลี่ยนรหัสก่อน production), ร้านทดสอบ e2e = `p3test.localhost:3000` (p3test@shopdash.local / P3Test!2026)
+- **.env.local เติมค่า dev แล้ว:** `CRON_SECRET` (สุ่มใหม่), `PLATFORM_PROMPTPAY_ID=0812345678` (placeholder — **ต้องแทนด้วย PromptPay จริงของแพลตฟอร์มก่อนใช้จริง**)
+- สคริปต์เทสต์ Phase 3: `.tmp-phase3-test.mjs` (DoD 1–4), `.tmp-phase3-billing-test.mjs` (DoD 5–6, ต้องรันตัวแรกก่อน) — ไม่ commit
 - R2 CORS ตั้งแล้ว (origin localhost:3000) — ทดสอบอัปโหลดรูปผ่านครบ flow: webp convert → presigned PUT → product_images → เสิร์ฟผ่าน next/image (2026-07-06) **ขึ้น production ต้องเพิ่ม origin โดเมนจริงใน CORS ด้วย**
 - สลับระหว่าง `pnpm build` ↔ `pnpm dev` ให้ `rm -rf .next` ก่อนเสมอ — artifacts ปนกันแล้ว asset 404/ERR_ABORTED
 - dev เปิดร้านผ่าน `demo.localhost:3000` / `shop2.localhost:3000` (localhost เปล่า = demo)

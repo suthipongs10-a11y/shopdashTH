@@ -62,6 +62,11 @@ export function brandingKey(tenantId: string, kind: 'logo' | 'banner'): string {
   return `branding/${tenantId}/${kind}.webp`;
 }
 
+/** สลิปค่าแพลนที่ร้านจ่ายให้แพลตฟอร์ม (Phase 3) — อยู่ใต้ slips/ จึงถูกกัน public URL อัตโนมัติ */
+export function platformSlipKey(tenantId: string, mime: string): string {
+  return `slips/platform/${tenantId}/${randomUUID()}.${IMAGE_MIME_EXT[mime]}`;
+}
+
 /** key นี้เป็นสลิปหรือไม่ — สลิปห้ามเสิร์ฟผ่าน public URL */
 export function isSlipKey(key: string): boolean {
   return key.startsWith('slips/');
