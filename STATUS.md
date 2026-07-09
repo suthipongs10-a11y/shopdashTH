@@ -1,26 +1,27 @@
 # STATUS
-- Current phase: 5 **โค้ดครบทุกงานย่อย (5.1–5.5) — DoD รอ verify (ต้อง apply migration 005/006 ก่อน)**
+- Current phase: 5 **ผ่าน DoD ครบ 5 ข้อ — tag `phase-5-done`** 🎉 (ครบทั้ง 5 เฟส — MVP + v1.1)
 - Last session: 2026-07-09
 
-## Done (Phase 5) — code complete, `pnpm build` ผ่าน
-- [x] 5.1 `supabase/migrations/005_analytics.sql`: RPC `store_daily_sales`/`store_weekly_sales`/`store_top_products`/`store_sales_summary`/`store_order_status_counts` + `platform_summary`/`platform_new_stores` (นับเฉพาะ confirmed/packing/shipped, วันตัดยอดเวลาไทย §7.6, revoke จาก anon/authenticated) + index `orders_tenant_status_created_idx` — **ยังไม่ apply**
+## Done (Phase 5) — `pnpm build` ผ่าน, migration 005/006 apply แล้ว, DoD ครบ
+- [x] 5.1 `supabase/migrations/005_analytics.sql`: RPC `store_daily_sales`/`store_weekly_sales`/`store_top_products`/`store_sales_summary`/`store_order_status_counts` + `platform_summary`/`platform_new_stores` (นับเฉพาะ confirmed/packing/shipped, วันตัดยอดเวลาไทย §7.6, revoke จาก anon/authenticated) + index `orders_tenant_status_created_idx` — **apply แล้ว 2026-07-09**
 - [x] 5.2 แดชบอร์ด Store Admin `/admin/dashboard`: การ์ดยอดขาย/ออร์เดอร์, ออร์เดอร์ค้างต่อสถานะ (ลิงก์ `/admin/orders?status=`), สต๊อกใกล้หมด (ทุกแพลน) + กราฟเส้นรายวัน/แท่งรายสัปดาห์ (Recharts) + top 10 สินค้าขายดี (gate `analytics_dashboard`) — เมนู nav + redirect หน้าแรกหลัง login
 - [x] 5.3 แดชบอร์ดแพลตฟอร์ม `/dashboard` (super admin): MRR/ARR, ร้านแต่ละสถานะ, churn 30 วัน, กราฟร้านใหม่ต่อเดือน 12 เดือน, ตารางร้านใกล้หมดอายุ 30 วัน — เมนู nav + redirect index
-- [x] 5.4 ค้นหาสินค้า: `supabase/migrations/006_search.sql` (pg_trgm + gin index) — **ยังไม่ apply** — เสียบ `?q=` ใน `lib/catalog.ts` (ilike sanitize wildcard) + ช่องค้นหาใน `FilterBar` + หัวข้อ "ผลการค้นหา" ในหน้า /products
+- [x] 5.4 ค้นหาสินค้า: `supabase/migrations/006_search.sql` (pg_trgm + gin index) — **apply แล้ว 2026-07-09** — เสียบ `?q=` ใน `lib/catalog.ts` (ilike sanitize wildcard) + ช่องค้นหาใน `FilterBar` + หัวข้อ "ผลการค้นหา" ในหน้า /products
 - [x] 5.5 Polish: error boundary (`app/error.tsx`, `global-error.tsx`, ต่อ segment storefront/admin/super-admin), `not-found` (แอป + storefront), loading skeleton (2 แดชบอร์ด), SEO `generateMetadata` ต่อร้าน (layout) + ต่อสินค้า (title/OG), `sitemap.ts` + `robots.ts` ต่อ tenant — ข้อความไทยทุกจุด
 - [x] Recharts 3.9.2 ติดตั้งแล้ว, `lib/analytics.ts` (typed RPC wrappers), `scripts/seed-load.ts` (10k orders + `--clean`)
 
-## DoD checklist (Phase 5) — สถานะ ณ 2026-07-09
-- [ ] 1. ตัวเลขแดชบอร์ดตรงกับนับมือ (ไม่รวม cancelled/ยังไม่ยืนยัน) — **รอ apply 005 + รัน `.tmp-phase5-test.mjs`** (test script เขียนเสร็จ นับ expected อิสระ)
-- [ ] 2. query 10k orders < 1s — **รอ apply 005 + `node --experimental-strip-types scripts/seed-load.ts` แล้วรัน test**
-- [x] 3. ค้นหาไทยบางส่วน "เสื้อยื" → "เสื้อยืดทดสอบ" — **ยืนยันแล้ว** (ilike ทำงานได้ก่อนมี index; 006 เพิ่ม perf)
-- [~] 4. Lighthouse ≥80 mobile — ทุกรูปผ่าน next/image + R2 **ยืนยันแล้ว** (ProductCard/HeroBanner/gallery/header/CartDrawer); คะแนน Lighthouse **ยังไม่วัด**
-- [x] 5. ไม่มีหน้าไหนโชว์ raw error/stack — error boundary + not-found ภาษาไทยครบทุก surface
+## DoD checklist (Phase 5) — ผ่านครบ 2026-07-09
+- [x] 1. ตัวเลข RPC ตรงกับนับมืออิสระ (`.tmp-phase5-test.mjs` ผ่าน 14/14): revenue/order_count/avg ตรง, ผลรวมรายวัน=summary, ตัด cancelled/ยังไม่ยืนยันออกครบ
+- [x] 2. query 10k orders < 1s — seed 10,006 ออร์เดอร์: `store_daily_sales` 176ms, `store_top_products` 161ms (ล้าง PERF ด้วย `seed-load.ts --clean` แล้ว demo กลับ 6 ออร์เดอร์)
+- [x] 3. ค้นหาไทยบางส่วน "เสื้อยื" → "เสื้อยืดทดสอบ" — ยิงผ่าน HTTP จริง (`/products?q=เสื้อยื`)
+- [x] 4. Lighthouse หน้าแรก storefront mobile = **95** (≥80) — FCP 0.9s / LCP 2.7s / TBT 130ms / CLS 0; ทุกรูปผ่าน next/image + R2
+- [x] 5. ไม่มีหน้าไหนโชว์ raw error/stack — error boundary + not-found ภาษาไทยครบทุก surface (ทดสอบ 404 → "ไม่พบสินค้า")
+- **Phase 5 ผ่าน DoD ครบ 5 ข้อ — tag `phase-5-done`** (2026-07-09)
 
-## ⚠️ Action ที่ต้องทำก่อนปิด Phase 5 (เหมือนเฟสก่อน — apply ผ่าน SQL Editor)
-1. เปิด Supabase SQL Editor (project `ebmwjfpprtzutpuvhhlb`) → รัน `supabase/migrations/005_analytics.sql` แล้ว `006_search.sql`
-2. `node --experimental-strip-types scripts/seed-load.ts` (seed 10k) → `node .tmp-phase5-test.mjs` (ปิด DoD 1–2) → `scripts/seed-load.ts --clean` ถ้าจะล้าง
-3. (ถ้าต้องการ) วัด Lighthouse หน้าแรก storefront mobile ≥80 (DoD 4)
+## หมายเหตุ Phase 5
+- test DoD 1–2: `.tmp-phase5-test.mjs` (ไม่ commit — ต้อง seed ก่อนด้วย `node --experimental-strip-types scripts/seed-load.ts`)
+- บทเรียน: PostgREST `.range()` pagination ต้องมี `.order(unique)` เสมอ ไม่งั้นลำดับไม่คงที่ (แถวซ้ำ/ข้าม) — เจอตอนเขียน test นับ expected
+- Lighthouse วัดผ่าน prod build (`pnpm start`) + chromium ของ Playwright ยิง `demo.localhost:3000` (prod ไม่ map `localhost` เปล่าเป็น demo)
 
 ## Done (Phase 4)
 - [x] 4.1 preset ครบ 10 ธีมตาม §4.5 (`themes/presets/*`) + `/admin/theme` เลือกธีมล็อกตาม tier (server ตรวจ tier ซ้ำ) + ฟอร์มข้อความประกาศ (AnnouncementBar)
