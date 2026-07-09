@@ -30,6 +30,7 @@ export default async function CatalogPage({
     category?: string;
     size?: string;
     color?: string;
+    q?: string;
     sort?: string;
     page?: string;
   }>;
@@ -50,6 +51,7 @@ export default async function CatalogPage({
         categoryId: params.category || undefined,
         size: params.size || undefined,
         color: params.color || undefined,
+        search: params.q || undefined,
         sort,
         page: pageNum,
       }),
@@ -70,7 +72,11 @@ export default async function CatalogPage({
     <main className="mx-auto max-w-(--container-max) space-y-6 px-4 py-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h1 className="font-heading text-2xl font-semibold">
-          {activeCategory ? activeCategory.name : 'สินค้าทั้งหมด'}
+          {params.q
+            ? `ผลการค้นหา “${params.q}”`
+            : activeCategory
+              ? activeCategory.name
+              : 'สินค้าทั้งหมด'}
         </h1>
         <p className="text-sm text-text-muted">พบ {total.toLocaleString('th-TH')} รายการ</p>
       </div>

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { superLogout } from './actions';
 
 const NAV_ITEMS = [
+  { href: '/dashboard', label: 'แดชบอร์ด' },
   { href: '/tenants', label: 'ร้านค้า' },
   { href: '/subscriptions', label: 'คิวสลิปค่าแพลน' },
   { href: '/plans', label: 'จัดการแพลน' },

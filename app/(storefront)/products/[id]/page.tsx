@@ -1,7 +1,9 @@
 // หน้าสินค้า — แกลเลอรีรูปซ้าย รายละเอียดขวา (wireframe กลุ่ม Basic §4.6)
 // P4: WishlistButton + RelatedProducts เปิดตาม feature flag ของธีม/แพลน (§3.7)
 
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import { RelatedProducts } from '@/components/storefront/RelatedProducts';
 import { WishlistButton } from '@/components/storefront/WishlistButton';
 import { fetchProduct, fetchRelated } from '@/lib/catalog';
@@ -10,6 +12,33 @@ import { getPreset } from '@/themes/presets';
 import { ImageGallery } from './image-gallery';
 import { VariantSelector } from './variant-selector';
 
+// cache ต่อ request — generateMetadata กับ page ใช้ผลเดียวกัน ไม่ query ซ้ำ
+const getProduct = cache((tenantId: string, id: string) => fetchProduct(tenantId, id));
+
+// SEO ต่อสินค้า (§5.5) — ชื่อสินค้า + รูปแรกเป็น OG (title ต่อท้ายด้วยชื่อร้านจาก template)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const ctx = await getTenantContext();
+    const product = await getProduct(ctx.tenantId, id);
+    if (!product) return { title: 'ไม่พบสินค้า' };
+    return {
+      title: product.name,
+      description: product.descriptionMd?.slice(0, 160) ?? `${product.name} — ${ctx.store.name}`,
+      openGraph: {
+        title: product.name,
+        images: product.images[0] ? [product.images[0]] : undefined,
+      },
+    };
+  } catch {
+    return {};
+  }
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -17,7 +46,7 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
   const ctx = await getTenantContext();
-  const product = await fetchProduct(ctx.tenantId, id);
+  const product = await getProduct(ctx.tenantId, id);
   if (!product) notFound();
 
   const preset = getPreset(ctx.store.theme_code);

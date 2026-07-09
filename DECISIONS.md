@@ -61,3 +61,15 @@ supabase-js เขียน `used_count = used_count + 1` ตรงๆ ไม่
 
 ## 2026-07-07 — คำขอชำระค่าแพลน = แถว pending ใน tenant_subscriptions (ทีละใบ)
 ปุ่ม "ขออัปเกรด" (§2.3) กับการต่ออายุ/จ่ายครั้งแรกใช้กลไกเดียว: ร้านเลือกแพลน + อัปสลิป → แถว pending → super admin อนุมัติแล้วระบบตั้ง plan_id + active + ขยายอายุ 1 ปีในจังหวะเดียว — จำกัด pending ทีละใบต่อร้าน (กันสับสน/กดรัว ตามหลัก §7.3) และ period ต่อจากวันหมดอายุเดิมถ้ายังไม่หมด (จ่ายก่อนกำหนดไม่เสียเศษวัน)
+
+## 2026-07-09 — analytics เป็น RPC (SECURITY INVOKER) เรียกผ่าน service role ไม่ใช่ view
+§5.1 ระบุ "View/RPC" — เลือก RPC เพราะ (ก) ต้องรับ p_tenant_id + p_days แบบพารามิเตอร์ (view ทำไม่ได้) (ข) store admin/super admin อ่านผ่าน `createAdminClient()` (service role) อยู่แล้วทั้งโปรเจ็ค — ฟังก์ชัน scope ด้วย p_tenant_id ในตัว query เอง + `revoke execute from anon/authenticated/public` (defense in depth แบบเดียวกับ consume_discount_code) กัน JWT ร้าน/ลูกค้าเรียกดูข้ามร้าน วันตัดยอดใช้ `timezone('Asia/Bangkok', created_at)::date` (§7.6) และ lower bound ของ created_at เขียน sargable ให้ใช้ index `orders_tenant_status_created_idx` (migration 005)
+
+## 2026-07-09 — store_top_products group ด้วย product_name (order_items ไม่มี product_id)
+order_items เป็น snapshot ไม่เก็บ product_id (ตั้งใจ §3.4 — ลบสินค้าแล้วประวัติไม่พัง) จึงจัดอันดับสินค้าขายดีด้วย `group by product_name` ยอมรับข้อจำกัดว่าสินค้าคนละตัวที่ชื่อซ้ำกันจะรวมกัน (ในร้านเดียวชื่อสินค้ามักไม่ซ้ำ) — ตรงกับปรัชญา snapshot ที่ห้าม join products ย้อนหลัง
+
+## 2026-07-09 — ค้นหา pg_trgm ผ่าน ILIKE บนคอลัมน์ name เท่านั้น
+tsvector ตัดคำไทยไม่ได้ (§2.1) จึงใช้ pg_trgm — query ฝั่งแอปใช้ `.ilike('name', '%term%')` ซึ่งทำงานได้แม้ยังไม่มี index (แค่ scan ช้าลง) index `gin (name gin_trgm_ops)` ใน 006 มีไว้เพื่อ performance ตอนสินค้าเยอะ ค้นเฉพาะชื่อสินค้า (ไม่รวม description) พอสำหรับ MVP + sanitize อักขระ wildcard (`% _ \`) ออกจากคำค้นเพื่อค้นแบบ substring ตรงตัว
+
+## 2026-07-09 — แดชบอร์ด basic (ทุกแพลน) vs full (flag analytics_dashboard)
+ตาราง §5.1 ให้ Starter เห็น "สรุปพื้นฐาน" ส่วน Pro/Premium เห็น "เต็ม" — หน้า `/admin/dashboard` เปิดให้ทุกแพลน แสดงการ์ดยอดขาย/ออร์เดอร์ค้างต่อสถานะ/สต๊อกใกล้หมดเสมอ ส่วนกราฟเส้นยอดขาย + สินค้าขายดี + ยอดเฉลี่ย/ออร์เดอร์ gate ด้วย `ctx.features.analytics_dashboard` (Starter เห็นกล่องชวนอัปเกรดแทน)

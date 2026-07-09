@@ -12,8 +12,14 @@ export interface CatalogFilters {
   categoryId?: string;
   size?: string;
   color?: string;
+  search?: string;
   sort?: 'newest' | 'price_asc' | 'price_desc';
   page?: number;
+}
+
+/** ตัดอักขระ wildcard ของ LIKE ออก (`%` `_` `\`) — ค้นหาแบบ substring ตรงตัว (§5.4) */
+function sanitizeSearch(raw: string): string {
+  return raw.replace(/[\\%_]/g, '').trim().slice(0, 100);
 }
 
 interface ProductRow {
@@ -60,6 +66,11 @@ function baseQuery(tenantId: string, filters: CatalogFilters, withCount: boolean
   if (filters.categoryId) q = q.eq('category_id', filters.categoryId);
   if (filters.size) q = q.eq('product_variants.size', filters.size);
   if (filters.color) q = q.eq('product_variants.color', filters.color);
+  if (filters.search) {
+    const term = sanitizeSearch(filters.search);
+    // pg_trgm GIN index (migration 006) รองรับ ILIKE — ค้นหาไทยบางส่วน
+    if (term) q = q.ilike('name', `%${term}%`);
+  }
 
   switch (filters.sort) {
     case 'price_asc':

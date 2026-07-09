@@ -12,6 +12,7 @@ interface NavItem {
 
 // เมนูฟีเจอร์ flagged (ส่วนลด/staff/โดเมน) แสดงตาม flag — ในหน้าเองก็มี guard ซ้ำอีกชั้น
 const NAV_ITEMS: NavItem[] = [
+  { href: '/admin/dashboard', label: 'แดชบอร์ด' },
   { href: '/admin/orders', label: 'ออร์เดอร์' },
   { href: '/admin/slips', label: 'ตรวจสลิป' },
   { href: '/admin/products', label: 'สินค้า' },

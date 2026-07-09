@@ -1,6 +1,7 @@
 // Layout ของ storefront ทั้งหมด (Phase 1: เสิร์ฟที่ path ตรง `/`)
 // ครอบด้วย ThemeScope — สี/ฟอนต์/รูปทรงทั้งหมดมาจาก token ของธีมร้าน (§4)
 
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Footer } from '@/components/storefront/Footer';
 import { publicR2Url } from '@/lib/r2';
@@ -16,6 +17,27 @@ import { ThemeScope } from '@/themes/theme-scope';
 import { StoreHeader } from './store-header';
 
 export const dynamic = 'force-dynamic';
+
+// SEO ต่อร้าน (§5.5) — title/description/OG จากชื่อร้าน + แบนเนอร์/โลโก้
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const ctx = await getTenantContext();
+    const name = ctx.store.name;
+    const ogKey = ctx.store.banner_r2_key ?? ctx.store.logo_r2_key;
+    return {
+      title: { default: name, template: `%s | ${name}` },
+      description: `ร้าน ${name} — ช้อปออนไลน์ ชำระเงินผ่าน PromptPay`,
+      openGraph: {
+        title: name,
+        siteName: name,
+        type: 'website',
+        images: ogKey ? [publicR2Url(ogKey)] : undefined,
+      },
+    };
+  } catch {
+    return { title: 'ShopDash' };
+  }
+}
 
 // §7.4: ร้าน locked — ทุกหน้า storefront แทนด้วยหน้าเดียว
 // "ปิดปรับปรุงชั่วคราว" ห้ามบอกลูกค้าว่าค้างจ่าย (รักษาหน้าให้ร้าน)
