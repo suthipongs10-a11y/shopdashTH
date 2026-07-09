@@ -19,17 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   // ต้องเป็น owner/staff "ของร้านนี้" เท่านั้น (§2.4) — บัญชีร้านอื่นถูกปฏิเสธ
   const user = await getStoreUser(ctx);
-  if (!user) {
-    const { headers: getHeaders } = await import('next/headers');
-    const h = await getHeaders();
-    console.log('[DEBUG guard-fail]', JSON.stringify({
-      slug: ctx.slug,
-      host: h.get('host'),
-      xfwd: h.get('x-forwarded-host'),
-      hasCookie: (h.get('cookie') ?? '').includes('auth-token'),
-    }));
-    redirect('/admin/login');
-  }
+  if (!user) redirect('/admin/login');
 
   // §7.4: ร้าน locked เข้าได้เฉพาะหน้าจ่ายเงิน (route group แยก /admin/plan)
   if (ctx.status === 'locked') redirect('/admin/plan');

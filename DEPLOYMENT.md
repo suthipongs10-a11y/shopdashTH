@@ -8,14 +8,15 @@
 
 ## §0. ⛔ Critical — พลาดแล้วเจ็บ (ทำก่อนเปิดจริง)
 
-- [ ] **`SLIP_VERIFY_MOCK_MODE` ต้องไม่ใช่ `pass` ใน production**
-  `.env.example` ตั้ง `SLIP_VERIFY_PROVIDER=mock` + `SLIP_VERIFY_MOCK_MODE=pass` ไว้ ถ้ายกค่านี้ขึ้น prod → ร้าน **Premium** ที่เปิดฟีเจอร์ตรวจสลิปอัตโนมัติจะ **auto-approve ทุกสลิป** (สลิปปลอมก็ผ่าน = เสียเงินจริง) ยังไม่มี provider จริง (`lib/slip-verify/index.ts` fallback เป็น mock เสมอ) → ก่อนมี provider จริง ให้ตั้ง **`SLIP_VERIFY_MOCK_MODE=amount_mismatch`** (บังคับทุกสลิปตกคิว manual — ปลอดภัย) **หรือ** อย่าเปิด flag `slip_verify_api` ให้ tenant ใด
+- [ ] **`SLIP_VERIFY_MOCK_MODE` ต้องไม่ใช่ `pass` บน Vercel production**
+  ถ้าตั้ง `pass` → ร้าน **Premium** ที่เปิดฟีเจอร์ตรวจสลิปอัตโนมัติจะ **auto-approve ทุกสลิป** (สลิปปลอมก็ผ่าน = ตัดสต๊อก+ยืนยันออร์เดอร์โดยไม่มีเงินเข้า) ยังไม่มี provider จริง (`lib/slip-verify/index.ts` fallback เป็น mock เสมอ) → ตั้ง **`SLIP_VERIFY_MOCK_MODE=amount_mismatch`** (บังคับทุกสลิปตกคิว manual — ปลอดภัย) **หรือ** อย่าเปิด flag `slip_verify_api` ให้ tenant ใด
+  ✅ *`.env.example` เปลี่ยน default เป็น `amount_mismatch` + คอมเมนต์เตือนแล้ว (2026-07-09) — ยังต้องตรวจค่าจริงบน Vercel*
 - [ ] **`DOMAIN_VERIFY_MOCK` ต้อง "ไม่ถูกตั้ง" ใน production**
-  `lib/domains.ts:116` — ถ้า `DOMAIN_VERIFY_MOCK=pass` ระบบจะผ่านการ verify custom domain โดยไม่เช็ค DNS จริง (test hook) ไม่มีใน `.env.example` อยู่แล้ว แค่ห้ามเผลอ set บน Vercel
+  `lib/domains.ts:116` — ถ้า `DOMAIN_VERIFY_MOCK=pass` ระบบจะผ่านการ verify custom domain โดยไม่เช็ค DNS จริง (test hook) — ตอนนี้ document ไว้ใน `.env.example` แบบคอมเมนต์ปิดไว้ ห้ามเผลอ set บน Vercel
 - [ ] **เปลี่ยนรหัสผ่าน super admin** จากค่า dev `superadmin@shopdash.local / SuperAdmin!2026` (ดู STATUS.md Blockers) — ตั้งบัญชี super admin ด้วยอีเมลจริง + รหัสแข็ง แล้ว disable/ลบบัญชี dev
 - [ ] **`PLATFORM_PROMPTPAY_ID` เป็น PromptPay จริงของแพลตฟอร์ม** (ตอนนี้ placeholder `0812345678`) — ถ้าผิด เงินค่าแพลนจากร้านค้าจะเข้าบัญชีผิด (regex ยอมรับเบอร์ 10 หลัก / บัตร ปชช. 13 หลัก) + ตั้ง `PLATFORM_PROMPTPAY_NAME` ให้ตรงชื่อบัญชี
 - [ ] **`SUPABASE_SERVICE_ROLE_KEY` / `R2_SECRET_ACCESS_KEY` ตั้งเป็น Server-only บน Vercel** (ห้ามมี prefix `NEXT_PUBLIC_`, ห้ามหลุด client) — service role ข้าม RLS ทั้งหมด
-- [ ] **ลบ debug log** `app/admin/(dashboard)/layout.tsx:25` `console.log('[DEBUG guard-fail]', …)` — log slug/host/สถานะ cookie ทุกครั้งที่ guard ร้านล้มเหลว (noise + ข้อมูลภายในใน log)
+- [x] ~~**ลบ debug log** `app/admin/(dashboard)/layout.tsx` `console.log('[DEBUG guard-fail]', …)`~~ — **แก้แล้ว 2026-07-09** (เหลือ `if (!user) redirect('/admin/login')`)
 
 ---
 
@@ -121,4 +122,4 @@
 
 ---
 
-*หมายเหตุ: §0 ข้อ "ลบ debug log" และการปรับ `SLIP_VERIFY_MOCK_MODE` ใน `.env.example` เป็น code change — บอกได้ถ้าให้แก้ให้เลย*
+*Code change ของ §0 ทำแล้วทั้งหมด (2026-07-09): ลบ debug log + `.env.example` default ปลอดภัย + document test hook `DOMAIN_VERIFY_MOCK` — ที่เหลือใน §0 เป็นค่า/บัญชีที่ต้องตั้งบน Vercel กับ Supabase เอง*
