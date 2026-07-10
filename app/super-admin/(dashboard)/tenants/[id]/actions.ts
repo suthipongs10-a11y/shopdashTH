@@ -6,6 +6,7 @@ import type { FeatureKey } from '@/lib/features';
 import {
   changeTenantPlan,
   downgradePrecheck,
+  extendTrial,
   fetchTenantById,
   setFeatureOverrides,
   setTenantStatus,
@@ -46,6 +47,25 @@ export async function superSetTenantStatus(
     return { done: true };
   } catch (err) {
     return { error: err instanceof Error ? err.message : 'ดำเนินการไม่สำเร็จ' };
+  }
+}
+
+// ---------- ขยายเวลาทดลองใช้ (Billing v2 — งานทำเว็บ P3/P4 เกิน trial 7 วัน) ----------
+
+export async function superExtendTrial(
+  tenantId: string,
+  _prev: StatusActionState,
+  formData: FormData,
+): Promise<StatusActionState> {
+  try {
+    const user = await requireSuperAdmin();
+    const days = Number(formData.get('days'));
+    await extendTrial(tenantId, days, user.email ?? user.id);
+    revalidatePath(`/tenants/${tenantId}`);
+    revalidatePath('/tenants');
+    return { done: true };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'ขยายเวลาทดลองใช้ไม่สำเร็จ' };
   }
 }
 
@@ -107,6 +127,7 @@ const OVERRIDE_KEYS: FeatureKey[] = [
   'discount_codes',
   'analytics_dashboard',
   'staff_accounts',
+  'theme_customize',
   'wishlist',
   'related_products',
 ];

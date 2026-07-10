@@ -30,7 +30,7 @@ export interface CheckoutCustomerInput {
 }
 
 export type CreateOrderResult =
-  | { ok: true; orderNumber: string; totalAmount: number }
+  | { ok: true; orderNumber: string; totalAmount: number; payToken: string }
   | { ok: false; status: number; error: string }
   | {
       ok: false;
@@ -238,7 +238,7 @@ export async function createOrder(
         ship_address: shipAddress,
         note: customer.note?.trim() || null,
       })
-      .select('id')
+      .select('id, public_token')
       .single();
 
     if (orderError) {
@@ -272,7 +272,8 @@ export async function createOrder(
       });
     }
 
-    return { ok: true, orderNumber, totalAmount };
+    // token แนบท้ายลิงก์หน้าสรุป/ชำระเงิน — เลขออร์เดอร์เดาได้ ต้องมี token จึงเห็นข้อมูลจัดส่ง
+    return { ok: true, orderNumber, totalAmount, payToken: order.public_token as string };
   }
 
   return failWithRelease({ ok: false, status: 500, error: 'ระบบหนาแน่น กรุณาลองใหม่อีกครั้ง' });

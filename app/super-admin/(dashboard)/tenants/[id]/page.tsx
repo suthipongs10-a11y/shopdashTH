@@ -7,7 +7,7 @@ import { formatBaht, formatThaiDate, formatThaiDateTime } from '@/lib/format';
 import { resolveFeatures } from '@/lib/features';
 import { fetchTenantById, TENANT_STATUS_TH } from '@/lib/platform/tenant-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { OverridesPanel, PlanPanel, StatusPanel } from './tenant-panels';
+import { OverridesPanel, PlanPanel, StatusPanel, TrialPanel } from './tenant-panels';
 
 export const dynamic = 'force-dynamic';
 
@@ -120,6 +120,14 @@ export default async function TenantDetailPage({
             ถูกระงับเมื่อ {formatThaiDateTime(tenant.locked_at)} — เกิน 60 วันจะถูกปิดถาวรโดย cron
           </p>
         )}
+        <div className="mt-4 border-t border-gray-100 pt-4">
+          <TrialPanel tenantId={tenant.id} trialEndsAt={tenant.trial_ends_at} />
+          {tenant.trial_ends_at && (
+            <p className="mt-1 text-xs text-gray-400">
+              ทดลองใช้ถึง {formatThaiDateTime(tenant.trial_ends_at)}
+            </p>
+          )}
+        </div>
       </Section>
 
       <Section title="แพลน">

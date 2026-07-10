@@ -1,4 +1,5 @@
-// หน้า "ปรับแต่งธีม" (งาน 4.3 — §4.6) เฉพาะธีม customizable (prem-01/02)
+// หน้า "ปรับแต่งธีม" (งาน 4.3 — §4.6) — gate ด้วย flag theme_customize ตามแพลน
+// (Billing v2: เดิมผูกกับธีม prem-01/02 — ตอนนี้แพลนที่เปิด flag ปรับได้ทุกธีม)
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export default async function CustomizeThemePage() {
   const ctx = await getTenantContext();
   const preset = getPreset(ctx.store.theme_code);
-  if (!preset.customizable) redirect('/admin/theme');
+  if (!ctx.features.theme_customize) redirect('/admin/theme');
 
   const overrides = ctx.store.theme_overrides as Record<string, string>;
   const effective = (token: keyof typeof preset.tokens) =>

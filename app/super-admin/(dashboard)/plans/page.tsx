@@ -2,7 +2,7 @@
 // ร้านที่ถือแพลนได้ค่าใหม่ทันทีเพราะ flag คำนวณจาก plan แบบ realtime (§5.2)
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { PlanForm, type PlanFormData } from './plan-form';
+import { NewPlanForm, PlanForm, type PlanFormData } from './plan-form';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +21,7 @@ export default async function PlansPage() {
         {plans.map((plan) => (
           <PlanForm key={plan.id} plan={plan} />
         ))}
+        <NewPlanForm />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { getTenantContext } from '@/lib/tenant-context';
-import { getPreset, THEME_PRESET_LIST } from '@/themes/presets';
+import { THEME_PRESET_LIST } from '@/themes/presets';
 import { AnnouncementForm } from './announcement-form';
 import { ThemePicker, type ThemeCardData } from './theme-picker';
 
@@ -10,7 +10,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function ThemePage() {
   const ctx = await getTenantContext();
-  const current = getPreset(ctx.store.theme_code);
+
+  // ปรับแต่งธีมได้ทุกธีมเมื่อแพลนเปิด flag theme_customize (Billing v2 — เดิมผูกกับ prem-01/02)
+  const canCustomize = ctx.features.theme_customize;
 
   const themes: ThemeCardData[] = THEME_PRESET_LIST.map((p) => ({
     code: p.code,
@@ -23,7 +25,7 @@ export default async function ThemePage() {
       p.tokens['--color-bg'],
     ],
     fontHeading: p.tokens['--font-heading'],
-    customizable: p.customizable === true,
+    customizable: canCustomize,
   }));
 
   return (
@@ -36,7 +38,7 @@ export default async function ThemePage() {
             ธีมที่ล็อกอยู่ปลดได้ด้วยการอัปเกรดแพลน
           </p>
         </div>
-        {current.customizable && (
+        {canCustomize && (
           <Link
             href="/admin/theme/customize"
             className="rounded-md border border-gray-900 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-900 hover:text-white"

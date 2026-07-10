@@ -15,7 +15,7 @@ export default async function SignupPage({
   const db = createAdminClient();
   const { data } = await db
     .from('plans')
-    .select('id, code, name_th, price_yearly')
+    .select('id, code, name_th, price_yearly, price_renewal')
     .eq('is_active', true)
     .order('price_yearly');
   const plans = (data ?? []) as SignupPlan[];

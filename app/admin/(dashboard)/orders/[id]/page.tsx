@@ -7,7 +7,8 @@ import { formatBaht, formatThaiDateTime } from '@/lib/format';
 import { CARRIER_TH, ORDER_STATUS_TH, type Carrier, type OrderStatus } from '@/lib/orders/status';
 import { presignGetUrl } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getTenantContext } from '@/lib/tenant-context';
+import { getTenantContext, type TenantContext } from '@/lib/tenant-context';
+import { CustomerSummaryPanel } from './customer-summary';
 import { OrderActionsPanel } from './order-actions-panel';
 
 const SLIP_STATUS_TH: Record<string, string> = {
@@ -32,7 +33,41 @@ interface AdminOrderRow {
   tracking_number: string | null;
   cancelled_reason: string | null;
   created_at: string;
+  public_token: string;
   order_items: { product_name: string; variant_label: string | null; unit_price: number; qty: number }[];
+}
+
+/** ข้อความสรุปออร์เดอร์สำเร็จรูป — แอดมินคัดลอกไปวางส่งลูกค้าในแชท (ลิงก์ต่อท้ายฝั่ง client) */
+function buildCustomerSummaryText(order: AdminOrderRow, ctx: TenantContext): string {
+  const store = ctx.store;
+  const lines: string[] = [
+    `สรุปคำสั่งซื้อ ${order.order_number} — ${store.name}`,
+    `สั่งซื้อเมื่อ ${formatThaiDateTime(order.created_at)}`,
+    '',
+    'รายการสินค้า:',
+    ...(order.order_items ?? []).map(
+      (i) =>
+        `• ${i.product_name}${i.variant_label ? ` (${i.variant_label})` : ''} × ${i.qty} = ${formatBaht(i.unit_price * i.qty)}`,
+    ),
+    '',
+    `รวมค่าสินค้า ${formatBaht(order.subtotal)}`,
+  ];
+  if (order.discount > 0) lines.push(`ส่วนลด -${formatBaht(order.discount)}`);
+  lines.push(
+    `ค่าจัดส่ง ${order.shipping_fee === 0 ? 'ส่งฟรี' : formatBaht(order.shipping_fee)}`,
+    `ยอดชำระสุทธิ ${formatBaht(order.total_amount)}`,
+  );
+  if (store.promptpay_id) {
+    lines.push(
+      '',
+      `ชำระผ่าน PromptPay: ${store.promptpay_id}${store.promptpay_account_name ? ` (${store.promptpay_account_name})` : ''}`,
+    );
+  }
+  if (store.order_cutoff_time) {
+    lines.push(`ตัดรอบจัดส่งทุกวัน ${store.order_cutoff_time} น. — ชำระก่อนเวลาตัดรอบ จัดส่งในรอบวันนั้น`);
+  }
+  lines.push('', `จัดส่งถึง: ${order.ship_name} (${order.ship_phone})`, order.ship_address);
+  return lines.join('\n');
 }
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -44,7 +79,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     .from('orders')
     .select(
       'id, order_number, status, subtotal, shipping_fee, discount, total_amount, ' +
-        'ship_name, ship_phone, ship_address, note, carrier, tracking_number, cancelled_reason, created_at, ' +
+        'ship_name, ship_phone, ship_address, note, carrier, tracking_number, cancelled_reason, created_at, public_token, ' +
         'order_items(product_name, variant_label, unit_price, qty)',
     )
     .eq('id', id)
@@ -118,6 +153,22 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <tfoot className="border-t border-gray-200 bg-gray-50 text-sm">
                 <tr>
                   <td colSpan={2} className="px-4 py-2 text-right text-gray-500">
+                    รวมค่าสินค้า
+                  </td>
+                  <td className="px-4 py-2 text-right">{formatBaht(order.subtotal)}</td>
+                </tr>
+                {order.discount > 0 && (
+                  <tr>
+                    <td colSpan={2} className="px-4 py-2 text-right text-gray-500">
+                      ส่วนลด
+                    </td>
+                    <td className="px-4 py-2 text-right text-green-700">
+                      -{formatBaht(order.discount)}
+                    </td>
+                  </tr>
+                )}
+                <tr>
+                  <td colSpan={2} className="px-4 py-2 text-right text-gray-500">
                     ค่าจัดส่ง
                   </td>
                   <td className="px-4 py-2 text-right">
@@ -177,6 +228,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
         <div className="space-y-6">
           <OrderActionsPanel orderId={order.id} status={status} />
+
+          {/* ลิงก์/ข้อความสรุปสำหรับส่งลูกค้า — ลิงก์แนบ public_token */}
+          <CustomerSummaryPanel
+            payPath={`/orders/${order.order_number}/pay?t=${order.public_token}`}
+            summaryText={buildCustomerSummaryText(order, ctx)}
+          />
 
           {/* ข้อมูลจัดส่ง */}
           <section className="rounded-md border border-gray-200 bg-white p-4 text-sm">

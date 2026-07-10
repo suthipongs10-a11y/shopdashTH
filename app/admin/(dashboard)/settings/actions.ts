@@ -11,6 +11,7 @@ export interface SettingsState {
 }
 
 const PROMPTPAY_PATTERN = /^[0-9]{10}$|^[0-9]{13}$/;
+const CUTOFF_TIME_PATTERN = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 // ตั้งค่าร้านแก้ได้เฉพาะ "เจ้าของร้าน" (§2.3 P4: staff สิทธิ์เท่า owner ยกเว้น ตั้งค่าร้าน/แพลน/staff)
 async function requireUser(): Promise<boolean> {
@@ -32,10 +33,15 @@ export async function updateStoreSettings(
   const phone = String(formData.get('phone') ?? '').trim();
   const flatShippingFee = Number(formData.get('flat_shipping_fee'));
   const freeShippingMinRaw = String(formData.get('free_shipping_min') ?? '').trim();
+  const orderCutoffTime = String(formData.get('order_cutoff_time') ?? '').trim();
+  const shippingNote = String(formData.get('shipping_note_th') ?? '').trim();
 
   if (!name) return { error: 'กรุณากรอกชื่อร้าน' };
   if (promptpayId && !PROMPTPAY_PATTERN.test(promptpayId)) {
     return { error: 'PromptPay ID ต้องเป็นเบอร์มือถือ 10 หลัก หรือเลขบัตรประชาชน 13 หลัก' };
+  }
+  if (orderCutoffTime && !CUTOFF_TIME_PATTERN.test(orderCutoffTime)) {
+    return { error: 'เวลาตัดรอบต้องเป็นรูปแบบ HH:MM เช่น 14:00' };
   }
   if (!Number.isInteger(flatShippingFee) || flatShippingFee < 0) {
     return { error: 'ค่าส่งต้องเป็นจำนวนเต็มไม่ติดลบ' };
@@ -60,6 +66,8 @@ export async function updateStoreSettings(
       phone: phone || null,
       flat_shipping_fee: flatShippingFee,
       free_shipping_min: freeShippingMin,
+      order_cutoff_time: orderCutoffTime || null,
+      shipping_note_th: shippingNote || null,
     })
     .eq('tenant_id', ctx.tenantId);
 

@@ -2,6 +2,24 @@
 
 บันทึกการตัดสินใจเมื่อเจอความกำกวมที่ CLAUDE.md ไม่ครอบคลุม (ตามกติกา §0.8)
 
+## 2026-07-10 — Billing v2: ราคาปีแรก ≠ ค่าดูแลรายปี (โมเดลรับจ้างทำเว็บ)
+เป้าหมายธุรกิจเปลี่ยนเป็น agency รับจ้างสร้างเว็บ 4 แพ็กเกจ (990/3,900/7,900/15,900 + ค่าดูแลรายปี 590/1,200/2,400/4,900) — เพิ่ม `plans.price_renewal` (null = เท่าปีแรก เข้ากันได้กับแพลนเดิม) ยอดเรียกเก็บตัดสินจากประวัติ: ร้านที่ "เคยมี subscription อนุมัติแล้ว" จ่าย price_renewal, จ่ายครั้งแรกจ่าย price_yearly (รวมค่าจัดทำ) — ดู `isRenewalTenant()`/`planChargeAmount()` ใน lib/billing.ts แพลนเก่า starter/pro/premium ปิดขาย (is_active=false) ร้านที่ถืออยู่ไม่กระทบ; seed.sql ต้อง insert แพลนเก่าเป็น is_active=false เพราะติดตั้งใหม่รัน migrations ก่อน seed
+
+## 2026-07-10 — แพ็กเกจใหม่ 4 ตัว: การแมปค่าที่สเปคธุรกิจไม่ได้ระบุ
+ตารางแพ็กเกจของเจ้าของไม่ได้ระบุ staff/รูปต่อสินค้า — ตัดสินใจ: p1-start (staff 0, รูป 3, tier 1), p2-shop (staff 0, รูป 6, tier 3 — "เลือกได้ทุก template"), p3-business (staff 3, รูป 10), p4-premium (staff 5, รูป 15) / "แดชบอร์ดพื้นฐาน" ของ p1/p2 = การ์ดสรุปที่เปิดให้ทุกแพลนอยู่แล้ว (ตาม decision 2026-07-09) flag `analytics_dashboard` เปิดเฉพาะ p3/p4 / "ปรับสี/โลโก้" ของ p2 ขึ้นไป = flag ใหม่ `theme_customize`
+
+## 2026-07-10 — theme_customize เป็น feature flag ตามแพลน แทนผูกกับธีม prem-01/02
+เดิมหน้า "ปรับแต่งธีม" เปิดเฉพาะ preset ที่ `customizable: true` (prem-01/02) — แพ็กเกจใหม่ให้ P2+ ปรับสี/ฟอนต์ได้ทุกธีม จึง gate ด้วย `ctx.features.theme_customize` (UI ซ่อน + server ตรวจซ้ำใน saveThemeOverrides) กลไก merge overrides รองรับทุกธีมอยู่แล้ว (ThemeScope ส่ง overrides เสมอ) — คงสิทธิ์ของเดิมโดย migration 007 เติม flag ให้แพลน premium เก่า + feature_defaults ของ prem-01/02
+
+## 2026-07-10 — ขยาย trial ได้จาก UI super admin (extendTrial)
+งานจัดทำร้าน P3/P4 ใช้เวลา 10–20 วัน เกิน trial 7 วัน — cron จะล็อกร้านกลางคัน จึงเพิ่มปุ่ม "ขยาย trial" ในหน้า detail ร้าน (ต่อจากวันหมดเดิม, 1–365 วัน, เขียน audit log `trial_extended`) — ไม่แตะ status: ร้านที่ locked ไปแล้วให้ super admin ตั้งกลับเป็น trial ผ่าน StatusPanel เอง (แยกความรับผิดชอบชัด)
+
+## 2026-07-10 — หน้าสรุปออร์เดอร์: ข้อมูลจัดส่งต้องมี public_token ในลิงก์
+ยกระดับหน้า pay เป็น "สรุปคำสั่งซื้อมืออาชีพ" (รายการสินค้า+ราคาต่อชิ้น, รวม/ส่วนลด/ค่าส่ง/สุทธิ, QR ยอดตรงจาก PromptPay ร้าน, เวลาตัดรอบจัดส่ง, ที่อยู่จัดส่ง, ติดต่อร้าน) — แต่เลขออร์เดอร์รูปแบบ {SLUG}-{YYMMDD}-{run4} เดาไล่เลขได้ การโชว์ที่อยู่/เบอร์ลูกค้าด้วยเลขออร์เดอร์เดี่ยวๆ = privacy leak จึงเพิ่ม `orders.public_token` (uuid) แนบใน redirect หลัง checkout และลิงก์ที่แอดมินคัดลอกส่งลูกค้า: token ตรง = เห็นข้อมูลจัดส่งเต็ม, ไม่มี token = เห็นเฉพาะรายการ+ยอด (พฤติกรรมเดิมตาม decision 2026-07-07) หน้า track (เลขออร์เดอร์+เบอร์) ยังใช้ได้เหมือนเดิม
+
+## 2026-07-10 — เวลาตัดรอบจัดส่งเป็น setting ของร้าน (order_cutoff_time + shipping_note_th)
+"เราจะตัดยอดกี่โมง" ต่างกันทุกร้าน — เก็บใน stores (HH:MM + free text) ตั้งจากหน้า ตั้งค่าร้าน แสดงในหน้าสรุปออร์เดอร์และข้อความสรุปที่ส่งลูกค้า ข้อความมาตรฐาน: "ชำระก่อนเวลาตัดรอบ จัดส่งในรอบวันนั้น" — ไม่ผูก logic ตัดรอบเข้ากับระบบออร์เดอร์ (เป็นข้อมูลแจ้งลูกค้า ไม่ใช่ SLA อัตโนมัติ)
+
 ## 2026-07-06 — JWT helper functions อยู่ schema `public` แทน `auth`
 §3.2 ระบุให้สร้าง `auth.tenant_id()` ฯลฯ แต่โปรเจ็ค Supabase ที่สร้างใหม่ role `postgres` ถูก revoke สิทธิ์ CREATE ใน schema `auth` แล้ว (migration จะ fail ด้วย permission denied) จึงย้ายไป `public` โดย map ชื่อ: `auth.tenant_id()` → `public.app_tenant_id()`, `auth.app_role()` → `public.app_role()`, `auth.is_super_admin()` → `public.is_super_admin()` — RLS policies ใน Phase 2 ต้องเรียกชื่อชุดนี้แทน
 

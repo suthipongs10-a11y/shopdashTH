@@ -32,6 +32,28 @@ function computePeriod(currentEndsAt: string | null): { start: Date; end: Date }
 }
 
 /**
+ * ร้านนี้เป็น "ลูกค้าต่ออายุ" หรือยัง — เคยมี subscription อนุมัติแล้วอย่างน้อย 1 ใบ
+ * = จ่ายรอบถัดไปคิด "ค่าดูแลรายปี" (price_renewal) แทนราคาปีแรกซึ่งรวมค่าจัดทำ
+ */
+export async function isRenewalTenant(tenantId: string): Promise<boolean> {
+  const db = createAdminClient();
+  const { count } = await db
+    .from('tenant_subscriptions')
+    .select('id', { count: 'exact', head: true })
+    .eq('tenant_id', tenantId)
+    .eq('status', 'approved');
+  return (count ?? 0) > 0;
+}
+
+/** ยอดที่ต้องชำระของแพลน — ปีแรก = price_yearly, ต่ออายุ = price_renewal (null = เท่าปีแรก) */
+export function planChargeAmount(
+  plan: { price_yearly: number; price_renewal: number | null },
+  isRenewal: boolean,
+): number {
+  return isRenewal ? (plan.price_renewal ?? plan.price_yearly) : plan.price_yearly;
+}
+
+/**
  * ร้านส่งคำขอชำระค่าแพลน (แนบสลิป) — กันคำขอ pending ซ้อน (ทีละใบ เหมือนกติกาสลิปออร์เดอร์ §7.3)
  * planId = แพลนที่ต้องการ (ต่ออายุแพลนเดิม หรือขออัปเกรดเป็นแพลนอื่น §2.3)
  */
@@ -54,7 +76,7 @@ export async function createSubscriptionRequest(
 
   const { data: plan } = await db
     .from('plans')
-    .select('id, price_yearly, is_active')
+    .select('id, price_yearly, price_renewal, is_active')
     .eq('id', planId)
     .single();
   if (!plan || !plan.is_active) return { ok: false, error: 'ไม่พบแพลนที่เลือก' };
@@ -66,11 +88,15 @@ export async function createSubscriptionRequest(
     .single();
   if (!tenant) return { ok: false, error: 'ไม่พบร้านค้า' };
 
+  // ปีแรก (รวมค่าจัดทำ) vs ค่าดูแลรายปี — ตัดสินจากประวัติอนุมัติ ไม่เชื่อ client
+  const renewal = await isRenewalTenant(tenantId);
+  const amount = planChargeAmount(plan, renewal);
+
   const period = computePeriod(tenant.subscription_ends_at);
   const { error } = await db.from('tenant_subscriptions').insert({
     tenant_id: tenantId,
     plan_id: planId,
-    amount: plan.price_yearly,
+    amount,
     slip_r2_key: slipR2Key,
     status: 'pending',
     period_start: period.start.toISOString(),
@@ -80,7 +106,8 @@ export async function createSubscriptionRequest(
 
   await logTenantEvent(tenantId, 'subscription_request', 'ok', {
     plan_id: planId,
-    amount: plan.price_yearly,
+    amount,
+    is_renewal: renewal,
   });
   return { ok: true };
 }

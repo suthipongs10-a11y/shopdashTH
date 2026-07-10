@@ -5,6 +5,7 @@ import { FEATURE_LABEL_TH, type FeatureKey } from '@/lib/features-shared';
 import type { TenantStatus } from '@/lib/platform/tenant-admin';
 import {
   superChangePlan,
+  superExtendTrial,
   superSaveOverrides,
   superSetTenantStatus,
   type OverridesState,
@@ -66,6 +67,51 @@ export function StatusPanel({
       </div>
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state.done && <p className="text-sm text-green-700">บันทึกสถานะแล้ว</p>}
+    </form>
+  );
+}
+
+// ---------- ขยายเวลาทดลองใช้ (Billing v2 — งานทำเว็บ P3/P4 ใช้เวลาเกิน trial 7 วัน) ----------
+
+export function TrialPanel({
+  tenantId,
+  trialEndsAt,
+}: {
+  tenantId: string;
+  trialEndsAt: string | null;
+}) {
+  const [state, formAction, pending] = useActionState<StatusActionState, FormData>(
+    superExtendTrial.bind(null, tenantId),
+    {},
+  );
+
+  return (
+    <form action={formAction} className="space-y-2">
+      <div className="flex flex-wrap items-end gap-3">
+        <div>
+          <label htmlFor="trial-days" className="mb-1 block text-xs font-medium text-gray-500">
+            ขยายเวลาทดลองใช้ (วัน)
+          </label>
+          <input
+            id="trial-days"
+            name="days"
+            type="number"
+            min={1}
+            max={365}
+            defaultValue={14}
+            className={`${inputClass} w-24`}
+          />
+        </div>
+        <button type="submit" disabled={pending} className={buttonClass}>
+          {pending ? 'กำลังขยาย…' : 'ขยาย trial'}
+        </button>
+      </div>
+      <p className="text-xs text-gray-400">
+        ต่อจากวันหมดเดิม{trialEndsAt ? '' : ' (ยังไม่เคยตั้ง — เริ่มนับจากวันนี้)'} — ใช้เมื่องานจัดทำร้าน
+        (แพลนธุรกิจ/พรีเมียม) ใช้เวลาเกินช่วงทดลอง 7 วัน ร้านจะได้ไม่ถูกล็อกกลางคัน
+      </p>
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.done && <p className="text-sm text-green-700">ขยายเวลาทดลองใช้แล้ว</p>}
     </form>
   );
 }
@@ -145,6 +191,7 @@ const OVERRIDE_KEYS: FeatureKey[] = [
   'discount_codes',
   'analytics_dashboard',
   'staff_accounts',
+  'theme_customize',
   'wishlist',
   'related_products',
 ];

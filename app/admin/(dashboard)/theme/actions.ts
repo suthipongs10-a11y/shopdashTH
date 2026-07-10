@@ -63,7 +63,7 @@ export async function setAnnouncementText(
   return { success: true };
 }
 
-// ---------- ปรับแต่งธีม (§4.6 — เฉพาะธีม customizable: prem-01/02) ----------
+// ---------- ปรับแต่งธีม (§4.6 — gate ด้วย flag theme_customize ตามแพลน) ----------
 
 // token ที่เปิดให้ร้านแก้จากหน้า "ปรับแต่งธีม"
 const CUSTOMIZABLE_TOKENS = ['--color-primary', '--color-accent', '--radius-md'] as const;
@@ -77,10 +77,11 @@ export async function saveThemeOverrides(
   const ctx = await getTenantContext();
   if (!(await getStoreUser(ctx))) return { error: 'กรุณาเข้าสู่ระบบ' };
 
-  const preset = getPreset(ctx.store.theme_code);
-  if (!preset.customizable) {
-    return { error: 'ธีมนี้ไม่รองรับการปรับแต่ง — ใช้ได้กับธีมซิกเนเจอร์และมินิมอลพรีเมียม' };
+  // server ตรวจ flag ซ้ำเสมอ ห้ามเชื่อ UI (§3.7)
+  if (!ctx.features.theme_customize) {
+    return { error: 'แพลนของร้านยังไม่รองรับการปรับแต่งธีม — อัปเกรดแพลนเพื่อปลดล็อก' };
   }
+  const preset = getPreset(ctx.store.theme_code);
 
   const overrides: Record<string, string> = {};
 

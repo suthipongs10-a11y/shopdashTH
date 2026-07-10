@@ -88,6 +88,51 @@ export async function setTenantStatus(
   });
 }
 
+/**
+ * ขยายเวลาทดลองใช้ (Billing v2 — โมเดลรับจ้างทำเว็บ: งาน P3/P4 ใช้เวลาทำ 10–20 วัน
+ * เกิน trial 7 วัน ต้องขยายได้จาก UI ไม่งั้น cron ล็อกร้านกลางคันระหว่างยังทำเว็บให้ลูกค้า)
+ * ต่อจากวันหมดเดิมถ้ายังไม่หมด / ต่อจากวันนี้ถ้าหมดแล้ว — ไม่แตะ status
+ * (ร้านที่ locked ไปแล้วให้ super admin ตั้งกลับเป็น trial ผ่าน StatusPanel)
+ */
+export async function extendTrial(
+  tenantId: string,
+  days: number,
+  actor: string,
+): Promise<string> {
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    throw new Error('จำนวนวันต้องเป็นจำนวนเต็ม 1–365');
+  }
+
+  const db = createAdminClient();
+  const { data: tenant } = await db
+    .from('tenants')
+    .select('slug, trial_ends_at')
+    .eq('id', tenantId)
+    .single();
+  if (!tenant) throw new Error('ไม่พบร้านค้า');
+
+  const base = Math.max(
+    Date.now(),
+    tenant.trial_ends_at ? new Date(tenant.trial_ends_at).getTime() : 0,
+  );
+  const newEnd = new Date(base + days * 24 * 60 * 60 * 1000).toISOString();
+
+  const { error } = await db
+    .from('tenants')
+    .update({ trial_ends_at: newEnd })
+    .eq('id', tenantId);
+  if (error) throw new Error(`ขยายเวลาทดลองใช้ไม่สำเร็จ: ${error.message}`);
+
+  invalidateTenantCache(tenant.slug);
+  await logTenantEvent(tenantId, 'trial_extended', 'ok', {
+    days,
+    from: tenant.trial_ends_at,
+    to: newEnd,
+    actor,
+  });
+  return newEnd;
+}
+
 export interface DowngradePrecheck {
   ok: boolean;
   warnings: string[];

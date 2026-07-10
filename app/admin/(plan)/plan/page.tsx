@@ -2,6 +2,7 @@
 // ผ่าน PromptPay QR "ของแพลตฟอร์ม" + อัปสลิป (§5.3 ข้อ 9–10) — เข้าได้แม้ร้าน locked
 
 import Link from 'next/link';
+import { isRenewalTenant, planChargeAmount } from '@/lib/billing';
 import { formatBaht, formatThaiDate, formatThaiDateTime } from '@/lib/format';
 import { generatePromptpayQrSvg } from '@/lib/promptpay';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -15,6 +16,7 @@ interface PlanOption {
   code: string;
   name_th: string;
   price_yearly: number;
+  price_renewal: number | null;
 }
 
 interface SubHistoryRow {
@@ -52,10 +54,10 @@ export default async function MyPlanPage({
   const ctx = await getTenantContextAllowLocked();
 
   const db = createAdminClient();
-  const [{ data: plansData }, { data: subsData }] = await Promise.all([
+  const [{ data: plansData }, { data: subsData }, renewal] = await Promise.all([
     db
       .from('plans')
-      .select('id, code, name_th, price_yearly')
+      .select('id, code, name_th, price_yearly, price_renewal')
       .eq('is_active', true)
       .order('price_yearly'),
     db
@@ -66,6 +68,7 @@ export default async function MyPlanPage({
       .eq('tenant_id', ctx.tenantId)
       .order('created_at', { ascending: false })
       .limit(10),
+    isRenewalTenant(ctx.tenantId),
   ]);
 
   const plans = (plansData ?? []) as PlanOption[];
@@ -79,12 +82,15 @@ export default async function MyPlanPage({
   const pendingSub = subs.find((s) => s.status === 'pending');
   const lastRejected = !pendingSub && subs[0]?.status === 'rejected' ? subs[0] : undefined;
 
+  // ปีแรก = ราคาเต็ม (รวมค่าจัดทำ) / เคยชำระแล้ว = ค่าดูแลรายปี
+  const payAmount = payPlan ? planChargeAmount(payPlan, renewal) : 0;
+
   const platformPromptpayId = process.env.PLATFORM_PROMPTPAY_ID ?? '';
   const platformPromptpayName = process.env.PLATFORM_PROMPTPAY_NAME ?? 'ShopDash';
   let qrSvg: string | null = null;
   if (payPlan && platformPromptpayId && !pendingSub) {
     try {
-      qrSvg = await generatePromptpayQrSvg(platformPromptpayId, payPlan.price_yearly);
+      qrSvg = await generatePromptpayQrSvg(platformPromptpayId, payAmount);
     } catch {
       qrSvg = null;
     }
@@ -104,7 +110,10 @@ export default async function MyPlanPage({
         <p className="text-lg font-medium text-gray-900">
           {ctx.plan.name_th}{' '}
           <span className="text-sm font-normal text-gray-400">
-            ({formatBaht(ctx.plan.price_yearly)}/ปี)
+            (ปีแรก {formatBaht(ctx.plan.price_yearly)}
+            {ctx.plan.price_renewal !== null &&
+              ` · ค่าดูแลรายปี ${formatBaht(ctx.plan.price_renewal)}`}
+            )
           </span>
         </p>
         <p className="mt-1 text-sm text-gray-500">
@@ -146,7 +155,8 @@ export default async function MyPlanPage({
                         : 'border-gray-300 text-gray-700 hover:border-gray-500'
                     }`}
                   >
-                    {p.name_th} · {formatBaht(p.price_yearly)}/ปี
+                    {p.name_th} · {formatBaht(planChargeAmount(p, renewal))}
+                    {renewal && p.price_renewal !== null ? '/ปี (ต่ออายุ)' : '/ปีแรก'}
                     {p.id === ctx.plan.id && ' (ปัจจุบัน)'}
                   </Link>
                 );
@@ -175,8 +185,9 @@ export default async function MyPlanPage({
                 </div>
                 <div className="min-w-64 flex-1 space-y-4">
                   <p className="text-sm text-gray-600">
-                    สแกนจ่าย <span className="text-xl font-bold text-gray-900">{formatBaht(payPlan.price_yearly)}</span>{' '}
+                    สแกนจ่าย <span className="text-xl font-bold text-gray-900">{formatBaht(payAmount)}</span>{' '}
                     สำหรับแพลน <span className="font-medium">{payPlan.name_th}</span> 1 ปี
+                    {renewal ? ' (ค่าดูแลรายปี)' : ' (ปีแรก รวมค่าจัดทำร้าน)'}
                     แล้วแนบสลิปด้านล่าง — ทีมงานตรวจสอบแล้วจะเปิดใช้งานให้ทันที
                   </p>
                   <PlanSlipUploader planId={payPlan.id} />

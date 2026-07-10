@@ -33,6 +33,8 @@ export default async function SettingsPage() {
           phone: store.phone,
           flat_shipping_fee: store.flat_shipping_fee,
           free_shipping_min: store.free_shipping_min,
+          order_cutoff_time: store.order_cutoff_time,
+          shipping_note_th: store.shipping_note_th,
           logoUrl: store.logo_r2_key ? publicR2Url(store.logo_r2_key) : null,
           bannerUrl: store.banner_r2_key ? publicR2Url(store.banner_r2_key) : null,
         }}

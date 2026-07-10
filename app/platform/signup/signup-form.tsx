@@ -10,6 +10,7 @@ export interface SignupPlan {
   code: string;
   name_th: string;
   price_yearly: number;
+  price_renewal: number | null;
 }
 
 const inputClass =
@@ -131,7 +132,7 @@ export function SignupForm({
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <p className="mb-2 text-sm font-medium text-gray-700">เลือกแพลน (ทดลองฟรี 7 วัน)</p>
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-2">
           {plans.map((plan) => (
             <label
               key={plan.id}
@@ -151,7 +152,12 @@ export function SignupForm({
               />
               <span className="block font-medium">{plan.name_th}</span>
               <span className={planId === plan.id ? 'text-gray-300' : 'text-gray-400'}>
-                ฿{plan.price_yearly.toLocaleString('th-TH')}/ปี
+                ฿{plan.price_yearly.toLocaleString('th-TH')}/ปีแรก
+                {plan.price_renewal !== null && (
+                  <span className="block text-xs">
+                    ต่ออายุ ฿{plan.price_renewal.toLocaleString('th-TH')}/ปี
+                  </span>
+                )}
               </span>
             </label>
           ))}

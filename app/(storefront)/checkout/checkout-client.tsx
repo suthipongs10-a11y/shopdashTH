@@ -85,6 +85,7 @@ export function CheckoutClient({
       });
       const json = (await res.json()) as {
         orderNumber?: string;
+        payToken?: string;
         error?: string;
         priceChanged?: boolean;
         items?: { variantId: string; unitPrice: number }[];
@@ -92,7 +93,9 @@ export function CheckoutClient({
 
       if (res.ok && json.orderNumber) {
         cart.clear();
-        router.push(`/orders/${json.orderNumber}/pay`);
+        // token ทำให้หน้าสรุปแสดงข้อมูลจัดส่งเต็ม (ไม่มี token เห็นเฉพาะรายการ+ยอด)
+        const tokenParam = json.payToken ? `?t=${json.payToken}` : '';
+        router.push(`/orders/${json.orderNumber}/pay${tokenParam}`);
         return;
       }
 

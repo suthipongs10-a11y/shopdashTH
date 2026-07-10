@@ -28,6 +28,8 @@ export interface PlanRow {
   code: string;
   name_th: string;
   price_yearly: number;
+  /** ค่าดูแลรายปี (ต่ออายุ) — null = ราคาเดียวกับปีแรก */
+  price_renewal: number | null;
   max_products: number;
   max_images_per_product: number;
   max_staff: number;
@@ -52,6 +54,9 @@ export interface StoreRow {
   theme_overrides: Record<string, unknown>;
   announcement_text: string | null;
   line_channel_access_token: string | null;
+  /** เวลาตัดรอบจัดส่งรายวัน HH:MM (เวลาไทย) — null = ไม่แสดง */
+  order_cutoff_time: string | null;
+  shipping_note_th: string | null;
 }
 
 export interface TenantContext {

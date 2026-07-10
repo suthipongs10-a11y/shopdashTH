@@ -83,6 +83,8 @@ export interface SettingsFormValues {
   phone: string | null;
   flat_shipping_fee: number;
   free_shipping_min: number | null;
+  order_cutoff_time: string | null;
+  shipping_note_th: string | null;
   logoUrl: string | null;
   bannerUrl: string | null;
 }
@@ -169,6 +171,37 @@ export function SettingsForm({ values }: { values: SettingsFormValues }) {
               min={1}
               step={1}
               defaultValue={values.free_shipping_min ?? ''}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="order_cutoff_time" className="mb-1 block text-sm font-medium text-gray-700">
+              เวลาตัดรอบจัดส่งรายวัน (เว้นว่าง = ไม่แสดง)
+            </label>
+            <input
+              id="order_cutoff_time"
+              name="order_cutoff_time"
+              type="time"
+              defaultValue={values.order_cutoff_time ?? ''}
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              แสดงในหน้าสรุปคำสั่งซื้อของลูกค้า เช่น &ldquo;ชำระก่อน 14:00 น. จัดส่งวันเดียวกัน&rdquo;
+            </p>
+          </div>
+          <div>
+            <label htmlFor="shipping_note_th" className="mb-1 block text-sm font-medium text-gray-700">
+              หมายเหตุการจัดส่ง (แสดงให้ลูกค้า)
+            </label>
+            <textarea
+              id="shipping_note_th"
+              name="shipping_note_th"
+              rows={3}
+              placeholder="เช่น จัดส่งทุกวันจันทร์–เสาร์ งดส่งวันอาทิตย์และวันหยุดนักขัตฤกษ์"
+              defaultValue={values.shipping_note_th ?? ''}
               className={inputClass}
             />
           </div>

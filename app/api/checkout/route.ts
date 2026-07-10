@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     if (result.ok) {
       // แจ้งเตือน LINE (P4 — fire-and-forget, fail แล้วไม่กระทบออร์เดอร์)
       await notifyNewOrder(ctx, result.orderNumber, result.totalAmount);
-      return NextResponse.json({ orderNumber: result.orderNumber });
+      return NextResponse.json({ orderNumber: result.orderNumber, payToken: result.payToken });
     }
     if ('priceChanged' in result) {
       return NextResponse.json(

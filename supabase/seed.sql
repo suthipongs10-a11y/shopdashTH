@@ -8,10 +8,12 @@
 -- ============================================================
 
 -- ------------------------------------------------------------
--- Plans (ค่าเริ่มต้นตามตาราง §5.1 — แก้ภายหลังได้จาก Super Admin UI)
+-- Plans ชุดเดิม §5.1 — ปิดขายแล้ว (Billing v2 ใช้แพ็กเกจใหม่ใน 007)
+-- ยังต้อง seed เพราะ demo/shop2 อ้างถึง และติดตั้งใหม่รัน migrations ก่อน seed
+-- (ถ้า seed insert เป็น active จะไปเปิดขายแพลนเก่าทับ 007)
 -- ------------------------------------------------------------
 insert into plans
-  (code, name_th, price_yearly, max_products, max_images_per_product, max_staff, allowed_theme_tier, features)
+  (code, name_th, price_yearly, max_products, max_images_per_product, max_staff, allowed_theme_tier, features, is_active)
 values
   ('starter', 'สตาร์ทเตอร์', 990, 50, 3, 0, 1, '{
     "custom_domain": false,
@@ -20,7 +22,7 @@ values
     "discount_codes": false,
     "analytics_dashboard": false,
     "staff_accounts": false
-  }'::jsonb),
+  }'::jsonb, false),
   ('pro', 'โปร', 1990, 300, 6, 2, 2, '{
     "custom_domain": true,
     "slip_verify_api": false,
@@ -28,15 +30,16 @@ values
     "discount_codes": true,
     "analytics_dashboard": true,
     "staff_accounts": true
-  }'::jsonb),
+  }'::jsonb, false),
   ('premium', 'พรีเมียม', 3990, -1, 10, 5, 3, '{
     "custom_domain": true,
     "slip_verify_api": true,
     "line_oa": true,
     "discount_codes": true,
     "analytics_dashboard": true,
-    "staff_accounts": true
-  }'::jsonb)
+    "staff_accounts": true,
+    "theme_customize": true
+  }'::jsonb, false)
 on conflict (code) do nothing;
 
 -- ------------------------------------------------------------
