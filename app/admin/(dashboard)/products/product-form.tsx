@@ -14,7 +14,7 @@ export interface ProductFormProduct {
 }
 
 const inputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900';
+  'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100';
 
 const initialState: ProductActionState = {};
 
@@ -41,7 +41,7 @@ export function ProductForm({
     <form action={formAction} className="max-w-xl space-y-4">
       <div>
         <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-          ชื่อสินค้า <span className="text-red-600">*</span>
+          ชื่อสินค้า <span className="text-rose-600">*</span>
         </label>
         <input
           id="name"
@@ -87,7 +87,7 @@ export function ProductForm({
         </div>
         <div>
           <label htmlFor="base_price" className="mb-1 block text-sm font-medium text-gray-700">
-            ราคาตั้งต้น (บาท) <span className="text-red-600">*</span>
+            ราคาตั้งต้น (บาท) <span className="text-rose-600">*</span>
           </label>
           <input
             id="base_price"
@@ -131,13 +131,13 @@ export function ProductForm({
         </div>
       </div>
 
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
       {savedFlash && <p className="text-sm text-green-600">บันทึกแล้ว</p>}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
         {pending ? 'กำลังบันทึก…' : product ? 'บันทึกการแก้ไข' : 'สร้างสินค้า'}
       </button>

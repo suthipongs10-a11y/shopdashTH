@@ -1,6 +1,8 @@
 // คิวอนุมัติสลิปแบบ manual — ดีฟอลต์ของทุกแพลน (§2.2)
 // เรียงเก่าสุดก่อน / รูปสลิปเสิร์ฟผ่าน presigned GET อายุ 15 นาที (§3.9)
 
+import { AlertIcon, CheckCircleIcon } from '@/components/admin/icons';
+import { EmptyState, PageHeader } from '@/components/admin/ui';
 import { formatBaht, formatThaiDateTime } from '@/lib/format';
 import { presignGetUrl } from '@/lib/r2';
 import { parseTransRef } from '@/lib/slip-qr';
@@ -41,27 +43,35 @@ export default async function SlipsQueuePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">คิวตรวจสอบสลิป</h1>
-        <p className="text-sm text-gray-500">{slips.length} รายการรอตรวจ</p>
-      </div>
+      <PageHeader
+        title="คิวตรวจสอบสลิป"
+        description={
+          slips.length > 0 ? `${slips.length} รายการรอตรวจ — เรียงเก่าสุดก่อน` : 'ไม่มีรายการค้าง'
+        }
+      />
 
       {/* คำเตือนหลัก — ระบบเช็คสลิปเป็นแค่ด่านแรก เงินเข้าจริงต้องเช็คจากธนาคารเอง */}
-      <div className="rounded-lg border-2 border-red-500 bg-red-50 px-5 py-4">
-        <p className="text-lg font-bold text-red-700">
-          ⚠️ ก่อนกดอนุมัติทุกครั้ง — ตรวจสอบเงินเข้าบัญชีด้วยตัวเองให้แน่ชัด
-        </p>
-        <p className="mt-1 text-sm text-red-700">
-          เปิดแอปธนาคาร/ข้อความแจ้งเตือนเงินเข้าของธนาคาร เช็คว่า <strong>ยอดเงินเข้าตรงกับออร์เดอร์จริง</strong>{' '}
-          — ระบบตรวจสลิปของ ShopDash เป็นเพียงการคัดกรองเบื้องต้น (กันสลิปซ้ำ/สลิปไม่มี QR){' '}
-          <strong>ไม่สามารถยืนยันว่าเงินเข้าบัญชีแล้ว</strong>
-        </p>
+      <div className="flex gap-3 rounded-xl border border-rose-200 bg-rose-50 px-5 py-4">
+        <AlertIcon size={20} className="mt-0.5 shrink-0 text-rose-500" />
+        <div>
+          <p className="font-bold text-rose-700">
+            ก่อนกดอนุมัติทุกครั้ง — ตรวจสอบเงินเข้าบัญชีด้วยตัวเองให้แน่ชัด
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-rose-700">
+            เปิดแอปธนาคาร/ข้อความแจ้งเตือนเงินเข้าของธนาคาร เช็คว่า{' '}
+            <strong>ยอดเงินเข้าตรงกับออร์เดอร์จริง</strong> — ระบบตรวจสลิปของ ShopDash
+            เป็นเพียงการคัดกรองเบื้องต้น (กันสลิปซ้ำ/สลิปไม่มี QR){' '}
+            <strong>ไม่สามารถยืนยันว่าเงินเข้าบัญชีแล้ว</strong>
+          </p>
+        </div>
       </div>
 
       {cards.length === 0 ? (
-        <p className="rounded-md border border-gray-200 bg-white px-4 py-10 text-center text-sm text-gray-500">
-          ไม่มีสลิปรอตรวจสอบ 🎉
-        </p>
+        <EmptyState
+          icon={<CheckCircleIcon size={22} />}
+          title="ไม่มีสลิปรอตรวจสอบ"
+          sub="เมื่อลูกค้าอัปโหลดสลิปใหม่ รายการจะขึ้นที่นี่ทันที"
+        />
       ) : (
         <div className="space-y-4">
           {cards.map(({ slip, imageUrl }) => (

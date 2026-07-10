@@ -43,24 +43,24 @@ export function CategoryRow({
             name="name"
             defaultValue={name}
             autoFocus
-            className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm"
+            className="flex-1 rounded-lg border border-gray-300 px-2 py-1 text-sm"
           />
           <button
             type="submit"
             disabled={renamePending}
-            className="rounded-md bg-gray-900 px-3 py-1 text-sm text-white disabled:opacity-50"
+            className="rounded-lg bg-indigo-600 px-3 py-1 text-sm font-medium text-white shadow-sm disabled:opacity-50"
           >
             บันทึก
           </button>
           <button
             type="button"
             onClick={() => setEditing(false)}
-            className="rounded-md border border-gray-300 px-3 py-1 text-sm"
+            className="rounded-lg border border-gray-300 px-3 py-1 text-sm"
           >
             ยกเลิก
           </button>
         </form>
-        {renameState.error && <p className="text-sm text-red-600">{renameState.error}</p>}
+        {renameState.error && <p className="text-sm text-rose-600">{renameState.error}</p>}
       </li>
     );
   }
@@ -97,12 +97,12 @@ export function CategoryRow({
         <button
           type="button"
           onClick={handleDelete}
-          className="rounded-md px-2 py-1 text-sm text-red-600 hover:bg-red-50"
+          className="rounded-md px-2 py-1 text-sm text-rose-600 hover:bg-rose-50"
         >
           ลบ
         </button>
       </div>
-      {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
+      {deleteError && <p className="text-sm text-rose-600">{deleteError}</p>}
     </li>
   );
 }

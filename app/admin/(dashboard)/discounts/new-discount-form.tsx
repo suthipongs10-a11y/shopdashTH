@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import { createDiscount, type DiscountActionState } from './actions';
 
-const inputClass = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm';
+const inputClass = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm';
 
 export function NewDiscountForm() {
   const [state, formAction, pending] = useActionState<DiscountActionState, FormData>(
@@ -12,7 +12,7 @@ export function NewDiscountForm() {
   );
 
   return (
-    <form action={formAction} className="rounded-lg border border-gray-200 bg-white p-5">
+    <form action={formAction} className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
       <h2 className="mb-4 text-sm font-semibold text-gray-900">สร้างโค้ดส่วนลดใหม่</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <div>
@@ -73,12 +73,12 @@ export function NewDiscountForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
         >
           {pending ? 'กำลังสร้าง…' : 'สร้างโค้ด'}
         </button>
-        {state.error && <p className="text-sm text-red-600">{state.error}</p>}
-        {state.success && <p className="text-sm text-green-700">สร้างโค้ดแล้ว</p>}
+        {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
+        {state.success && <p className="text-sm text-emerald-700">สร้างโค้ดแล้ว</p>}
       </div>
     </form>
   );

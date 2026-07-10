@@ -3,6 +3,27 @@
 
 import Link from 'next/link';
 import {
+  AlertIcon,
+  BahtIcon,
+  BoxIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  OrdersIcon,
+  SlipIcon,
+  StarIcon,
+} from '@/components/admin/icons';
+import {
+  Badge,
+  btnPrimary,
+  Card,
+  EmptyState,
+  PageHeader,
+  StatCard,
+  tdClass,
+  thClass,
+  trHover,
+} from '@/components/admin/ui';
+import {
   getLowStockVariants,
   getStoreDailySales,
   getStoreOrderStatusCounts,
@@ -21,17 +42,23 @@ import { SalesCharts } from './sales-charts';
 export const dynamic = 'force-dynamic';
 
 // สถานะที่ต้อง "ตามงาน" (ยังไม่ปิดจบ) — แสดงเป็นการ์ดค้างต่อสถานะ
-const PIPELINE: OrderStatus[] = ['pending_payment', 'slip_uploaded', 'confirmed', 'packing'];
+const PIPELINE: {
+  status: OrderStatus;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  tone: 'amber' | 'violet' | 'sky' | 'indigo';
+}[] = [
+  { status: 'pending_payment', icon: ClockIcon, tone: 'amber' },
+  { status: 'slip_uploaded', icon: SlipIcon, tone: 'violet' },
+  { status: 'confirmed', icon: CheckCircleIcon, tone: 'sky' },
+  { status: 'packing', icon: BoxIcon, tone: 'indigo' },
+];
 
-function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-gray-400">{hint}</p>}
-    </div>
-  );
-}
+const PIPE_TONES: Record<string, string> = {
+  amber: 'bg-amber-50 text-amber-600',
+  violet: 'bg-violet-50 text-violet-600',
+  sky: 'bg-sky-50 text-sky-600',
+  indigo: 'bg-indigo-50 text-indigo-600',
+};
 
 export default async function DashboardPage() {
   const ctx = await getTenantContext();
@@ -56,34 +83,54 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">แดชบอร์ด</h1>
-        <span className="text-xs text-gray-400">ข้อมูล 30 วันล่าสุด (เวลาไทย)</span>
-      </div>
+      <PageHeader title="แดชบอร์ด" description="ข้อมูล 30 วันล่าสุด (เวลาไทย)" />
 
       {/* การ์ดตัวเลขสรุป — นับเฉพาะออร์เดอร์ยืนยันแล้ว */}
       <div className={`grid gap-4 sm:grid-cols-2 ${full ? 'lg:grid-cols-3' : ''}`}>
-        <StatCard label="ยอดขาย 30 วัน" value={formatBaht(summary.revenue)} hint="เฉพาะออร์เดอร์ที่ยืนยันแล้ว" />
-        <StatCard label="ออร์เดอร์ 30 วัน" value={summary.order_count.toLocaleString('th-TH')} />
+        <StatCard
+          label="ยอดขาย 30 วัน"
+          value={formatBaht(summary.revenue)}
+          sub="เฉพาะออร์เดอร์ที่ยืนยันแล้ว"
+          icon={<BahtIcon size={20} />}
+          tone="emerald"
+        />
+        <StatCard
+          label="ออร์เดอร์ 30 วัน"
+          value={summary.order_count.toLocaleString('th-TH')}
+          icon={<OrdersIcon size={20} />}
+          tone="indigo"
+        />
         {full && (
-          <StatCard label="ยอดเฉลี่ยต่อออร์เดอร์" value={formatBaht(summary.avg_order_value)} />
+          <StatCard
+            label="ยอดเฉลี่ยต่อออร์เดอร์"
+            value={formatBaht(summary.avg_order_value)}
+            icon={<StarIcon size={18} />}
+            tone="violet"
+          />
         )}
       </div>
 
       {/* ออร์เดอร์ค้างต่อสถานะ */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-700">ออร์เดอร์ที่ต้องดำเนินการ</h2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          {PIPELINE.map((s) => (
+      <section>
+        <h2 className="mb-3 text-sm font-semibold text-gray-900">ออร์เดอร์ที่ต้องดำเนินการ</h2>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {PIPELINE.map(({ status, icon: Icon, tone }) => (
             <Link
-              key={s}
-              href={`/admin/orders?status=${s}`}
-              className="rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-300 hover:bg-gray-50"
+              key={status}
+              href={`/admin/orders?status=${status}`}
+              className="group rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
             >
-              <p className="text-2xl font-semibold text-gray-900">
-                {(statusCounts[s] ?? 0).toLocaleString('th-TH')}
+              <span
+                className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${PIPE_TONES[tone]}`}
+              >
+                <Icon size={18} />
+              </span>
+              <p className="text-2xl font-bold tracking-tight text-gray-900">
+                {(statusCounts[status] ?? 0).toLocaleString('th-TH')}
               </p>
-              <p className="mt-0.5 text-xs text-gray-500">{ORDER_STATUS_TH[s]}</p>
+              <p className="mt-0.5 text-xs text-gray-500 group-hover:text-indigo-600">
+                {ORDER_STATUS_TH[status]}
+              </p>
             </Link>
           ))}
         </div>
@@ -94,99 +141,102 @@ export default async function DashboardPage() {
         <>
           <SalesCharts daily={daily} weekly={weekly} />
 
-          <section className="space-y-3">
-            <h2 className="text-sm font-medium text-gray-700">สินค้าขายดี (30 วัน)</h2>
-            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-              {top.length === 0 ? (
-                <p className="px-4 py-10 text-center text-sm text-gray-500">
-                  ยังไม่มีข้อมูลการขายในช่วง 30 วันนี้
-                </p>
-              ) : (
-                <table className="w-full text-left text-sm">
-                  <thead className="border-b border-gray-200 bg-gray-50 text-gray-500">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">#</th>
-                      <th className="px-4 py-2 font-medium">สินค้า</th>
-                      <th className="px-4 py-2 text-right font-medium">จำนวนที่ขาย</th>
-                      <th className="px-4 py-2 text-right font-medium">ยอดขาย</th>
+          <Card title="สินค้าขายดี (30 วัน)" padded={false}>
+            {top.length === 0 ? (
+              <p className="px-4 py-10 text-center text-sm text-gray-500">
+                ยังไม่มีข้อมูลการขายในช่วง 30 วันนี้
+              </p>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr>
+                    <th className={thClass}>#</th>
+                    <th className={thClass}>สินค้า</th>
+                    <th className={`${thClass} text-right`}>จำนวนที่ขาย</th>
+                    <th className={`${thClass} text-right`}>ยอดขาย</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {top.map((p, i) => (
+                    <tr key={p.product_name} className={trHover}>
+                      <td className={`${tdClass} text-gray-400`}>{i + 1}</td>
+                      <td className={`${tdClass} font-medium text-gray-900`}>{p.product_name}</td>
+                      <td className={`${tdClass} text-right`}>
+                        {p.qty.toLocaleString('th-TH')} ชิ้น
+                      </td>
+                      <td className={`${tdClass} text-right font-semibold text-gray-900`}>
+                        {formatBaht(p.revenue)}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {top.map((p, i) => (
-                      <tr key={p.product_name} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-gray-400">{i + 1}</td>
-                        <td className="px-4 py-3 font-medium text-gray-900">{p.product_name}</td>
-                        <td className="px-4 py-3 text-right text-gray-700">
-                          {p.qty.toLocaleString('th-TH')} ชิ้น
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium">{formatBaht(p.revenue)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </section>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Card>
         </>
       ) : (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center">
-          <p className="text-sm text-gray-600">
+        <div className="rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 p-8 text-center">
+          <p className="text-sm font-medium text-gray-700">
             กราฟยอดขายรายวัน/รายสัปดาห์ และสินค้าขายดี มีในแพลน Pro ขึ้นไป
           </p>
-          <Link
-            href="/admin/plan"
-            className="mt-3 inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-          >
+          <Link href="/admin/plan" className={`${btnPrimary} mt-4`}>
             อัปเกรดแพลน
           </Link>
         </div>
       )}
 
       {/* แถบเตือนสต๊อกใกล้หมด */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-700">สต๊อกใกล้หมด</h2>
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-          {lowStock.length === 0 ? (
-            <p className="px-4 py-10 text-center text-sm text-gray-500">
-              สต๊อกทุกรายการอยู่ในระดับปกติ
-            </p>
-          ) : (
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50 text-gray-500">
-                <tr>
-                  <th className="px-4 py-2 font-medium">สินค้า</th>
-                  <th className="px-4 py-2 font-medium">ตัวเลือก</th>
-                  <th className="px-4 py-2 text-right font-medium">คงเหลือ</th>
-                  <th className="px-4 py-2 text-right font-medium">เกณฑ์เตือน</th>
+      <Card
+        title="สต๊อกใกล้หมด"
+        description="ต่ำกว่าเกณฑ์เตือนที่ตั้งไว้ต่อตัวเลือกสินค้า"
+        padded={false}
+      >
+        {lowStock.length === 0 ? (
+          <div className="px-4 py-8">
+            <EmptyState
+              icon={<CheckCircleIcon size={22} />}
+              title="สต๊อกทุกรายการอยู่ในระดับปกติ"
+            />
+          </div>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr>
+                <th className={thClass}>สินค้า</th>
+                <th className={thClass}>ตัวเลือก</th>
+                <th className={`${thClass} text-right`}>คงเหลือ</th>
+                <th className={`${thClass} text-right`}>เกณฑ์เตือน</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lowStock.map((v) => (
+                <tr key={`${v.productId}-${v.label}`} className={trHover}>
+                  <td className={tdClass}>
+                    <Link
+                      href={`/admin/products/${v.productId}`}
+                      className="font-medium text-gray-900 hover:text-indigo-600 hover:underline"
+                    >
+                      {v.productName}
+                    </Link>
+                  </td>
+                  <td className={`${tdClass} text-gray-500`}>{v.label}</td>
+                  <td className={`${tdClass} text-right`}>
+                    {v.stock === 0 ? (
+                      <Badge tone="danger">
+                        <AlertIcon size={11} />
+                        หมด
+                      </Badge>
+                    ) : (
+                      <Badge tone="warning">เหลือ {v.stock.toLocaleString('th-TH')}</Badge>
+                    )}
+                  </td>
+                  <td className={`${tdClass} text-right text-gray-400`}>{v.threshold}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {lowStock.map((v) => (
-                  <tr key={`${v.productId}-${v.label}`} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/products/${v.productId}`}
-                        className="font-medium text-gray-900 hover:underline"
-                      >
-                        {v.productName}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">{v.label}</td>
-                    <td className="px-4 py-3 text-right">
-                      <span
-                        className={`font-medium ${v.stock === 0 ? 'text-red-600' : 'text-yellow-700'}`}
-                      >
-                        {v.stock.toLocaleString('th-TH')}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right text-gray-400">{v.threshold}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Card>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { trackingUrl } from '@/lib/carriers';
+import { Badge, ORDER_STATUS_TONE } from '@/components/admin/ui';
 import { formatBaht, formatThaiDateTime } from '@/lib/format';
 import { CARRIER_TH, ORDER_STATUS_TH, type Carrier, type OrderStatus } from '@/lib/orders/status';
 import { presignGetUrl } from '@/lib/r2';
@@ -111,13 +112,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <h1 className="text-xl font-semibold text-gray-900">{order.order_number}</h1>
           <p className="text-sm text-gray-500">สั่งเมื่อ {formatThaiDateTime(order.created_at)}</p>
         </div>
-        <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
-          {ORDER_STATUS_TH[status]}
-        </span>
+        <Badge tone={ORDER_STATUS_TONE[status]}>{ORDER_STATUS_TH[status]}</Badge>
       </div>
 
       {status === 'cancelled' && order.cancelled_reason && (
-        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">
+        <p className="rounded-md bg-rose-50 px-4 py-3 text-sm text-rose-600">
           เหตุผลที่ยกเลิก: {order.cancelled_reason}
         </p>
       )}
@@ -125,7 +124,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           {/* รายการสินค้า */}
-          <section className="overflow-hidden rounded-md border border-gray-200 bg-white">
+          <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 text-gray-500">
                 <tr>
@@ -162,7 +161,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     <td colSpan={2} className="px-4 py-2 text-right text-gray-500">
                       ส่วนลด
                     </td>
-                    <td className="px-4 py-2 text-right text-green-700">
+                    <td className="px-4 py-2 text-right text-emerald-700">
                       -{formatBaht(order.discount)}
                     </td>
                   </tr>
@@ -186,7 +185,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </section>
 
           {/* สลิปทั้งหมด (ประวัติเก็บทุกใบ — ห้ามลบ §7.1) */}
-          <section className="rounded-md border border-gray-200 bg-white p-4">
+          <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
             <h2 className="mb-3 text-sm font-medium text-gray-500">
               สลิปโอนเงิน ({slipLinks.length} ใบ)
             </h2>
@@ -209,7 +208,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                         s.status === 'approved'
                           ? 'text-green-600'
                           : s.status === 'rejected'
-                            ? 'text-red-600'
+                            ? 'text-rose-600'
                             : 'text-yellow-600'
                       }
                     >
@@ -236,13 +235,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           />
 
           {/* ข้อมูลจัดส่ง */}
-          <section className="rounded-md border border-gray-200 bg-white p-4 text-sm">
+          <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 text-sm">
             <h2 className="mb-2 font-medium text-gray-500">ข้อมูลจัดส่ง</h2>
             <p className="font-medium text-gray-900">{order.ship_name}</p>
             <p className="text-gray-600">{order.ship_phone}</p>
             <p className="mt-1 whitespace-pre-wrap text-gray-600">{order.ship_address}</p>
             {order.note && (
-              <p className="mt-2 rounded-md bg-yellow-50 px-3 py-2 text-yellow-800">
+              <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-amber-800">
                 หมายเหตุลูกค้า: {order.note}
               </p>
             )}

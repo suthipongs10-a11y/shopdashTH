@@ -6,7 +6,7 @@ import { UploadError, uploadImage } from '@/lib/upload-client';
 import { updateBrandingKey, updateStoreSettings, type SettingsState } from './actions';
 
 const inputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900';
+  'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100';
 
 const initial: SettingsState = {};
 
@@ -58,7 +58,7 @@ function BrandingUploader({
           {url && <Image src={url} alt={label} fill unoptimized className="object-cover" />}
         </div>
         <label
-          className={`cursor-pointer rounded-md border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 ${busy ? 'pointer-events-none opacity-50' : ''}`}
+          className={`cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 ${busy ? 'pointer-events-none opacity-50' : ''}`}
         >
           <input
             type="file"
@@ -70,7 +70,7 @@ function BrandingUploader({
           {busy ? 'กำลังอัปโหลด…' : url ? 'เปลี่ยนรูป' : 'อัปโหลดรูป'}
         </label>
       </div>
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-sm text-rose-600">{error}</p>}
     </div>
   );
 }
@@ -104,13 +104,13 @@ export function SettingsForm({ values }: { values: SettingsFormValues }) {
         <h2 className="text-lg font-semibold text-gray-900">ข้อมูลร้าน</h2>
         <div>
           <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-            ชื่อร้าน <span className="text-red-600">*</span>
+            ชื่อร้าน <span className="text-rose-600">*</span>
           </label>
           <input id="name" name="name" required defaultValue={values.name} className={inputClass} />
         </div>
 
-        <div className="rounded-md border border-yellow-200 bg-yellow-50 p-4">
-          <h3 className="mb-3 text-sm font-semibold text-yellow-800">
+        <div className="rounded-md border border-yellow-200 bg-amber-50 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-amber-800">
             บัญชีรับเงิน PromptPay — เงินค่าสินค้าเข้าบัญชีนี้โดยตรง
           </h3>
           <div className="space-y-3">
@@ -226,13 +226,13 @@ export function SettingsForm({ values }: { values: SettingsFormValues }) {
           <input id="phone" name="phone" defaultValue={values.phone ?? ''} className={inputClass} />
         </div>
 
-        {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+        {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
         {state.success && <p className="text-sm text-green-600">บันทึกแล้ว</p>}
 
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
         >
           {pending ? 'กำลังบันทึก…' : 'บันทึกการตั้งค่า'}
         </button>

@@ -20,7 +20,7 @@ export interface ReviewRowData {
 }
 
 const inputClass =
-  'rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900';
+  'rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100';
 
 const initialState: ReviewActionState = {};
 
@@ -74,11 +74,11 @@ export function ProductReviews({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm text-white disabled:opacity-50"
+          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:opacity-50"
         >
           เพิ่มรีวิว
         </button>
-        {state.error && <p className="w-full text-xs text-red-600">{state.error}</p>}
+        {state.error && <p className="w-full text-xs text-rose-600">{state.error}</p>}
       </form>
 
       {/* รายการรีวิว */}
@@ -101,7 +101,7 @@ export function ProductReviews({
                 <button
                   type="button"
                   onClick={() => toggleReviewPublished(r.id, productId, !r.is_published)}
-                  className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                  className="rounded-lg border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-100"
                 >
                   {r.is_published ? 'ซ่อน' : 'แสดง'}
                 </button>
@@ -110,7 +110,7 @@ export function ProductReviews({
                   onClick={() => {
                     if (window.confirm(`ลบรีวิวของ "${r.author_name}"?`)) deleteReview(r.id, productId);
                   }}
-                  className="rounded-md border border-red-200 px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
+                  className="rounded-md border border-rose-200 px-2.5 py-1 text-xs text-rose-600 hover:bg-rose-50"
                 >
                   ลบ
                 </button>

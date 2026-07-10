@@ -8,7 +8,7 @@ import {
   type StaffActionState,
 } from './actions';
 
-const inputClass = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm';
+const inputClass = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm';
 
 export function InviteStaffForm() {
   const [state, formAction, pending] = useActionState<StaffActionState, FormData>(
@@ -17,7 +17,7 @@ export function InviteStaffForm() {
   );
 
   return (
-    <form action={formAction} className="rounded-lg border border-gray-200 bg-white p-5">
+    <form action={formAction} className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
       <h2 className="mb-4 text-sm font-semibold text-gray-900">เพิ่ม staff ใหม่</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
@@ -47,12 +47,12 @@ export function InviteStaffForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
         >
           {pending ? 'กำลังเพิ่ม…' : 'เพิ่ม staff'}
         </button>
-        {state.error && <p className="text-sm text-red-600">{state.error}</p>}
-        {state.success && <p className="text-sm text-green-700">{state.success}</p>}
+        {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
+        {state.success && <p className="text-sm text-emerald-700">{state.success}</p>}
       </div>
     </form>
   );
@@ -70,12 +70,12 @@ export function StaffRowActions({ userId, disabled }: { userId: string; disabled
 
   return (
     <div className="flex items-center justify-end gap-2">
-      {error && <span className="text-xs text-red-600">{error}</span>}
+      {error && <span className="text-xs text-rose-600">{error}</span>}
       <button
         type="button"
         disabled={pending}
         onClick={() => run(() => setStaffDisabledAction(userId, !disabled))}
-        className="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+        className="rounded-lg border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 disabled:opacity-50"
       >
         {disabled ? 'เปิดใช้งาน' : 'ระงับการใช้งาน'}
       </button>
@@ -85,7 +85,7 @@ export function StaffRowActions({ userId, disabled }: { userId: string; disabled
         onClick={() => {
           if (window.confirm('ลบบัญชี staff นี้ถาวร?')) run(() => removeStaffAction(userId));
         }}
-        className="rounded-md border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
+        className="rounded-md border border-rose-200 px-2 py-1 text-xs text-rose-600 hover:bg-rose-50 disabled:opacity-50"
       >
         ลบ
       </button>

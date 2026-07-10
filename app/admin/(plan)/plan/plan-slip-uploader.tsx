@@ -52,11 +52,11 @@ export function PlanSlipUploader({ planId }: { planId: string }) {
           className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-gray-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-gray-800"
         />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rose-600">{error}</p>}
       <button
         type="submit"
         disabled={uploading}
-        className="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
         {uploading ? 'กำลังอัปโหลด…' : 'ส่งสลิปให้ ShopDash ตรวจสอบ'}
       </button>

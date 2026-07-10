@@ -27,7 +27,7 @@ export function VariantMatrix({
             id="sizes"
             name="sizes"
             placeholder="S, M, L, XL"
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />
         </div>
         <div>
@@ -38,18 +38,18 @@ export function VariantMatrix({
             id="colors"
             name="colors"
             placeholder="แดง, น้ำเงิน"
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
         >
           {pending ? 'กำลังสร้าง…' : 'สร้าง / เพิ่ม Variant'}
         </button>
       </form>
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
       {state.addedCount !== undefined && (
         <p className="text-sm text-green-600">
           {state.addedCount > 0
@@ -62,11 +62,11 @@ export function VariantMatrix({
       </p>
 
       {variants.length === 0 ? (
-        <p className="rounded-md border border-gray-200 bg-white px-4 py-6 text-center text-sm text-gray-500">
+        <p className="rounded-xl border border-gray-200 bg-white shadow-sm px-4 py-6 text-center text-sm text-gray-500">
           ยังไม่มี variant — กรอกไซส์/สีด้านบนแล้วกด "สร้าง/เพิ่ม Variant"
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-gray-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 bg-gray-50 text-gray-500">
               <tr>

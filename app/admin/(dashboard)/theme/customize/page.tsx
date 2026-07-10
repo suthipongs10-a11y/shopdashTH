@@ -33,7 +33,7 @@ export default async function CustomizeThemePage() {
         </p>
       </div>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <CustomizeForm
           defaults={{
             primary: effective('--color-primary'),

@@ -16,7 +16,7 @@ export interface VariantRowData {
 }
 
 const cellInputClass =
-  'w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900';
+  'w-full rounded-lg border border-gray-300 px-2 py-1 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100';
 
 const initialState: UpdateVariantState = {};
 
@@ -76,11 +76,11 @@ export function VariantRow({ productId, variant }: { productId: string; variant:
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-gray-900 px-3 py-1 text-sm text-white disabled:opacity-50"
+            className="rounded-lg bg-indigo-600 px-3 py-1 text-sm font-medium text-white shadow-sm disabled:opacity-50"
           >
             บันทึก
           </button>
-          {state.error && <p className="w-full text-xs text-red-600">{state.error}</p>}
+          {state.error && <p className="w-full text-xs text-rose-600">{state.error}</p>}
         </form>
       </td>
     </tr>

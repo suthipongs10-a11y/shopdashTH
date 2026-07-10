@@ -24,7 +24,7 @@ export default async function PagesAdminPage() {
 
   if (!ctx.features.custom_pages) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <h1 className="text-lg font-semibold text-gray-900">หน้าเพจ / บทความ</h1>
         <p className="mt-2 text-sm text-gray-500">
           สร้างหน้า &ldquo;เกี่ยวกับเรา&rdquo; วิธีสั่งซื้อ หรือบทความของร้าน — ใช้ได้กับแพลนธุรกิจขึ้นไป{' '}
@@ -56,12 +56,12 @@ export default async function PagesAdminPage() {
         </p>
       </div>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <h2 className="mb-4 text-sm font-semibold text-gray-900">สร้างหน้าใหม่</h2>
         <PageForm />
       </section>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs text-gray-500">
@@ -107,7 +107,7 @@ export default async function PagesAdminPage() {
                 </td>
                 <td className="px-4 py-3">
                   {row.status === 'published' ? (
-                    <span className="text-green-700">เผยแพร่</span>
+                    <span className="text-emerald-700">เผยแพร่</span>
                   ) : (
                     <span className="text-gray-400">ฉบับร่าง</span>
                   )}
@@ -116,7 +116,7 @@ export default async function PagesAdminPage() {
                 <td className="px-4 py-3 text-gray-400">{formatThaiDate(row.updated_at)}</td>
                 <td className="px-4 py-3 text-right">
                   <form action={deletePage.bind(null, row.id)}>
-                    <button type="submit" className="text-xs text-red-600 hover:underline">
+                    <button type="submit" className="text-xs text-rose-600 hover:underline">
                       ลบ
                     </button>
                   </form>

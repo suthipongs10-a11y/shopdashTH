@@ -80,6 +80,14 @@
 - [x] **scripts/test-isolation.ts ผ่าน 19/19** (2026-07-11): RLS forced ครบ 20 ตารางรวม product_reviews / รันด้วย `cp เป็น .mts + npx tsx@latest` (tsx มอง .ts เป็น CJS เพราะไม่มี type:module) / รีเซ็ตรหัส phase1-smoke-test ให้ตรง script (ถูกเปลี่ยนตอน e2e Phase 6)
 - [x] `npm run build` ผ่าน / พบ+แก้ปัญหาแวดล้อม: node server เก่าค้างพอร์ต 3000 เสิร์ฟ .next เก่า → chunk 404 ทั้งหน้า (ฆ่า process แล้วปกติ)
 
+## Done (Phase 7 ต่อ — ยกเครื่อง UI Store Admin ทั้งระบบ, 2026-07-11 ตามคำสั่งเจ้าของ "Dashboard ยังไม่สวย")
+- [x] **ระบบดีไซน์ admin ใหม่** (`components/admin/ui.tsx` + `icons.tsx`): sidebar เข้ม gray-900 จัดกลุ่มเมนู 5 กลุ่ม + ไอคอน 25 ตัว + active pill + ลิงก์เปิดหน้าร้าน + email ผู้ใช้ + mobile drawer / ปุ่มหลัก indigo-600 / Badge สถานะ emerald-amber-rose-sky-violet (`ORDER_STATUS_TONE`) / การ์ด rounded-xl+shadow-sm / PageHeader/StatCard/EmptyState กลาง
+- [x] หน้าหลักเขียนใหม่: dashboard (การ์ดสถิติมีไอคอนสี, pipeline การ์ดกดได้, upgrade panel), products (**รูปสินค้า thumbnail ในตาราง**, badge แนะนำ/สถานะ, empty state), orders (badge สีตามสถานะ, ลูกค้า 2 บรรทัด), slips (warning box + empty state ใหม่), login (พื้นเข้ม gradient + โลโก้)
+- [x] กวาดอีก 39 ไฟล์ให้เข้าชุดเดียวกัน (ปุ่ม/input focus indigo, การ์ด, โทนสีแดง→rose เขียว→emerald เหลือง→amber) + order detail ใช้ Badge + (plan) layout header ใหม่
+- [x] **ซ่อม bug พบระหว่างทาง**: `/admin/slips` พัง ERR_DLOPEN_FAILED — sharp 0.35.3 (โปรเจ็ค) ชน sharp 0.34.5 (ของ Next 15.5) libvips DLL ชนกันบน Windows → ตรึง `"sharp": "^0.34.5"` (ดู DECISIONS)
+- [x] ตรวจ 3 รอบ screenshot (before/r1/r2/r3 ใน `.tmp-admin/`) + mobile drawer + ทุกหน้า admin 13 หน้า HTTP 200 + `npm run build` ผ่าน
+- ⚠ บทเรียนแวดล้อม: ห้าม `next build` ขณะ dev server รันอยู่ (ทับ .next → chunk 404 ทั้งเว็บ) — kill dev ก่อนเสมอ
+
 ## ค้าง / ขั้นตอนถัดไป
 - [ ] เทมเพลต T1 "SIMPLE" / T3 "HUB" / T4 "LUXÉ" ตาม TEMPLATE_SPEC (ทำทีละตัว — T2 เสร็จแล้วเป็นแม่แบบวิธีทำ)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)

@@ -38,7 +38,7 @@ export function CustomizeForm({
             name="--color-primary"
             type="color"
             defaultValue={defaults.primary}
-            className="h-10 w-full cursor-pointer rounded-md border border-gray-300"
+            className="h-10 w-full cursor-pointer rounded-lg border border-gray-300"
           />
         </div>
         <div>
@@ -50,7 +50,7 @@ export function CustomizeForm({
             name="--color-accent"
             type="color"
             defaultValue={defaults.accent}
-            className="h-10 w-full cursor-pointer rounded-md border border-gray-300"
+            className="h-10 w-full cursor-pointer rounded-lg border border-gray-300"
           />
         </div>
         <div>
@@ -61,7 +61,7 @@ export function CustomizeForm({
             id="--font-heading"
             name="--font-heading"
             defaultValue={defaults.fontHeading}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
           >
             {fontNames.map((f) => (
               <option key={f} value={f}>
@@ -78,7 +78,7 @@ export function CustomizeForm({
             id="--font-body"
             name="--font-body"
             defaultValue={defaults.fontBody}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
           >
             {fontNames.map((f) => (
               <option key={f} value={f}>
@@ -96,28 +96,28 @@ export function CustomizeForm({
             name="--radius-md"
             defaultValue={defaults.radiusMd}
             pattern="\d{1,2}px"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
           />
         </div>
       </div>
 
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
       {state.success && (
-        <p className="text-sm text-green-700">บันทึกแล้ว — หน้าร้านอัปเดตทันที</p>
+        <p className="text-sm text-emerald-700">บันทึกแล้ว — หน้าร้านอัปเดตทันที</p>
       )}
 
       <div className="flex gap-3">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
         >
           {pending ? 'กำลังบันทึก…' : 'บันทึกการปรับแต่ง'}
         </button>
         <button
           type="button"
           onClick={() => resetThemeOverrides()}
-          className="rounded-md border border-gray-300 px-5 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          className="rounded-lg border border-gray-300 px-5 py-2 text-sm text-gray-700 hover:bg-gray-100"
         >
           คืนค่าธีมเดิม
         </button>

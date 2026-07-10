@@ -15,7 +15,7 @@ export default async function SettingsPage() {
   const user = await getStoreUser(ctx);
   if (user && userRole(user) !== 'store_owner') {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center text-sm text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
         เฉพาะเจ้าของร้านเท่านั้นที่แก้ไขตั้งค่าร้านได้
       </div>
     );
@@ -41,7 +41,7 @@ export default async function SettingsPage() {
       />
 
       {ctx.features.line_oa && (
-        <section className="rounded-lg border border-gray-200 bg-white p-5">
+        <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
           <h2 className="mb-3 text-sm font-semibold text-gray-900">แจ้งเตือนผ่าน LINE OA</h2>
           <LineForm hasToken={!!store.line_channel_access_token} />
         </section>

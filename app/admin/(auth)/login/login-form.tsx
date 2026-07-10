@@ -1,10 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
+import { inputClass, labelClass } from '@/components/admin/ui';
 import { login, type LoginState } from './actions';
-
-const inputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900';
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(login, {});
@@ -12,22 +10,31 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className={labelClass}>
           อีเมล
         </label>
-        <input id="email" name="email" type="email" required className={inputClass} />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          placeholder="you@example.com"
+          className={inputClass}
+        />
       </div>
       <div>
-        <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className={labelClass}>
           รหัสผ่าน
         </label>
         <input id="password" name="password" type="password" required className={inputClass} />
       </div>
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && (
+        <p className="rounded-lg bg-rose-50 px-3.5 py-2.5 text-sm text-rose-600">{state.error}</p>
+      )}
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-gray-900 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
         {pending ? 'กำลังเข้าสู่ระบบ…' : 'เข้าสู่ระบบ'}
       </button>

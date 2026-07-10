@@ -39,7 +39,7 @@ export default async function CustomersPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold text-gray-900">ลูกค้า</h1>
-      <div className="overflow-x-auto rounded-md border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         {customers.length === 0 ? (
           <p className="px-4 py-10 text-center text-sm text-gray-500">
             ยังไม่มีลูกค้า — รายชื่อจะถูกสร้างอัตโนมัติเมื่อมีคำสั่งซื้อ

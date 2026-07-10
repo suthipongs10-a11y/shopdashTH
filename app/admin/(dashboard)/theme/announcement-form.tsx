@@ -23,18 +23,18 @@ export function AnnouncementForm({ current }: { current: string | null }) {
           name="announcement_text"
           defaultValue={current ?? ''}
           placeholder="เช่น ส่งฟรีเมื่อสั่งครบ ฿500 🎉"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
         {pending ? 'กำลังบันทึก…' : 'บันทึกประกาศ'}
       </button>
-      {state.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
-      {state.success && <p className="w-full text-sm text-green-700">บันทึกแล้ว</p>}
+      {state.error && <p className="w-full text-sm text-rose-600">{state.error}</p>}
+      {state.success && <p className="w-full text-sm text-emerald-700">บันทึกแล้ว</p>}
     </form>
   );
 }

@@ -51,11 +51,11 @@ export function SlipReviewCard({
   const decided = approveState.success || rejectState.success;
 
   return (
-    <div className="rounded-md border border-gray-200 bg-white p-4">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="grid gap-4 sm:grid-cols-[200px_1fr]">
         {/* รูปสลิป */}
         <a href={imageUrl} target="_blank" rel="noreferrer" title="เปิดรูปเต็ม">
-          <div className="relative h-64 w-full overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+          <div className="relative h-64 w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-50 transition-shadow hover:shadow-md">
             <Image src={imageUrl} alt={`สลิปออร์เดอร์ ${orderNumber}`} fill unoptimized className="object-contain" />
           </div>
         </a>
@@ -68,29 +68,29 @@ export function SlipReviewCard({
             <p className="text-xs text-gray-400">อัปโหลดเมื่อ {uploadedAt}</p>
           </div>
           {qrMissing && (
-            <p className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-sm text-rose-700">
               ⚠️ ไม่พบ QR ในสลิป — สลิปจริงจากแอปธนาคารมี QR เสมอ ตรวจอย่างระมัดระวัง
             </p>
           )}
           {qrRef && (
-            <p className="rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-500">
+            <p className="rounded-lg bg-gray-50 px-3.5 py-2.5 text-xs text-gray-500">
               เลขอ้างอิงธุรกรรม (จาก QR): <span className="font-mono text-gray-900">{qrRef}</span>
               <span className="ml-1">— ใช้ค้นเทียบรายการเงินเข้าในแอปธนาคารได้</span>
             </p>
           )}
           {autoVerifyFailedReason && (
-            <p className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
               ⚠️ ตรวจอัตโนมัติไม่ผ่าน: {autoVerifyFailedReason}
             </p>
           )}
-          <div className="rounded-md bg-gray-50 px-3 py-2 text-sm">
+          <div className="rounded-lg border border-gray-100 bg-gray-50 px-3.5 py-2.5 text-sm">
             <p className="text-gray-500">บัญชีที่ต้องได้รับเงิน (เทียบกับสลิป)</p>
             <p className="font-medium text-gray-900">{accountName ?? '-'}</p>
             {promptpayId && <p className="text-gray-500">PromptPay: {promptpayId}</p>}
           </div>
 
           {decided ? (
-            <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
+            <p className="rounded-lg bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700">
               {approveState.success ?? rejectState.success}
             </p>
           ) : rejecting ? (
@@ -98,7 +98,7 @@ export function SlipReviewCard({
               <select
                 name="preset_reason"
                 required
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
                 defaultValue=""
               >
                 <option value="" disabled>
@@ -113,20 +113,20 @@ export function SlipReviewCard({
               <input
                 name="extra_note"
                 placeholder="ข้อความเพิ่มเติมถึงลูกค้า (ถ้ามี)"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
               />
               <div className="flex gap-2">
                 <button
                   type="submit"
                   disabled={rejectPending}
-                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+                  className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-500 disabled:opacity-50"
                 >
                   {rejectPending ? 'กำลังบันทึก…' : 'ยืนยันปฏิเสธสลิป'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setRejecting(false)}
-                  className="rounded-md border border-gray-300 px-4 py-2 text-sm"
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
                 >
                   กลับ
                 </button>
@@ -134,7 +134,7 @@ export function SlipReviewCard({
             </form>
           ) : (
             <div className="space-y-2">
-              <p className="text-sm font-bold text-red-600">
+              <p className="text-sm font-bold text-rose-600">
                 เช็คเงินเข้า {amount} ในแอปธนาคารของคุณก่อน — อย่าเชื่อรูปสลิปอย่างเดียว
               </p>
               <div className="flex gap-2">
@@ -142,7 +142,7 @@ export function SlipReviewCard({
                   <button
                     type="submit"
                     disabled={approvePending}
-                    className="rounded-md bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:opacity-50"
+                    className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 disabled:opacity-50"
                   >
                     {approvePending ? 'กำลังอนุมัติ…' : '✓ อนุมัติ — เช็คเงินเข้าแล้ว'}
                   </button>
@@ -150,14 +150,14 @@ export function SlipReviewCard({
                 <button
                   type="button"
                   onClick={() => setRejecting(true)}
-                  className="rounded-md border border-red-300 px-5 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                  className="rounded-lg border border-rose-200 bg-white px-5 py-2 text-sm font-medium text-rose-600 shadow-sm hover:bg-rose-50"
                 >
                   ปฏิเสธ…
                 </button>
               </div>
             </div>
           )}
-          {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
         </div>
       </div>
     </div>

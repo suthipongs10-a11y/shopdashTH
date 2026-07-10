@@ -14,7 +14,7 @@ export default async function StaffPage() {
 
   if (user && userRole(user) !== 'store_owner') {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center text-sm text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
         เฉพาะเจ้าของร้านเท่านั้นที่จัดการ staff ได้
       </div>
     );
@@ -22,7 +22,7 @@ export default async function StaffPage() {
 
   if (!ctx.features.staff_accounts) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <h1 className="text-lg font-semibold text-gray-900">จัดการ staff</h1>
         <p className="mt-2 text-sm text-gray-500">
           ฟีเจอร์นี้ใช้ได้กับแพลน Pro ขึ้นไป —{' '}
@@ -50,7 +50,7 @@ export default async function StaffPage() {
 
       <InviteStaffForm />
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs text-gray-500">
@@ -67,9 +67,9 @@ export default async function StaffPage() {
                 <td className="px-4 py-3 text-gray-500">{formatThaiDate(s.createdAt)}</td>
                 <td className="px-4 py-3">
                   {s.disabled ? (
-                    <span className="text-red-600">ถูกระงับ</span>
+                    <span className="text-rose-600">ถูกระงับ</span>
                   ) : (
-                    <span className="text-green-700">ใช้งานได้</span>
+                    <span className="text-emerald-700">ใช้งานได้</span>
                   )}
                 </td>
                 <td className="px-4 py-3">

@@ -54,7 +54,7 @@ export default async function ThemePage() {
         allowedTier={ctx.plan.allowed_theme_tier}
       />
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <AnnouncementForm current={ctx.store.announcement_text} />
       </section>
     </div>

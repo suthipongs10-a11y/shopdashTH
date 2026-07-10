@@ -7,7 +7,7 @@ import { useActionState } from 'react';
 import { createPage, updatePage, type PageActionState } from './actions';
 
 const inputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900';
+  'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100';
 
 export interface PageFormValues {
   id: string;
@@ -28,7 +28,7 @@ export function PageForm({ page }: { page?: PageFormValues }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="title" className="mb-1 block text-sm font-medium text-gray-700">
-            ชื่อหน้า <span className="text-red-600">*</span>
+            ชื่อหน้า <span className="text-rose-600">*</span>
           </label>
           <input
             id="title"
@@ -41,7 +41,7 @@ export function PageForm({ page }: { page?: PageFormValues }) {
         </div>
         <div>
           <label htmlFor="slug" className="mb-1 block text-sm font-medium text-gray-700">
-            ลิงก์ (slug) <span className="text-red-600">*</span>
+            ลิงก์ (slug) <span className="text-rose-600">*</span>
           </label>
           <div className="flex items-center gap-1">
             <span className="text-sm text-gray-400">/p/</span>
@@ -99,13 +99,13 @@ export function PageForm({ page }: { page?: PageFormValues }) {
         </label>
       </div>
 
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
       {state.done && <p className="text-sm text-green-600">บันทึกแล้ว</p>}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
         {pending ? 'กำลังบันทึก…' : page ? 'บันทึกหน้า' : 'สร้างหน้าใหม่'}
       </button>

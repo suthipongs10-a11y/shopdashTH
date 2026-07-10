@@ -32,7 +32,7 @@ export default async function EditPagePage({ params }: { params: Promise<{ id: s
         </Link>
         <h1 className="text-xl font-semibold text-gray-900">แก้ไข &ldquo;{page.title}&rdquo;</h1>
       </div>
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <PageForm page={page} />
       </section>
     </div>

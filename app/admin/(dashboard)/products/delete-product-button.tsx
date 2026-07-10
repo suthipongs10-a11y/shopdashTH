@@ -11,7 +11,7 @@ export function DeleteProductButton({ productId, name }: { productId: string; na
           void deleteProduct(productId);
         }
       }}
-      className="rounded-md border border-red-200 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+      className="rounded-md border border-rose-200 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
     >
       ลบสินค้านี้
     </button>

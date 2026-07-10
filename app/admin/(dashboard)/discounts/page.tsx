@@ -26,7 +26,7 @@ export default async function DiscountsPage() {
 
   if (!ctx.features.discount_codes) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <h1 className="text-lg font-semibold text-gray-900">โค้ดส่วนลด</h1>
         <p className="mt-2 text-sm text-gray-500">
           ฟีเจอร์นี้ใช้ได้กับแพลน Pro ขึ้นไป —{' '}
@@ -52,7 +52,7 @@ export default async function DiscountsPage() {
       <h1 className="text-xl font-semibold text-gray-900">โค้ดส่วนลด</h1>
       <NewDiscountForm />
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs text-gray-500">
@@ -85,7 +85,7 @@ export default async function DiscountsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {d.is_active ? (
-                    <span className="text-green-700">เปิดใช้งาน</span>
+                    <span className="text-emerald-700">เปิดใช้งาน</span>
                   ) : (
                     <span className="text-gray-400">ปิด</span>
                   )}

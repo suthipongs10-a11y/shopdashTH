@@ -29,19 +29,19 @@ export function DomainForm({ currentDomain }: { currentDomain: string | null }) 
           defaultValue={currentDomain ?? ''}
           placeholder="baannoi.com"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
         {pending ? 'กำลังบันทึก…' : currentDomain ? 'เปลี่ยนโดเมน' : 'เริ่มตั้งค่าโดเมน'}
       </button>
-      {state.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="w-full text-sm text-rose-600">{state.error}</p>}
       {state.success && (
-        <p className="w-full text-sm text-green-700">
+        <p className="w-full text-sm text-emerald-700">
           บันทึกแล้ว — ตั้งค่า DNS ตามคำแนะนำด้านล่าง แล้วกด &ldquo;ตรวจสอบ DNS&rdquo;
         </p>
       )}
@@ -89,7 +89,7 @@ export function VerifyButton() {
       >
         {checking ? 'กำลังตรวจสอบ DNS…' : 'ตรวจสอบ DNS'}
       </button>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rose-600">{error}</p>}
       {checks && (
         <div className="space-y-2">
           {checks.map((c) => (
@@ -97,8 +97,8 @@ export function VerifyButton() {
               key={c.name}
               className={`rounded-md border px-3 py-2 text-sm ${
                 c.passed
-                  ? 'border-green-200 bg-green-50 text-green-800'
-                  : 'border-yellow-300 bg-yellow-50 text-yellow-800'
+                  ? 'border-green-200 bg-emerald-50 text-green-800'
+                  : 'border-amber-200 bg-amber-50 text-amber-800'
               }`}
             >
               <p className="font-medium">
@@ -108,7 +108,7 @@ export function VerifyButton() {
             </div>
           ))}
           {status === 'active' && (
-            <p className="text-sm font-medium text-green-700">
+            <p className="text-sm font-medium text-emerald-700">
               🎉 โดเมนพร้อมใช้งานแล้ว — ลูกค้าเปิดร้านผ่านโดเมนนี้ได้ทันที
             </p>
           )}

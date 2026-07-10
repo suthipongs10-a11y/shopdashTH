@@ -10,10 +10,10 @@ export const dynamic = 'force-dynamic';
 
 const STATUS_TH: Record<string, { label: string; tone: string }> = {
   pending: { label: 'รอตั้งค่า DNS', tone: 'bg-gray-100 text-gray-600' },
-  verifying: { label: 'กำลังตรวจสอบ', tone: 'bg-blue-50 text-blue-700' },
-  verified: { label: 'ยืนยันเจ้าของแล้ว (รอชี้ DNS)', tone: 'bg-yellow-50 text-yellow-700' },
-  active: { label: 'ใช้งานได้', tone: 'bg-green-50 text-green-700' },
-  error: { label: 'ตั้งค่าไม่ถูกต้อง', tone: 'bg-red-50 text-red-700' },
+  verifying: { label: 'กำลังตรวจสอบ', tone: 'bg-indigo-50 text-indigo-700' },
+  verified: { label: 'ยืนยันเจ้าของแล้ว (รอชี้ DNS)', tone: 'bg-amber-50 text-amber-700' },
+  active: { label: 'ใช้งานได้', tone: 'bg-emerald-50 text-emerald-700' },
+  error: { label: 'ตั้งค่าไม่ถูกต้อง', tone: 'bg-rose-50 text-rose-700' },
   suspended: { label: 'พักการใช้งาน (ตามแพลน)', tone: 'bg-gray-100 text-gray-500' },
 };
 
@@ -29,7 +29,7 @@ export default async function DomainPage() {
 
   if (user && userRole(user) !== 'store_owner') {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center text-sm text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
         เฉพาะเจ้าของร้านเท่านั้นที่ตั้งค่าโดเมนได้
       </div>
     );
@@ -37,7 +37,7 @@ export default async function DomainPage() {
 
   if (!ctx.features.custom_domain) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <h1 className="text-lg font-semibold text-gray-900">โดเมนของตัวเอง</h1>
         <p className="mt-2 text-sm text-gray-500">
           ฟีเจอร์นี้ใช้ได้กับแพลน Pro ขึ้นไป —{' '}
@@ -64,13 +64,13 @@ export default async function DomainPage() {
         </p>
       </div>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <DomainForm currentDomain={domain?.domain ?? null} />
       </section>
 
       {domain && (
         <>
-          <section className="rounded-lg border border-gray-200 bg-white p-5">
+          <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
             <div className="mb-3 flex flex-wrap items-center gap-3">
               <h2 className="text-sm font-semibold text-gray-900">{domain.domain}</h2>
               {status && (
@@ -86,7 +86,7 @@ export default async function DomainPage() {
             </div>
 
             {domain.last_error_th && domain.status !== 'active' && (
-              <p className="mb-3 rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+              <p className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
                 {domain.last_error_th}
               </p>
             )}
@@ -136,7 +136,7 @@ export default async function DomainPage() {
           </section>
 
           {domain.status !== 'suspended' && (
-            <section className="rounded-lg border border-gray-200 bg-white p-5">
+            <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
               <VerifyButton />
             </section>
           )}

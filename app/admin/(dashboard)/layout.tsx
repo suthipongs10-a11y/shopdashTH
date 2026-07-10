@@ -25,27 +25,33 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (ctx.status === 'locked') redirect('/admin/plan');
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Nav storeName={ctx.store.name} isOwner={userRole(user) === 'store_owner'} />
-      {ctx.status === 'grace' && (
-        <div className="border-b border-yellow-300 bg-yellow-50 px-4 py-2 text-center text-sm text-yellow-800">
-          แพลนหมดอายุแล้ว — อยู่ในช่วงผ่อนผัน กรุณา{' '}
-          <a href="/admin/plan" className="font-medium underline underline-offset-2">
-            ชำระค่าแพลน
-          </a>{' '}
-          เพื่อไม่ให้ร้านถูกระงับ
-        </div>
-      )}
-      {ctx.status === 'trial' && ctx.trialEndsAt && (
-        <div className="border-b border-blue-200 bg-blue-50 px-4 py-2 text-center text-sm text-blue-800">
-          ช่วงทดลองใช้ถึง {formatThaiDate(ctx.trialEndsAt)} —{' '}
-          <a href="/admin/plan" className="font-medium underline underline-offset-2">
-            ชำระค่าแพลน
-          </a>{' '}
-          เพื่อใช้งานต่อเนื่อง
-        </div>
-      )}
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+    <div className="min-h-screen bg-gray-50 lg:flex">
+      <Nav
+        storeName={ctx.store.name}
+        isOwner={userRole(user) === 'store_owner'}
+        userEmail={user.email}
+      />
+      <div className="min-w-0 flex-1">
+        {ctx.status === 'grace' && (
+          <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-center text-sm text-amber-800">
+            แพลนหมดอายุแล้ว — อยู่ในช่วงผ่อนผัน กรุณา{' '}
+            <a href="/admin/plan" className="font-semibold underline underline-offset-2">
+              ชำระค่าแพลน
+            </a>{' '}
+            เพื่อไม่ให้ร้านถูกระงับ
+          </div>
+        )}
+        {ctx.status === 'trial' && ctx.trialEndsAt && (
+          <div className="border-b border-indigo-100 bg-indigo-50 px-4 py-2.5 text-center text-sm text-indigo-700">
+            ช่วงทดลองใช้ถึง {formatThaiDate(ctx.trialEndsAt)} —{' '}
+            <a href="/admin/plan" className="font-semibold underline underline-offset-2">
+              ชำระค่าแพลน
+            </a>{' '}
+            เพื่อใช้งานต่อเนื่อง
+          </div>
+        )}
+        <main className="mx-auto w-full max-w-6xl px-4 py-8 lg:px-8">{children}</main>
+      </div>
     </div>
   );
 }

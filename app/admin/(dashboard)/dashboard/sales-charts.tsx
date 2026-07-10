@@ -59,7 +59,7 @@ function ChartTooltip({ active, payload, label, labelPrefix, fmtLabel }: Tooltip
   if (!active || !payload || payload.length === 0 || label == null) return null;
   const p = payload[0].payload;
   return (
-    <div className="rounded-md border border-gray-200 bg-white px-3 py-2 text-xs shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm px-3 py-2 text-xs shadow-sm">
       <p className="font-medium text-gray-900">
         {labelPrefix}
         {fmtLabel(String(label))}
@@ -82,7 +82,7 @@ export function SalesCharts({
 }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
         <h2 className="mb-4 text-sm font-medium text-gray-700">ยอดขายรายวัน (30 วันล่าสุด)</h2>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={daily} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
@@ -125,7 +125,7 @@ export function SalesCharts({
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
         <h2 className="mb-4 text-sm font-medium text-gray-700">ยอดขายรายสัปดาห์ (12 สัปดาห์ล่าสุด)</h2>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={weekly} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>

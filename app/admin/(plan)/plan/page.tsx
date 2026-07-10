@@ -32,15 +32,15 @@ interface SubHistoryRow {
 
 const STATUS_NOTICE: Record<string, { tone: string; text: string }> = {
   trial: {
-    tone: 'border-blue-200 bg-blue-50 text-blue-800',
+    tone: 'border-indigo-100 bg-indigo-50 text-indigo-700',
     text: 'ร้านอยู่ในช่วงทดลองใช้ — ชำระค่าแพลนด้านล่างเพื่อใช้งานต่อหลังหมดช่วงทดลอง',
   },
   grace: {
-    tone: 'border-yellow-300 bg-yellow-50 text-yellow-800',
+    tone: 'border-amber-200 bg-amber-50 text-amber-800',
     text: 'แพลนหมดอายุแล้ว (อยู่ในช่วงผ่อนผัน 7 วัน) — กรุณาชำระค่าแพลนเพื่อใช้งานต่อเนื่อง',
   },
   locked: {
-    tone: 'border-red-300 bg-red-50 text-red-800',
+    tone: 'border-rose-200 bg-rose-50 text-red-800',
     text: 'ร้านถูกระงับเนื่องจากค้างชำระค่าแพลน — หน้าร้านปิดชั่วคราว ชำระแล้วระบบจะเปิดให้ทันทีที่อนุมัติ',
   },
 };
@@ -105,7 +105,7 @@ export default async function MyPlanPage({
 
       {notice && <div className={`rounded-md border p-4 text-sm ${notice.tone}`}>{notice.text}</div>}
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <h2 className="mb-3 text-sm font-semibold text-gray-900">แพลนปัจจุบัน</h2>
         <p className="text-lg font-medium text-gray-900">
           {ctx.plan.name_th}{' '}
@@ -123,20 +123,20 @@ export default async function MyPlanPage({
         </p>
       </section>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <h2 className="mb-3 text-sm font-semibold text-gray-900">
           ชำระค่าแพลน / ต่ออายุ / เปลี่ยนแพลน
         </h2>
 
         {pendingSub ? (
-          <div className="rounded-md border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-800">
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
             ส่งสลิปแล้ว ({formatBaht(pendingSub.amount)} — แพลน {pendingSub.plans?.name_th}) กำลังรอ
             ShopDash ตรวจสอบ อนุมัติแล้วร้านจะใช้งานได้ทันที
           </div>
         ) : (
           <>
             {lastRejected && (
-              <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <div className="mb-4 rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
                 สลิปก่อนหน้าถูกปฏิเสธ: {lastRejected.reject_reason_th ?? 'ไม่ระบุเหตุผล'} —
                 กรุณาส่งสลิปใหม่
               </div>
@@ -199,7 +199,7 @@ export default async function MyPlanPage({
       </section>
 
       {subs.length > 0 && (
-        <section className="rounded-lg border border-gray-200 bg-white p-5">
+        <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
           <h2 className="mb-3 text-sm font-semibold text-gray-900">ประวัติการชำระ</h2>
           <ul className="space-y-2 text-sm">
             {subs.map((s) => (
@@ -209,13 +209,13 @@ export default async function MyPlanPage({
                   {s.plans?.name_th} · {formatBaht(s.amount)}
                 </span>
                 {s.status === 'approved' && (
-                  <span className="text-green-700">
+                  <span className="text-emerald-700">
                     อนุมัติแล้ว (ถึง {formatThaiDate(s.period_end)})
                   </span>
                 )}
-                {s.status === 'pending' && <span className="text-yellow-700">รอตรวจสอบ</span>}
+                {s.status === 'pending' && <span className="text-amber-700">รอตรวจสอบ</span>}
                 {s.status === 'rejected' && (
-                  <span className="text-red-600">ปฏิเสธ — {s.reject_reason_th ?? ''}</span>
+                  <span className="text-rose-600">ปฏิเสธ — {s.reject_reason_th ?? ''}</span>
                 )}
               </li>
             ))}

@@ -33,9 +33,9 @@ export function ThemePicker({
 
   return (
     <div>
-      {state.error && <p className="mb-4 text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="mb-4 text-sm text-rose-600">{state.error}</p>}
       {state.success && (
-        <p className="mb-4 text-sm text-green-700">เปลี่ยนธีมแล้ว — หน้าร้านอัปเดตทันที</p>
+        <p className="mb-4 text-sm text-emerald-700">เปลี่ยนธีมแล้ว — หน้าร้านอัปเดตทันที</p>
       )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {themes.map((theme) => {

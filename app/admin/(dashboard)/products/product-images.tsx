@@ -88,7 +88,7 @@ export function ProductImages({
               type="button"
               onClick={() => handleDelete(img.id)}
               aria-label="ลบรูปนี้"
-              className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-white/90 text-xs text-red-600 group-hover:flex"
+              className="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-white/90 text-xs text-rose-600 group-hover:flex"
             >
               ✕
             </button>
@@ -111,7 +111,7 @@ export function ProductImages({
           {uploading ? 'กำลังอัปโหลด…' : '+ เพิ่มรูป'}
         </label>
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rose-600">{error}</p>}
       {items.length > 1 && <p className="text-xs text-gray-400">ลากรูปเพื่อจัดเรียงลำดับ</p>}
     </div>
   );
