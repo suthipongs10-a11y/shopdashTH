@@ -46,6 +46,18 @@ export default async function SlipsQueuePage() {
         <p className="text-sm text-gray-500">{slips.length} รายการรอตรวจ</p>
       </div>
 
+      {/* คำเตือนหลัก — ระบบเช็คสลิปเป็นแค่ด่านแรก เงินเข้าจริงต้องเช็คจากธนาคารเอง */}
+      <div className="rounded-lg border-2 border-red-500 bg-red-50 px-5 py-4">
+        <p className="text-lg font-bold text-red-700">
+          ⚠️ ก่อนกดอนุมัติทุกครั้ง — ตรวจสอบเงินเข้าบัญชีด้วยตัวเองให้แน่ชัด
+        </p>
+        <p className="mt-1 text-sm text-red-700">
+          เปิดแอปธนาคาร/ข้อความแจ้งเตือนเงินเข้าของธนาคาร เช็คว่า <strong>ยอดเงินเข้าตรงกับออร์เดอร์จริง</strong>{' '}
+          — ระบบตรวจสลิปของ ShopDash เป็นเพียงการคัดกรองเบื้องต้น (กันสลิปซ้ำ/สลิปไม่มี QR){' '}
+          <strong>ไม่สามารถยืนยันว่าเงินเข้าบัญชีแล้ว</strong>
+        </p>
+      </div>
+
       {cards.length === 0 ? (
         <p className="rounded-md border border-gray-200 bg-white px-4 py-10 text-center text-sm text-gray-500">
           ไม่มีสลิปรอตรวจสอบ 🎉

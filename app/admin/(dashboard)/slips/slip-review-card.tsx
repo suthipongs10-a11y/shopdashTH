@@ -133,23 +133,28 @@ export function SlipReviewCard({
               </div>
             </form>
           ) : (
-            <div className="flex gap-2">
-              <form action={approveAction}>
+            <div className="space-y-2">
+              <p className="text-sm font-bold text-red-600">
+                เช็คเงินเข้า {amount} ในแอปธนาคารของคุณก่อน — อย่าเชื่อรูปสลิปอย่างเดียว
+              </p>
+              <div className="flex gap-2">
+                <form action={approveAction}>
+                  <button
+                    type="submit"
+                    disabled={approvePending}
+                    className="rounded-md bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:opacity-50"
+                  >
+                    {approvePending ? 'กำลังอนุมัติ…' : '✓ อนุมัติ — เช็คเงินเข้าแล้ว'}
+                  </button>
+                </form>
                 <button
-                  type="submit"
-                  disabled={approvePending}
-                  className="rounded-md bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:opacity-50"
+                  type="button"
+                  onClick={() => setRejecting(true)}
+                  className="rounded-md border border-red-300 px-5 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                 >
-                  {approvePending ? 'กำลังอนุมัติ…' : '✓ อนุมัติ — ยอดถูกต้อง'}
+                  ปฏิเสธ…
                 </button>
-              </form>
-              <button
-                type="button"
-                onClick={() => setRejecting(true)}
-                className="rounded-md border border-red-300 px-5 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
-              >
-                ปฏิเสธ…
-              </button>
+              </div>
             </div>
           )}
           {state.error && <p className="text-sm text-red-600">{state.error}</p>}
