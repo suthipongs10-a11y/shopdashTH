@@ -18,6 +18,8 @@ export function SlipReviewCard({
   imageUrl,
   accountName,
   promptpayId,
+  qrRef,
+  qrMissing = false,
   autoVerifyFailedReason,
 }: {
   slipId: string;
@@ -28,6 +30,10 @@ export function SlipReviewCard({
   imageUrl: string;
   accountName: string | null;
   promptpayId: string | null;
+  /** เลขอ้างอิงธุรกรรมจาก QR บนสลิป — ใช้ค้นเทียบในแอปธนาคาร */
+  qrRef?: string | null;
+  /** ระบบสแกนแล้วไม่พบ QR — สลิปจริงจากแอปธนาคารมี QR เสมอ */
+  qrMissing?: boolean;
   /** P4: ผลตรวจอัตโนมัติไม่ผ่าน — โชว์ flag + เหตุผลให้แอดมินพิจารณาเอง (§7.1) */
   autoVerifyFailedReason?: string | null;
 }) {
@@ -61,6 +67,17 @@ export function SlipReviewCard({
             <p className="text-3xl font-bold text-gray-900">{amount}</p>
             <p className="text-xs text-gray-400">อัปโหลดเมื่อ {uploadedAt}</p>
           </div>
+          {qrMissing && (
+            <p className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+              ⚠️ ไม่พบ QR ในสลิป — สลิปจริงจากแอปธนาคารมี QR เสมอ ตรวจอย่างระมัดระวัง
+            </p>
+          )}
+          {qrRef && (
+            <p className="rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-500">
+              เลขอ้างอิงธุรกรรม (จาก QR): <span className="font-mono text-gray-900">{qrRef}</span>
+              <span className="ml-1">— ใช้ค้นเทียบรายการเงินเข้าในแอปธนาคารได้</span>
+            </p>
+          )}
           {autoVerifyFailedReason && (
             <p className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
               ⚠️ ตรวจอัตโนมัติไม่ผ่าน: {autoVerifyFailedReason}

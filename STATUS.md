@@ -34,8 +34,16 @@
 - [x] `pnpm build` ผ่าน + ทดสอบ: home/404/rate-limit ผ่านครบ
 - [x] **e2e Phase 6b ผ่าน 15/15** (2026-07-10, `.tmp-phase6b-test.mjs` — ไม่ commit): ร้าน starter ถูก gate หน้าเพจ / เปลี่ยนเป็นแพลนธุรกิจ → สร้างเพจ "เกี่ยวกับเรา" ผ่าน UI → `/p/about` แสดงเนื้อหา + ลิงก์ใน footer / slug สงวน "admin" ถูกปฏิเสธ / demo สลับธีมวันเพจ → หน้าแรกมีแคตตาล็อกเต็ม+การ์ดติดต่อร้าน (screenshot `.tmp-shots/p6b-one-page-home.png`) → สลับกลับ basic-01 — cleanup ครบ (เพจทดสอบลบ, shop2 กลับ starter)
 
+## Done (Phase 6 ต่อ — ชั้นถอด QR กันสลิปซ้ำ, 2026-07-10)
+- [x] `lib/slip-qr.ts` (sharp + jsQR — deps ใหม่ 2 ตัว): ถอด mini-QR จากรูปสลิป 3 สเกล + parse เลขอ้างอิงธุรกรรม (TLV tolerant) — **ทดสอบ offline ผ่าน 9/9** (`.tmp-qr-decode-test.mjs`): สองรูปคนละ hash → payload เดียวกัน, jpg บีบอัดถอดได้, รูปไม่มี QR คืน null ไม่ throw
+- [x] `supabase/migrations/009_slip_qr.sql` — **⛔ ยังไม่ apply (รอรันใน SQL Editor — อัปโหลดสลิปจะพังจนกว่าจะ apply เพราะ insert คอลัมน์ใหม่)**: payment_slips.qr_payload + qr_scanned + partial index
+- [x] `/api/slips`: ถอด QR ทุกใบ → payload ซ้ำกับออร์เดอร์อื่นในร้าน = ปฏิเสธ "สลิปนี้ถูกใช้ชำระคำสั่งซื้ออื่นไปแล้ว" (จับ crop/แคปใหม่ที่ hash จับไม่ได้) — ออร์เดอร์เดิมอัปธุรกรรมเดิมซ้ำได้ (§7.1) / ไม่พบ QR = รับเข้าคิว manual พร้อม flag
+- [x] คิวตรวจสลิป: ป้ายแดง "ไม่พบ QR ในสลิป" (เฉพาะแถวที่สแกนแล้ว — แถวเก่าไม่เตือน) + แสดงเลขอ้างอิงธุรกรรมให้แอดมินค้นเทียบแอปธนาคาร
+- [x] `pnpm build` ผ่าน — e2e ระดับ API เตรียมแล้ว (`.tmp-phase6c-test.mjs` — รอ apply 009)
+
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] Slip Verify provider จริง (ปลดล็อกจุดขาย P4) — **รอเจ้าของเลือก provider + สมัคร API key** (ตัวเลือกหลักในไทย: SlipOK / EasySlip — โครง interface `lib/slip-verify/` พร้อมเสียบแล้ว)
+- [ ] **Apply `009_slip_qr.sql` ใน SQL Editor** → รัน e2e 6c (สลิป QR เดิมคนละรูปข้ามออร์เดอร์ต้องโดนบล็อก)
+- [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 
 ## Done (Phase 5) — `pnpm build` ผ่าน, migration 005/006 apply แล้ว, DoD ครบ

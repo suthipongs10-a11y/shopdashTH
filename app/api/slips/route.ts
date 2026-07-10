@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { notifyNewSlip } from '@/lib/line';
 import { transitionOrder, TransitionError } from '@/lib/orders/transition';
 import { getSlipVerifier } from '@/lib/slip-verify';
+import { decodeSlipQr } from '@/lib/slip-qr';
 import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import type { TenantContext } from '@/lib/tenant-context';
 import { IMAGE_MIME_EXT, MAX_IMAGE_BYTES, putObject, slipKey } from '@/lib/r2';
@@ -146,6 +147,23 @@ export async function POST(req: Request) {
       return bad('สลิปนี้ถูกใช้ไปแล้ว กรุณาตรวจสอบหรือติดต่อร้านค้า');
     }
 
+    // ---------- ถอด QR กันสลิปซ้ำข้ามออร์เดอร์ (Phase 6 — lib/slip-qr.ts) ----------
+    // payload ใน QR ไม่เปลี่ยนแม้รูปถูก crop/แคปใหม่ — จับ reuse ที่ hash ไฟล์จับไม่ได้
+    // ธุรกรรมเดียวกันกับ "ออร์เดอร์เดิม" อัปซ้ำได้ (ใบเก่าถูกปฏิเสธเพราะรูปไม่ชัด §7.1)
+    const qr = await decodeSlipQr(buffer);
+    if (qr.payload) {
+      const { count: qrDupCount } = await db
+        .from('payment_slips')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', ctx.tenantId)
+        .eq('qr_payload', qr.payload)
+        .neq('order_id', order.id);
+
+      if ((qrDupCount ?? 0) > 0) {
+        return bad('สลิปนี้ถูกใช้ชำระคำสั่งซื้ออื่นไปแล้ว กรุณาตรวจสอบหรือติดต่อร้านค้า');
+      }
+    }
+
     const key = slipKey(ctx.tenantId, order.id, file.type);
     await putObject(key, buffer, file.type);
 
@@ -157,6 +175,8 @@ export async function POST(req: Request) {
         r2_key: key,
         file_hash: fileHash,
         status: 'pending',
+        qr_payload: qr.payload,
+        qr_scanned: true,
       })
       .select('id')
       .single();

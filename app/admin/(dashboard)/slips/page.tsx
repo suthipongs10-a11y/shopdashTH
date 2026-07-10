@@ -3,6 +3,7 @@
 
 import { formatBaht, formatThaiDateTime } from '@/lib/format';
 import { presignGetUrl } from '@/lib/r2';
+import { parseTransRef } from '@/lib/slip-qr';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext } from '@/lib/tenant-context';
 import { SlipReviewCard } from './slip-review-card';
@@ -11,6 +12,8 @@ interface PendingSlipRow {
   id: string;
   r2_key: string;
   created_at: string;
+  qr_payload: string | null;
+  qr_scanned: boolean;
   auto_verify_result: { verified?: boolean; reason_th?: string | null } | null;
   orders: { order_number: string; total_amount: number; ship_name: string };
 }
@@ -22,7 +25,7 @@ export default async function SlipsQueuePage() {
   const { data } = await db
     .from('payment_slips')
     .select(
-      'id, r2_key, created_at, auto_verify_result, orders!inner(order_number, total_amount, ship_name)',
+      'id, r2_key, created_at, qr_payload, qr_scanned, auto_verify_result, orders!inner(order_number, total_amount, ship_name)',
     )
     .eq('tenant_id', ctx.tenantId)
     .eq('status', 'pending')
@@ -60,6 +63,13 @@ export default async function SlipsQueuePage() {
               imageUrl={imageUrl}
               accountName={ctx.store.promptpay_account_name}
               promptpayId={ctx.store.promptpay_id}
+              // เลขอ้างอิงธุรกรรมจาก QR — parse ไม่ได้ให้โชว์ payload ช่วงต้นแทน
+              qrRef={
+                slip.qr_payload
+                  ? (parseTransRef(slip.qr_payload) ?? `${slip.qr_payload.slice(0, 28)}…`)
+                  : null
+              }
+              qrMissing={slip.qr_scanned && !slip.qr_payload}
               autoVerifyFailedReason={
                 slip.auto_verify_result?.verified === false
                   ? (slip.auto_verify_result.reason_th ?? 'ไม่ทราบเหตุผล')

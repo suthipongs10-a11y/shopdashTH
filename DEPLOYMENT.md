@@ -95,7 +95,7 @@
 
 ## §6. Feature caveats (ที่ยังเป็น mock/รอของจริง)
 
-- [ ] **Slip auto-verify (Premium)**: ยังเป็น `MockSlipVerifier` — ไม่ตรวจสลิปจริง (ดู §0) เสียบ provider จริงที่ `lib/slip-verify/` ก่อนเปิดขายจุดนี้เป็นจุดขาย
+- [ ] **Slip auto-verify (Premium)**: ยังเป็น `MockSlipVerifier` — ไม่ตรวจสลิปจริง (ดู §0) เสียบ provider จริงที่ `lib/slip-verify/` ก่อนเปิดขายจุดนี้เป็นจุดขาย — *หมายเหตุ: มีชั้นถอด QR in-house แล้ว (2026-07-10, `lib/slip-qr.ts`) กันสลิปซ้ำข้ามออร์เดอร์ + ป้ายเตือนไม่มี QR ทำงานทุกแพลนโดยไม่มีค่าใช้จ่าย แต่ไม่พิสูจน์เงินเข้าจริง*
 - [ ] **LINE OA**: ร้านกรอก channel access token เอง — ใช้ **broadcast** (ส่งผู้ติดตามทุกคนของ OA, ดู DECISIONS.md) เตือนร้านให้ใช้ OA แยกสำหรับทีมงาน ไม่ใช่ OA ที่ลูกค้าติดตาม
 - [ ] **Custom domain**: HTTPS cert เป็นข้อมูลประกอบ (เช็คด้วย HEAD ไม่ block active, DECISIONS.md) — ต้องมีขั้น add domain เข้า Vercel เพื่อออก cert จริง ตรวจ flow นี้ครบกับโดเมนทดสอบ 1 อัน
 
