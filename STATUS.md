@@ -4,7 +4,7 @@
 - Last session: 2026-07-10
 
 ## Done (Phase 6 — Billing v2 + สรุปออร์เดอร์)
-- [x] `supabase/migrations/007_billing_v2.sql` — **⛔ ยังไม่ apply ลง Supabase (ต้องรันใน SQL Editor ก่อนใช้งาน — checkout จะพังจนกว่าจะ apply เพราะโค้ด select `orders.public_token`)**: plans.price_renewal, แพ็กเกจใหม่ 4 ตัว (p1-start ฿990/590, p2-shop ฿3,900/1,200, p3-business ฿7,900/2,400, p4-premium ฿15,900/4,900), ปิดขาย starter/pro/premium, flag ใหม่ `theme_customize`, orders.public_token, stores.order_cutoff_time + shipping_note_th
+- [x] `supabase/migrations/007_billing_v2.sql` — **apply แล้ว 2026-07-10 (ผู้ใช้รันใน SQL Editor, ตรวจ 12/12 ผ่านด้วย `.tmp-verify-007.mjs`)**: plans.price_renewal, แพ็กเกจใหม่ 4 ตัว (p1-start ฿990/590, p2-shop ฿3,900/1,200, p3-business ฿7,900/2,400, p4-premium ฿15,900/4,900), ปิดขาย starter/pro/premium, flag ใหม่ `theme_customize`, orders.public_token, stores.order_cutoff_time + shipping_note_th
 - [x] Billing v2: `isRenewalTenant()`/`planChargeAmount()` (lib/billing.ts) — จ่ายครั้งแรก = ปีแรก (รวมค่าจัดทำ), เคยอนุมัติแล้ว = ค่าดูแลรายปี; `/admin/plan` + `/platform` pricing + `/signup` แสดง 2 ราคา; QR คิดยอดตามสถานะลูกค้า
 - [x] Super admin `/plans`: ช่องค่าดูแลรายปี + checkbox theme_customize + **ฟอร์มสร้างแพลนใหม่** (เดิมเพิ่มได้ทาง SQL เท่านั้น)
 - [x] Super admin tenant detail: **ปุ่มขยาย trial** (`extendTrial` 1–365 วัน, audit log `trial_extended`) — งานทำเว็บ P3/P4 เกิน trial 7 วัน ร้านไม่ถูก cron ล็อกกลางคัน + theme_customize ใน feature overrides
@@ -16,8 +16,17 @@
 - [x] `supabase/seed.sql`: แพลนเก่า insert เป็น is_active=false (กันติดตั้งใหม่เปิดขายแพลนเก่าทับ 007)
 - [x] `pnpm build` ผ่าน + smoke test dev server (home/products/platform/signup/track = 200)
 
-## ค้าง / ขั้นตอนถัดไป (Phase 6)
-- [ ] **Apply `007_billing_v2.sql` ใน Supabase SQL Editor** แล้วทดสอบ: checkout เต็ม loop → หน้าสรุปมี token เห็นที่อยู่ / ไม่มี token ไม่เห็น, /admin/plan แสดง 2 ราคา, สร้างร้านใหม่เห็นแพลน 4 ตัว, ขยาย trial, P2 ปรับแต่งธีมได้
+## E2E Phase 6 — ผ่านครบ 47/47 (2026-07-10, `.tmp-phase6-test.mjs` — ไม่ commit)
+- [x] A. checkout จริง → หน้าสรุป: เลขออร์เดอร์/วันเวลา/รายการ/รวม ฿319+ส่ง ฿50=สุทธิ ฿369/QR+PromptPay ID/ตัดรอบ 14:00/หมายเหตุร้าน — **มี token เห็นที่อยู่จัดส่งครบ, ไม่มี token หรือ token ผิด → ไม่เห็น (ยังจ่ายได้)**
+- [x] B. order detail แอดมิน: คัดลอกลิงก์ = ลิงก์สรุป+token เป๊ะ, ข้อความสรุปครบทุกส่วน
+- [x] C. /admin/plan: ยังไม่เคยจ่าย → "/ปีแรก ฿990 (รวมค่าจัดทำ)", มี approved sub → "(ต่ออายุ) ฿590 ค่าดูแลรายปี"
+- [x] D. theme_customize: starter ไม่เห็นปุ่ม+เข้า /customize โดน redirect; p2-shop เห็นปุ่ม+ปรับธีม basic ได้ (สะท้อนผลใน ≤60s ตาม cache TTL §3.8)
+- [x] E. super admin: ฟอร์มสร้างแพลน+ช่องค่าดูแลรายปี+checkbox theme_customize, เปลี่ยนแพลน shop2 ผ่าน UI, ขยาย trial 10 วัน (trial_ends_at +10.00 วัน + audit log `trial_extended`)
+- [x] F. landing/signup: ราคา 2 ชั้น, แพลนใหม่ 4 ตัว, ไม่เห็นแพลนเก่า
+- ข้อมูลทดสอบล้างแล้ว (ออร์เดอร์/customer ทดสอบลบ, shop2 กลับ starter + trial null) — ร้าน demo ตั้ง order_cutoff_time=14:00 ค้างไว้เป็นข้อมูลตัวอย่าง
+- หมายเหตุ: รหัสผ่าน `phase1-smoke-test@shopdash.local` ถูก reset เพื่อใช้ e2e (user ทดสอบ — ลบได้ก่อน production ตาม DEPLOYMENT §3)
+
+## ค้าง / ขั้นตอนถัดไป
 - [ ] ต่อจากแผนธุรกิจใหม่ (audit 2026-07-10): production hardening ตาม DEPLOYMENT.md, Pages/CMS (หน้าเกี่ยวกับเรา/บทความ — ปลดล็อกขาย P3), one-page preset สำหรับ P1, เสียบ Slip Verify provider จริง (ปลดล็อกจุดขาย P4)
 
 ## Done (Phase 5) — `pnpm build` ผ่าน, migration 005/006 apply แล้ว, DoD ครบ
