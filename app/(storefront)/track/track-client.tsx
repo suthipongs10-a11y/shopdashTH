@@ -8,7 +8,7 @@ import { trackOrder, type TrackState } from './actions';
 const inputClass =
   'w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text transition-colors placeholder:text-text-muted hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary-ring';
 
-export function TrackClient() {
+export function TrackClient({ initialOrderNumber }: { initialOrderNumber?: string }) {
   const [state, formAction, pending] = useActionState<TrackState, FormData>(trackOrder, {});
 
   return (
@@ -22,11 +22,11 @@ export function TrackClient() {
             เลขออร์เดอร์
           </label>
           <input
-            key={`on-${state.orderNumber ?? ''}`}
+            key={`on-${state.orderNumber ?? initialOrderNumber ?? ''}`}
             id="order_number"
             name="order_number"
             required
-            defaultValue={state.orderNumber ?? ''}
+            defaultValue={state.orderNumber ?? initialOrderNumber ?? ''}
             placeholder="เช่น DEMO-260707-0001"
             className={inputClass}
           />

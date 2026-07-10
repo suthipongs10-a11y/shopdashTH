@@ -91,6 +91,8 @@ export default async function CatalogPage({
         products={products}
         cardVariant={preset.variants.productCard}
         emptyText="ไม่พบสินค้าตามเงื่อนไขที่เลือก"
+        slug={ctx.slug}
+        wishlistEnabled={ctx.features.wishlist}
       />
 
       {pageCount > 1 && (

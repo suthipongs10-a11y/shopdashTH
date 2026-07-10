@@ -128,3 +128,130 @@ export function TagIcon({ className, size = 18 }: IconProps) {
     </svg>
   );
 }
+
+export function ClockIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 3" />
+    </svg>
+  );
+}
+
+export function LockIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  );
+}
+
+export function HeadsetIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 14v-2a8 8 0 0 1 16 0v2" />
+      <rect x="3" y="14" width="4" height="6" rx="1.5" />
+      <rect x="17" y="14" width="4" height="6" rx="1.5" />
+      <path d="M20 18v1a3 3 0 0 1-3 3h-3" />
+    </svg>
+  );
+}
+
+export function HeartIcon({ className, size = 18, filled = false }: IconProps & { filled?: boolean }) {
+  return (
+    <svg {...base(size)} className={className} fill={filled ? 'currentColor' : 'none'}>
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z" />
+    </svg>
+  );
+}
+
+export function UserIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </svg>
+  );
+}
+
+export function CreditCardIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <path d="M2 10h20" />
+    </svg>
+  );
+}
+
+export function BankIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3 9.5 12 4l9 5.5" />
+      <path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8" />
+      <path d="M3 20h18" />
+    </svg>
+  );
+}
+
+export function CashIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="2" y="7" width="20" height="12" rx="2" />
+      <circle cx="12" cy="13" r="2.6" />
+      <path d="M5.5 10h.01M18.5 16h.01" />
+    </svg>
+  );
+}
+
+export function StarIcon({ className, size = 14, filled = true }: IconProps & { filled?: boolean }) {
+  return (
+    <svg {...base(size)} className={className} fill={filled ? 'currentColor' : 'none'} strokeWidth={1.5}>
+      <path d="M12 2.6 14.9 8.5l6.5.94-4.7 4.58 1.1 6.47L12 17.44l-5.8 3.05 1.1-6.47L2.6 9.44l6.5-.94z" />
+    </svg>
+  );
+}
+
+export function BellIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+    </svg>
+  );
+}
+
+export function ClipboardIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="6" y="4" width="12" height="18" rx="2" />
+      <path d="M9 4a2 2 0 0 1 6 0" />
+      <path d="M9 10h6M9 14h6M9 18h4" />
+    </svg>
+  );
+}
+
+export function ShirtIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="m9 3-5.2 3.1a1 1 0 0 0-.42 1.28l1.5 3.4a1 1 0 0 0 1.3.52L8 10.5V20a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-9.5l1.82.8a1 1 0 0 0 1.3-.52l1.5-3.4a1 1 0 0 0-.42-1.27L15 3a3 3 0 0 1-6 0z" />
+    </svg>
+  );
+}
+
+export function CheckIcon({ className, size = 16 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="m5 13 4 4L19 7" />
+    </svg>
+  );
+}
+
+export function BagIcon({ className, size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M6 7h12l1 13a1.5 1.5 0 0 1-1.5 1.6h-11A1.5 1.5 0 0 1 5 20z" />
+      <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+    </svg>
+  );
+}

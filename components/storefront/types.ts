@@ -3,6 +3,15 @@
 
 import type { Carrier, OrderStatus } from '@/lib/orders/status';
 
+/** variant สำหรับ QuickView (ธีม Commerce) — โครงเดียวกับ StorefrontVariant ใน lib/catalog */
+export interface QuickViewVariant {
+  id: string;
+  size: string | null;
+  color: string | null;
+  price: number;
+  stock: number;
+}
+
 export interface ProductCardData {
   id: string;
   name: string;
@@ -11,9 +20,17 @@ export interface ProductCardData {
   priceMin: number;
   priceMax?: number;
   imageUrl?: string;
+  /** รูปที่สอง — โชว์ตอน hover (ธีม Commerce, TEMPLATE_SPEC §4) */
+  hoverImageUrl?: string;
   /** ป้ายบน card เช่น "ใหม่" / "ขายดี" (ธีมกลุ่ม Professional ขึ้นไป) */
   badge?: string;
   inStock: boolean;
+  /** จุดสีของ variant (ค่า CSS จาก lib/color-names) — การ์ดแบบ 'store' */
+  colors?: string[];
+  /** ดาวรีวิวเดโม่ (layout.demoRatings — ดู DECISIONS) */
+  rating?: { score: string; count: number };
+  /** ข้อมูล variant สำหรับ QuickView panel — เฉพาะการ์ดแบบ 'store' */
+  variants?: QuickViewVariant[];
 }
 
 export interface CategoryItem {

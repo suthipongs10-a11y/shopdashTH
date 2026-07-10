@@ -59,7 +59,18 @@
 - [x] `npm run build` ผ่าน + grep hex/rgb ใน `components/storefront` และ `app/(storefront)` = 0 (กฎ token §8.5 ข้อ 3)
 - หมายเหตุ: ร้านทดสอบ dev ยังถือธีมที่สลับไว้ (shop2=basic-02, p3test=one-01, p3race=pro-02) — เก็บไว้ใช้ดูธีมต่างกันได้เลย
 
+## Done (Phase 7 — TEMPLATE_SPEC "Commerce Premium": เทมเพลต T2 "STORE", 2026-07-10)
+- [x] อ่าน TEMPLATE_SPEC.md + ภาพ ref 5 ภาพ (design-refs/) — ทำ T2 ตัวเดียวตามคำสั่ง (ห้ามแตะ T1/T3/T4), เจ้าของยืนยันแผน B1 (ธีมในระบบ ShopDash) + รูป
+- [x] **Phase A รูปภาพ (§1)**: ค้น 213 candidate (Unsplash/Pexels ผ่าน Playwright) → คัด 33 รูป → sharp desaturate 90% + crop → `public/demo/t2/` + CREDITS.json — hero รอบแรกได้แนวตั้งหมด ต้อง re-search ด้วย `?orientation=landscape`
+- [x] **ธีม `t2-store`** (tier 2): token ตาม §2 (ขาวจริง/ink #111214/radius 12-8/เงา 0 1px 3px/IBM Plex Sans Thai/container 1280) + `ThemeLayout` ใหม่ (utilityBar, headerSearch, footerVariant, demoRatings) — ทุกความต่างเป็น data ใน preset
+- [x] **Section/variant ใหม่ใน library กลาง**: `UspStrip` `CategoryBannerRow` `ToolsRow` (ฟอร์มติดตาม→/track?num= + timeline สถานะเขียว + วิธีชำระเงิน) `FeatureBand` (พื้นครีม 5 ไอคอน) / การ์ด `store` (รูป 3:4 + hover สลับ flat-lay + badge + หัวใจ + จุดสี + ราคา "บาท" + ดาว) / hero `commerce` (full-bleed ข้อความซ้าย) / Footer `full` (newsletter+คอลัมน์ลิงก์+social สีแบรนด์) / **QuickView panel** (เลือกสี/ไซส์/จำนวน + เพิ่มลงตะกร้า/ซื้อเลย — preselect ตัวแรกที่มีสต๊อก) / header โหมด Commerce (utility bar ดำ + search box + เมนู drawer มือถือ)
+- [x] **ร้านเดโม่ `wearstore`** (.tmp-t2-seed.mjs รันซ้ำได้): แพลน p2-shop active 1 ปี, หมวด 5, สินค้า 12 ชิ้น (variants ไซส์×สี, บาง combination สต๊อก 0), รูปหลัก+hover อัปเข้า R2 จริง 24 ไฟล์, เพจ help/contact, `__content` (hero SUMMER 2026 + แบนเนอร์หมวด 3 ใบ) — created_at ไล่ลำดับให้แถวสินค้าแนะนำตรง ref
+- [x] **Loop วิจารณ์ 3 รอบ** (§6.1 — 390/768/1440, `.tmp-t2/shots/r1-r3/`): r1 พบ hero ตัดหัวคน/การ์ดแรกเป็น flat-lay/ราคา ฿ ไม่ใช่ "บาท"/scrim อ่อน → r2 แก้ครบ เหลือ QuickView ไม่ preselect + social wrap → r3 ผ่าน
+- [x] **DoD §6 ครบ**: องค์ประกอบ ref ที่เหลือมีเหตุผลบันทึก (เมนู 5 ตามหมวดจริง, ไม่ fake เลขตะกร้า, ไม่มีลูกศร carousel — ของ T3, โลโก้บัตรเป็น text-badge) / anatomy การ์ดครบตาม §0.4 / มือถือ: การ์ด 2 คอลัมน์ + hero ไม่ตัดหัว + เมนู drawer (screenshot ยืนยัน) / **Lighthouse mobile (prod build): Performance 88 ≥ 85, CLS 0 < 0.1** / grep hex ใน components/storefront = 0 / `npm run build` ผ่าน
+- เดโม่: `http://wearstore.localhost:3000` — เหลือ T1/T3/T4 รอคำสั่งถัดไป
+
 ## ค้าง / ขั้นตอนถัดไป
+- [ ] เทมเพลต T1 "SIMPLE" / T3 "HUB" / T4 "LUXÉ" ตาม TEMPLATE_SPEC (ทำทีละตัว — T2 เสร็จแล้วเป็นแม่แบบวิธีทำ)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 

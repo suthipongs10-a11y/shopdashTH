@@ -19,11 +19,14 @@ export function WishlistButton({
   productId,
   enabled,
   storageKey,
+  variant = 'default',
 }: {
   productId: string;
   enabled: boolean;
   /** เช่น shopdash_wishlist_{tenant_slug} */
   storageKey: string;
+  /** floating = วงกลมขาวลอยมุมการ์ดสินค้า (ธีม Commerce — ref T2) */
+  variant?: 'default' | 'floating';
 }) {
   const [saved, setSaved] = useState(false);
 
@@ -40,21 +43,32 @@ export function WishlistButton({
     setSaved(!saved);
   }
 
+  const className =
+    variant === 'floating'
+      ? `flex h-8 w-8 items-center justify-center rounded-full bg-bg/95 shadow-card transition-colors hover:text-danger ${
+          saved ? 'text-danger' : 'text-text-muted'
+        }`
+      : `rounded-md border border-border p-2 transition-colors hover:border-danger ${
+          saved ? 'text-danger' : 'text-text-muted'
+        }`;
+
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      }}
       aria-pressed={saved}
       aria-label={saved ? 'เอาออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}
       title={saved ? 'เอาออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}
-      className={`rounded-md border border-border p-2 transition-colors hover:border-danger ${
-        saved ? 'text-danger' : 'text-text-muted'
-      }`}
+      className={className}
     >
       <svg
         viewBox="0 0 24 24"
-        width="20"
-        height="20"
+        width={variant === 'floating' ? 15 : 20}
+        height={variant === 'floating' ? 15 : 20}
         fill={saved ? 'currentColor' : 'none'}
         stroke="currentColor"
         strokeWidth="2"

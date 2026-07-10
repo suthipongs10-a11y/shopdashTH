@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ProductCardVariant } from '@/themes/types';
 import { formatBahtRange } from '@/lib/format';
+import { StoreProductCard } from './StoreProductCard';
 import type { ProductCardData } from './types';
 
 function CardImage({ product }: { product: ProductCardData }) {
@@ -55,10 +56,19 @@ function CardImage({ product }: { product: ProductCardData }) {
 export function ProductCard({
   product,
   variant = 'minimal',
+  slug = '',
+  wishlistEnabled = false,
 }: {
   product: ProductCardData;
   variant?: ProductCardVariant;
+  /** ใช้กับ variant 'store' (ตะกร้า/wishlist ต่อร้าน) */
+  slug?: string;
+  wishlistEnabled?: boolean;
 }) {
+  if (variant === 'store') {
+    return <StoreProductCard product={product} slug={slug} wishlistEnabled={wishlistEnabled} />;
+  }
+
   const priceText = formatBahtRange(product.priceMin, product.priceMax);
 
   if (variant === 'overlay') {

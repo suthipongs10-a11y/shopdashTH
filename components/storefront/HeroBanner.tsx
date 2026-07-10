@@ -10,6 +10,8 @@ interface HeroBannerProps {
   subline?: string;
   ctaText?: string;
   ctaHref?: string;
+  /** ข้อความเล็กเหนือ headline (variant 'commerce' — เช่น "NEW COLLECTION") */
+  eyebrow?: string;
 }
 
 function Cta({ text, href, onDark = false }: { text?: string; href?: string; onDark?: boolean }) {
@@ -85,9 +87,52 @@ export function HeroBanner({
   subline,
   ctaText,
   ctaHref,
+  eyebrow,
 }: HeroBannerProps) {
   if (!imageUrl && !headline) return null;
   const alt = headline ?? 'แบนเนอร์ร้าน';
+
+  // 'commerce' (ref T2): full-bleed ภาพคนขวา ข้อความชิดซ้ายบนภาพ (ไม่มี scrim ตัวหนังสือเข้ม)
+  if (variant === 'commerce' && imageUrl) {
+    return (
+      <section className="relative min-h-[300px] w-full overflow-hidden md:aspect-[3/1] md:min-h-[360px]">
+        {/* ชี้ตำแหน่ง crop ไปด้านบน-ขวา — กันหัวคนขาดตอน crop แนวกว้าง (DoD §6.5) */}
+        <Image
+          src={imageUrl}
+          alt={alt}
+          fill
+          priority
+          className="object-cover object-[78%_18%]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0">
+          <div className="mx-auto flex h-full max-w-(--container-max) flex-col justify-center gap-2.5 px-4 py-10 md:gap-3">
+            {eyebrow && (
+              <p className="text-xs font-semibold tracking-[0.25em] text-text">{eyebrow}</p>
+            )}
+            {headline && (
+              <h1 className="max-w-lg font-heading text-4xl font-bold leading-none tracking-tight text-text md:text-6xl">
+                {headline}
+              </h1>
+            )}
+            {subline && (
+              <p className="max-w-xs whitespace-pre-line text-sm leading-relaxed text-text md:max-w-sm md:text-base">
+                {subline}
+              </p>
+            )}
+            {ctaText && ctaHref && (
+              <Link
+                href={ctaHref}
+                className="mt-2 inline-block w-fit rounded-sm bg-primary px-7 py-3 text-sm font-semibold text-primary-fg transition-colors hover:bg-primary-deep"
+              >
+                {ctaText}
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // ไม่มีรูป → แผงตกแต่งจากสีธีม (ทุก variant)
   if (!imageUrl) {

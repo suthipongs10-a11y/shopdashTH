@@ -35,8 +35,8 @@ export type ThemeFontName =
   | 'Bai Jamjuree'
   | 'IBM Plex Sans Thai';
 
-export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay';
-export type HeroVariant = 'full-bleed' | 'boxed' | 'split';
+export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay' | 'store';
+export type HeroVariant = 'full-bleed' | 'boxed' | 'split' | 'commerce';
 export type CategoryNavVariant = 'topbar' | 'pills' | 'sidebar';
 
 export type ThemeSection =
@@ -49,7 +49,28 @@ export type ThemeSection =
   | 'catalog'
   /** การ์ดติดต่อร้าน (ที่อยู่/โทร) บนหน้าแรก (ธีม one-page) */
   | 'contact'
+  /* --- ชุด Commerce Premium (TEMPLATE_SPEC — ธีม t2-store ขึ้นไป) --- */
+  /** แถบ USP 4 ไอคอน (ส่งฟรี/คืนได้/จ่ายปลอดภัย/บริการลูกค้า) */
+  | 'usp'
+  /** แบนเนอร์หมวด 3 ใบ (รูป + ชื่อหมวด + ปุ่ม) */
+  | 'categoryBanners'
+  /** แถวเครื่องมือ 3 กล่อง (ติดตามคำสั่งซื้อ / สถานะล่าสุด / วิธีชำระเงิน) */
+  | 'tools'
+  /** แถบ "ครบทุกฟังก์ชัน" 5 ไอคอนพื้นครีม */
+  | 'featureBand'
   | 'footer';
+
+/** โครง layout ระดับธีม (header/footer) — ค่า default = พฤติกรรมเดิมของทุกธีม */
+export interface ThemeLayout {
+  /** แถบ utility ดำบนสุด (ของ ref T2) แทนแถบส่งฟรีแบบเดิม */
+  utilityBar?: boolean;
+  /** ช่องค้นหาจริงใน header (แทนไอคอนแว่นขยาย) */
+  headerSearch?: boolean;
+  /** footer แบบเต็ม: newsletter + คอลัมน์ลิงก์ + social (ref T2) */
+  footerVariant?: 'simple' | 'full';
+  /** โชว์ดาวรีวิวเดโม่บนการ์ดสินค้า (ค่า deterministic จาก id — ดู DECISIONS) */
+  demoRatings?: boolean;
+}
 
 /** ฟีเจอร์หน้าร้านที่ธีมเปิด/ปิดได้ (merge ใน resolveFeatures() §3.7) */
 export interface ThemeFeatureDefaults {
@@ -74,4 +95,6 @@ export interface ThemePreset {
   sections: ThemeSection[];
   /** ธีม 9–10 (§4.6): ร้านแก้ token หลักเองได้จากหน้า "ปรับแต่งธีม" */
   customizable?: boolean;
+  /** โครง header/footer — ไม่ระบุ = พฤติกรรมเดิม */
+  layout?: ThemeLayout;
 }

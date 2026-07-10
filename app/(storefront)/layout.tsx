@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { Footer } from '@/components/storefront/Footer';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getThemeContent, type FooterLinkGroup } from '@/lib/theme-content';
+import { formatBaht } from '@/lib/format';
 import {
   getTenantContext,
   TenantLockedError,
@@ -87,6 +89,43 @@ export default async function StorefrontLayout({ children }: { children: React.R
     href: `/products?category=${c.id}`,
   }));
 
+  // เนื้อหา section ชุด Commerce (ธีมที่ตั้ง layout.utilityBar/footerVariant)
+  const content = getThemeContent(ctx.store.theme_overrides);
+  const utilityItems =
+    content.utility ??
+    [
+      ctx.store.free_shipping_min != null
+        ? { icon: 'truck' as const, text: `ส่งฟรีเมื่อสั่งซื้อครบ ${formatBaht(ctx.store.free_shipping_min)}` }
+        : { icon: 'truck' as const, text: 'จัดส่งทั่วประเทศ' },
+      { icon: 'clock' as const, text: 'เปลี่ยน/คืนสินค้าได้ภายใน 14 วัน' },
+    ];
+  const defaultLinkGroups: FooterLinkGroup[] = [
+    {
+      title: 'ช้อปปิ้ง',
+      links: [
+        { label: 'ใหม่ล่าสุด', href: '/products' },
+        { label: 'สินค้าทั้งหมด', href: '/products' },
+        { label: 'โปรโมชั่น', href: '/products' },
+      ],
+    },
+    {
+      title: 'บริการลูกค้า',
+      links: [
+        { label: 'วิธีสั่งซื้อ', href: '/p/help' },
+        { label: 'การจัดส่ง', href: '/p/help' },
+        { label: 'ติดต่อเรา', href: '/p/contact' },
+      ],
+    },
+    {
+      title: 'บัญชีของฉัน',
+      links: [
+        { label: 'ติดตามคำสั่งซื้อ', href: '/track' },
+        { label: 'ประวัติคำสั่งซื้อ', href: '/track' },
+        { label: 'รายการโปรด', href: '/products' },
+      ],
+    },
+  ];
+
   return (
     <ThemeScope themeCode={ctx.store.theme_code} overrides={ctx.store.theme_overrides}>
       <StoreHeader
@@ -96,6 +135,9 @@ export default async function StorefrontLayout({ children }: { children: React.R
         categories={categoryItems}
         navVariant={preset.variants.categoryNav}
         freeShippingMin={ctx.store.free_shipping_min}
+        layout={preset.layout}
+        utilityItems={utilityItems}
+        wishlistEnabled={ctx.features.wishlist}
       />
       <div className="flex-1">{children}</div>
       <Footer
@@ -103,6 +145,9 @@ export default async function StorefrontLayout({ children }: { children: React.R
         address={ctx.store.address}
         phone={ctx.store.phone}
         pages={navPages ?? []}
+        variant={preset.layout?.footerVariant ?? 'simple'}
+        linkGroups={content.footerLinkGroups ?? defaultLinkGroups}
+        newsletterText={content.newsletterText ?? 'รับสิทธิพิเศษและโปรโมชั่นก่อนใครทางอีเมล'}
       />
     </ThemeScope>
   );

@@ -3,9 +3,13 @@
 
 import Link from 'next/link';
 import { AnnouncementBar } from '@/components/storefront/AnnouncementBar';
+import { CategoryBannerRow } from '@/components/storefront/CategoryBannerRow';
+import { FeatureBand } from '@/components/storefront/FeatureBand';
 import { HeroBanner } from '@/components/storefront/HeroBanner';
 import { ProductGrid } from '@/components/storefront/ProductGrid';
 import { SectionHeading } from '@/components/storefront/SectionHeading';
+import { ToolsRow } from '@/components/storefront/ToolsRow';
+import { UspStrip } from '@/components/storefront/UspStrip';
 import {
   ArrowRightIcon,
   MapPinIcon,
@@ -13,8 +17,11 @@ import {
   PhoneIcon,
 } from '@/components/storefront/icons';
 import { fetchFeatured, fetchLatest } from '@/lib/catalog';
+import { demoRating } from '@/lib/demo-rating';
+import { formatThaiDate } from '@/lib/format';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { DEFAULT_FEATURE_BAND_TITLE, DEFAULT_USP, getThemeContent } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
 import type { ThemeSection } from '@/themes/types';
@@ -22,10 +29,13 @@ import type { ThemeSection } from '@/themes/types';
 export default async function StorefrontHomePage() {
   const ctx = await getTenantContext();
   const preset = getPreset(ctx.store.theme_code);
+  const content = getThemeContent(ctx.store.theme_overrides);
+  const isStoreCard = preset.variants.productCard === 'store';
 
   const db = createAdminClient();
-  const [featured, latest, { data: categories }, catalog] = await Promise.all([
-    fetchFeatured(ctx.tenantId),
+  const [featuredRaw, latest, { data: categories }, catalog] = await Promise.all([
+    // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2
+    fetchFeatured(ctx.tenantId, isStoreCard ? 6 : 8),
     fetchLatest(ctx.tenantId),
     db
       .from('categories')
@@ -36,30 +46,84 @@ export default async function StorefrontHomePage() {
     preset.sections.includes('catalog') ? fetchLatest(ctx.tenantId, 24) : Promise.resolve([]),
   ]);
 
+  // ธีม Commerce: ดาวรีวิวเดโม่ (deterministic — ดู DECISIONS) + badge "ใหม่" 2 ชิ้นแรก
+  const featured = preset.layout?.demoRatings
+    ? featuredRaw.map((p, i) => ({
+        ...p,
+        rating: demoRating(p.id),
+        badge: i < 2 ? 'ใหม่' : p.badge,
+      }))
+    : featuredRaw;
+
   const sections: Record<ThemeSection, React.ReactNode> = {
     announcement: <AnnouncementBar key="announcement" text={ctx.store.announcement_text} />,
-    hero: (
-      <HeroBanner
-        key="hero"
-        variant={preset.variants.hero}
-        imageUrl={ctx.store.banner_r2_key ? publicR2Url(ctx.store.banner_r2_key) : undefined}
-        headline={ctx.store.banner_r2_key ? undefined : ctx.store.name}
-        ctaText="ดูสินค้าทั้งหมด"
-        ctaHref="/products"
-      />
-    ),
+    hero:
+      preset.variants.hero === 'commerce' ? (
+        <HeroBanner
+          key="hero"
+          variant="commerce"
+          imageUrl={
+            content.hero?.imageUrl ??
+            (ctx.store.banner_r2_key ? publicR2Url(ctx.store.banner_r2_key) : undefined)
+          }
+          eyebrow={content.hero?.eyebrow ?? 'NEW COLLECTION'}
+          headline={content.hero?.headline ?? ctx.store.name}
+          subline={content.hero?.sub}
+          ctaText={content.hero?.ctaText ?? 'ช้อปเลย'}
+          ctaHref={content.hero?.ctaHref ?? '/products'}
+        />
+      ) : (
+        <HeroBanner
+          key="hero"
+          variant={preset.variants.hero}
+          imageUrl={ctx.store.banner_r2_key ? publicR2Url(ctx.store.banner_r2_key) : undefined}
+          headline={ctx.store.banner_r2_key ? undefined : ctx.store.name}
+          ctaText="ดูสินค้าทั้งหมด"
+          ctaHref="/products"
+        />
+      ),
+    usp: <UspStrip key="usp" items={content.usp ?? DEFAULT_USP} />,
     featured:
       featured.length > 0 ? (
         <section key="featured" className="mx-auto max-w-(--container-max) px-4 py-12">
-          <SectionHeading
-            eyebrow="คัดสรรโดยร้าน"
-            title="สินค้าแนะนำ"
-            linkText="ดูทั้งหมด"
-            linkHref="/products"
+          {isStoreCard ? (
+            // หัว section แบบ ref T2 — ข้อความซ้ายเรียบๆ ไม่มี pill
+            <h2 className="mb-5 font-heading text-lg font-semibold tracking-tight text-text">
+              สินค้าแนะนำ
+            </h2>
+          ) : (
+            <SectionHeading
+              eyebrow="คัดสรรโดยร้าน"
+              title="สินค้าแนะนำ"
+              linkText="ดูทั้งหมด"
+              linkHref="/products"
+            />
+          )}
+          <ProductGrid
+            products={featured}
+            cardVariant={preset.variants.productCard}
+            slug={ctx.slug}
+            wishlistEnabled={ctx.features.wishlist}
           />
-          <ProductGrid products={featured} cardVariant={preset.variants.productCard} />
         </section>
       ) : null,
+    categoryBanners:
+      (content.categoryBanners ?? []).length > 0 ? (
+        <div key="categoryBanners" className="py-2">
+          <CategoryBannerRow banners={content.categoryBanners ?? []} />
+        </div>
+      ) : null,
+    tools: (
+      <div key="tools" className="py-10">
+        <ToolsRow
+          demoOrderNumber={`${ctx.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 2) || 'WS'}24051789`}
+          demoOrderDate={formatThaiDate(new Date().toISOString())}
+        />
+      </div>
+    ),
+    featureBand: (
+      <FeatureBand key="featureBand" title={content.featureBandTitle ?? DEFAULT_FEATURE_BAND_TITLE} />
+    ),
     categories:
       (categories ?? []).length > 0 ? (
         <section key="categories" className="mx-auto max-w-(--container-max) px-4 py-6">
@@ -91,7 +155,12 @@ export default async function StorefrontHomePage() {
           linkText="ดูทั้งหมด"
           linkHref="/products"
         />
-        <ProductGrid products={latest} cardVariant={preset.variants.productCard} />
+        <ProductGrid
+          products={latest}
+          cardVariant={preset.variants.productCard}
+          slug={ctx.slug}
+          wishlistEnabled={ctx.features.wishlist}
+        />
       </section>
     ),
     // ธีม one-page: แคตตาล็อกเต็มบนหน้าแรก (สูงสุด 24 ชิ้น — เกินนั้นลิงก์ไป /products)
@@ -104,7 +173,12 @@ export default async function StorefrontHomePage() {
             linkText={catalog.length >= 24 ? 'ดูทั้งหมด' : undefined}
             linkHref={catalog.length >= 24 ? '/products' : undefined}
           />
-          <ProductGrid products={catalog} cardVariant={preset.variants.productCard} />
+          <ProductGrid
+            products={catalog}
+            cardVariant={preset.variants.productCard}
+            slug={ctx.slug}
+            wishlistEnabled={ctx.features.wishlist}
+          />
         </section>
       ) : null,
     // ธีม one-page: การ์ดติดต่อร้าน — "แคตตาล็อก+ติดต่อ" จบในหน้าเดียว

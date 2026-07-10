@@ -3,6 +3,7 @@
 
 import 'server-only';
 import type { ProductCardData } from '@/components/storefront/types';
+import { colorFromName } from '@/lib/color-names';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -28,6 +29,7 @@ interface ProductRow {
   base_price: number;
   product_images: { r2_key: string; sort_order: number }[];
   product_variants: {
+    id: string;
     price_override: number | null;
     stock: number;
     size: string | null;
@@ -38,19 +40,30 @@ interface ProductRow {
 const CARD_SELECT =
   'id, name, base_price, created_at, ' +
   'product_images(r2_key, sort_order), ' +
-  'product_variants!inner(price_override, stock, size, color, is_enabled)';
+  'product_variants!inner(id, price_override, stock, size, color, is_enabled)';
 
 function toCard(row: ProductRow): ProductCardData {
   const prices = row.product_variants.map((v) => v.price_override ?? row.base_price);
-  const image = [...row.product_images].sort((a, b) => a.sort_order - b.sort_order)[0];
+  const images = [...row.product_images].sort((a, b) => a.sort_order - b.sort_order);
+  // จุดสีบนการ์ด (การ์ดแบบ 'store') — สีไม่ซ้ำ เรียงตามลำดับ variant
+  const colorNames = [...new Set(row.product_variants.map((v) => v.color).filter(Boolean))] as string[];
   return {
     id: row.id,
     name: row.name,
     href: `/products/${row.id}`,
     priceMin: prices.length > 0 ? Math.min(...prices) : row.base_price,
     priceMax: prices.length > 0 ? Math.max(...prices) : undefined,
-    imageUrl: image ? publicR2Url(image.r2_key) : undefined,
+    imageUrl: images[0] ? publicR2Url(images[0].r2_key) : undefined,
+    hoverImageUrl: images[1] ? publicR2Url(images[1].r2_key) : undefined,
     inStock: row.product_variants.some((v) => v.stock > 0),
+    colors: colorNames.length > 0 ? colorNames.map(colorFromName) : undefined,
+    variants: row.product_variants.map((v) => ({
+      id: v.id,
+      size: v.size,
+      color: v.color,
+      price: v.price_override ?? row.base_price,
+      stock: v.stock,
+    })),
   };
 }
 

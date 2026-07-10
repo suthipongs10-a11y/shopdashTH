@@ -31,6 +31,20 @@
   --color-primary-deep: color-mix(in oklab, var(--color-primary) 82%, var(--color-text));
   --color-hero-glow: color-mix(in oklab, var(--color-primary-fg) 12%, transparent);
 
+  /* โทเคนเสริมชุด Commerce Premium (TEMPLATE_SPEC §2) — preset override ได้ */
+  --color-star: #f5a623; /* ดาวรีวิว — สีเดียวทุกธีม (§2) */
+  --color-link: #2f6fdd; /* ลิงก์เลขพัสดุ/ดูรายละเอียด (ตาม ref T2) */
+
+  /* สีโลโก้แบรนด์ภายนอก (ข้อยกเว้น §5.3 — social/payment เท่านั้น) */
+  --brand-facebook: #1877f2;
+  --brand-instagram: #e1306c;
+  --brand-line: #06c755;
+  --brand-tiktok: #111214;
+  --brand-youtube: #ff0000;
+  --brand-visa: #1a1f71;
+  --brand-mastercard: #eb001b;
+  --brand-jcb: #0b4ea2;
+
   /* ตัวอักษร (ค่า var(--font-*) มาจาก next/font ใน themes/fonts.ts) */
   --font-heading: var(--font-prompt, ui-sans-serif, system-ui, sans-serif);
   --font-body: var(--font-sarabun, ui-sans-serif, system-ui, sans-serif);
@@ -66,6 +80,16 @@
   --color-primary-ring: var(--color-primary-ring);
   --color-primary-deep: var(--color-primary-deep);
   --color-hero-glow: var(--color-hero-glow);
+  --color-star: var(--color-star);
+  --color-link: var(--color-link);
+  --color-brand-facebook: var(--brand-facebook);
+  --color-brand-instagram: var(--brand-instagram);
+  --color-brand-line: var(--brand-line);
+  --color-brand-tiktok: var(--brand-tiktok);
+  --color-brand-youtube: var(--brand-youtube);
+  --color-brand-visa: var(--brand-visa);
+  --color-brand-mastercard: var(--brand-mastercard);
+  --color-brand-jcb: var(--brand-jcb);
 
   /* ฟอนต์ → font-heading, font-body */
   --font-heading: var(--font-heading);

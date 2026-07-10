@@ -103,3 +103,15 @@ tsvector ตัดคำไทยไม่ได้ (§2.1) จึงใช้ p
 
 ## 2026-07-09 — แดชบอร์ด basic (ทุกแพลน) vs full (flag analytics_dashboard)
 ตาราง §5.1 ให้ Starter เห็น "สรุปพื้นฐาน" ส่วน Pro/Premium เห็น "เต็ม" — หน้า `/admin/dashboard` เปิดให้ทุกแพลน แสดงการ์ดยอดขาย/ออร์เดอร์ค้างต่อสถานะ/สต๊อกใกล้หมดเสมอ ส่วนกราฟเส้นยอดขาย + สินค้าขายดี + ยอดเฉลี่ย/ออร์เดอร์ gate ด้วย `ctx.features.analytics_dashboard` (Starter เห็นกล่องชวนอัปเกรดแทน)
+
+## 2026-07-10 — ชุดเทมเพลต Commerce Premium (TEMPLATE_SPEC.md) เริ่มที่ T2 "STORE" เป็นธีมในระบบเดิม
+TEMPLATE_SPEC.md (แทน DESIGN_SPEC เดิม) ต้องการเดโม่ 4 ระดับตาม ref 5 ภาพ — เลือกทำเป็น **ธีม preset ในระบบธีมเดิม** (ไม่ใช่หน้า static แยก) ตามที่เจ้าของยืนยัน: เดโม่ = ตัวพิสูจน์ว่าแพลตฟอร์มส่งงานจริงได้ ธีมแรก `t2-store` + ร้านเดโม่ `wearstore` (seed สคริปต์ + รูปอัปผ่าน R2 pipeline จริง) — section ใหม่ (usp/categoryBanners/tools/featureBand), variant ใหม่ (card `store`, hero `commerce`), `ThemeLayout` (utilityBar/headerSearch/footerVariant) ทั้งหมดเป็น data ใน preset ไม่มี if ชื่อธีม (§8.5)
+
+## 2026-07-10 — เนื้อหา section ธีม Commerce เก็บใน stores.theme_overrides.__content
+hero copy/แบนเนอร์หมวด/ลิงก์ footer เป็นเนื้อหาต่อร้าน ไม่ใช่ token และไม่คุ้มเพิ่มคอลัมน์ — ใช้ key `__content` ใน jsonb เดิม (ปลอดภัยเพราะ `resolveThemeStyle` กรองเฉพาะ THEME_TOKEN_NAMES อยู่แล้ว) อ่านผ่าน `lib/theme-content.ts` พร้อม default ไทยครบทุก section
+
+## 2026-07-10 — ดาวรีวิวเดโม่ deterministic + สี hex อยู่ในชั้น data เท่านั้น
+ระบบรีวิวเป็น Future (§2.1) แต่ ref Commerce ต้องมีดาว+จำนวนรีวิวบนการ์ด → gen ค่าจาก hash ของ product id (`lib/demo-rating.ts`) เปิดเฉพาะธีมที่ตั้ง `layout.demoRatings` — ไม่แตะ DB ไม่หลอกข้อมูลข้ามร้าน / สีแบรนด์ social+payment (ข้อยกเว้น §5.3 ของสเปค) เพิ่มเป็น token ใน tokens.css และ map ชื่อสีไทย→hex อยู่ใน `lib/color-names.ts` (ชั้น data เทียบเท่า preset) — grep hex ใน components/storefront ยังเป็น 0 ตามกฎ
+
+## 2026-07-10 — รูปเดโม่ T2 อยู่ public/demo/t2 พร้อม CREDITS.json
+33 รูปจาก Unsplash/Pexels (license เชิงพาณิชย์ได้) ผ่าน sharp desaturate 90% + crop ตามบทบาท — รูปสินค้าอัปเข้า R2 ตอน seed (pipeline จริง) ส่วน hero/แบนเนอร์อ้าง path static ผ่าน __content เพราะเป็นเนื้อหาเดโม่ต่อร้าน แหล่งที่มาทุกรูปบันทึกใน public/demo/t2/CREDITS.json

@@ -123,6 +123,8 @@ export default async function ProductDetailPage({
         products={related}
         enabled={ctx.features.related_products}
         cardVariant={preset.variants.productCard}
+        slug={ctx.slug}
+        wishlistEnabled={ctx.features.wishlist}
       />
     </main>
   );
