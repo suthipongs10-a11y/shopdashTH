@@ -28,13 +28,13 @@
 
 ## Done (Phase 6 ต่อ — hardening + Pages/CMS + ธีม one-page, 2026-07-10)
 - [x] **Rate limit** (`lib/rate-limit.ts` — in-memory sliding window ต่อ instance): checkout 10/นาที, slips 6/นาที, signup 5/ชม., slug-check 30/นาที, discount-check 20/นาที (ต่อ IP), domain-verify 10/10นาที (ต่อร้าน) — ตอบ 429 ไทย; **ทดสอบจริง: ยิง checkout 12 ครั้ง → 10×400 + 2×429** ✅
-- [x] `supabase/migrations/008_pages_onepage.sql` — **⛔ ยังไม่ apply (รอรันใน SQL Editor)**: ตาราง `pages` (tenant_id + RLS ENABLE+FORCE ตาม §3.5 + anon อ่านเฉพาะ published), flag `custom_pages` ให้ p3-business/p4-premium, ธีม one-01 ใน theme_registry — **โค้ดไม่พังก่อน apply** (footer query คืน [] เงียบๆ, ทดสอบแล้ว home 200)
+- [x] `supabase/migrations/008_pages_onepage.sql` — **apply แล้ว 2026-07-10 (ผู้ใช้รันใน SQL Editor)**: ตาราง `pages` (tenant_id + RLS ENABLE+FORCE ตาม §3.5 + anon อ่านเฉพาะ published), flag `custom_pages` ให้ p3-business/p4-premium, ธีม one-01 ใน theme_registry
 - [x] **Pages/CMS** (ปลดล็อกขายแพลนธุรกิจ): `/admin/pages` CRUD (สร้าง/แก้/ลบ/ฉบับร่าง-เผยแพร่/ลำดับ/แสดงใน footer, flag-gated + server ตรวจซ้ำ), storefront `/p/{slug}` (published เท่านั้น + SEO metadata), ลิงก์เพจใน Footer ทุกหน้า, เมนู "เพจ" ใน admin nav — เพจเดิมอยู่รอดการดาวน์เกรด (gate เฉพาะสร้าง/แก้ ตาม §7.2)
 - [x] **ธีม one-01 "วันเพจ"** (tier 1 — แพ็กเกจเริ่มต้น ฿990 "หน้าเดียว แคตตาล็อก+ติดต่อ"): section ใหม่ `catalog` (สินค้า 24 ชิ้นบนหน้าแรก) + `contact` (การ์ดที่อยู่/โทร/ลิงก์ track) ผ่านระบบ preset ตามสถาปัตยกรรมเดิม ไม่มี if ชื่อธีม
-- [x] `pnpm build` ผ่าน + ทดสอบ: home/404/rate-limit ผ่านครบ (pages + ธีม one-01 รอ e2e หลัง apply 008)
+- [x] `pnpm build` ผ่าน + ทดสอบ: home/404/rate-limit ผ่านครบ
+- [x] **e2e Phase 6b ผ่าน 15/15** (2026-07-10, `.tmp-phase6b-test.mjs` — ไม่ commit): ร้าน starter ถูก gate หน้าเพจ / เปลี่ยนเป็นแพลนธุรกิจ → สร้างเพจ "เกี่ยวกับเรา" ผ่าน UI → `/p/about` แสดงเนื้อหา + ลิงก์ใน footer / slug สงวน "admin" ถูกปฏิเสธ / demo สลับธีมวันเพจ → หน้าแรกมีแคตตาล็อกเต็ม+การ์ดติดต่อร้าน (screenshot `.tmp-shots/p6b-one-page-home.png`) → สลับกลับ basic-01 — cleanup ครบ (เพจทดสอบลบ, shop2 กลับ starter)
 
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] **Apply `008_pages_onepage.sql` ใน SQL Editor** → e2e: สร้างเพจ "เกี่ยวกับเรา" ร้าน p3 → เห็นที่ /p/about + footer, ร้าน p1 ถูก gate, สลับธีม one-01 → หน้าแรกมีแคตตาล็อก+ติดต่อ
 - [ ] Slip Verify provider จริง (ปลดล็อกจุดขาย P4) — **รอเจ้าของเลือก provider + สมัคร API key** (ตัวเลือกหลักในไทย: SlipOK / EasySlip — โครง interface `lib/slip-verify/` พร้อมเสียบแล้ว)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 
