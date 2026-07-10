@@ -54,14 +54,15 @@ export default async function StorePagePage({
   if (!page) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-12">
       <article>
-        <h1 className="font-heading text-2xl font-semibold">{page.title}</h1>
-        <p className="mt-1 text-xs text-text-muted">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">{page.title}</h1>
+        <p className="mt-2 text-xs text-text-muted">
           อัปเดตล่าสุด {formatThaiDate(page.updated_at)}
         </p>
+        <hr className="my-6 border-border-soft" />
         {page.body_md && (
-          <div className="mt-6 whitespace-pre-wrap text-[calc(1rem*var(--text-scale))] leading-relaxed">
+          <div className="whitespace-pre-wrap text-[calc(1rem*var(--text-scale))] leading-relaxed">
             {page.body_md}
           </div>
         )}

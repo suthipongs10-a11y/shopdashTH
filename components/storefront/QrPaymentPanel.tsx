@@ -19,12 +19,17 @@ export function QrPaymentPanel({
   promptpayId?: string | null;
 }) {
   return (
-    <section className="rounded-lg border border-border bg-surface p-6 text-center">
-      <h2 className="font-heading text-lg font-semibold">สแกนจ่ายด้วย PromptPay</h2>
-      <p className="mt-1 text-sm text-text-muted">เลขที่ออร์เดอร์ {orderNumber}</p>
+    <section className="overflow-hidden rounded-lg border border-border bg-surface text-center shadow-card">
+      <div className="bg-primary px-6 py-3">
+        <h2 className="font-heading text-lg font-semibold text-primary-fg">
+          สแกนจ่ายด้วย PromptPay
+        </h2>
+        <p className="text-xs text-primary-fg/80">เลขที่ออร์เดอร์ {orderNumber}</p>
+      </div>
+      <div className="p-6 pt-5">
 
       <div
-        className="mx-auto mt-4 w-56 rounded-md bg-bg p-3 [&>svg]:h-auto [&>svg]:w-full"
+        className="mx-auto w-56 rounded-lg border border-border-soft bg-bg p-3 shadow-card [&>svg]:h-auto [&>svg]:w-full"
         role="img"
         aria-label={`QR PromptPay ยอดชำระ ${formatBaht(amount)}`}
         dangerouslySetInnerHTML={{ __html: qrSvg }}
@@ -51,6 +56,7 @@ export function QrPaymentPanel({
         <li>ตรวจชื่อบัญชีและยอดเงินให้ตรงก่อนกดโอน</li>
         <li>อัปโหลดสลิปด้านล่างเพื่อยืนยันการชำระเงิน</li>
       </ol>
+      </div>
     </section>
   );
 }

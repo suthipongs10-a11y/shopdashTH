@@ -7,6 +7,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { ChevronDownIcon, SearchIcon } from './icons';
 
 export const SORT_OPTIONS = [
   { value: 'newest', label: 'ใหม่ล่าสุด' },
@@ -16,8 +17,35 @@ export const SORT_OPTIONS = [
 
 export type SortValue = (typeof SORT_OPTIONS)[number]['value'];
 
-const selectClass =
-  'rounded-md border border-border bg-bg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary';
+// select แบบ custom — ซ่อนลูกศร default แล้ววาง chevron เอง ให้เข้าธีมทุกร้าน
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  children,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className="relative inline-flex">
+      <select
+        aria-label={label}
+        className="appearance-none rounded-full border border-border bg-bg py-2 pl-4 pr-9 text-sm font-medium text-text transition-colors hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary-ring"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {children}
+      </select>
+      <ChevronDownIcon
+        size={15}
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+      />
+    </span>
+  );
+}
 
 export function FilterBar({
   categories,
@@ -62,91 +90,93 @@ export function FilterBar({
         className="flex gap-2"
         role="search"
       >
-        <input
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="ค้นหาสินค้า…"
-          aria-label="ค้นหาสินค้า"
-          className="w-full max-w-sm rounded-md border border-border bg-bg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
-        />
+        <span className="relative w-full max-w-sm">
+          <SearchIcon
+            size={17}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+          />
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="ค้นหาสินค้า…"
+            aria-label="ค้นหาสินค้า"
+            className="w-full rounded-full border border-border bg-bg py-2.5 pl-10 pr-4 text-sm text-text transition-colors placeholder:text-text-muted hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary-ring"
+          />
+        </span>
         <button
           type="submit"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg"
+          className="shrink-0 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
         >
           ค้นหา
         </button>
       </form>
 
       <div className="flex flex-wrap items-center gap-2">
-      <select
-        aria-label="หมวดหมู่"
-        className={selectClass}
-        value={searchParams.get('category') ?? ''}
-        onChange={(e) => update('category', e.target.value)}
-      >
-        <option value="">ทุกหมวดหมู่</option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-
-      {sizes.length > 0 && (
-        <select
-          aria-label="ไซส์"
-          className={selectClass}
-          value={searchParams.get('size') ?? ''}
-          onChange={(e) => update('size', e.target.value)}
+        <FilterSelect
+          label="หมวดหมู่"
+          value={searchParams.get('category') ?? ''}
+          onChange={(v) => update('category', v)}
         >
-          <option value="">ทุกไซส์</option>
-          {sizes.map((s) => (
-            <option key={s} value={s}>
-              {s}
+          <option value="">ทุกหมวดหมู่</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
             </option>
           ))}
-        </select>
-      )}
+        </FilterSelect>
 
-      {colors.length > 0 && (
-        <select
-          aria-label="สี"
-          className={selectClass}
-          value={searchParams.get('color') ?? ''}
-          onChange={(e) => update('color', e.target.value)}
+        {sizes.length > 0 && (
+          <FilterSelect
+            label="ไซส์"
+            value={searchParams.get('size') ?? ''}
+            onChange={(v) => update('size', v)}
+          >
+            <option value="">ทุกไซส์</option>
+            {sizes.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </FilterSelect>
+        )}
+
+        {colors.length > 0 && (
+          <FilterSelect
+            label="สี"
+            value={searchParams.get('color') ?? ''}
+            onChange={(v) => update('color', v)}
+          >
+            <option value="">ทุกสี</option>
+            {colors.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </FilterSelect>
+        )}
+
+        <FilterSelect
+          label="เรียงตาม"
+          value={searchParams.get('sort') ?? 'newest'}
+          onChange={(v) => update('sort', v)}
         >
-          <option value="">ทุกสี</option>
-          {colors.map((c) => (
-            <option key={c} value={c}>
-              {c}
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
             </option>
           ))}
-        </select>
-      )}
+        </FilterSelect>
 
-      <select
-        aria-label="เรียงตาม"
-        className={selectClass}
-        value={searchParams.get('sort') ?? 'newest'}
-        onChange={(e) => update('sort', e.target.value)}
-      >
-        {SORT_OPTIONS.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-
-      {hasFilter && (
-        <button
-          type="button"
-          onClick={clearAll}
-          className="text-sm text-text-muted underline underline-offset-2 hover:text-text"
-        >
-          ล้างตัวกรอง
-        </button>
-      )}
+        {hasFilter && (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="rounded-full px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-danger-soft hover:text-danger"
+          >
+            ✕ ล้างตัวกรอง
+          </button>
+        )}
       </div>
     </div>
   );

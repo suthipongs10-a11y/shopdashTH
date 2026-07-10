@@ -134,7 +134,7 @@ export function SlipUploader({
           type="button"
           onClick={handleUpload}
           disabled={!file || inputDisabled}
-          className="w-full rounded-md bg-primary py-3 text-sm font-medium text-primary-fg transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0"
         >
           {uploading ? 'กำลังอัปโหลด…' : 'ส่งสลิปให้ร้านตรวจสอบ'}
         </button>

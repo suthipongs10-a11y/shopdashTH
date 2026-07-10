@@ -4,6 +4,7 @@
 // ปุ่มหยิบใส่ตะกร้า disabled เมื่อ variant นั้นสต๊อก 0 (§2.1 + DoD ข้อ 4)
 
 import { useMemo, useState } from 'react';
+import { CartIcon } from '@/components/storefront/icons';
 import type { StorefrontVariant } from '@/lib/catalog';
 import { useCart } from '@/lib/cart';
 import { formatBaht, formatBahtRange } from '@/lib/format';
@@ -89,17 +90,19 @@ export function VariantSelector({
   }
 
   const dimButton = (active: boolean, disabled: boolean) =>
-    `rounded-md border px-4 py-2 text-sm transition-colors ${
+    `min-w-12 rounded-md border px-4 py-2 text-sm font-medium transition-all ${
       active
-        ? 'border-primary bg-primary text-primary-fg'
+        ? 'border-primary bg-primary text-primary-fg shadow-card'
         : disabled
-          ? 'cursor-not-allowed border-border text-text-muted line-through opacity-50'
-          : 'border-border hover:border-primary'
+          ? 'cursor-not-allowed border-border-soft text-text-muted line-through opacity-50'
+          : 'border-border hover:-translate-y-0.5 hover:border-primary hover:text-primary'
     }`;
 
   return (
     <div className="space-y-5">
-      <p className="font-heading text-2xl font-semibold text-primary">{priceText}</p>
+      <div className="inline-flex items-baseline gap-2 rounded-lg bg-primary-soft px-4 py-2">
+        <p className="font-heading text-3xl font-bold tracking-tight text-primary">{priceText}</p>
+      </div>
 
       {needSize && (
         <div>
@@ -138,47 +141,57 @@ export function VariantSelector({
       )}
 
       {selected && remaining > 0 && (
-        <p className="text-sm text-text-muted">
-          เหลือ {remaining.toLocaleString('th-TH')} ชิ้น
+        <p className="inline-flex items-center gap-1.5 text-sm text-success">
+          <span className="h-2 w-2 rounded-full bg-success" aria-hidden />
+          พร้อมส่ง เหลือ {remaining.toLocaleString('th-TH')} ชิ้น
           {inCartQty > 0 && ` (อยู่ในตะกร้าแล้ว ${inCartQty})`}
         </p>
       )}
-      {outOfStock && <p className="text-sm font-medium text-danger">สินค้าหมด</p>}
+      {outOfStock && (
+        <p className="inline-flex items-center gap-1.5 text-sm font-medium text-danger">
+          <span className="h-2 w-2 rounded-full bg-danger" aria-hidden />
+          สินค้าหมด
+        </p>
+      )}
       {!selectionComplete && (
         <p className="text-sm text-text-muted">กรุณาเลือก{needSize && !size ? 'ไซส์' : ''}{needSize && !size && needColor && !color ? 'และ' : ''}{needColor && !color ? 'สี' : ''}</p>
       )}
 
-      <div className="flex items-center gap-3">
-        <div className="flex items-center rounded-md border border-border">
+      {/* มือถือ: แถวปุ่มลอยติดขอบล่างจอ (sticky) — desktop อยู่ในตำแหน่งปกติ (§4.6) */}
+      <div className="sticky bottom-0 z-10 -mx-4 border-t border-border-soft bg-bg/95 px-4 py-3 backdrop-blur-sm md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center rounded-full border border-border">
+            <button
+              type="button"
+              aria-label="ลดจำนวน"
+              onClick={() => setQty(Math.max(1, qty - 1))}
+              disabled={qty <= 1}
+              className="px-3.5 py-2.5 transition-colors hover:text-primary disabled:opacity-40"
+            >
+              −
+            </button>
+            <span className="min-w-10 text-center font-medium">{qty}</span>
+            <button
+              type="button"
+              aria-label="เพิ่มจำนวน"
+              onClick={() => setQty(Math.min(remaining || 1, qty + 1))}
+              disabled={!selected || qty >= remaining}
+              className="px-3.5 py-2.5 transition-colors hover:text-primary disabled:opacity-40"
+            >
+              +
+            </button>
+          </div>
+
           <button
             type="button"
-            aria-label="ลดจำนวน"
-            onClick={() => setQty(Math.max(1, qty - 1))}
-            disabled={qty <= 1}
-            className="px-3 py-2 disabled:opacity-40"
+            onClick={handleAdd}
+            disabled={!canAdd}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0"
           >
-            −
-          </button>
-          <span className="min-w-10 text-center">{qty}</span>
-          <button
-            type="button"
-            aria-label="เพิ่มจำนวน"
-            onClick={() => setQty(Math.min(remaining || 1, qty + 1))}
-            disabled={!selected || qty >= remaining}
-            className="px-3 py-2 disabled:opacity-40"
-          >
-            +
+            {!outOfStock && !added && <CartIcon size={17} />}
+            {outOfStock ? 'สินค้าหมด' : added ? '✓ เพิ่มลงตะกร้าแล้ว' : 'หยิบใส่ตะกร้า'}
           </button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={!canAdd}
-          className="flex-1 rounded-md bg-primary py-3 text-sm font-medium text-primary-fg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {outOfStock ? 'สินค้าหมด' : added ? '✓ เพิ่มลงตะกร้าแล้ว' : 'หยิบใส่ตะกร้า'}
-        </button>
       </div>
     </div>
   );

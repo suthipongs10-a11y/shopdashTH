@@ -6,14 +6,17 @@ import { OrderTracker } from '@/components/storefront/OrderTracker';
 import { trackOrder, type TrackState } from './actions';
 
 const inputClass =
-  'w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary';
+  'w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text transition-colors placeholder:text-text-muted hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary-ring';
 
 export function TrackClient() {
   const [state, formAction, pending] = useActionState<TrackState, FormData>(trackOrder, {});
 
   return (
     <div className="space-y-8">
-      <form action={formAction} className="mx-auto max-w-md space-y-4">
+      <form
+        action={formAction}
+        className="mx-auto max-w-md space-y-4 rounded-lg border border-border bg-surface p-6"
+      >
         <div>
           <label htmlFor="order_number" className="mb-1 block text-sm font-medium">
             เลขออร์เดอร์
@@ -51,7 +54,7 @@ export function TrackClient() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-md bg-primary py-3 text-sm font-medium text-primary-fg transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0"
         >
           {pending ? 'กำลังค้นหา…' : 'ตรวจสอบสถานะ'}
         </button>

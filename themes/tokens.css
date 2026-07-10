@@ -22,9 +22,14 @@
 
   /* สีอนุพันธ์ — คำนวณอัตโนมัติจาก token หลัก (preset ไม่ต้อง set เอง) */
   --color-border: color-mix(in oklab, var(--color-text) 12%, transparent);
+  --color-border-soft: color-mix(in oklab, var(--color-text) 7%, transparent);
   --color-scrim: color-mix(in oklab, var(--color-text) 45%, transparent);
   --color-danger-soft: color-mix(in oklab, var(--color-danger) 10%, transparent);
   --color-success-soft: color-mix(in oklab, var(--color-success) 12%, transparent);
+  --color-primary-soft: color-mix(in oklab, var(--color-primary) 8%, transparent);
+  --color-primary-ring: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  --color-primary-deep: color-mix(in oklab, var(--color-primary) 82%, var(--color-text));
+  --color-hero-glow: color-mix(in oklab, var(--color-primary-fg) 12%, transparent);
 
   /* ตัวอักษร (ค่า var(--font-*) มาจาก next/font ใน themes/fonts.ts) */
   --font-heading: var(--font-prompt, ui-sans-serif, system-ui, sans-serif);
@@ -53,9 +58,14 @@
   --color-danger: var(--color-danger);
   --color-success: var(--color-success);
   --color-border: var(--color-border);
+  --color-border-soft: var(--color-border-soft);
   --color-scrim: var(--color-scrim);
   --color-danger-soft: var(--color-danger-soft);
   --color-success-soft: var(--color-success-soft);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-primary-ring: var(--color-primary-ring);
+  --color-primary-deep: var(--color-primary-deep);
+  --color-hero-glow: var(--color-hero-glow);
 
   /* ฟอนต์ → font-heading, font-body */
   --font-heading: var(--font-heading);
@@ -81,4 +91,29 @@
   --text-2xl: calc(1.5rem * var(--text-scale));
   --text-3xl: calc(1.875rem * var(--text-scale));
   --text-4xl: calc(2.25rem * var(--text-scale));
+  --text-5xl: calc(3rem * var(--text-scale));
+
+  /* animation → animate-drawer-in / animate-fade-up */
+  --animate-drawer-in: drawer-in 0.25s ease-out;
+  --animate-fade-up: fade-up 0.4s ease-out both;
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -4,13 +4,18 @@ import Link from 'next/link';
 export default function StorefrontNotFound() {
   return (
     <div className="mx-auto flex min-h-[50vh] max-w-md flex-col items-center justify-center px-4 text-center">
-      <h1 className="font-heading text-3xl font-semibold text-text">ไม่พบสินค้า</h1>
+      <p className="font-heading text-6xl font-bold text-primary-soft" aria-hidden>
+        404
+      </p>
+      <h1 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-text">
+        ไม่พบหน้าที่ต้องการ
+      </h1>
       <p className="mt-2 text-sm text-text-muted">
-        สินค้าที่คุณค้นหาอาจถูกลบหรือยังไม่เผยแพร่
+        สินค้าหรือหน้าที่คุณค้นหาอาจถูกลบหรือยังไม่เผยแพร่
       </p>
       <Link
         href="/products"
-        className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg"
+        className="mt-5 inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
       >
         ดูสินค้าทั้งหมด
       </Link>

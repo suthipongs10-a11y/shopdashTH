@@ -94,7 +94,7 @@ export function OrderTracker({ order }: { order: TrackedOrder }) {
               href={order.trackingUrl}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-block rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-fg hover:opacity-90"
+              className="mt-2 inline-block rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               ติดตามพัสดุที่เว็บขนส่ง ↗
             </a>
@@ -131,9 +131,9 @@ export function OrderTracker({ order }: { order: TrackedOrder }) {
               <dd>-{formatBaht(order.discount)}</dd>
             </div>
           )}
-          <div className="flex justify-between pt-1 font-heading text-base font-semibold">
-            <dt>ยอดสุทธิ</dt>
-            <dd>{formatBaht(order.totalAmount)}</dd>
+          <div className="flex items-baseline justify-between pt-1 font-heading">
+            <dt className="text-base font-semibold">ยอดสุทธิ</dt>
+            <dd className="text-xl font-bold text-primary">{formatBaht(order.totalAmount)}</dd>
           </div>
         </dl>
       </div>

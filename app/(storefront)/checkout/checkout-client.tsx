@@ -119,11 +119,11 @@ export function CheckoutClient({
 
   if (cart.items.length === 0) {
     return (
-      <div className="py-16 text-center">
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-border py-16 text-center">
         <p className="text-text-muted">ตะกร้าของคุณว่างเปล่า</p>
         <Link
           href="/products"
-          className="mt-4 inline-block rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-fg"
+          className="inline-block rounded-full bg-primary px-7 py-2.5 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
         >
           เลือกซื้อสินค้า
         </Link>
@@ -132,15 +132,25 @@ export function CheckoutClient({
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
+    <div className="grid items-start gap-8 md:grid-cols-2">
       <section>
-        <h2 className="mb-3 font-heading text-lg font-semibold">ข้อมูลจัดส่ง</h2>
+        <h2 className="mb-4 flex items-center gap-2.5 font-heading text-lg font-semibold">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-fg">
+            1
+          </span>
+          ข้อมูลจัดส่ง
+        </h2>
         <CheckoutForm onSubmit={handleSubmit} submitting={submitting} serverError={serverError} />
       </section>
 
-      <section>
-        <h2 className="mb-3 font-heading text-lg font-semibold">สรุปคำสั่งซื้อ</h2>
-        <div className="rounded-md border border-border bg-surface p-4">
+      <section className="md:sticky md:top-28">
+        <h2 className="mb-4 flex items-center gap-2.5 font-heading text-lg font-semibold">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-fg">
+            2
+          </span>
+          สรุปคำสั่งซื้อ
+        </h2>
+        <div className="rounded-lg border border-border bg-surface p-5">
           <ul className="divide-y divide-border">
             {cart.items.map((item) => (
               <li key={item.variantId} className="flex justify-between gap-3 py-2 text-sm">
@@ -211,9 +221,9 @@ export function CheckoutClient({
                 <dd>-{formatBaht(discountAmount)}</dd>
               </div>
             )}
-            <div className="flex justify-between pt-1 font-heading text-base font-semibold">
-              <dt>ยอดสุทธิ</dt>
-              <dd>{formatBaht(total)}</dd>
+            <div className="flex items-baseline justify-between border-t border-border pt-2 font-heading">
+              <dt className="text-base font-semibold">ยอดสุทธิ</dt>
+              <dd className="text-2xl font-bold text-primary">{formatBaht(total)}</dd>
             </div>
           </dl>
           {!freeShipping && freeShippingMin !== null && (

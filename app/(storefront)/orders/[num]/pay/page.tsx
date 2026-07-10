@@ -85,10 +85,20 @@ export default async function PayPage({
     <section className="rounded-lg border border-border bg-surface p-5">
       <p className="text-sm text-text-muted">{store.name}</p>
       <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-heading text-xl font-semibold">
+        <h1 className="font-heading text-xl font-semibold tracking-tight">
           คำสั่งซื้อ {order.order_number}
         </h1>
-        <span className="rounded-full bg-bg px-3 py-1 text-sm font-medium">
+        <span
+          className={`rounded-full px-3 py-1 text-sm font-medium ${
+            status === 'cancelled'
+              ? 'bg-danger-soft text-danger'
+              : status === 'shipped'
+                ? 'bg-success-soft text-success'
+                : status === 'pending_payment'
+                  ? 'bg-primary-soft text-primary'
+                  : 'bg-bg text-text'
+          }`}
+        >
           {ORDER_STATUS_TH[status]}
         </span>
       </div>
@@ -131,9 +141,9 @@ export default async function PayPage({
           <dt>ค่าจัดส่ง</dt>
           <dd>{order.shipping_fee === 0 ? 'ส่งฟรี' : formatBaht(order.shipping_fee)}</dd>
         </div>
-        <div className="flex justify-between border-t border-border pt-2 font-heading text-base font-semibold">
-          <dt>ยอดชำระสุทธิ</dt>
-          <dd>{formatBaht(order.total_amount)}</dd>
+        <div className="flex items-baseline justify-between border-t border-border pt-2 font-heading">
+          <dt className="text-base font-semibold">ยอดชำระสุทธิ</dt>
+          <dd className="text-xl font-bold text-primary">{formatBaht(order.total_amount)}</dd>
         </div>
       </dl>
     </section>

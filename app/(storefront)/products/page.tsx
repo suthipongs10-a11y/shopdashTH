@@ -71,14 +71,16 @@ export default async function CatalogPage({
   return (
     <main className="mx-auto max-w-(--container-max) space-y-6 px-4 py-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="font-heading text-2xl font-semibold">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">
           {params.q
             ? `ผลการค้นหา “${params.q}”`
             : activeCategory
               ? activeCategory.name
               : 'สินค้าทั้งหมด'}
         </h1>
-        <p className="text-sm text-text-muted">พบ {total.toLocaleString('th-TH')} รายการ</p>
+        <p className="rounded-full bg-surface px-3 py-1 text-sm text-text-muted">
+          พบ {total.toLocaleString('th-TH')} รายการ
+        </p>
       </div>
 
       <Suspense fallback={null}>
@@ -96,18 +98,18 @@ export default async function CatalogPage({
           {page > 1 && (
             <Link
               href={pageHref(currentParams, page - 1)}
-              className="rounded-md border border-border px-4 py-2 text-sm hover:bg-surface"
+              className="rounded-full border border-border px-5 py-2 text-sm font-medium transition-colors hover:border-primary hover:bg-primary-soft hover:text-primary"
             >
               ← ก่อนหน้า
             </Link>
           )}
-          <span className="px-2 text-sm text-text-muted">
+          <span className="rounded-full bg-surface px-4 py-2 text-sm text-text-muted">
             หน้า {page} / {pageCount}
           </span>
           {page < pageCount && (
             <Link
               href={pageHref(currentParams, page + 1)}
-              className="rounded-md border border-border px-4 py-2 text-sm hover:bg-surface"
+              className="rounded-full border border-border px-5 py-2 text-sm font-medium transition-colors hover:border-primary hover:bg-primary-soft hover:text-primary"
             >
               ถัดไป →
             </Link>

@@ -43,6 +43,22 @@
 - [x] `pnpm build` ผ่าน + **e2e 6c ผ่าน 7/7** (2026-07-10, `.tmp-phase6c-test.mjs`): สลิปมี QR ผ่าน+payload ลง DB / ธุรกรรมเดิมคนละรูป (hash ใหม่) ยิงออร์เดอร์อื่น → ถูกปฏิเสธ / รูปไม่มี QR → เข้าคิว+flag / ออร์เดอร์เดิมส่งธุรกรรมเดิมซ้ำหลังถูกปฏิเสธ → ผ่าน (§7.1) — ข้อมูลทดสอบล้างครบ
 - หมายเหตุ test harness: curl บน Windows ส่งภาษาไทยใน JSON เพี้ยนเป็น `?????` (แอปปกติ — browser ส่งตรงไม่เพี้ยน ยืนยันจาก e2e Phase 6) — สคริปต์ที่สร้างออร์เดอร์ผ่าน curl ให้ cleanup ด้วย order_number/เบอร์โทร ไม่ใช่ชื่อไทย
 
+## Done (Phase 6 ต่อ — ยกเครื่อง UI storefront ทั้งระบบ, 2026-07-10 ตามคำสั่งเจ้าของ "ความสวยสำคัญมาก")
+- [x] **Design tokens เพิ่ม** (`themes/tokens.css` — อนุพันธ์ คำนวณจาก token หลักอัตโนมัติ ทุกธีมได้ฟรี): `border-soft`, `primary-soft` (พื้นอ่อน/hover), `primary-ring` (focus), `primary-deep` (gradient), `hero-glow` + keyframes `drawer-in`/`fade-up` + `text-5xl`
+- [x] **ชุดไอคอน SVG กลาง** `components/storefront/icons.tsx` (cart/search/phone/map/truck/qr/shield/package/arrow/chevron/close/tag — stroke currentColor ตาม token) + `SectionHeading` (eyebrow สี primary + หัวข้อใหญ่ + ปุ่มลิงก์ pill)
+- [x] **Hero ใหม่**: ร้านไม่มีแบนเนอร์ → แผง gradient จากสีธีม (primary→primary-deep + วงแสง hero-glow) + headline ใหญ่ + CTA pill + trust badges — เลิกเป็นกล่องเทาโล่ง; มีรูป → overlay gradient สวยขึ้นทุก variant
+- [x] **Header ใหม่**: แถบ utility บน (ส่งฟรีขั้นต่ำ/ติดตามคำสั่งซื้อ), โลโก้-ชื่อร้านใหญ่ขึ้น, ปุ่มค้นหา, ปุ่มตะกร้ากลม bg-primary + badge จำนวน, backdrop-blur — **บทเรียน: backdrop-filter บน `<header>` ทำให้มันเป็น containing block ของ position:fixed → CartDrawer ต้อง render นอก `<header>` (fragment)**
+- [x] **Footer 3 คอลัมน์**: ข้อมูลร้าน (ไอคอนที่อยู่/โทร) / เมนู / การชำระเงิน&จัดส่ง (PromptPay/ตรวจสลิป/เลขพัสดุ) + แถวลิขสิทธิ์
+- [x] **ProductCard 3 variant ยกเครื่อง**: ราคา font-heading bold สี primary, hover ยกการ์ด+ซูมรูป, ป้าย badge pill, overlay สินค้าหมด blur, placeholder ไม่มีรูปมีไอคอน
+- [x] **FilterBar**: select แบบ custom (appearance-none + chevron), ช่องค้นหามีไอคอนแว่น, ปุ่ม pill, ล้างตัวกรอง hover แดง
+- [x] **หน้าสินค้า**: breadcrumb, ราคาใหญ่บนพื้น primary-soft, สถานะสต๊อกมีจุดสี, trust row 3 ช่อง, คำอธิบายใส่การ์ด, gallery thumbnail active ชัด, **แถวหยิบใส่ตะกร้า sticky ล่างบนมือถือ** (§4.6)
+- [x] **CartDrawer**: อนิเมชันสไลด์เข้า (animate-drawer-in), header มี badge จำนวน, nudge ส่งฟรีสี primary, ปุ่ม checkout pill
+- [x] **Checkout**: หัวข้อขั้นตอนมีหมายเลข ①②, สรุปยอด sticky, ยอดสุทธิใหญ่สี primary; **Track**: ฟอร์มใส่การ์ด; **Pay**: QrPaymentPanel หัวแถบ primary + สถานะ chip สี; 404 มีเลขใหญ่; หน้าเพจ /p มีเส้นคั่น
+- [x] หน้าแรก: SectionHeading ทุก section, หมวดหมู่เป็นการ์ด grid มี arrow hover, การ์ดติดต่อร้าน (one-page) มีไอคอนวงกลม
+- [x] ตรวจด้วยตา (screenshots `.tmp-shots/after/`): demo (มินิมอลขาว) desktop+mobile ครบทุกหน้า, drawer, checkout + สลับธีมร้านทดสอบดูจริง: shop2→basic-02 (พาสเทลม่วง), p3test→one-01 (เขียวteal), p3race→pro-02 (ดาร์กนีออน) — design ใหม่สวยทุกธีมโดยไม่มีโค้ดเฉพาะธีม
+- [x] `npm run build` ผ่าน + grep hex/rgb ใน `components/storefront` และ `app/(storefront)` = 0 (กฎ token §8.5 ข้อ 3)
+- หมายเหตุ: ร้านทดสอบ dev ยังถือธีมที่สลับไว้ (shop2=basic-02, p3test=one-01, p3race=pro-02) — เก็บไว้ใช้ดูธีมต่างกันได้เลย
+
 ## ค้าง / ขั้นตอนถัดไป
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)

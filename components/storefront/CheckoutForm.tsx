@@ -9,7 +9,7 @@ import type { CheckoutFormData } from './types';
 const PHONE_PATTERN = /^0[0-9]{9}$/;
 
 const inputClass =
-  'w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary';
+  'w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text transition-colors placeholder:text-text-muted hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary-ring';
 
 export function CheckoutForm({
   onSubmit,
@@ -106,9 +106,9 @@ export function CheckoutForm({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-md bg-primary py-3 text-sm font-medium text-primary-fg transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0"
       >
-        {submitting ? 'กำลังสร้างคำสั่งซื้อ…' : 'ยืนยันคำสั่งซื้อ'}
+        {submitting ? 'กำลังสร้างคำสั่งซื้อ…' : 'ยืนยันคำสั่งซื้อ →'}
       </button>
     </form>
   );

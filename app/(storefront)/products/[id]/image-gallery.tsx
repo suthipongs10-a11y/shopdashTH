@@ -26,8 +26,10 @@ export function ImageGallery({ images, productName }: { images: string[]; produc
               type="button"
               onClick={() => setActiveIndex(i)}
               aria-label={`รูปที่ ${i + 1}`}
-              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-md border ${
-                i === activeIndex ? 'border-primary' : 'border-border'
+              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                i === activeIndex
+                  ? 'border-primary shadow-card'
+                  : 'border-border-soft opacity-70 hover:opacity-100'
               }`}
             >
               <Image src={url} alt="" fill sizes="64px" className="object-cover" />
@@ -35,7 +37,7 @@ export function ImageGallery({ images, productName }: { images: string[]; produc
           ))}
         </div>
       )}
-      <div className="relative aspect-square flex-1 overflow-hidden rounded-md bg-surface">
+      <div className="relative aspect-square flex-1 overflow-hidden rounded-lg border border-border-soft bg-surface shadow-card">
         <Image
           src={images[activeIndex]}
           alt={productName}

@@ -7,7 +7,7 @@ export default async function CheckoutPage() {
   const ctx = await getTenantContext();
   return (
     <main className="mx-auto max-w-(--container-max) px-4 py-8">
-      <h1 className="mb-6 font-heading text-2xl font-semibold">ชำระเงิน</h1>
+      <h1 className="mb-6 font-heading text-3xl font-semibold tracking-tight">สั่งซื้อและชำระเงิน</h1>
       <CheckoutClient
         slug={ctx.slug}
         flatShippingFee={ctx.store.flat_shipping_fee}

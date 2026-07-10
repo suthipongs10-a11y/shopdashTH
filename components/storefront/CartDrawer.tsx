@@ -6,6 +6,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatBaht } from '@/lib/format';
+import { CartIcon, CloseIcon } from './icons';
 import type { CartItem } from './types';
 
 export function CartDrawer({
@@ -42,26 +43,37 @@ export function CartDrawer({
         onClick={onClose}
         className="absolute inset-0 h-full w-full bg-scrim"
       />
-      <div className="absolute right-0 top-0 flex h-full w-full flex-col bg-bg shadow-card sm:max-w-md sm:border-l sm:border-border">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="font-heading text-lg font-semibold">ตะกร้าสินค้า</h2>
+      <div className="absolute right-0 top-0 flex h-full w-full animate-drawer-in flex-col bg-bg shadow-lg sm:max-w-md sm:border-l sm:border-border">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+          <h2 className="flex items-center gap-2 font-heading text-lg font-semibold">
+            <CartIcon size={19} className="text-primary" />
+            ตะกร้าสินค้า
+            {items.length > 0 && (
+              <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
+                {items.reduce((sum, i) => sum + i.qty, 0)} ชิ้น
+              </span>
+            )}
+          </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="ปิด"
-            className="rounded-md px-2 py-1 text-text-muted hover:bg-surface hover:text-text"
+            className="rounded-full p-2 text-text-muted transition-colors hover:bg-surface hover:text-text"
           >
-            ✕
+            <CloseIcon size={17} />
           </button>
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-surface text-text-muted">
+              <CartIcon size={24} />
+            </span>
             <p className="text-text-muted">ตะกร้าของคุณว่างเปล่า</p>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md border border-border px-4 py-2 text-sm hover:bg-surface"
+              className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               เลือกซื้อสินค้าต่อ
             </button>
@@ -134,20 +146,22 @@ export function CartDrawer({
 
             <div className="space-y-3 border-t border-border p-4">
               {untilFreeShipping !== null && (
-                <p className="rounded-md bg-surface px-3 py-2 text-xs text-text-muted">
-                  ซื้อเพิ่มอีก {formatBaht(untilFreeShipping)} รับสิทธิ์ส่งฟรี
+                <p className="rounded-md bg-primary-soft px-3 py-2 text-xs font-medium text-primary">
+                  🚚 ซื้อเพิ่มอีก {formatBaht(untilFreeShipping)} รับสิทธิ์ส่งฟรี
                 </p>
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">ยอดรวมสินค้า</span>
-                <span className="font-heading text-lg font-semibold">{formatBaht(subtotal)}</span>
+                <span className="font-heading text-xl font-bold text-primary">
+                  {formatBaht(subtotal)}
+                </span>
               </div>
               <p className="text-xs text-text-muted">ค่าจัดส่งคำนวณในขั้นตอนชำระเงิน</p>
               <Link
                 href={checkoutHref}
-                className="block rounded-md bg-primary py-3 text-center text-sm font-medium text-primary-fg transition-opacity hover:opacity-90"
+                className="block rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
-                สั่งซื้อและชำระเงิน
+                สั่งซื้อและชำระเงิน →
               </Link>
             </div>
           </>

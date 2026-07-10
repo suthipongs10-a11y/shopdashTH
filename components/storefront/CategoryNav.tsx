@@ -57,15 +57,15 @@ export function CategoryNav({
   // topbar (ดีฟอลต์กลุ่ม Basic — เลื่อนแนวนอนได้บนมือถือ)
   return (
     <nav aria-label="หมวดหมู่สินค้า" className="overflow-x-auto">
-      <ul className="flex items-center gap-6 whitespace-nowrap">
+      <ul className="flex items-center gap-1 whitespace-nowrap">
         {categories.map((c) => (
           <li key={c.id}>
             <Link
               href={c.href}
-              className={`text-sm transition-colors hover:text-primary ${
+              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
                 c.id === activeId
-                  ? 'font-medium text-primary underline underline-offset-8'
-                  : 'text-text'
+                  ? 'bg-primary-soft font-semibold text-primary'
+                  : 'font-medium text-text hover:bg-surface hover:text-primary'
               }`}
             >
               {c.name}
