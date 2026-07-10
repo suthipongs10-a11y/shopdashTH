@@ -3,6 +3,7 @@
 
 import { NextResponse } from 'next/server';
 import { validateDiscountCode } from '@/lib/discounts';
+import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
@@ -12,6 +13,11 @@ interface CheckBody {
 }
 
 export async function POST(req: Request) {
+  // กัน brute-force เดาโค้ดส่วนลด
+  if (isRateLimited(`discount-check:${clientIp(req)}`, 20, 60_000)) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
+  }
+
   let body: CheckBody;
   try {
     body = (await req.json()) as CheckBody;

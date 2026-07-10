@@ -17,7 +17,7 @@ export default async function StorefrontHomePage() {
   const preset = getPreset(ctx.store.theme_code);
 
   const db = createAdminClient();
-  const [featured, latest, { data: categories }] = await Promise.all([
+  const [featured, latest, { data: categories }, catalog] = await Promise.all([
     fetchFeatured(ctx.tenantId),
     fetchLatest(ctx.tenantId),
     db
@@ -25,6 +25,8 @@ export default async function StorefrontHomePage() {
       .select('id, name')
       .eq('tenant_id', ctx.tenantId)
       .order('sort_order', { ascending: true }),
+    // section 'catalog' (ธีม one-page) — แคตตาล็อกเต็มบนหน้าแรก
+    preset.sections.includes('catalog') ? fetchLatest(ctx.tenantId, 24) : Promise.resolve([]),
   ]);
 
   const sections: Record<ThemeSection, React.ReactNode> = {
@@ -74,6 +76,50 @@ export default async function StorefrontHomePage() {
         <ProductGrid products={latest} cardVariant={preset.variants.productCard} />
       </section>
     ),
+    // ธีม one-page: แคตตาล็อกเต็มบนหน้าแรก (สูงสุด 24 ชิ้น — เกินนั้นลิงก์ไป /products)
+    catalog:
+      catalog.length > 0 ? (
+        <section key="catalog" className="mx-auto max-w-(--container-max) px-4 py-10">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="font-heading text-xl font-semibold">สินค้าของร้าน</h2>
+            {catalog.length >= 24 && (
+              <Link href="/products" className="text-sm text-text-muted underline underline-offset-2">
+                ดูทั้งหมด
+              </Link>
+            )}
+          </div>
+          <ProductGrid products={catalog} cardVariant={preset.variants.productCard} />
+        </section>
+      ) : null,
+    // ธีม one-page: การ์ดติดต่อร้าน — "แคตตาล็อก+ติดต่อ" จบในหน้าเดียว
+    contact:
+      ctx.store.phone || ctx.store.address ? (
+        <section key="contact" className="mx-auto max-w-(--container-max) px-4 py-10">
+          <div className="rounded-lg border border-border bg-surface p-6">
+            <h2 className="font-heading text-xl font-semibold">ติดต่อร้าน</h2>
+            {ctx.store.address && (
+              <p className="mt-2 whitespace-pre-wrap text-sm text-text-muted">{ctx.store.address}</p>
+            )}
+            {ctx.store.phone && (
+              <p className="mt-2 text-sm">
+                โทร:{' '}
+                <a
+                  href={`tel:${ctx.store.phone}`}
+                  className="font-medium underline underline-offset-2 hover:text-primary"
+                >
+                  {ctx.store.phone}
+                </a>
+              </p>
+            )}
+            <p className="mt-3 text-sm text-text-muted">
+              สั่งซื้อแล้วติดตามสถานะได้ที่{' '}
+              <Link href="/track" className="underline underline-offset-2 hover:text-primary">
+                หน้าติดตามคำสั่งซื้อ
+              </Link>
+            </p>
+          </div>
+        </section>
+      ) : null,
     footer: null, // Footer อยู่ใน layout
   };
 

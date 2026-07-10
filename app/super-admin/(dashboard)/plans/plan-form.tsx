@@ -15,6 +15,7 @@ const FEATURE_KEYS: FeatureKey[] = [
   'analytics_dashboard',
   'staff_accounts',
   'theme_customize',
+  'custom_pages',
 ];
 
 export interface PlanFormData {

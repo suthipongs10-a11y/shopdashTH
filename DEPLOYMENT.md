@@ -61,7 +61,7 @@
 > ถ้า prod ใช้ **โปรเจ็คเดียวกับที่พัฒนา** (`ebmwjfpprtzutpuvhhlb`) migration 001–006 apply แล้ว
 > ถ้าเปิด **โปรเจ็ค Supabase ใหม่สำหรับ prod** ต้องทำใหม่ทั้งหมดด้านล่าง
 
-- [ ] รัน migration ตามลำดับ `001_init` → `002_rls` → `003_phase3` → `004_phase4` → `005_analytics` → `006_search` (SQL Editor)
+- [ ] รัน migration ตามลำดับ `001_init` → `002_rls` → `003_phase3` → `004_phase4` → `005_analytics` → `006_search` → `007_billing_v2` → `008_pages_onepage` (SQL Editor)
 - [ ] `supabase/seed.sql` — 3 แพลน (starter/pro/premium) + demo tenant/store + theme basic-01 (ปรับ/ลบ demo tenant ถ้าไม่ต้องการใน prod)
 - [ ] `theme_registry` ครบ 10 ธีม (มากับ `004_phase4.sql`)
 - [ ] สร้าง super admin จริง (`scripts/setup-super-admin.mjs` แก้อีเมล/รหัสก่อน หรือทำผ่าน Dashboard + set `app_metadata.role=super_admin`)
@@ -118,7 +118,7 @@
 - [ ] Monitoring/alert (Vercel logs + Supabase logs) — จับ error 5xx, cron fail, slip-verify warning
 - [ ] ตรวจ cron ทำงานจริงวันแรก (ดู `provisioning_logs` / สถานะ tenant)
 - [ ] นโยบายเก็บข้อมูล: archived ≥ 90 วันก่อนลบจริง (§7.4) — ทำเป็นงาน manual super admin
-- [ ] ทบทวน rate limit / abuse ของ endpoint public (`/api/checkout`, `/api/slips`, `/api/signup`) — ยังไม่มี rate limit ในโค้ด (พิจารณา Vercel WAF / edge)
+- [ ] ทบทวน rate limit / abuse ของ endpoint public — **มี rate limit ในโค้ดแล้ว (2026-07-10, `lib/rate-limit.ts`)**: checkout 10/นาที, slips 6/นาที, signup 5/ชม., slug-check 30/นาที, discount-check 20/นาที (ต่อ IP) + domain-verify 10/10นาที (ต่อร้าน) — แต่นับ **ต่อ instance** (in-memory) — ถ้าโดนโจมตีจริงจังยังควรเปิด Vercel WAF / edge rate limit เป็นชั้นนอก
 
 ---
 

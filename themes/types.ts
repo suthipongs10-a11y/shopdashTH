@@ -45,6 +45,10 @@ export type ThemeSection =
   | 'featured'
   | 'categories'
   | 'grid'
+  /** แคตตาล็อกเต็มบนหน้าแรก (ธีม one-page — แพลนเริ่มต้น) */
+  | 'catalog'
+  /** การ์ดติดต่อร้าน (ที่อยู่/โทร) บนหน้าแรก (ธีม one-page) */
+  | 'contact'
   | 'footer';
 
 /** ฟีเจอร์หน้าร้านที่ธีมเปิด/ปิดได้ (merge ใน resolveFeatures() §3.7) */

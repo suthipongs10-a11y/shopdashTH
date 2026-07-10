@@ -3,6 +3,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkSlug, provisionTenant } from '@/lib/provisioning';
+import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 
 interface SignupBody {
   storeName?: string;
@@ -17,6 +18,11 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^0\d{8,9}$/;
 
 export async function POST(req: NextRequest) {
+  // สมัครร้านสร้าง auth user + แถวหลายตาราง — จำกัดแน่นกว่าตัวอื่น
+  if (isRateLimited(`signup:${clientIp(req)}`, 5, 3_600_000)) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
+  }
+
   let body: SignupBody;
   try {
     body = (await req.json()) as SignupBody;
@@ -54,6 +60,11 @@ export async function POST(req: NextRequest) {
 
 // GET /api/signup?slug=xxx — เช็ค slug ว่างแบบ realtime ระหว่างพิมพ์
 export async function GET(req: NextRequest) {
+  // เช็ค slug realtime (debounce ฝั่ง client 400ms) — เพดานกันยิง scan
+  if (isRateLimited(`slug-check:${clientIp(req)}`, 30, 60_000)) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
+  }
+
   const slug = (req.nextUrl.searchParams.get('slug') ?? '').trim().toLowerCase();
   if (!slug) return NextResponse.json({ available: false, reason: 'กรุณากรอกชื่อ subdomain' });
   const result = await checkSlug(slug);

@@ -9,6 +9,7 @@ export type FeatureKey =
   | 'analytics_dashboard'
   | 'staff_accounts'
   | 'theme_customize'
+  | 'custom_pages'
   | 'wishlist'
   | 'related_products';
 
@@ -22,6 +23,7 @@ export const FEATURE_KEYS: FeatureKey[] = [
   'analytics_dashboard',
   'staff_accounts',
   'theme_customize',
+  'custom_pages',
   'wishlist',
   'related_products',
 ];
@@ -34,6 +36,7 @@ export const FEATURE_LABEL_TH: Record<FeatureKey, string> = {
   analytics_dashboard: 'แดชบอร์ดวิเคราะห์ยอดขาย',
   staff_accounts: 'บัญชี staff เพิ่มเติม',
   theme_customize: 'ปรับแต่งธีมเอง (สี/ฟอนต์)',
+  custom_pages: 'หน้าเพจ/บทความ',
   wishlist: 'Wishlist',
   related_products: 'สินค้าที่เกี่ยวข้อง',
 };

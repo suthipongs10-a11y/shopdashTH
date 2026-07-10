@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { notifyNewSlip } from '@/lib/line';
 import { transitionOrder, TransitionError } from '@/lib/orders/transition';
 import { getSlipVerifier } from '@/lib/slip-verify';
+import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import type { TenantContext } from '@/lib/tenant-context';
 import { IMAGE_MIME_EXT, MAX_IMAGE_BYTES, putObject, slipKey } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -85,6 +86,10 @@ async function tryAutoVerify(
 }
 
 export async function POST(req: Request) {
+  if (isRateLimited(`slips:${clientIp(req)}`, 6, 60_000)) {
+    return bad(RATE_LIMIT_MESSAGE, 429);
+  }
+
   try {
     const ctx = await getTenantContext();
     const db = createAdminClient();

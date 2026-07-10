@@ -26,8 +26,17 @@
 - ข้อมูลทดสอบล้างแล้ว (ออร์เดอร์/customer ทดสอบลบ, shop2 กลับ starter + trial null) — ร้าน demo ตั้ง order_cutoff_time=14:00 ค้างไว้เป็นข้อมูลตัวอย่าง
 - หมายเหตุ: รหัสผ่าน `phase1-smoke-test@shopdash.local` ถูก reset เพื่อใช้ e2e (user ทดสอบ — ลบได้ก่อน production ตาม DEPLOYMENT §3)
 
+## Done (Phase 6 ต่อ — hardening + Pages/CMS + ธีม one-page, 2026-07-10)
+- [x] **Rate limit** (`lib/rate-limit.ts` — in-memory sliding window ต่อ instance): checkout 10/นาที, slips 6/นาที, signup 5/ชม., slug-check 30/นาที, discount-check 20/นาที (ต่อ IP), domain-verify 10/10นาที (ต่อร้าน) — ตอบ 429 ไทย; **ทดสอบจริง: ยิง checkout 12 ครั้ง → 10×400 + 2×429** ✅
+- [x] `supabase/migrations/008_pages_onepage.sql` — **⛔ ยังไม่ apply (รอรันใน SQL Editor)**: ตาราง `pages` (tenant_id + RLS ENABLE+FORCE ตาม §3.5 + anon อ่านเฉพาะ published), flag `custom_pages` ให้ p3-business/p4-premium, ธีม one-01 ใน theme_registry — **โค้ดไม่พังก่อน apply** (footer query คืน [] เงียบๆ, ทดสอบแล้ว home 200)
+- [x] **Pages/CMS** (ปลดล็อกขายแพลนธุรกิจ): `/admin/pages` CRUD (สร้าง/แก้/ลบ/ฉบับร่าง-เผยแพร่/ลำดับ/แสดงใน footer, flag-gated + server ตรวจซ้ำ), storefront `/p/{slug}` (published เท่านั้น + SEO metadata), ลิงก์เพจใน Footer ทุกหน้า, เมนู "เพจ" ใน admin nav — เพจเดิมอยู่รอดการดาวน์เกรด (gate เฉพาะสร้าง/แก้ ตาม §7.2)
+- [x] **ธีม one-01 "วันเพจ"** (tier 1 — แพ็กเกจเริ่มต้น ฿990 "หน้าเดียว แคตตาล็อก+ติดต่อ"): section ใหม่ `catalog` (สินค้า 24 ชิ้นบนหน้าแรก) + `contact` (การ์ดที่อยู่/โทร/ลิงก์ track) ผ่านระบบ preset ตามสถาปัตยกรรมเดิม ไม่มี if ชื่อธีม
+- [x] `pnpm build` ผ่าน + ทดสอบ: home/404/rate-limit ผ่านครบ (pages + ธีม one-01 รอ e2e หลัง apply 008)
+
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] ต่อจากแผนธุรกิจใหม่ (audit 2026-07-10): production hardening ตาม DEPLOYMENT.md, Pages/CMS (หน้าเกี่ยวกับเรา/บทความ — ปลดล็อกขาย P3), one-page preset สำหรับ P1, เสียบ Slip Verify provider จริง (ปลดล็อกจุดขาย P4)
+- [ ] **Apply `008_pages_onepage.sql` ใน SQL Editor** → e2e: สร้างเพจ "เกี่ยวกับเรา" ร้าน p3 → เห็นที่ /p/about + footer, ร้าน p1 ถูก gate, สลับธีม one-01 → หน้าแรกมีแคตตาล็อก+ติดต่อ
+- [ ] Slip Verify provider จริง (ปลดล็อกจุดขาย P4) — **รอเจ้าของเลือก provider + สมัคร API key** (ตัวเลือกหลักในไทย: SlipOK / EasySlip — โครง interface `lib/slip-verify/` พร้อมเสียบแล้ว)
+- [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 
 ## Done (Phase 5) — `pnpm build` ผ่าน, migration 005/006 apply แล้ว, DoD ครบ
 - [x] 5.1 `supabase/migrations/005_analytics.sql`: RPC `store_daily_sales`/`store_weekly_sales`/`store_top_products`/`store_sales_summary`/`store_order_status_counts` + `platform_summary`/`platform_new_stores` (นับเฉพาะ confirmed/packing/shipped, วันตัดยอดเวลาไทย §7.6, revoke จาก anon/authenticated) + index `orders_tenant_status_created_idx` — **apply แล้ว 2026-07-09**

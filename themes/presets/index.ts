@@ -11,6 +11,7 @@ import { preset as pro01 } from './pro-01';
 import { preset as pro02 } from './pro-02';
 import { preset as prem01 } from './prem-01';
 import { preset as prem02 } from './prem-02';
+import { preset as one01 } from './one-01';
 
 /** เรียงตามตาราง §4.5 */
 export const THEME_PRESET_LIST: ThemePreset[] = [
@@ -24,6 +25,7 @@ export const THEME_PRESET_LIST: ThemePreset[] = [
   pro02,
   prem01,
   prem02,
+  one01,
 ];
 
 export const THEME_PRESETS: Record<string, ThemePreset> = Object.fromEntries(

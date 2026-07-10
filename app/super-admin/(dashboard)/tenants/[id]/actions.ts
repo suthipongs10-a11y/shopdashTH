@@ -128,6 +128,7 @@ const OVERRIDE_KEYS: FeatureKey[] = [
   'analytics_dashboard',
   'staff_accounts',
   'theme_customize',
+  'custom_pages',
   'wishlist',
   'related_products',
 ];

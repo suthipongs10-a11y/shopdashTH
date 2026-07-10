@@ -4,6 +4,7 @@
 import { NextResponse } from 'next/server';
 import { notifyNewOrder } from '@/lib/line';
 import { createOrder, type CheckoutCustomerInput, type CheckoutItemInput } from '@/lib/orders/create';
+import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
 interface CheckoutRequestBody {
@@ -14,6 +15,10 @@ interface CheckoutRequestBody {
 }
 
 export async function POST(req: Request) {
+  if (isRateLimited(`checkout:${clientIp(req)}`, 10, 60_000)) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
+  }
+
   let body: CheckoutRequestBody;
   try {
     body = (await req.json()) as CheckoutRequestBody;

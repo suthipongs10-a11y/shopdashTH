@@ -64,11 +64,22 @@ export default async function StorefrontLayout({ children }: { children: React.R
   const preset = getPreset(ctx.store.theme_code);
 
   const db = createAdminClient();
-  const { data: categories } = await db
-    .from('categories')
-    .select('id, name')
-    .eq('tenant_id', ctx.tenantId)
-    .order('sort_order', { ascending: true });
+  const [{ data: categories }, { data: navPages }] = await Promise.all([
+    db
+      .from('categories')
+      .select('id, name')
+      .eq('tenant_id', ctx.tenantId)
+      .order('sort_order', { ascending: true }),
+    // หน้าเพจเผยแพร่ (Phase 6) — โชว์ต่อแม้แพลนถูกดาวน์เกรด (§7.2 ของเดิมไม่หาย
+    // gate เฉพาะการสร้าง/แก้ใน admin) — ก่อน migration 008 ตารางไม่มี → data null = []
+    db
+      .from('pages')
+      .select('slug, title')
+      .eq('tenant_id', ctx.tenantId)
+      .eq('status', 'published')
+      .eq('show_in_nav', true)
+      .order('sort_order', { ascending: true }),
+  ]);
 
   const categoryItems = (categories ?? []).map((c) => ({
     id: c.id,
@@ -87,7 +98,12 @@ export default async function StorefrontLayout({ children }: { children: React.R
         freeShippingMin={ctx.store.free_shipping_min}
       />
       <div className="flex-1">{children}</div>
-      <Footer storeName={ctx.store.name} address={ctx.store.address} phone={ctx.store.phone} />
+      <Footer
+        storeName={ctx.store.name}
+        address={ctx.store.address}
+        phone={ctx.store.phone}
+        pages={navPages ?? []}
+      />
     </ThemeScope>
   );
 }

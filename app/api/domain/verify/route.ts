@@ -3,6 +3,7 @@
 
 import { NextResponse } from 'next/server';
 import { getStoreUser, userRole } from '@/lib/auth';
+import { isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import { checkAndPersistDomain, getCustomDomain } from '@/lib/domains';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
@@ -18,6 +19,11 @@ export async function POST() {
         { error: 'ฟีเจอร์ custom domain ใช้ได้กับแพลน Pro ขึ้นไป' },
         { status: 403 },
       );
+    }
+
+    // DNS lookup จริงหลายรายการต่อคลิก — จำกัดต่อร้าน
+    if (isRateLimited(`domain-verify:${ctx.tenantId}`, 10, 600_000)) {
+      return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
     }
 
     const row = await getCustomDomain(ctx.tenantId);

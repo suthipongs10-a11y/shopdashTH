@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/categories', label: 'หมวดหมู่' },
   { href: '/admin/customers', label: 'ลูกค้า' },
   { href: '/admin/discounts', label: 'ส่วนลด' },
+  { href: '/admin/pages', label: 'เพจ' },
   { href: '/admin/theme', label: 'ธีมร้าน' },
   { href: '/admin/domain', label: 'โดเมน', ownerOnly: true },
   { href: '/admin/staff', label: 'Staff', ownerOnly: true },
