@@ -17,8 +17,6 @@ import {
   PhoneIcon,
 } from '@/components/storefront/icons';
 import { fetchFeatured, fetchLatest } from '@/lib/catalog';
-import { demoRating } from '@/lib/demo-rating';
-import { formatThaiDate } from '@/lib/format';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { DEFAULT_FEATURE_BAND_TITLE, DEFAULT_USP, getThemeContent } from '@/lib/theme-content';
@@ -46,13 +44,10 @@ export default async function StorefrontHomePage() {
     preset.sections.includes('catalog') ? fetchLatest(ctx.tenantId, 24) : Promise.resolve([]),
   ]);
 
-  // ธีม Commerce: ดาวรีวิวเดโม่ (deterministic — ดู DECISIONS) + badge "ใหม่" 2 ชิ้นแรก
-  const featured = preset.layout?.demoRatings
-    ? featuredRaw.map((p, i) => ({
-        ...p,
-        rating: demoRating(p.id),
-        badge: i < 2 ? 'ใหม่' : p.badge,
-      }))
+  // ธีม Commerce: badge "ใหม่" 2 ชิ้นแรก (เรียงตาม created_at ล่าสุดอยู่แล้ว)
+  // ดาวรีวิวมาจาก DB จริงใน fetchFeatured (product_reviews — migration 010)
+  const featured = isStoreCard
+    ? featuredRaw.map((p, i) => ({ ...p, badge: i < 2 ? 'ใหม่' : p.badge }))
     : featuredRaw;
 
   const sections: Record<ThemeSection, React.ReactNode> = {
@@ -116,8 +111,8 @@ export default async function StorefrontHomePage() {
     tools: (
       <div key="tools" className="py-10">
         <ToolsRow
-          demoOrderNumber={`${ctx.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 2) || 'WS'}24051789`}
-          demoOrderDate={formatThaiDate(new Date().toISOString())}
+          slug={ctx.slug}
+          sampleOrderNumber={`${ctx.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 2) || 'WS'}24051789`}
         />
       </div>
     ),

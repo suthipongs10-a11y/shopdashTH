@@ -69,7 +69,17 @@
 - [x] **DoD §6 ครบ**: องค์ประกอบ ref ที่เหลือมีเหตุผลบันทึก (เมนู 5 ตามหมวดจริง, ไม่ fake เลขตะกร้า, ไม่มีลูกศร carousel — ของ T3, โลโก้บัตรเป็น text-badge) / anatomy การ์ดครบตาม §0.4 / มือถือ: การ์ด 2 คอลัมน์ + hero ไม่ตัดหัว + เมนู drawer (screenshot ยืนยัน) / **Lighthouse mobile (prod build): Performance 88 ≥ 85, CLS 0 < 0.1** / grep hex ใน components/storefront = 0 / `npm run build` ผ่าน
 - เดโม่: `http://wearstore.localhost:3000` — เหลือ T1/T3/T4 รอคำสั่งถัดไป
 
+## Done (Phase 7 ต่อ — รีวิวจริง + กล่องสถานะออร์เดอร์จริง, 2026-07-11 ตามคำสั่งเจ้าของ "ข้อ 6 ต้องใช้ได้จริง")
+- [x] `supabase/migrations/010_product_reviews.sql` — **⚠ ยังไม่ apply (รอผู้ใช้รันใน SQL Editor)**: ตาราง `product_reviews` (tenant_id + RLS ENABLE+FORCE ตาม §3.5, anon อ่านเฉพาะ published) + view `product_rating_summary` (security_invoker) — แอดมินร้านเป็นคนจัดการรีวิว (ลูกค้าเป็น guest ไม่มีบัญชี ตามที่เจ้าของยืนยันข้อ 1)
+- [x] **ดาวรีวิวจริง**: ลบ `lib/demo-rating.ts` + flag `demoRatings` ทิ้ง — `lib/reviews.ts` + `attachRatings()` ใน lib/catalog (ทุก fetcher) → การ์ดโชว์คะแนนเฉลี่ย+จำนวนจาก DB, ไม่มีรีวิว = ไม่มีดาว; หน้าสินค้าเพิ่ม section `ReviewList` (สรุปคะแนน + รายการรีวิว)
+- [x] **Store Admin จัดการรีวิว**: section ใหม่ในหน้าแก้ไขสินค้า (`product-reviews.tsx` + `review-actions.ts`) — เพิ่ม (ดาว/ชื่อ/ข้อความ), ซ่อน/แสดง, ลบ + โชว์คะแนนเฉลี่ยที่ลูกค้าเห็น
+- [x] **กล่อง "สถานะคำสั่งซื้อล่าสุด" เป็นข้อมูลจริง**: checkout สำเร็จ → จำ เลขออร์เดอร์+เบอร์ ใน localStorage (`lib/last-order.ts`) → หน้าแรกยิง `GET /api/orders/status` (ต้องส่งคู่ num+phone ตรงกัน — กติกาเดียวกับ /track กัน enumeration) → `LatestOrderStatus` วาด timeline 5 ขั้นจริงตาม ORDER_FLOW + ขนส่ง/เลขพัสดุ/ลิงก์ติดตาม; ยังไม่เคยสั่ง → โชว์ตัวอย่างพร้อมป้าย "ตัวอย่าง" (ซื่อสัตย์กับลูกค้า)
+- [x] **E2E ผ่าน (.tmp-t2-status-test.mjs)**: ก่อนสั่ง=ป้ายตัวอย่าง ✔ / สั่งจริง WEARSTORE-260711-0001 → กล่องโชว์เลขจริง+รอชำระเงิน+ป้ายหาย ✔ / เบอร์ผิด → 404 ✔ — screenshot `.tmp-t2/shots/status/`
+- [x] `.tmp-t2-reviews-seed.mjs` พร้อมรัน (guard เช็คตาราง): seed รีวิว ~8–32/สินค้า (กระจาย 5★60% 4★30% 3★10%, ชื่อ+คอมเมนต์ไทย, ย้อนหลัง 90 วัน) + สร้าง `wearstore-owner@shopdash.local` (store_owner) — **รอ migration 010 ก่อน**
+- [x] `npm run build` ผ่าน / พบ+แก้ปัญหาแวดล้อม: node server เก่าค้างพอร์ต 3000 เสิร์ฟ .next เก่า → chunk 404 ทั้งหน้า (ฆ่า process แล้วปกติ)
+
 ## ค้าง / ขั้นตอนถัดไป
+- [ ] **ผู้ใช้รัน `supabase/migrations/010_product_reviews.sql` ใน SQL Editor** → แล้วรัน `node .tmp-t2-reviews-seed.mjs` (seed รีวิว + สร้าง admin user wearstore)
 - [ ] เทมเพลต T1 "SIMPLE" / T3 "HUB" / T4 "LUXÉ" ตาม TEMPLATE_SPEC (ทำทีละตัว — T2 เสร็จแล้วเป็นแม่แบบวิธีทำ)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)

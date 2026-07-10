@@ -1,8 +1,9 @@
-// แถวเครื่องมือ 3 กล่อง (ref T2): ติดตามคำสั่งซื้อ / สถานะคำสั่งซื้อล่าสุด (ตัวอย่าง) / วิธีชำระเงิน
-// กล่องกลางกว้างกว่า (~1 : 1.6 : 1 ตาม ref)
+// แถวเครื่องมือ 3 กล่อง (ref T2): ติดตามคำสั่งซื้อ / สถานะคำสั่งซื้อล่าสุด / วิธีชำระเงิน
+// กล่องกลางกว้างกว่า (~1 : 1.6 : 1 ตาม ref) — สถานะเป็นข้อมูลจริง (LatestOrderStatus)
 
 import Link from 'next/link';
-import { BankIcon, CashIcon, CheckIcon, CreditCardIcon, QrIcon } from './icons';
+import { LatestOrderStatus } from './LatestOrderStatus';
+import { BankIcon, CashIcon, CreditCardIcon, QrIcon } from './icons';
 
 function TrackBox() {
   return (
@@ -28,67 +29,6 @@ function TrackBox() {
       >
         ดูประวัติคำสั่งซื้อทั้งหมด
       </Link>
-    </div>
-  );
-}
-
-// timeline สถานะ (ตัวอย่างประกอบ — เดโม่ให้ลูกค้าร้านเห็นหน้าตาระบบจริง)
-const DEMO_STEPS = ['รับออเดอร์', 'กำลังจัดเตรียม', 'กำลังจัดส่ง', 'จัดส่งสำเร็จ'];
-const DEMO_DONE = 3; // ผ่านแล้ว 3 ขั้น
-
-function StatusBox({ orderNumber, orderDate }: { orderNumber: string; orderDate: string }) {
-  return (
-    <div className="rounded-md border border-border-soft bg-bg p-5 shadow-card">
-      <h3 className="font-heading text-base font-semibold text-text">สถานะคำสั่งซื้อล่าสุด</h3>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-text">
-          คำสั่งซื้อ <span className="font-semibold">#{orderNumber}</span>{' '}
-          <span className="ml-1 text-xs text-text-muted">{orderDate}</span>
-        </p>
-        <span className="rounded-full bg-success-soft px-2.5 py-1 text-xs font-medium text-success">
-          กำลังจัดส่ง
-        </span>
-      </div>
-
-      {/* timeline แนวนอน 4 จุด — จุดที่ผ่านวงเขียวติ๊กถูก เส้นเขียวเชื่อมถึงขั้นปัจจุบัน (ref) */}
-      <div className="relative mt-5">
-        <div className="absolute left-[12.5%] right-[12.5%] top-3 h-0.5 -translate-y-1/2 bg-border" />
-        <div
-          className="absolute left-[12.5%] top-3 h-0.5 -translate-y-1/2 bg-success"
-          style={{ width: `${((DEMO_DONE - 1) / DEMO_STEPS.length) * 100}%` }}
-        />
-        <div className="relative flex items-start">
-          {DEMO_STEPS.map((step, i) => {
-            const done = i < DEMO_DONE;
-            return (
-              <div key={step} className="flex flex-1 flex-col items-center">
-                <span
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] ${
-                    done ? 'bg-success text-primary-fg' : 'border border-border bg-surface text-text-muted'
-                  }`}
-                >
-                  {done ? <CheckIcon size={13} /> : i + 1}
-                </span>
-                <p className={`mt-1.5 text-center text-[11px] leading-tight ${done ? 'text-text' : 'text-text-muted'}`}>
-                  {step}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border-soft pt-3 text-xs text-text-muted">
-        <span>
-          ขนส่ง: <span className="font-medium text-text">Kerry Express</span>
-        </span>
-        <span>
-          หมายเลขติดตาม: <span className="font-medium text-link">KEX123456789TH</span>
-        </span>
-        <Link href="/track" className="ml-auto font-medium text-link hover:underline">
-          ดูรายละเอียด
-        </Link>
-      </div>
     </div>
   );
 }
@@ -131,12 +71,12 @@ function PaymentBox() {
   );
 }
 
-export function ToolsRow({ demoOrderNumber, demoOrderDate }: { demoOrderNumber: string; demoOrderDate: string }) {
+export function ToolsRow({ slug, sampleOrderNumber }: { slug: string; sampleOrderNumber: string }) {
   return (
     <section className="mx-auto max-w-(--container-max) px-4">
       <div className="grid gap-4 lg:grid-cols-[1fr_1.6fr_1fr]">
         <TrackBox />
-        <StatusBox orderNumber={demoOrderNumber} orderDate={demoOrderDate} />
+        <LatestOrderStatus slug={slug} sampleOrderNumber={sampleOrderNumber} />
         <PaymentBox />
       </div>
     </section>

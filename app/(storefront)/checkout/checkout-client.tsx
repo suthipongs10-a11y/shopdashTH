@@ -7,6 +7,7 @@ import { CheckoutForm } from '@/components/storefront/CheckoutForm';
 import type { CheckoutFormData } from '@/components/storefront/types';
 import { cartStorageKey, useCart } from '@/lib/cart';
 import { formatBaht } from '@/lib/format';
+import { saveLastOrder } from '@/lib/last-order';
 
 interface AppliedDiscount {
   code: string;
@@ -92,6 +93,8 @@ export function CheckoutClient({
       };
 
       if (res.ok && json.orderNumber) {
+        // จำออร์เดอร์ล่าสุดของเครื่องนี้ — กล่อง "สถานะคำสั่งซื้อล่าสุด" หน้าแรกใช้เช็คสถานะจริง
+        saveLastOrder(slug, json.orderNumber, data.shipPhone);
         cart.clear();
         // token ทำให้หน้าสรุปแสดงข้อมูลจัดส่งเต็ม (ไม่มี token เห็นเฉพาะรายการ+ยอด)
         const tokenParam = json.payToken ? `?t=${json.payToken}` : '';

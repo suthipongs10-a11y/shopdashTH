@@ -42,6 +42,5 @@ export const preset: ThemePreset = {
     utilityBar: true,
     headerSearch: true,
     footerVariant: 'full',
-    demoRatings: true,
   },
 };

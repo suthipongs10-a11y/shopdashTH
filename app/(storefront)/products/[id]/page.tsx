@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { RelatedProducts } from '@/components/storefront/RelatedProducts';
+import { ReviewList } from '@/components/storefront/ReviewList';
 import { WishlistButton } from '@/components/storefront/WishlistButton';
 import { QrIcon, ShieldIcon, TruckIcon } from '@/components/storefront/icons';
 import { fetchProduct, fetchRelated } from '@/lib/catalog';
+import { fetchProductReviews } from '@/lib/reviews';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
 import { ImageGallery } from './image-gallery';
@@ -52,9 +54,12 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const preset = getPreset(ctx.store.theme_code);
-  const related = ctx.features.related_products
-    ? await fetchRelated(ctx.tenantId, product.id, product.categoryId)
-    : [];
+  const [related, { summary, reviews }] = await Promise.all([
+    ctx.features.related_products
+      ? fetchRelated(ctx.tenantId, product.id, product.categoryId)
+      : Promise.resolve([]),
+    fetchProductReviews(ctx.tenantId, product.id),
+  ]);
 
   return (
     <main className="mx-auto max-w-(--container-max) px-4 py-8">
@@ -118,6 +123,8 @@ export default async function ProductDetailPage({
           )}
         </div>
       </div>
+
+      {summary && summary.count > 0 && <ReviewList summary={summary} reviews={reviews} />}
 
       <RelatedProducts
         products={related}

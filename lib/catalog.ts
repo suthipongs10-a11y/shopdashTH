@@ -5,6 +5,7 @@ import 'server-only';
 import type { ProductCardData } from '@/components/storefront/types';
 import { colorFromName } from '@/lib/color-names';
 import { publicR2Url } from '@/lib/r2';
+import { fetchRatingSummaries } from '@/lib/reviews';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export const CATALOG_PAGE_SIZE = 24; // §2.1
@@ -67,6 +68,16 @@ function toCard(row: ProductRow): ProductCardData {
   };
 }
 
+/** แปะดาวรีวิวจริง (product_reviews ที่ published) — สินค้าไม่มีรีวิว = ไม่มีดาว */
+async function attachRatings(tenantId: string, cards: ProductCardData[]): Promise<ProductCardData[]> {
+  const ratings = await fetchRatingSummaries(tenantId, cards.map((c) => c.id));
+  if (ratings.size === 0) return cards;
+  return cards.map((c) => {
+    const rating = ratings.get(c.id);
+    return rating ? { ...c, rating } : c;
+  });
+}
+
 function baseQuery(tenantId: string, filters: CatalogFilters, withCount: boolean) {
   const db = createAdminClient();
   let q = db
@@ -108,7 +119,7 @@ export async function fetchCatalog(
   );
   const total = count ?? 0;
   return {
-    products: ((data ?? []) as unknown as ProductRow[]).map(toCard),
+    products: await attachRatings(tenantId, ((data ?? []) as unknown as ProductRow[]).map(toCard)),
     total,
     page,
     pageCount: Math.max(1, Math.ceil(total / CATALOG_PAGE_SIZE)),
@@ -118,13 +129,13 @@ export async function fetchCatalog(
 /** สินค้าแนะนำหน้าแรก (flag is_featured) */
 export async function fetchFeatured(tenantId: string, limit = 8): Promise<ProductCardData[]> {
   const { data } = await baseQuery(tenantId, {}, false).eq('is_featured', true).limit(limit);
-  return ((data ?? []) as unknown as ProductRow[]).map(toCard);
+  return attachRatings(tenantId, ((data ?? []) as unknown as ProductRow[]).map(toCard));
 }
 
 /** สินค้าล่าสุดหน้าแรก */
 export async function fetchLatest(tenantId: string, limit = 8): Promise<ProductCardData[]> {
   const { data } = await baseQuery(tenantId, {}, false).limit(limit);
-  return ((data ?? []) as unknown as ProductRow[]).map(toCard);
+  return attachRatings(tenantId, ((data ?? []) as unknown as ProductRow[]).map(toCard));
 }
 
 /** สินค้าที่เกี่ยวข้อง (P4 — หมวดเดียวกันก่อน ไม่พอเติมสินค้าล่าสุด) */
@@ -151,7 +162,7 @@ export async function fetchRelated(
       if (!seen.has(row.id)) rows.push(row);
     }
   }
-  return rows.slice(0, limit).map(toCard);
+  return attachRatings(tenantId, rows.slice(0, limit).map(toCard));
 }
 
 /** ตัวเลือกไซส์/สีทั้งหมดของร้าน (ไว้ทำ FilterBar) */

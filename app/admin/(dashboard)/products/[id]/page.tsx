@@ -5,6 +5,7 @@ import { getTenantContext } from '@/lib/tenant-context';
 import { DeleteProductButton } from '../delete-product-button';
 import { ProductForm } from '../product-form';
 import { ProductImages } from '../product-images';
+import { ProductReviews, type ReviewRowData } from '../product-reviews';
 import { VariantMatrix } from '../variant-matrix';
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -12,7 +13,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   const ctx = await getTenantContext();
   const supabase = await createClient();
 
-  const [{ data: product }, { data: categories }, { data: images }, { data: variants }] =
+  const [{ data: product }, { data: categories }, { data: images }, { data: variants }, { data: reviews }] =
     await Promise.all([
       supabase
         .from('products')
@@ -38,6 +39,12 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         .eq('product_id', id)
         .order('size', { ascending: true })
         .order('color', { ascending: true }),
+      supabase
+        .from('product_reviews')
+        .select('id, rating, author_name, comment, is_published, created_at')
+        .eq('tenant_id', ctx.tenantId)
+        .eq('product_id', id)
+        .order('created_at', { ascending: false }),
     ]);
 
   if (!product) notFound();
@@ -62,6 +69,11 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-gray-900">ไซส์ / สี (Variant)</h2>
         <VariantMatrix productId={product.id} variants={variants ?? []} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-900">รีวิวสินค้า</h2>
+        <ProductReviews productId={product.id} reviews={(reviews ?? []) as ReviewRowData[]} />
       </section>
     </div>
   );

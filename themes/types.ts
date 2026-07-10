@@ -68,8 +68,6 @@ export interface ThemeLayout {
   headerSearch?: boolean;
   /** footer แบบเต็ม: newsletter + คอลัมน์ลิงก์ + social (ref T2) */
   footerVariant?: 'simple' | 'full';
-  /** โชว์ดาวรีวิวเดโม่บนการ์ดสินค้า (ค่า deterministic จาก id — ดู DECISIONS) */
-  demoRatings?: boolean;
 }
 
 /** ฟีเจอร์หน้าร้านที่ธีมเปิด/ปิดได้ (merge ใน resolveFeatures() §3.7) */

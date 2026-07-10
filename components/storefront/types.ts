@@ -27,7 +27,7 @@ export interface ProductCardData {
   inStock: boolean;
   /** จุดสีของ variant (ค่า CSS จาก lib/color-names) — การ์ดแบบ 'store' */
   colors?: string[];
-  /** ดาวรีวิวเดโม่ (layout.demoRatings — ดู DECISIONS) */
+  /** คะแนนรีวิวจริงจาก product_reviews (migration 010) — ไม่มีรีวิว = ไม่มีดาว */
   rating?: { score: string; count: number };
   /** ข้อมูล variant สำหรับ QuickView panel — เฉพาะการ์ดแบบ 'store' */
   variants?: QuickViewVariant[];
