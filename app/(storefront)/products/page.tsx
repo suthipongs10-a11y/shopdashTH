@@ -93,6 +93,7 @@ export default async function CatalogPage({
         emptyText="ไม่พบสินค้าตามเงื่อนไขที่เลือก"
         slug={ctx.slug}
         wishlistEnabled={ctx.features.wishlist}
+        detailButtonText={ctx.features.online_ordering ? 'สั่งซื้อ' : 'ดูรายละเอียด'}
       />
 
       {pageCount > 1 && (

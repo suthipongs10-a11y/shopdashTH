@@ -12,6 +12,7 @@ import { preset as pro02 } from './pro-02';
 import { preset as prem01 } from './prem-01';
 import { preset as prem02 } from './prem-02';
 import { preset as one01 } from './one-01';
+import { preset as t1Simple } from './t1-simple';
 import { preset as t2Store } from './t2-store';
 
 /** เรียงตามตาราง §4.5 (+ ชุด Commerce Premium ตาม TEMPLATE_SPEC) */
@@ -27,6 +28,7 @@ export const THEME_PRESET_LIST: ThemePreset[] = [
   prem01,
   prem02,
   one01,
+  t1Simple,
   t2Store,
 ];
 

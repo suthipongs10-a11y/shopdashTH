@@ -26,6 +26,8 @@ export function resolveFeatures(
   theme: { feature_defaults: Record<string, unknown> | null },
 ): FeatureMap {
   const base = Object.fromEntries(FEATURE_KEYS.map((k) => [k, false])) as FeatureMap;
+  // online_ordering เป็น flag แบบ "ปิดเมื่อระบุ" — ร้านเดิมทุกแพลนต้องได้ระบบสั่งซื้อโดยไม่แตะ DB
+  base.online_ordering = true;
   return {
     ...base,
     ...pickKnown(plan.features), // ฐานจากแพลน (realtime — เปลี่ยนแพลนมีผลทันที)

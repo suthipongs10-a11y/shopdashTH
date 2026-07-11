@@ -58,18 +58,69 @@ export function ProductCard({
   variant = 'minimal',
   slug = '',
   wishlistEnabled = false,
+  detailButtonText = 'ดูรายละเอียด',
 }: {
   product: ProductCardData;
   variant?: ProductCardVariant;
   /** ใช้กับ variant 'store' (ตะกร้า/wishlist ต่อร้าน) */
   slug?: string;
   wishlistEnabled?: boolean;
+  /** ป้ายปุ่มการ์ดแบบ 'simple' — "ดูรายละเอียด" หรือ "สั่งซื้อ" ตาม flag online_ordering (§3.1) */
+  detailButtonText?: string;
 }) {
   if (variant === 'store') {
     return <StoreProductCard product={product} slug={slug} wishlistEnabled={wishlistEnabled} />;
   }
 
   const priceText = formatBahtRange(product.priceMin, product.priceMax);
+
+  // 'simple' (ref T1): การ์ดขาว รูป flat-lay บนพื้น surface, ชื่อ, ราคา "บาท", ปุ่มกรอบเต็มกว้าง
+  // เรียบตามแพลน — ไม่มีดาว/จุดสี/ไซส์
+  if (variant === 'simple') {
+    return (
+      <Link
+        href={product.href}
+        className="group block overflow-hidden rounded-md border border-border-soft bg-bg shadow-card transition-shadow duration-300 hover:shadow-[0_4px_16px_rgba(0,0,0,.08)]"
+      >
+        {/* 4:5 — crop เบากว่าจัตุรัส เห็นตัวเสื้อครบ (ref รูป flat-lay เต็มตัว) */}
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface">
+          {product.imageUrl ? (
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-xs text-text-muted">
+              ไม่มีรูปสินค้า
+            </div>
+          )}
+          {!product.inStock && (
+            <div className="absolute inset-0 flex items-center justify-center bg-scrim">
+              <span className="rounded-full bg-bg px-3.5 py-1 text-xs font-semibold text-text">
+                สินค้าหมด
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="p-4">
+          <p className="truncate text-[15px] font-medium text-text">{product.name}</p>
+          <p className="mt-1 text-base font-bold text-text">
+            {product.priceMin.toLocaleString('th-TH')}
+            {product.priceMax != null && product.priceMax !== product.priceMin
+              ? `–${product.priceMax.toLocaleString('th-TH')}`
+              : ''}{' '}
+            บาท
+          </p>
+          <span className="mt-3 block rounded-sm border border-border px-3 py-2 text-center text-sm font-medium text-text transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-primary-fg">
+            {detailButtonText}
+          </span>
+        </div>
+      </Link>
+    );
+  }
 
   if (variant === 'overlay') {
     return (

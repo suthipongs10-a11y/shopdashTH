@@ -1,6 +1,14 @@
 import Link from 'next/link';
-import type { FooterLinkGroup } from '@/lib/theme-content';
-import { MapPinIcon, PhoneIcon, QrIcon, ShieldIcon, TruckIcon } from './icons';
+import type { ContactChannels, FooterLinkGroup } from '@/lib/theme-content';
+import {
+  FacebookLogoIcon,
+  LineLogoIcon,
+  MapPinIcon,
+  PhoneIcon,
+  QrIcon,
+  ShieldIcon,
+  TruckIcon,
+} from './icons';
 
 export interface FooterPageLink {
   slug: string;
@@ -168,6 +176,8 @@ export function Footer({
   variant = 'simple',
   linkGroups = [],
   newsletterText = 'รับสิทธิพิเศษและโปรโมชั่นก่อนใคร',
+  contact,
+  orderingEnabled = true,
 }: {
   storeName: string;
   address?: string | null;
@@ -178,6 +188,10 @@ export function Footer({
   variant?: 'simple' | 'full';
   linkGroups?: FooterLinkGroup[];
   newsletterText?: string;
+  /** ช่องทางแชทของร้าน (ref T1) — โชว์ในคอลัมน์ติดต่อของ footer แบบ simple */
+  contact?: ContactChannels;
+  /** ปิด = ร้านขายผ่านแชท ไม่โชว์ข้อความชำระเงิน PromptPay */
+  orderingEnabled?: boolean;
 }) {
   if (variant === 'full') {
     return (
@@ -209,6 +223,36 @@ export function Footer({
               </a>
             </p>
           )}
+          {contact?.lineUrl && (
+            <p className="flex items-center gap-2 text-sm text-text-muted">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-line text-primary-fg">
+                <LineLogoIcon size={12} />
+              </span>
+              <a
+                href={contact.lineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
+                {contact.lineLabel ?? 'LINE'}
+              </a>
+            </p>
+          )}
+          {contact?.facebookUrl && (
+            <p className="flex items-center gap-2 text-sm text-text-muted">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-facebook text-primary-fg">
+                <FacebookLogoIcon size={12} />
+              </span>
+              <a
+                href={contact.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
+                {contact.facebookLabel ?? 'Facebook'}
+              </a>
+            </p>
+          )}
         </div>
 
         {/* เมนู */}
@@ -216,15 +260,22 @@ export function Footer({
           <p className="mb-3 text-xs font-semibold tracking-widest text-text-muted">เมนู</p>
           <ul className="space-y-2 text-sm">
             <li>
+              <Link href="/" className="text-text transition-colors hover:text-primary">
+                หน้าแรก
+              </Link>
+            </li>
+            <li>
               <Link href="/products" className="text-text transition-colors hover:text-primary">
                 สินค้าทั้งหมด
               </Link>
             </li>
-            <li>
-              <Link href="/track" className="text-text transition-colors hover:text-primary">
-                ติดตามคำสั่งซื้อ
-              </Link>
-            </li>
+            {orderingEnabled && (
+              <li>
+                <Link href="/track" className="text-text transition-colors hover:text-primary">
+                  ติดตามคำสั่งซื้อ
+                </Link>
+              </li>
+            )}
             {pages.map((p) => (
               <li key={p.slug}>
                 <Link
@@ -244,14 +295,23 @@ export function Footer({
             การชำระเงิน & จัดส่ง
           </p>
           <ul className="space-y-2.5 text-sm text-text-muted">
-            <li className="flex items-center gap-2">
-              <QrIcon size={16} className="shrink-0 text-primary" />
-              ชำระเงินด้วย PromptPay สแกนจ่ายได้ทุกธนาคาร
-            </li>
-            <li className="flex items-center gap-2">
-              <ShieldIcon size={16} className="shrink-0 text-primary" />
-              ร้านตรวจสอบยอดโอนทุกรายการก่อนจัดส่ง
-            </li>
+            {orderingEnabled ? (
+              <>
+                <li className="flex items-center gap-2">
+                  <QrIcon size={16} className="shrink-0 text-primary" />
+                  ชำระเงินด้วย PromptPay สแกนจ่ายได้ทุกธนาคาร
+                </li>
+                <li className="flex items-center gap-2">
+                  <ShieldIcon size={16} className="shrink-0 text-primary" />
+                  ร้านตรวจสอบยอดโอนทุกรายการก่อนจัดส่ง
+                </li>
+              </>
+            ) : (
+              <li className="flex items-center gap-2">
+                <ShieldIcon size={16} className="shrink-0 text-primary" />
+                สั่งซื้อและชำระเงินผ่านแชทของร้านโดยตรง
+              </li>
+            )}
             <li className="flex items-center gap-2">
               <TruckIcon size={16} className="shrink-0 text-primary" />
               จัดส่งทั่วประเทศ พร้อมเลขพัสดุติดตามได้

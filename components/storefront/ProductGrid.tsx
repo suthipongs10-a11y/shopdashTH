@@ -10,6 +10,7 @@ export function ProductGrid({
   emptyText = 'ยังไม่มีสินค้าในหมวดนี้',
   slug = '',
   wishlistEnabled = false,
+  detailButtonText,
 }: {
   products: ProductCardData[];
   cardVariant?: ProductCardVariant;
@@ -17,6 +18,8 @@ export function ProductGrid({
   /** ใช้กับการ์ดแบบ 'store' (QuickView/wishlist ต่อร้าน) */
   slug?: string;
   wishlistEnabled?: boolean;
+  /** ป้ายปุ่มการ์ดแบบ 'simple' (ref T1) */
+  detailButtonText?: string;
 }) {
   if (products.length === 0) {
     return (
@@ -31,7 +34,9 @@ export function ProductGrid({
   const gridClass =
     cardVariant === 'store'
       ? 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6'
-      : 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
+      : cardVariant === 'simple'
+        ? 'grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5'
+        : 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
   return (
     <div className={gridClass}>
       {products.map((product) => (
@@ -41,6 +46,7 @@ export function ProductGrid({
           variant={cardVariant}
           slug={slug}
           wishlistEnabled={wishlistEnabled}
+          detailButtonText={detailButtonText}
         />
       ))}
     </div>

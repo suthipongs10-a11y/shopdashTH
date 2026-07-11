@@ -255,3 +255,55 @@ export function BagIcon({ className, size = 18 }: IconProps) {
     </svg>
   );
 }
+
+/* โลโก้ช่องทางแชท (ref T1 — ปุ่ม LINE/Facebook) — fill ตามสีตัวอักษรปุ่ม */
+export function LineLogoIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden>
+      <path d="M12 3C6.9 3 2.8 6.4 2.8 10.6c0 3.7 3.3 6.9 7.7 7.5.3.1.7.2.8.5.1.2.1.6 0 .8l-.1.8c0 .2-.2.9.8.5s5.2-3.1 7.1-5.3c1.3-1.4 1.9-2.9 1.9-4.8C21.2 6.4 17.1 3 12 3z" />
+    </svg>
+  );
+}
+
+export function FacebookLogoIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className} aria-hidden>
+      <path d="M13.5 21v-7h2.4l.36-2.8H13.5V9.4c0-.81.22-1.36 1.38-1.36h1.48V5.55c-.26-.03-1.14-.11-2.16-.11-2.14 0-3.6 1.3-3.6 3.7v2.06H8.2V14h2.4v7z" />
+    </svg>
+  );
+}
+
+export function InfoIcon({ size = 14, className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 11v5M12 7.8v.2" />
+    </svg>
+  );
+}
+
+export function HomeIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="m3.5 10.5 8.5-7 8.5 7" />
+      <path d="M5.5 9v10.5h5v-6h3v6h5V9" />
+    </svg>
+  );
+}
+
+export function PageIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M7 3.5h7l4 4v13H7z" />
+      <path d="M14 3.5V8h4M10 12.5h5M10 16h5" />
+    </svg>
+  );
+}
+
+export function ChatIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M12 4c-4.7 0-8.5 3.1-8.5 7 0 2.2 1.2 4.1 3.1 5.4L6 20.5l4-1.7c.6.1 1.3.2 2 .2 4.7 0 8.5-3.1 8.5-7S16.7 4 12 4z" />
+    </svg>
+  );
+}

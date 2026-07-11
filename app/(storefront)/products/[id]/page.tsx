@@ -8,9 +8,17 @@ import { cache } from 'react';
 import { RelatedProducts } from '@/components/storefront/RelatedProducts';
 import { ReviewList } from '@/components/storefront/ReviewList';
 import { WishlistButton } from '@/components/storefront/WishlistButton';
-import { QrIcon, ShieldIcon, TruckIcon } from '@/components/storefront/icons';
+import {
+  FacebookLogoIcon,
+  LineLogoIcon,
+  QrIcon,
+  ShieldIcon,
+  TruckIcon,
+} from '@/components/storefront/icons';
 import { fetchProduct, fetchRelated } from '@/lib/catalog';
+import { formatBahtRange } from '@/lib/format';
 import { fetchProductReviews } from '@/lib/reviews';
+import { getThemeContent } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
 import { ImageGallery } from './image-gallery';
@@ -54,6 +62,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const preset = getPreset(ctx.store.theme_code);
+  const contact = getThemeContent(ctx.store.theme_overrides).contact;
   const [related, { summary, reviews }] = await Promise.all([
     ctx.features.related_products
       ? fetchRelated(ctx.tenantId, product.id, product.categoryId)
@@ -89,29 +98,74 @@ export default async function ProductDetailPage({
             />
           </div>
 
-          <VariantSelector
-            slug={ctx.slug}
-            productId={product.id}
-            productName={product.name}
-            imageUrl={product.images[0]}
-            variants={product.variants}
-          />
+          {ctx.features.online_ordering ? (
+            <>
+              <VariantSelector
+                slug={ctx.slug}
+                productId={product.id}
+                productName={product.name}
+                imageUrl={product.images[0]}
+                variants={product.variants}
+              />
 
-          {/* จุดขายความมั่นใจ — ชำระ/ตรวจสอบ/จัดส่ง */}
-          <ul className="grid gap-2 rounded-lg border border-border-soft bg-surface p-4 text-sm text-text-muted sm:grid-cols-3">
-            <li className="flex items-center gap-2">
-              <QrIcon size={16} className="shrink-0 text-primary" />
-              สแกนจ่าย PromptPay
-            </li>
-            <li className="flex items-center gap-2 whitespace-nowrap">
-              <ShieldIcon size={16} className="shrink-0 text-primary" />
-              ตรวจสลิปทุกออร์เดอร์
-            </li>
-            <li className="flex items-center gap-2">
-              <TruckIcon size={16} className="shrink-0 text-primary" />
-              มีเลขพัสดุติดตาม
-            </li>
-          </ul>
+              {/* จุดขายความมั่นใจ — ชำระ/ตรวจสอบ/จัดส่ง */}
+              <ul className="grid gap-2 rounded-lg border border-border-soft bg-surface p-4 text-sm text-text-muted sm:grid-cols-3">
+                <li className="flex items-center gap-2">
+                  <QrIcon size={16} className="shrink-0 text-primary" />
+                  สแกนจ่าย PromptPay
+                </li>
+                <li className="flex items-center gap-2 whitespace-nowrap">
+                  <ShieldIcon size={16} className="shrink-0 text-primary" />
+                  ตรวจสลิปทุกออร์เดอร์
+                </li>
+                <li className="flex items-center gap-2">
+                  <TruckIcon size={16} className="shrink-0 text-primary" />
+                  มีเลขพัสดุติดตาม
+                </li>
+              </ul>
+            </>
+          ) : (
+            // โหมดเว็บแนะนำสินค้า (ref T1): ราคา + ปุ่มติดต่อสั่งซื้อผ่านแชท แทนตะกร้า
+            <div className="space-y-4">
+              <p className="text-2xl font-bold text-text">
+                {formatBahtRange(
+                  Math.min(...product.variants.map((v) => v.price), product.basePrice),
+                  product.variants.length > 0
+                    ? Math.max(...product.variants.map((v) => v.price))
+                    : undefined,
+                )}
+              </p>
+              <div className="space-y-2 rounded-lg border border-border-soft bg-surface p-4">
+                <p className="text-sm font-semibold text-text">สนใจสั่งซื้อสินค้าชิ้นนี้ ติดต่อร้านได้เลย</p>
+                {contact?.lineUrl && (
+                  <a
+                    href={contact.lineUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-sm bg-brand-line px-4 py-3 text-sm font-semibold text-primary-fg transition-opacity hover:opacity-90"
+                  >
+                    <LineLogoIcon size={17} />
+                    ติดต่อสั่งซื้อผ่าน LINE {contact.lineLabel ? `(${contact.lineLabel})` : ''}
+                  </a>
+                )}
+                {contact?.facebookUrl && (
+                  <a
+                    href={contact.facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-sm bg-brand-facebook px-4 py-3 text-sm font-semibold text-primary-fg transition-opacity hover:opacity-90"
+                  >
+                    <FacebookLogoIcon size={17} />
+                    ส่งข้อความผ่าน Facebook
+                  </a>
+                )}
+                <p className="flex items-center gap-2 pt-1 text-xs text-text-muted">
+                  <TruckIcon size={14} className="shrink-0 text-primary" />
+                  จัดส่งทั่วประเทศ พร้อมเลขพัสดุติดตาม
+                </p>
+              </div>
+            </div>
+          )}
 
           {product.descriptionMd && (
             <div className="rounded-lg border border-border-soft p-5">

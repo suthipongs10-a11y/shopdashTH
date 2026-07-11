@@ -35,8 +35,8 @@ export type ThemeFontName =
   | 'Bai Jamjuree'
   | 'IBM Plex Sans Thai';
 
-export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay' | 'store';
-export type HeroVariant = 'full-bleed' | 'boxed' | 'split' | 'commerce';
+export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay' | 'store' | 'simple';
+export type HeroVariant = 'full-bleed' | 'boxed' | 'split' | 'commerce' | 'split-panel';
 export type CategoryNavVariant = 'topbar' | 'pills' | 'sidebar';
 
 export type ThemeSection =
@@ -58,6 +58,11 @@ export type ThemeSection =
   | 'tools'
   /** แถบ "ครบทุกฟังก์ชัน" 5 ไอคอนพื้นครีม */
   | 'featureBand'
+  /* --- ชุด T1 "SIMPLE" (TEMPLATE_SPEC §3.1) --- */
+  /** แถบ CTA คู่ LINE/Facebook พื้นเขียวอ่อน */
+  | 'contactCta'
+  /** แถบครีม "ฟีเจอร์ของเว็บ" รายการมีเลขข้อ + หมายเหตุ */
+  | 'featureList'
   | 'footer';
 
 /** โครง layout ระดับธีม (header/footer) — ค่า default = พฤติกรรมเดิมของทุกธีม */
@@ -68,6 +73,8 @@ export interface ThemeLayout {
   headerSearch?: boolean;
   /** footer แบบเต็ม: newsletter + คอลัมน์ลิงก์ + social (ref T2) */
   footerVariant?: 'simple' | 'full';
+  /** ปุ่ม LINE/Facebook ใน header (ref T1 — ร้านที่ขายผ่านแชท) */
+  headerContactButtons?: boolean;
 }
 
 /** ฟีเจอร์หน้าร้านที่ธีมเปิด/ปิดได้ (merge ใน resolveFeatures() §3.7) */

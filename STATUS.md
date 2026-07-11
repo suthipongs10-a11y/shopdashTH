@@ -88,8 +88,16 @@
 - [x] ตรวจ 3 รอบ screenshot (before/r1/r2/r3 ใน `.tmp-admin/`) + mobile drawer + ทุกหน้า admin 13 หน้า HTTP 200 + `npm run build` ผ่าน
 - ⚠ บทเรียนแวดล้อม: ห้าม `next build` ขณะ dev server รันอยู่ (ทับ .next → chunk 404 ทั้งเว็บ) — kill dev ก่อนเสมอ
 
+## Done (Phase 7 ต่อ — เทมเพลต T1 "SIMPLE", 2026-07-11)
+- [x] **ธีม `t1-simple`** (tier 1, ตาม ref: SIMPLE WEAR): hero `split-panel` (แผงเบจ ข้อความซ้าย นายแบบขวา+gradient กลืนพื้น), การ์ด `simple` (รูป 4:5, ชื่อ, ราคา "บาท", ปุ่มกรอบ — ไม่มีดาว/จุดสีตามแพลน), section ใหม่ `contactCta` (แถบ LINE/FB พื้น brand-line/10) + `featureList` (แถบครีม 4 ข้อมีเลข + note แดง), `layout.headerContactButtons` (ปุ่ม LINE/FB ใน header + tagline ใต้โลโก้ + แถบประกาศดำเหนือ header + drawer มือถือ), container 1100px
+- [x] **Flag ใหม่ `online_ordering`** (default เปิด — ร้านเดิมไม่กระทบ): ปิดแล้ว = ตะกร้า/track/PromptPay หายทั้งเว็บ, แถบ disclaimer "ไม่สามารถสั่งซื้อได้", หน้าสินค้าเป็นปุ่มแชท, ปุ่มการ์ด "ดูรายละเอียด"↔"สั่งซื้อ" ตาม §3.1 (ดู DECISIONS)
+- [x] **ร้านเดโม่ `simplewear`** (.tmp-t1-seed.mjs รันซ้ำได้): แพลน p1-start active 1 ปี + override ปิด online_ordering, สินค้า 8 ชิ้น (รูป pool t2 อัป R2 จริง), เพจ about/contact ใน nav, `__content` ครบ (hero/contact/featureList/disclaimer/tagline)
+- [x] **Loop วิจารณ์ 3 รอบ** (390/768/1440 — `.tmp-t1/r1-r3/`): r1 พบแถบ utility เดิมโผล่+ข้อความ PromptPay ขัดโหมดแชท/แถบประกาศดำอยู่ผิดที่/footer มี track/รูป flat-05 เห็นแต่ไม้แขวน → r2 แก้ครบ เหลือรูปเบลอ 1 ใบ + DoD ต้องมี drawer → r3 ผ่าน (สลับรูป model-05, drawer มือถือทำงาน)
+- [x] **DoD §6 ครบ**: องค์ประกอบ ref เหลือศูนย์/มีเหตุผล (การ์ดขาวแทนดำ — ข้อจำกัด pool, ไอคอน LINE วาดเอง — ไม่มี asset โลโก้ทางการ) / anatomy การ์ดตาม tier / มือถือ 2 คอลัมน์+hero หัวไม่ขาด+drawer / **Lighthouse mobile (prod build): Performance 91, CLS 0** / grep hex ใน components/storefront = 0 / build ผ่าน
+- เดโม่: `http://simplewear.localhost:3000` — เหลือ T3/T4
+
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] เทมเพลต T1 "SIMPLE" / T3 "HUB" / T4 "LUXÉ" ตาม TEMPLATE_SPEC (ทำทีละตัว — T2 เสร็จแล้วเป็นแม่แบบวิธีทำ)
+- [ ] เทมเพลต T3 "HUB" / T4 "LUXÉ" ตาม TEMPLATE_SPEC (ทำทีละตัว)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 

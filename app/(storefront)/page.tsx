@@ -4,7 +4,9 @@
 import Link from 'next/link';
 import { AnnouncementBar } from '@/components/storefront/AnnouncementBar';
 import { CategoryBannerRow } from '@/components/storefront/CategoryBannerRow';
+import { ContactCtaBand } from '@/components/storefront/ContactCtaBand';
 import { FeatureBand } from '@/components/storefront/FeatureBand';
+import { FeatureListBand } from '@/components/storefront/FeatureListBand';
 import { HeroBanner } from '@/components/storefront/HeroBanner';
 import { ProductGrid } from '@/components/storefront/ProductGrid';
 import { SectionHeading } from '@/components/storefront/SectionHeading';
@@ -19,7 +21,13 @@ import {
 import { fetchFeatured, fetchLatest } from '@/lib/catalog';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { DEFAULT_FEATURE_BAND_TITLE, DEFAULT_USP, getThemeContent } from '@/lib/theme-content';
+import {
+  DEFAULT_FEATURE_BAND_TITLE,
+  DEFAULT_FEATURE_LIST,
+  DEFAULT_FEATURE_LIST_TITLE,
+  DEFAULT_USP,
+  getThemeContent,
+} from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
 import type { ThemeSection } from '@/themes/types';
@@ -29,11 +37,14 @@ export default async function StorefrontHomePage() {
   const preset = getPreset(ctx.store.theme_code);
   const content = getThemeContent(ctx.store.theme_overrides);
   const isStoreCard = preset.variants.productCard === 'store';
+  const isSimpleCard = preset.variants.productCard === 'simple';
+  // §3.1 (ref T1): ปุ่มการ์ดตาม flag — เว็บแนะนำสินค้า = "ดูรายละเอียด", มีระบบสั่งซื้อ = "สั่งซื้อ"
+  const detailButtonText = ctx.features.online_ordering ? 'สั่งซื้อ' : 'ดูรายละเอียด';
 
   const db = createAdminClient();
   const [featuredRaw, latest, { data: categories }, catalog] = await Promise.all([
-    // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2
-    fetchFeatured(ctx.tenantId, isStoreCard ? 6 : 8),
+    // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2 / แบบ 'simple' โชว์ 4 ใบตาม ref T1
+    fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard ? 4 : 8),
     fetchLatest(ctx.tenantId),
     db
       .from('categories')
@@ -53,15 +64,15 @@ export default async function StorefrontHomePage() {
   const sections: Record<ThemeSection, React.ReactNode> = {
     announcement: <AnnouncementBar key="announcement" text={ctx.store.announcement_text} />,
     hero:
-      preset.variants.hero === 'commerce' ? (
+      preset.variants.hero === 'commerce' || preset.variants.hero === 'split-panel' ? (
         <HeroBanner
           key="hero"
-          variant="commerce"
+          variant={preset.variants.hero}
           imageUrl={
             content.hero?.imageUrl ??
             (ctx.store.banner_r2_key ? publicR2Url(ctx.store.banner_r2_key) : undefined)
           }
-          eyebrow={content.hero?.eyebrow ?? 'NEW COLLECTION'}
+          eyebrow={content.hero?.eyebrow ?? (preset.variants.hero === 'commerce' ? 'NEW COLLECTION' : undefined)}
           headline={content.hero?.headline ?? ctx.store.name}
           subline={content.hero?.sub}
           ctaText={content.hero?.ctaText ?? 'ช้อปเลย'}
@@ -86,6 +97,14 @@ export default async function StorefrontHomePage() {
             <h2 className="mb-5 font-heading text-lg font-semibold tracking-tight text-text">
               สินค้าแนะนำ
             </h2>
+          ) : isSimpleCard ? (
+            // หัว section แบบ ref T1 — กลางหน้า + เส้นใต้สั้น
+            <div className="mb-8 text-center">
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-text">
+                สินค้าแนะนำ
+              </h2>
+              <span className="mt-2.5 inline-block h-0.5 w-14 bg-primary" />
+            </div>
           ) : (
             <SectionHeading
               eyebrow="คัดสรรโดยร้าน"
@@ -99,7 +118,18 @@ export default async function StorefrontHomePage() {
             cardVariant={preset.variants.productCard}
             slug={ctx.slug}
             wishlistEnabled={ctx.features.wishlist}
+            detailButtonText={detailButtonText}
           />
+          {isSimpleCard && (
+            <div className="mt-8 text-center">
+              <Link
+                href="/products"
+                className="inline-block rounded-sm bg-primary px-8 py-3 text-sm font-semibold text-primary-fg transition-colors hover:bg-primary-deep"
+              >
+                ดูสินค้าทั้งหมด
+              </Link>
+            </div>
+          )}
         </section>
       ) : null,
     categoryBanners:
@@ -118,6 +148,21 @@ export default async function StorefrontHomePage() {
     ),
     featureBand: (
       <FeatureBand key="featureBand" title={content.featureBandTitle ?? DEFAULT_FEATURE_BAND_TITLE} />
+    ),
+    contactCta: content.contact ? (
+      <div key="contactCta" className="py-6">
+        <ContactCtaBand contact={content.contact} />
+      </div>
+    ) : null,
+    featureList: (
+      <div key="featureList" className="py-6">
+        <FeatureListBand
+          title={content.featureListTitle ?? DEFAULT_FEATURE_LIST_TITLE}
+          items={content.featureList ?? DEFAULT_FEATURE_LIST}
+          note={content.featureListNote}
+          noteHighlight={content.featureListNoteHighlight}
+        />
+      </div>
     ),
     categories:
       (categories ?? []).length > 0 ? (

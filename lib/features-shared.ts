@@ -11,7 +11,9 @@ export type FeatureKey =
   | 'theme_customize'
   | 'custom_pages'
   | 'wishlist'
-  | 'related_products';
+  | 'related_products'
+  /** ระบบสั่งซื้อ+ชำระเงินบนเว็บ — default เปิด; ปิดเมื่อร้านขายผ่านแชท (ref T1) */
+  | 'online_ordering';
 
 export type FeatureMap = Record<FeatureKey, boolean>;
 
@@ -26,6 +28,7 @@ export const FEATURE_KEYS: FeatureKey[] = [
   'custom_pages',
   'wishlist',
   'related_products',
+  'online_ordering',
 ];
 
 export const FEATURE_LABEL_TH: Record<FeatureKey, string> = {
@@ -39,4 +42,5 @@ export const FEATURE_LABEL_TH: Record<FeatureKey, string> = {
   custom_pages: 'หน้าเพจ/บทความ',
   wishlist: 'Wishlist',
   related_products: 'สินค้าที่เกี่ยวข้อง',
+  online_ordering: 'ระบบสั่งซื้อบนเว็บ (ตะกร้า + PromptPay)',
 };

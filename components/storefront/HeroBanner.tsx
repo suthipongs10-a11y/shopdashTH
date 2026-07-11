@@ -134,6 +134,47 @@ export function HeroBanner({
     );
   }
 
+  // 'split-panel' (ref T1): แผงพื้นสี secondary ใบเดียว — ข้อความซ้าย รูปนายแบบขวากลืนกับพื้น
+  if (variant === 'split-panel' && imageUrl) {
+    return (
+      <section className="mx-auto max-w-(--container-max) px-4 pt-4">
+        <div className="grid overflow-hidden rounded-md bg-secondary md:grid-cols-[1.1fr_1fr]">
+          <div className="flex flex-col justify-center gap-4 px-7 py-10 md:px-12 md:py-16">
+            {eyebrow && (
+              <p className="text-xs font-semibold tracking-[0.2em] text-text-muted">{eyebrow}</p>
+            )}
+            {headline && (
+              <h1 className="whitespace-pre-line font-heading text-3xl font-bold leading-tight tracking-tight text-text md:text-[40px] md:leading-[1.15]">
+                {headline}
+              </h1>
+            )}
+            {subline && <p className="text-sm text-text-muted md:text-base">{subline}</p>}
+            {ctaText && ctaHref && (
+              <Link
+                href={ctaHref}
+                className="mt-2 inline-block w-fit rounded-sm bg-primary px-8 py-3 text-sm font-semibold text-primary-fg transition-colors hover:bg-primary-deep"
+              >
+                {ctaText}
+              </Link>
+            )}
+          </div>
+          {/* รูปชิดขอบล่างของแผง — gradient ซ้ายช่วยกลืนรูปเข้ากับพื้น secondary (ref) */}
+          <div className="relative min-h-64 md:min-h-[380px]">
+            <Image
+              src={imageUrl}
+              alt={alt}
+              fill
+              priority
+              className="object-cover object-top"
+              sizes="(max-width: 768px) 100vw, 45vw"
+            />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-secondary to-transparent" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   // ไม่มีรูป → แผงตกแต่งจากสีธีม (ทุก variant)
   if (!imageUrl) {
     const panel = (

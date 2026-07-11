@@ -14,7 +14,9 @@ import {
   CartIcon,
   ClockIcon,
   CloseIcon,
+  FacebookLogoIcon,
   HeartIcon,
+  LineLogoIcon,
   SearchIcon,
   TruckIcon,
   UserIcon,
@@ -22,6 +24,7 @@ import {
 import type { CategoryItem } from '@/components/storefront/types';
 import { useCart } from '@/lib/cart';
 import { formatBaht } from '@/lib/format';
+import type { ContactChannels } from '@/lib/theme-content';
 import type { CategoryNavVariant, ThemeLayout } from '@/themes/types';
 
 interface UtilityItem {
@@ -32,6 +35,7 @@ interface UtilityItem {
 export function StoreHeader({
   slug,
   storeName,
+  tagline,
   logoUrl,
   categories,
   navVariant,
@@ -39,9 +43,13 @@ export function StoreHeader({
   layout = {},
   utilityItems = [],
   wishlistEnabled = false,
+  orderingEnabled = true,
+  contact,
 }: {
   slug: string;
   storeName: string;
+  /** ข้อความเล็กใต้โลโก้ (ref T1 เช่น "BASIC STYLE FOR EVERYDAY") */
+  tagline?: string | null;
   logoUrl?: string | null;
   categories: CategoryItem[];
   navVariant: CategoryNavVariant;
@@ -50,11 +58,16 @@ export function StoreHeader({
   /** ข้อความซ้ายของ utility bar โหมด Commerce */
   utilityItems?: UtilityItem[];
   wishlistEnabled?: boolean;
+  /** flag online_ordering — ปิด = ร้านขายผ่านแชท ไม่มีตะกร้า (ref T1) */
+  orderingEnabled?: boolean;
+  /** ช่องทางแชท (ปุ่ม LINE/FB เมื่อ layout.headerContactButtons) */
+  contact?: ContactChannels;
 }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const cart = useCart(slug);
   const commerce = layout.utilityBar === true;
+  const contactButtons = layout.headerContactButtons === true;
 
   // หมายเหตุ: CartDrawer/เมนู drawer ต้องอยู่ "นอก" <header> — backdrop-blur บน header
   // ทำให้มันกลายเป็น containing block ของ position:fixed แล้ว drawer จะสูงเท่า header
@@ -86,8 +99,9 @@ export function StoreHeader({
             </span>
           </div>
         </div>
-      ) : (
-        /* แถบ utility เดิม — ข้อความส่งฟรีซ้าย + ติดตามคำสั่งซื้อขวา */
+      ) : contactButtons ? null : (
+        /* แถบ utility เดิม — ข้อความส่งฟรีซ้าย + ติดตามคำสั่งซื้อขวา
+           (โหมดปุ่มแชท ref T1 ไม่มีแถบนี้ — แถบประกาศดำด้านบนทำหน้าที่แทน) */
         <div className="border-b border-border-soft bg-surface">
           <div className="mx-auto flex max-w-(--container-max) items-center justify-between gap-4 px-4 py-1.5 text-xs text-text-muted">
             <span className="inline-flex items-center gap-1.5 truncate">
@@ -96,16 +110,18 @@ export function StoreHeader({
                 ? `สั่งซื้อครบ ${formatBaht(freeShippingMin)} ส่งฟรีทั่วประเทศ`
                 : 'จัดส่งทั่วประเทศ ชำระผ่าน PromptPay'}
             </span>
-            <Link href="/track" className="shrink-0 font-medium transition-colors hover:text-primary">
-              ติดตามคำสั่งซื้อ
-            </Link>
+            {orderingEnabled && (
+              <Link href="/track" className="shrink-0 font-medium transition-colors hover:text-primary">
+                ติดตามคำสั่งซื้อ
+              </Link>
+            )}
           </div>
         </div>
       )}
 
       <div className="mx-auto flex max-w-(--container-max) items-center gap-4 px-4 py-3.5 lg:gap-6">
-        {/* มือถือโหมด Commerce: hamburger เปิด drawer เมนู (DoD §6.5) */}
-        {commerce && (
+        {/* มือถือ: hamburger เปิด drawer เมนู (DoD §6.5 — โหมด Commerce และโหมดปุ่มแชท) */}
+        {(commerce || contactButtons) && (
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
@@ -124,12 +140,19 @@ export function StoreHeader({
               <Image src={logoUrl} alt={storeName} fill sizes="40px" className="object-cover" />
             </span>
           )}
-          <span
-            className={`truncate font-heading font-bold tracking-tight text-text ${
-              commerce ? 'text-lg tracking-wide' : 'text-xl'
-            }`}
-          >
-            {storeName}
+          <span className="min-w-0">
+            <span
+              className={`block truncate font-heading font-bold tracking-tight text-text ${
+                commerce ? 'text-lg tracking-wide' : 'text-xl'
+              }`}
+            >
+              {storeName}
+            </span>
+            {tagline && (
+              <span className="block truncate text-[10px] font-medium tracking-[0.18em] text-text-muted">
+                {tagline}
+              </span>
+            )}
           </span>
         </Link>
 
@@ -138,6 +161,52 @@ export function StoreHeader({
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          {/* ปุ่มช่องทางแชท (ref T1) — เต็มบน desktop, ไอคอนกลมบนมือถือ */}
+          {contactButtons && contact?.lineUrl && (
+            <>
+              <a
+                href={contact.lineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden items-center gap-1.5 rounded-sm bg-brand-line px-3.5 py-2 text-xs font-semibold text-primary-fg transition-opacity hover:opacity-90 lg:inline-flex"
+              >
+                <LineLogoIcon size={15} />
+                ติดต่อสั่งซื้อ (LINE)
+              </a>
+              <a
+                href={contact.lineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="ติดต่อสั่งซื้อผ่าน LINE"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-line text-primary-fg lg:hidden"
+              >
+                <LineLogoIcon size={17} />
+              </a>
+            </>
+          )}
+          {contactButtons && contact?.facebookUrl && (
+            <>
+              <a
+                href={contact.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden items-center gap-1.5 rounded-sm bg-brand-facebook px-3.5 py-2 text-xs font-semibold text-primary-fg transition-opacity hover:opacity-90 lg:inline-flex"
+              >
+                <FacebookLogoIcon size={15} />
+                ข้อความ (Facebook)
+              </a>
+              <a
+                href={contact.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="ส่งข้อความผ่าน Facebook"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-facebook text-primary-fg lg:hidden"
+              >
+                <FacebookLogoIcon size={17} />
+              </a>
+            </>
+          )}
+
           {commerce && layout.headerSearch ? (
             <>
               {/* search box จริง (ref T2) — ส่งไป /products?q= */}
@@ -173,57 +242,63 @@ export function StoreHeader({
                   <HeartIcon size={19} />
                 </span>
               )}
-              <button
-                type="button"
-                onClick={() => setCartOpen(true)}
-                aria-label={`ตะกร้าสินค้า (${cart.count} ชิ้น)`}
-                className="relative rounded-full p-2 text-text transition-colors hover:bg-surface"
-              >
-                <CartIcon size={19} />
-                {cart.count > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-fg">
-                    {cart.count}
-                  </span>
-                )}
-              </button>
+              {orderingEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setCartOpen(true)}
+                  aria-label={`ตะกร้าสินค้า (${cart.count} ชิ้น)`}
+                  className="relative rounded-full p-2 text-text transition-colors hover:bg-surface"
+                >
+                  <CartIcon size={19} />
+                  {cart.count > 0 && (
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-fg">
+                      {cart.count}
+                    </span>
+                  )}
+                </button>
+              )}
             </>
           ) : (
             <>
-              <Link
-                href="/products"
-                aria-label="ค้นหาสินค้า"
-                className="rounded-full p-2.5 text-text transition-colors hover:bg-primary-soft hover:text-primary"
-              >
-                <SearchIcon />
-              </Link>
-              <button
-                type="button"
-                onClick={() => setCartOpen(true)}
-                aria-label={`ตะกร้าสินค้า (${cart.count} ชิ้น)`}
-                className="relative rounded-full bg-primary p-2.5 text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
-              >
-                <CartIcon />
-                {cart.count > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-bg bg-accent px-1 text-[11px] font-bold text-primary-fg">
-                    {cart.count}
-                  </span>
-                )}
-              </button>
+              {!contactButtons && (
+                <Link
+                  href="/products"
+                  aria-label="ค้นหาสินค้า"
+                  className="rounded-full p-2.5 text-text transition-colors hover:bg-primary-soft hover:text-primary"
+                >
+                  <SearchIcon />
+                </Link>
+              )}
+              {orderingEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setCartOpen(true)}
+                  aria-label={`ตะกร้าสินค้า (${cart.count} ชิ้น)`}
+                  className="relative rounded-full bg-primary p-2.5 text-primary-fg shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  <CartIcon />
+                  {cart.count > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-bg bg-accent px-1 text-[11px] font-bold text-primary-fg">
+                      {cart.count}
+                    </span>
+                  )}
+                </button>
+              )}
             </>
           )}
         </div>
       </div>
 
-      {/* มือถือ: nav แถวล่างเลื่อนแนวนอน (โหมดปกติ — โหมด Commerce ใช้ drawer แทน) */}
-      {!commerce && (
+      {/* มือถือ: nav แถวล่างเลื่อนแนวนอน (โหมดปกติ — โหมด Commerce/ปุ่มแชทใช้ drawer แทน) */}
+      {!commerce && !contactButtons && (
         <div className="border-t border-border-soft px-4 py-2 md:hidden">
           <CategoryNav categories={categories} variant="topbar" />
         </div>
       )}
     </header>
 
-    {/* เมนู drawer มือถือ (โหมด Commerce) */}
-    {commerce && menuOpen && (
+    {/* เมนู drawer มือถือ (โหมด Commerce/ปุ่มแชท) */}
+    {(commerce || contactButtons) && menuOpen && (
       <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="เมนู">
         <button type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)} className="absolute inset-0 bg-scrim" />
         <div className="absolute left-0 top-0 flex h-full w-72 flex-col bg-bg shadow-lg">
@@ -240,15 +315,18 @@ export function StoreHeader({
           </div>
           <nav className="flex-1 overflow-y-auto p-3">
             <ul className="space-y-0.5">
-              <li>
-                <Link
-                  href="/products"
-                  onClick={() => setMenuOpen(false)}
-                  className="block rounded-md px-3 py-2.5 text-sm font-medium text-text hover:bg-surface"
-                >
-                  สินค้าทั้งหมด
-                </Link>
-              </li>
+              {/* โหมดปุ่มแชท: รายการใน categories เป็นลิงก์หน้าอยู่แล้ว (มีรวมสินค้า) — ไม่ต้องเติมซ้ำ */}
+              {!contactButtons && (
+                <li>
+                  <Link
+                    href="/products"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-md px-3 py-2.5 text-sm font-medium text-text hover:bg-surface"
+                  >
+                    สินค้าทั้งหมด
+                  </Link>
+                </li>
+              )}
               {categories.map((c) => (
                 <li key={c.id}>
                   <Link
@@ -260,30 +338,34 @@ export function StoreHeader({
                   </Link>
                 </li>
               ))}
-              <li className="mt-2 border-t border-border-soft pt-2">
-                <Link
-                  href="/track"
-                  onClick={() => setMenuOpen(false)}
-                  className="block rounded-md px-3 py-2.5 text-sm text-text-muted hover:bg-surface"
-                >
-                  ติดตามคำสั่งซื้อ
-                </Link>
-              </li>
+              {orderingEnabled && (
+                <li className="mt-2 border-t border-border-soft pt-2">
+                  <Link
+                    href="/track"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-md px-3 py-2.5 text-sm text-text-muted hover:bg-surface"
+                  >
+                    ติดตามคำสั่งซื้อ
+                  </Link>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
       </div>
     )}
 
-    <CartDrawer
-      open={cartOpen}
-      onClose={() => setCartOpen(false)}
-      items={cart.items}
-      onUpdateQty={cart.updateQty}
-      onRemove={cart.removeItem}
-      checkoutHref="/checkout"
-      freeShippingMin={freeShippingMin}
-    />
+    {orderingEnabled && (
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        items={cart.items}
+        onUpdateQty={cart.updateQty}
+        onRemove={cart.removeItem}
+        checkoutHref="/checkout"
+        freeShippingMin={freeShippingMin}
+      />
+    )}
     </>
   );
 }

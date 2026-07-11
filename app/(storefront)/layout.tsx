@@ -83,11 +83,18 @@ export default async function StorefrontLayout({ children }: { children: React.R
       .order('sort_order', { ascending: true }),
   ]);
 
-  const categoryItems = (categories ?? []).map((c) => ({
-    id: c.id,
-    name: c.name,
-    href: `/products?category=${c.id}`,
-  }));
+  // ธีมโหมดปุ่มแชท (ref T1): เมนูเป็นลิงก์หน้า (รวมสินค้า/เพจ) แทนรายชื่อหมวด
+  const categoryItems = preset.layout?.headerContactButtons
+    ? [
+        { id: 'home', name: 'หน้าแรก', href: '/' },
+        { id: 'all', name: 'รวมสินค้า', href: '/products' },
+        ...(navPages ?? []).map((p) => ({ id: p.slug, name: p.title, href: `/p/${p.slug}` })),
+      ]
+    : (categories ?? []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        href: `/products?category=${c.id}`,
+      }));
 
   // เนื้อหา section ชุด Commerce (ธีมที่ตั้ง layout.utilityBar/footerVariant)
   const content = getThemeContent(ctx.store.theme_overrides);
@@ -126,11 +133,20 @@ export default async function StorefrontLayout({ children }: { children: React.R
     },
   ];
 
+  const orderingEnabled = ctx.features.online_ordering;
+
   return (
     <ThemeScope themeCode={ctx.store.theme_code} overrides={ctx.store.theme_overrides}>
+      {/* โหมดปุ่มแชท (ref T1): แถบประกาศดำอยู่บนสุดเหนือ header */}
+      {preset.layout?.headerContactButtons && ctx.store.announcement_text && (
+        <div className="bg-primary px-4 py-2 text-center text-xs font-medium tracking-wide text-primary-fg">
+          {ctx.store.announcement_text}
+        </div>
+      )}
       <StoreHeader
         slug={ctx.slug}
         storeName={ctx.store.name}
+        tagline={content.tagline}
         logoUrl={ctx.store.logo_r2_key ? publicR2Url(ctx.store.logo_r2_key) : null}
         categories={categoryItems}
         navVariant={preset.variants.categoryNav}
@@ -138,7 +154,18 @@ export default async function StorefrontLayout({ children }: { children: React.R
         layout={preset.layout}
         utilityItems={utilityItems}
         wishlistEnabled={ctx.features.wishlist}
+        orderingEnabled={orderingEnabled}
+        contact={content.contact}
       />
+      {/* โหมดเว็บแนะนำสินค้า (ref T1): แถบแจ้งลูกค้าว่าเว็บนี้สั่งซื้อออนไลน์ไม่ได้ */}
+      {!orderingEnabled && (
+        <div className="border-b border-border-soft bg-surface px-4 py-2 text-center text-xs text-text-muted">
+          {content.disclaimer?.text ?? 'เว็บไซต์นี้เป็นเพียงเว็บไซต์แนะนำสินค้า'}{' '}
+          <span className="font-medium text-danger">
+            {content.disclaimer?.highlight ?? 'ไม่สามารถสั่งซื้อและชำระเงินได้'}
+          </span>
+        </div>
+      )}
       <div className="flex-1">{children}</div>
       <Footer
         storeName={ctx.store.name}
@@ -148,6 +175,8 @@ export default async function StorefrontLayout({ children }: { children: React.R
         variant={preset.layout?.footerVariant ?? 'simple'}
         linkGroups={content.footerLinkGroups ?? defaultLinkGroups}
         newsletterText={content.newsletterText ?? 'รับสิทธิพิเศษและโปรโมชั่นก่อนใครทางอีเมล'}
+        contact={content.contact}
+        orderingEnabled={orderingEnabled}
       />
     </ThemeScope>
   );
