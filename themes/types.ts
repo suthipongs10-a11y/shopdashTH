@@ -25,7 +25,7 @@ export const THEME_TOKEN_NAMES = [
 export type ThemeTokenName = (typeof THEME_TOKEN_NAMES)[number];
 export type ThemeTokens = Record<ThemeTokenName, string>;
 
-/** ฟอนต์ที่อนุญาต (§4.2) — โหลดผ่าน next/font ใน themes/fonts.ts */
+/** ฟอนต์ที่อนุญาต (§4.2 + TEMPLATE_SPEC §3.4 เพิ่มชุด serif ของธีม LUXÉ) */
 export type ThemeFontName =
   | 'Prompt'
   | 'Sarabun'
@@ -33,10 +33,28 @@ export type ThemeFontName =
   | 'Noto Sans Thai'
   | 'Mitr'
   | 'Bai Jamjuree'
-  | 'IBM Plex Sans Thai';
+  | 'IBM Plex Sans Thai'
+  /** หัวเรื่อง serif (LUXÉ): Cormorant Garamond (Latin) + Noto Serif Thai (ไทย) */
+  | 'Noto Serif Thai';
 
-export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay' | 'store' | 'simple' | 'hub';
-export type HeroVariant = 'full-bleed' | 'boxed' | 'split' | 'commerce' | 'split-panel' | 'carousel';
+export type ProductCardVariant =
+  | 'minimal'
+  | 'bordered'
+  | 'overlay'
+  | 'store'
+  | 'simple'
+  | 'hub'
+  /** LUXÉ (ref T4): รูปใหญ่ 3:4 + จุดสี + ชื่อ + ราคา — ไม่มีดาว/badge (§5.6) */
+  | 'luxe';
+export type HeroVariant =
+  | 'full-bleed'
+  | 'boxed'
+  | 'split'
+  | 'commerce'
+  | 'split-panel'
+  | 'carousel'
+  /** LUXÉ: แผงเข้มเต็มกว้าง + headline serif ขาว + รูปแฟชั่นโทนเข้มขวา */
+  | 'luxe';
 export type CategoryNavVariant = 'topbar' | 'pills' | 'sidebar';
 
 export type ThemeSection =
@@ -76,6 +94,15 @@ export type ThemeSection =
   | 'articles'
   /** แถบ "ระบบและบริการ" 8 ไอคอน */
   | 'serviceBand'
+  /* --- ชุด T4 "LUXÉ" (TEMPLATE_SPEC §3.4) --- */
+  /** split คู่: Lookbook (ภาพเต็ม+ข้อความทับ) / Brand Story (พื้น ink ตัวขาว) */
+  | 'lookbookSplit'
+  /** แถบไฮไลต์ 4 ไอคอนเส้นบาง */
+  | 'highlights'
+  /** แถว Size Guide / โค้ดลูกค้าใหม่ / newsletter */
+  | 'luxePerks'
+  /** แถบ payment + SSL + จำนวนลูกค้า */
+  | 'trustBar'
   | 'footer';
 
 /** โครง layout ระดับธีม (header/footer) — ค่า default = พฤติกรรมเดิมของทุกธีม */
@@ -84,8 +111,8 @@ export interface ThemeLayout {
   utilityBar?: boolean;
   /** ช่องค้นหาจริงใน header (แทนไอคอนแว่นขยาย) */
   headerSearch?: boolean;
-  /** footer แบบเต็ม: newsletter + คอลัมน์ลิงก์ + social (ref T2) */
-  footerVariant?: 'simple' | 'full';
+  /** footer: simple (ดีฟอลต์) / full (ref T2) / dark (ref T4 — พื้นดำ + "ทำไมต้องเลือก" 7 ไอคอน) */
+  footerVariant?: 'simple' | 'full' | 'dark';
   /** ปุ่ม LINE/Facebook ใน header (ref T1 — ร้านที่ขายผ่านแชท) */
   headerContactButtons?: boolean;
   /** แถบสมาชิกใต้ header (ref T3 — สมาชิก Silver / คูปอง / คะแนน) */
@@ -94,6 +121,10 @@ export interface ThemeLayout {
   catalogSidebar?: boolean;
   /** แถวโลโก้ช่องทางชำระเงินใน footer แบบ full (ref T3) */
   footerPayments?: boolean;
+  /** เมนูมือถือเป็น drawer (ค่าปกติเฉพาะโหมด Commerce/ปุ่มแชท — ธีมอื่นเปิดผ่าน flag นี้) */
+  mobileDrawer?: boolean;
+  /** โลโก้ตัวโปร่ง letter-spacing กว้าง (ref T4 — LUXÉ) */
+  logoWide?: boolean;
 }
 
 /** ฟีเจอร์หน้าร้านที่ธีมเปิด/ปิดได้ (merge ใน resolveFeatures() §3.7) */

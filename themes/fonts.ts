@@ -6,10 +6,12 @@
 
 import {
   Bai_Jamjuree,
+  Cormorant_Garamond,
   IBM_Plex_Sans_Thai,
   Kanit,
   Mitr,
   Noto_Sans_Thai,
+  Noto_Serif_Thai,
   Prompt,
   Sarabun,
 } from 'next/font/google';
@@ -71,6 +73,24 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   variable: '--font-ibm-plex-sans-thai',
 });
 
+// คู่ serif ของธีม LUXÉ (TEMPLATE_SPEC §3.4): Latin ใช้ Cormorant Garamond ก่อน
+// แล้ว fallback อักษรไทยไป Noto Serif Thai — นับเป็นชุดหัวเรื่องเดียว
+const notoSerifThai = Noto_Serif_Thai({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
+  display: 'swap',
+  preload: false,
+  variable: '--font-noto-serif-thai',
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+  variable: '--font-cormorant-garamond',
+});
+
 /** className รวมทุกฟอนต์ — ใส่ที่ ThemeScope เพื่อให้ var(--font-*) ใช้ได้ */
 export const themeFontVariables = [
   prompt.variable,
@@ -80,6 +100,8 @@ export const themeFontVariables = [
   mitr.variable,
   baiJamjuree.variable,
   ibmPlexSansThai.variable,
+  notoSerifThai.variable,
+  cormorantGaramond.variable,
 ].join(' ');
 
 /** map ชื่อฟอนต์ในธีม → ค่า CSS var สำหรับ --font-heading / --font-body */
@@ -91,4 +113,6 @@ export const FONT_VAR: Record<ThemeFontName, string> = {
   Mitr: 'var(--font-mitr)',
   'Bai Jamjuree': 'var(--font-bai-jamjuree)',
   'IBM Plex Sans Thai': 'var(--font-ibm-plex-sans-thai)',
+  // ชุด serif LUXÉ — Latin (Cormorant) นำ ไทย (Noto Serif Thai) ตาม
+  'Noto Serif Thai': 'var(--font-cormorant-garamond), var(--font-noto-serif-thai)',
 };

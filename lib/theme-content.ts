@@ -8,6 +8,9 @@ export interface HeroContent {
   sub: string;
   ctaText: string;
   ctaHref: string;
+  /** ปุ่มรอง (ref T4: ปุ่มขาว + ปุ่มลิงก์) */
+  cta2Text?: string;
+  cta2Href?: string;
   /** URL รูป (จาก R2 หรือ path static เช่น /demo/t2/hero-01.jpg) */
   imageUrl?: string;
 }
@@ -89,6 +92,46 @@ export interface ArticleCard {
   tag?: string;
 }
 
+/* --- ชุด T4 "LUXÉ" (TEMPLATE_SPEC §3.4) --- */
+
+/** ครึ่ง Lookbook ของ split section — ภาพเต็ม + ข้อความทับ */
+export interface LookbookContent {
+  imageUrl: string;
+  eyebrow?: string;
+  title: string;
+  sub?: string;
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+/** ครึ่ง Brand Story — พื้น ink ตัวขาว + ลิงก์อ่านต่อ */
+export interface BrandStoryContent {
+  eyebrow?: string;
+  title: string;
+  body: string;
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+export interface HighlightItem {
+  icon: 'star' | 'shield' | 'package' | 'headset' | 'truck' | 'tag';
+  title: string;
+  sub: string;
+}
+
+/** แถว Size Guide / โค้ดลูกค้าใหม่ / newsletter (ref T4) */
+export interface LuxePerksContent {
+  sizeGuideTitle?: string;
+  sizeGuideSub?: string;
+  sizeGuideHref?: string;
+  welcomeTitle?: string;
+  /** โค้ดจริงในตาราง discount_codes — ลูกค้ากรอกตอน checkout ได้เลย */
+  welcomeCode?: string;
+  welcomeSub?: string;
+  newsletterTitle?: string;
+  newsletterSub?: string;
+}
+
 export interface ThemeContent {
   hero?: Partial<HeroContent>;
   usp?: UspItem[];
@@ -121,6 +164,15 @@ export interface ThemeContent {
   articlesTitle?: string;
   articles?: ArticleCard[];
   serviceBandTitle?: string;
+  /* --- ชุด T4 "LUXÉ" --- */
+  lookbook?: LookbookContent;
+  brandStory?: BrandStoryContent;
+  highlights?: HighlightItem[];
+  perks?: LuxePerksContent;
+  /** ข้อความความเชื่อมั่นในแถบ payment เช่น "ลูกค้าไว้วางใจกว่า 50,000+ คน" */
+  trustText?: string;
+  /** หัวแถบ "ทำไมต้องเลือก" ใน footer ดำ */
+  whyUsTitle?: string;
 }
 
 export const DEFAULT_USP: UspItem[] = [

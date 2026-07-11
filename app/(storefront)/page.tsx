@@ -14,11 +14,15 @@ import { FeatureListBand } from '@/components/storefront/FeatureListBand';
 import { FeaturedScroller } from '@/components/storefront/FeaturedScroller';
 import { HeroBanner } from '@/components/storefront/HeroBanner';
 import { HeroCarousel, type HeroSlide } from '@/components/storefront/HeroCarousel';
+import { HighlightsBand } from '@/components/storefront/HighlightsBand';
+import { LookbookSplit } from '@/components/storefront/LookbookSplit';
+import { LuxePerksRow } from '@/components/storefront/LuxePerksRow';
 import { MemberBenefitsBand } from '@/components/storefront/MemberBenefitsBand';
 import { ProductGrid } from '@/components/storefront/ProductGrid';
 import { SectionHeading } from '@/components/storefront/SectionHeading';
 import { ServiceBand } from '@/components/storefront/ServiceBand';
 import { ToolsRow } from '@/components/storefront/ToolsRow';
+import { TrustBar } from '@/components/storefront/TrustBar';
 import { UspStrip } from '@/components/storefront/UspStrip';
 import {
   ArrowRightIcon,
@@ -46,14 +50,15 @@ export default async function StorefrontHomePage() {
   const content = getThemeContent(ctx.store.theme_overrides);
   const isStoreCard = preset.variants.productCard === 'store';
   const isSimpleCard = preset.variants.productCard === 'simple';
+  const isLuxeCard = preset.variants.productCard === 'luxe';
   // §3.1 (ref T1): ปุ่มการ์ดตาม flag — เว็บแนะนำสินค้า = "ดูรายละเอียด", มีระบบสั่งซื้อ = "สั่งซื้อ"
   const detailButtonText = ctx.features.online_ordering ? 'สั่งซื้อ' : 'ดูรายละเอียด';
 
   const db = createAdminClient();
   const [featuredRaw, latest, { data: categories }, catalog, homeCatalog, filterOptions] =
     await Promise.all([
-      // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2 / แบบ 'simple' โชว์ 4 ใบตาม ref T1
-      fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard ? 4 : 8),
+      // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2 / 'simple' 4 ใบตาม ref T1 / 'luxe' 4 ใบใหญ่ตาม ref T4
+      fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard || isLuxeCard ? 4 : 8),
       fetchLatest(ctx.tenantId),
       db
         .from('categories')
@@ -92,6 +97,22 @@ export default async function StorefrontHomePage() {
     hero:
       preset.variants.hero === 'carousel' && heroSlides.length > 0 ? (
         <HeroCarousel key="hero" slides={heroSlides} />
+      ) : preset.variants.hero === 'luxe' ? (
+        <HeroBanner
+          key="hero"
+          variant="luxe"
+          imageUrl={
+            content.hero?.imageUrl ??
+            (ctx.store.banner_r2_key ? publicR2Url(ctx.store.banner_r2_key) : undefined)
+          }
+          eyebrow={content.hero?.eyebrow}
+          headline={content.hero?.headline ?? ctx.store.name}
+          subline={content.hero?.sub}
+          ctaText={content.hero?.ctaText ?? 'ช้อปคอลเลกชัน'}
+          ctaHref={content.hero?.ctaHref ?? '/products'}
+          cta2Text={content.hero?.cta2Text}
+          cta2Href={content.hero?.cta2Href}
+        />
       ) : preset.variants.hero === 'commerce' || preset.variants.hero === 'split-panel' ? (
         <HeroBanner
           key="hero"
@@ -116,11 +137,17 @@ export default async function StorefrontHomePage() {
           ctaHref="/products"
         />
       ),
-    usp: <UspStrip key="usp" items={content.usp ?? DEFAULT_USP} />,
+    usp: <UspStrip key="usp" items={content.usp ?? DEFAULT_USP} tone={isLuxeCard ? 'band' : 'plain'} />,
     featured:
       featured.length > 0 ? (
         <section key="featured" className="mx-auto max-w-(--container-max) px-4 py-12">
-          {isStoreCard ? (
+          {isLuxeCard ? (
+            // หัว section แบบ ref T4 — serif กลางหน้า + eyebrow ตัวโปร่ง (ระยะ 96px §3.4)
+            <div className="mb-10 mt-6 text-center">
+              <p className="text-xs font-medium tracking-[0.35em] text-text-muted">NEW IN</p>
+              <h2 className="mt-2 font-heading text-3xl text-text md:text-4xl">ใหม่ล่าสุด</h2>
+            </div>
+          ) : isStoreCard ? (
             // หัว section แบบ ref T2 — ข้อความซ้ายเรียบๆ ไม่มี pill
             <h2 className="mb-5 font-heading text-lg font-semibold tracking-tight text-text">
               สินค้าแนะนำ
@@ -158,8 +185,40 @@ export default async function StorefrontHomePage() {
               </Link>
             </div>
           )}
+          {isLuxeCard && (
+            <div className="mb-6 mt-10 text-center">
+              <Link
+                href="/products"
+                className="inline-block border border-text px-10 py-3 text-sm font-medium tracking-wide text-text transition-colors hover:bg-primary hover:text-primary-fg"
+              >
+                ดูสินค้าทั้งหมด
+              </Link>
+            </div>
+          )}
         </section>
       ) : null,
+    /* --- ชุด T4 "LUXÉ" --- */
+    lookbookSplit: (
+      <div key="lookbookSplit" className="py-12">
+        <LookbookSplit lookbook={content.lookbook} brandStory={content.brandStory} />
+      </div>
+    ),
+    highlights:
+      (content.highlights ?? []).length > 0 ? (
+        <div key="highlights" className="py-6">
+          <HighlightsBand items={content.highlights ?? []} />
+        </div>
+      ) : null,
+    luxePerks: (
+      <div key="luxePerks" className="py-12">
+        <LuxePerksRow perks={content.perks ?? {}} />
+      </div>
+    ),
+    trustBar: (
+      <div key="trustBar" className="pt-12">
+        <TrustBar trustText={content.trustText} />
+      </div>
+    ),
     categoryBanners:
       (content.categoryBanners ?? []).length > 0 ? (
         <div key="categoryBanners" className="py-2">

@@ -1,5 +1,5 @@
 # STATUS
-- Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — T2 ✓ T1 ✓ T3 ✓ เหลือ T4)
+- Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
 - Last session: 2026-07-11
 
@@ -106,9 +106,23 @@
 - [ ] **DoD §6.6 Lighthouse ≥85 — ยังยืนยันไม่ได้ (2026-07-11)**: วันนี้เครื่องมี dev server โปรเจ็คอื่นรันอยู่ (thaiApp next+prisma :3100, Ubontaxi astro :3002) กดคะแนนทั้งระบบ — control T1 ที่เคยได้ 91 วันนี้เหลือ 69, T2 ที่เคยผ่าน ≥85 เหลือ 52, T3 ได้ 42-48 (คลาสเดียวกับ T2) — optimize ที่ทำแล้ว: carousel mount รูปเฉพาะสไลด์ที่แสดง (ตัดรูปใหญ่ 2 ใบจากโหลดแรก), รูป hover ไม่โหลดบนจอสัมผัส (`pointer-fine:` + display:none), TBT 1,650→1,010ms — **ต้องวัดซ้ำตอนปิด dev server โปรเจ็คอื่น** (`npm run build && npm run start` แล้ว lighthouse ที่ fashionhub.localhost:3000)
 - เดโม่: `http://fashionhub.localhost:3000` — เหลือ T4
 
+## Done (Phase 7 ต่อ — ปุ่มโซเชียลใช้จริง + แก้ cache invalidation, 2026-07-11 ตามรายงานเจ้าของ)
+- [x] **ปุ่มวงกลมโซเชียลใน footer เป็นลิงก์จริง** (เดิมเป็น span ตกแต่ง — เจ้าของรายงาน): แสดงเฉพาะช่องที่ตั้งค่า, รองรับ footer ทุกแบบ (full T2/T3 + simple T1 + dark T4)
+- [x] **การ์ด "โซเชียลของร้าน" ใน /admin/settings** (เฉพาะเจ้าของร้าน): 5 ช่อง URL (Facebook/Instagram/LINE/TikTok/YouTube) → เก็บใน `theme_overrides.__content.socials` (jsonb เดิม — ไม่ต้อง migration)
+- [x] **แก้บั๊กแฝงทั้งแพลตฟอร์ม: ตั้งค่าร้านสะท้อนหน้าร้านทันที** — LRU cache ของ tenant ย้ายไป globalThis: Next.js แยก module instance ต่อ route bundle ทำให้ `invalidateTenantCache` จาก server action (bundle admin) ล้างไม่ถึง Map ของ bundle storefront → ทุกการตั้งค่าเดิมค้างถึง 60 วิ (พฤติกรรม "≤60s" ที่บันทึกไว้ตอน e2e Phase 6 คืออาการของบั๊กนี้) — พิสูจน์ด้วยเทสต์ poll: ก่อนแก้ค่าใหม่โผล่ที่ ~45 วิ / หลังแก้ทันที
+- [x] e2e 10/10 (`.tmp-socials-test.mjs`): footer 3 ร้านลิงก์ครบ (5/5/3 ปุ่ม), แก้จาก Dashboard → หน้าร้านเปลี่ยนทันที, คืนค่า — commit `02d97f4`
+
+## Done (Phase 7 จบ — เทมเพลต T4 "LUXÉ", 2026-07-11)
+- [x] **ธีม `t4-luxe`** (tier 3, ตาม ref: LUXÉ + BRAND.CO): เปลี่ยนบุคลิกเป็น serif — ฟอนต์ใหม่ 2 ตัวในระบบ (`Noto Serif Thai` + `Cormorant Garamond` เป็นชุดหัวเรื่องเดียว Latin นำไทยตาม), hero `luxe` (แผง ink เต็มกว้าง + "Timeless Elegance" serif 64px ขาว + ปุ่มขาว/ปุ่มลิงก์ + portrait โทนเข้มกลืนพื้นด้วย gradient), การ์ด `luxe` (รูป 3:4 + จุดสี + ชื่อ + ราคา — **ไม่มีดาว/badge ตาม §5.6**), USP `tone=band` พื้นเทาอ่อน, section ใหม่ `lookbookSplit` (ภาพ+ข้อความทับ / Brand Story พื้น ink) + `highlights` (4 ไอคอนเส้นบาง) + `luxePerks` (Size Guide / โค้ดลูกค้าใหม่ / newsletter) + `trustBar` (payment+SSL+ลูกค้า 50,000+), **footer `dark`** ("ทำไมต้องเลือก" 7 ไอคอน + คอลัมน์ + social), radius 2/4/8 เหลี่ยมคม, จังหวะ section 96px, text-scale 1.05
+- [x] **Flag ใหม่ใน ThemeLayout**: `mobileDrawer` (บังคับเมนู drawer โดยไม่ต้องเป็นโหมด commerce — DoD §6.5) + `logoWide` (โลโก้ตัวโปร่ง tracking 0.3em ตาม §3.4) — ธีมเดิมทุกตัวพฤติกรรมเดิมเป๊ะ (regression ผ่านทุกร้าน)
+- [x] **ร้านเดโม่ `luxe`** (.tmp-t4-seed.mjs รันซ้ำได้): แพลน p4-premium, 8 สินค้าราคาพรีเมียม 1,290–5,990 (รูป subset โทน editorial: model-09/10/11/12/14 ที่ T3 ไม่ใช้เพราะโทน moody — เข้าบุคลิก luxury พอดี), **โค้ด WELCOME10 เป็นของจริงในตาราง discount_codes** (percent 10, ขั้นต่ำ 1,000 — ทดสอบผ่าน API ลดจริง ฿329), เพจ about/size-guide/contact, admin `luxe-owner@shopdash.local` / `Luxe!2026`
+- [x] **Loop วิจารณ์ 3 รอบ** (390/768/1440 — `.tmp-t4/r1-r3/`): r1 พบเมนูมือถือไม่เป็น drawer + โลโก้ header ไม่โปร่ง → r2 แก้ครบ → r3 ผ่าน + regression ทุกร้าน ALL PASS (รวม drawer ธีมเดิม + โค้ดมั่วถูกปฏิเสธ)
+- [x] **DoD §6**: องค์ประกอบ ref ครบ (diff บันทึก: hero ใช้แผง ink + portrait เพราะ pool ไม่มีภาพ landscape โทนเข้ม ≥1800px, "ลูกค้า 50,000+" เป็น copy เดโม่แก้ได้ใน __content) / ไม่มีดาว/badge บนการ์ดตามบุคลิก / มือถือ 2 คอลัมน์ + hero หัวไม่ขาด + drawer / grep hex = 0 / build+tsc ผ่าน / **CLS = 0**
+- [ ] **DoD §6.6 Lighthouse ≥85 — รอเครื่องว่าง (เหมือน T3)**: วันนี้ T4 ได้ **72-76 เท่ากับ control T1 (76) ที่เคยได้ 91 ตอนเครื่องว่าง** — T4 อยู่คลาสประสิทธิภาพเดียวกับ T1 ที่ผ่าน DoD แล้วแบบ 1:1 คาดว่าเครื่องว่างจะได้ ~85-91 — วัดซ้ำพร้อม T3
+- เดโม่: `http://luxe.localhost:3000` — **ครบทั้ง 4 เทมเพลต Commerce Premium** 🎉
+
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] **วัด Lighthouse T3 ซ้ำตอนเครื่องว่าง** (ปิด dev server โปรเจ็คอื่นก่อน) — ปิด DoD §6.6 ของ T3
-- [ ] เทมเพลต T4 "LUXÉ" ตาม TEMPLATE_SPEC §3.4 (ตัวสุดท้าย — ต้องหารูปโทนเข้ม luxury เพิ่ม: pool t2 เป็นโทนสว่างมินิมอล ไม่พอสำหรับ hero เต็มจอโทนเข้ม + Lookbook)
+- [ ] **วัด Lighthouse T3+T4 ซ้ำตอนเครื่องว่าง** (ปิด dev server โปรเจ็คอื่น: thaiApp :3100, Ubontaxi :3002 ก่อน) — ปิด DoD §6.6: `npm run build && npm run start` แล้ว lighthouse ที่ fashionhub / luxe (control: simplewear ต้องได้ ~91)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 

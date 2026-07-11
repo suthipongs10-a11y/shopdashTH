@@ -12,6 +12,9 @@ interface HeroBannerProps {
   ctaHref?: string;
   /** ข้อความเล็กเหนือ headline (variant 'commerce' — เช่น "NEW COLLECTION") */
   eyebrow?: string;
+  /** ปุ่มรองแบบลิงก์ขีดเส้นใต้ (variant 'luxe' — ref T4) */
+  cta2Text?: string;
+  cta2Href?: string;
 }
 
 function Cta({ text, href, onDark = false }: { text?: string; href?: string; onDark?: boolean }) {
@@ -88,9 +91,69 @@ export function HeroBanner({
   ctaText,
   ctaHref,
   eyebrow,
+  cta2Text,
+  cta2Href,
 }: HeroBannerProps) {
   if (!imageUrl && !headline) return null;
   const alt = headline ?? 'แบนเนอร์ร้าน';
+
+  // 'luxe' (ref T4): แผงเข้มเต็มกว้าง — headline serif ขาว 64px ซ้าย + ภาพแฟชั่นโทนเข้มขวา
+  // ปุ่มขาว + ปุ่มลิงก์ขีดเส้นใต้ / รูป portrait กลืนกับพื้น ink ด้วย gradient
+  if (variant === 'luxe' && imageUrl) {
+    return (
+      <section className="bg-primary">
+        <div className="mx-auto grid max-w-(--container-max) md:min-h-[560px] md:grid-cols-[1.05fr_1fr]">
+          <div className="flex flex-col justify-center gap-5 px-6 py-14 md:px-10 md:py-20">
+            {eyebrow && (
+              <p className="text-xs font-medium tracking-[0.35em] text-primary-fg/60">{eyebrow}</p>
+            )}
+            {headline && (
+              <h1 className="whitespace-pre-line font-heading text-4xl leading-tight text-primary-fg md:text-[64px] md:leading-[1.08]">
+                {headline}
+              </h1>
+            )}
+            {subline && (
+              <p className="max-w-md text-sm leading-relaxed text-primary-fg/70 md:text-base">
+                {subline}
+              </p>
+            )}
+            <div className="mt-3 flex flex-wrap items-center gap-6">
+              {ctaText && ctaHref && (
+                <Link
+                  href={ctaHref}
+                  className="bg-bg px-8 py-3.5 text-sm font-semibold tracking-wide text-text transition-opacity hover:opacity-90"
+                >
+                  {ctaText}
+                </Link>
+              )}
+              {cta2Text && cta2Href && (
+                <Link
+                  href={cta2Href}
+                  className="border-b border-primary-fg/50 pb-0.5 text-sm font-medium tracking-wide text-primary-fg transition-colors hover:border-primary-fg"
+                >
+                  {cta2Text}
+                </Link>
+              )}
+            </div>
+          </div>
+          <div className="relative min-h-80 md:min-h-[560px]">
+            {/* portrait โทนเข้ม — crop ชี้บนกันหัวขาด (DoD §6.5) */}
+            <Image
+              src={imageUrl}
+              alt={alt}
+              fill
+              priority
+              className="object-cover object-top"
+              sizes="(max-width: 768px) 100vw, 48vw"
+            />
+            {/* gradient ซ้าย+ล่างกลืนภาพเข้ากับพื้น ink (§5.3 อนุญาต scrim บนภาพ) */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-primary to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-primary to-transparent md:hidden" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // 'commerce' (ref T2): full-bleed ภาพคนขวา ข้อความชิดซ้ายบนภาพ (ไม่มี scrim ตัวหนังสือเข้ม)
   if (variant === 'commerce' && imageUrl) {

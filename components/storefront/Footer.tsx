@@ -1,9 +1,14 @@
 import Link from 'next/link';
 import type { ContactChannels, FooterLinkGroup, SocialLinks } from '@/lib/theme-content';
 import {
+  BellIcon,
+  ClipboardIcon,
   FacebookLogoIcon,
+  HeadsetIcon,
   LineLogoIcon,
+  LockIcon,
   MapPinIcon,
+  PackageIcon,
   PhoneIcon,
   QrIcon,
   ShieldIcon,
@@ -228,6 +233,134 @@ function FooterFull({
   );
 }
 
+/* ---------- Footer ดำ (ref T4 — LUXÉ): "ทำไมต้องเลือก" 7 ไอคอน + คอลัมน์ + social ---------- */
+
+const WHY_US = [
+  { icon: ShieldIcon, label: 'ของแท้ 100%' },
+  { icon: PackageIcon, label: 'แพ็คพรีเมียม' },
+  { icon: TruckIcon, label: 'ส่งไวทั่วไทย' },
+  { icon: ClipboardIcon, label: 'เปลี่ยนคืนใน 14 วัน' },
+  { icon: LockIcon, label: 'ชำระเงินปลอดภัย' },
+  { icon: BellIcon, label: 'แจ้งสถานะทุกขั้น' },
+  { icon: HeadsetIcon, label: 'ดูแลส่วนตัว' },
+];
+
+function FooterDark({
+  storeName,
+  address,
+  phone,
+  pages,
+  socials = {},
+  whyUsTitle,
+}: {
+  storeName: string;
+  address?: string | null;
+  phone?: string | null;
+  pages: FooterPageLink[];
+  socials?: SocialLinks;
+  whyUsTitle?: string;
+}) {
+  return (
+    <footer className="mt-auto bg-primary text-primary-fg">
+      {/* แถบ "ทำไมต้องเลือก" 7 ไอคอน */}
+      <div className="border-b border-primary-fg/10">
+        <div className="mx-auto max-w-(--container-max) px-4 py-10">
+          <h2 className="text-center font-heading text-xl text-primary-fg md:text-2xl">
+            {whyUsTitle ?? `ทำไมต้องเลือก ${storeName}`}
+          </h2>
+          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-4 lg:grid-cols-7">
+            {WHY_US.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex flex-col items-center gap-2.5 text-center">
+                <Icon size={24} className="text-primary-fg/80" />
+                <p className="text-xs leading-snug text-primary-fg/70">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto grid max-w-(--container-max) gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-3">
+          <p className="font-heading text-2xl tracking-[0.25em] text-primary-fg">{storeName}</p>
+          {address && (
+            <p className="flex items-start gap-2 text-sm leading-relaxed text-primary-fg/60">
+              <MapPinIcon size={15} className="mt-0.5 shrink-0" />
+              <span className="whitespace-pre-wrap">{address}</span>
+            </p>
+          )}
+          {phone && (
+            <p className="flex items-center gap-2 text-sm text-primary-fg/60">
+              <PhoneIcon size={15} className="shrink-0" />
+              <a href={`tel:${phone}`} className="transition-colors hover:text-primary-fg">
+                {phone}
+              </a>
+            </p>
+          )}
+        </div>
+
+        <div>
+          <p className="text-xs font-medium tracking-[0.2em] text-primary-fg/50">SHOP</p>
+          <ul className="mt-4 space-y-2.5 text-sm text-primary-fg/75">
+            <li>
+              <Link href="/products" className="transition-colors hover:text-primary-fg">
+                สินค้าทั้งหมด
+              </Link>
+            </li>
+            <li>
+              <Link href="/products?sort=newest" className="transition-colors hover:text-primary-fg">
+                ใหม่ล่าสุด
+              </Link>
+            </li>
+            <li>
+              <Link href="/track" className="transition-colors hover:text-primary-fg">
+                ติดตามคำสั่งซื้อ
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium tracking-[0.2em] text-primary-fg/50">ABOUT</p>
+          <ul className="mt-4 space-y-2.5 text-sm text-primary-fg/75">
+            {pages.map((p) => (
+              <li key={p.slug}>
+                <Link href={`/p/${p.slug}`} className="transition-colors hover:text-primary-fg">
+                  {p.title}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link href="/p/privacy" className="transition-colors hover:text-primary-fg">
+                นโยบายความเป็นส่วนตัว
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium tracking-[0.2em] text-primary-fg/50">FOLLOW US</p>
+          <div className="mt-4">
+            <SocialRow socials={socials} />
+          </div>
+          <p className="mt-5 flex items-center gap-1.5 text-xs text-primary-fg/50">
+            <QrIcon size={13} />
+            ชำระเงินผ่าน PromptPay ปลอดภัยทุกรายการ
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-primary-fg/10">
+        <div className="mx-auto flex max-w-(--container-max) flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-primary-fg/45">
+          <p>
+            © {new Date().getFullYear()} {storeName} All Rights Reserved.
+          </p>
+          <p>ขับเคลื่อนโดย ShopDash</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export function Footer({
   storeName,
   address,
@@ -240,14 +373,15 @@ export function Footer({
   orderingEnabled = true,
   showPayments = false,
   socials = {},
+  whyUsTitle,
 }: {
   storeName: string;
   address?: string | null;
   phone?: string | null;
   /** หน้าเพจเผยแพร่ที่ตั้ง show_in_nav (Phase 6 — flag custom_pages) */
   pages?: FooterPageLink[];
-  /** 'full' = footer แบบ Commerce (newsletter + คอลัมน์ลิงก์ + social — ref T2) */
-  variant?: 'simple' | 'full';
+  /** 'full' = Commerce (ref T2) / 'dark' = พื้นดำ + ทำไมต้องเลือก 7 ไอคอน (ref T4) */
+  variant?: 'simple' | 'full' | 'dark';
   linkGroups?: FooterLinkGroup[];
   newsletterText?: string;
   /** ช่องทางแชทของร้าน (ref T1) — โชว์ในคอลัมน์ติดต่อของ footer แบบ simple */
@@ -258,7 +392,21 @@ export function Footer({
   showPayments?: boolean;
   /** ลิงก์โซเชียล (ปุ่มวงกลม) — ตั้งค่าจากหลังร้าน */
   socials?: SocialLinks;
+  /** หัวแถบ "ทำไมต้องเลือก" (footer แบบ dark — ref T4) */
+  whyUsTitle?: string;
 }) {
+  if (variant === 'dark') {
+    return (
+      <FooterDark
+        storeName={storeName}
+        address={address}
+        phone={phone}
+        pages={pages}
+        socials={socials}
+        whyUsTitle={whyUsTitle}
+      />
+    );
+  }
   if (variant === 'full') {
     return (
       <FooterFull

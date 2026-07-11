@@ -68,6 +68,8 @@ export function StoreHeader({
   const cart = useCart(slug);
   const commerce = layout.utilityBar === true;
   const contactButtons = layout.headerContactButtons === true;
+  // เมนูมือถือเป็น drawer: โหมด Commerce/ปุ่มแชท หรือธีมที่ตั้ง layout.mobileDrawer (ref T4)
+  const drawerNav = commerce || contactButtons || layout.mobileDrawer === true;
 
   // หมายเหตุ: CartDrawer/เมนู drawer ต้องอยู่ "นอก" <header> — backdrop-blur บน header
   // ทำให้มันกลายเป็น containing block ของ position:fixed แล้ว drawer จะสูงเท่า header
@@ -120,8 +122,8 @@ export function StoreHeader({
       )}
 
       <div className="mx-auto flex max-w-(--container-max) items-center gap-4 px-4 py-3.5 lg:gap-6">
-        {/* มือถือ: hamburger เปิด drawer เมนู (DoD §6.5 — โหมด Commerce และโหมดปุ่มแชท) */}
-        {(commerce || contactButtons) && (
+        {/* มือถือ: hamburger เปิด drawer เมนู (DoD §6.5) */}
+        {drawerNav && (
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
@@ -142,8 +144,12 @@ export function StoreHeader({
           )}
           <span className="min-w-0">
             <span
-              className={`block truncate font-heading font-bold tracking-tight text-text ${
-                commerce ? 'text-lg tracking-wide' : 'text-xl'
+              className={`block truncate font-heading text-text ${
+                layout.logoWide
+                  ? 'text-xl font-medium uppercase tracking-[0.3em]' // โลโก้ตัวโปร่ง (ref T4)
+                  : commerce
+                    ? 'text-lg font-bold tracking-wide'
+                    : 'text-xl font-bold tracking-tight'
               }`}
             >
               {storeName}
@@ -289,16 +295,16 @@ export function StoreHeader({
         </div>
       </div>
 
-      {/* มือถือ: nav แถวล่างเลื่อนแนวนอน (โหมดปกติ — โหมด Commerce/ปุ่มแชทใช้ drawer แทน) */}
-      {!commerce && !contactButtons && (
+      {/* มือถือ: nav แถวล่างเลื่อนแนวนอน (โหมดปกติ — โหมดที่มี drawer ไม่ต้องมี) */}
+      {!drawerNav && (
         <div className="border-t border-border-soft px-4 py-2 md:hidden">
           <CategoryNav categories={categories} variant="topbar" />
         </div>
       )}
     </header>
 
-    {/* เมนู drawer มือถือ (โหมด Commerce/ปุ่มแชท) */}
-    {(commerce || contactButtons) && menuOpen && (
+    {/* เมนู drawer มือถือ */}
+    {drawerNav && menuOpen && (
       <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="เมนู">
         <button type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)} className="absolute inset-0 bg-scrim" />
         <div className="absolute left-0 top-0 flex h-full w-72 flex-col bg-bg shadow-lg">

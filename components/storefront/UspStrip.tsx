@@ -10,10 +10,17 @@ const ICONS = {
   headset: HeadsetIcon,
 } as const;
 
-export function UspStrip({ items }: { items: UspItem[] }) {
+export function UspStrip({
+  items,
+  tone = 'plain',
+}: {
+  items: UspItem[];
+  /** 'band' = พื้นเทาอ่อน (ref T4) / 'plain' = ขาวมีเส้นคั่น (ref T2) */
+  tone?: 'plain' | 'band';
+}) {
   if (items.length === 0) return null;
   return (
-    <section className="border-b border-border-soft">
+    <section className={tone === 'band' ? 'bg-secondary' : 'border-b border-border-soft'}>
       <div className="mx-auto grid max-w-(--container-max) grid-cols-2 gap-x-4 gap-y-5 px-4 py-6 lg:grid-cols-4">
         {items.map((item) => {
           const Icon = ICONS[item.icon] ?? TruckIcon;
