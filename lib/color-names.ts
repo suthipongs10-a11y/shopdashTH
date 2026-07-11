@@ -29,3 +29,9 @@ export function colorFromName(name: string | null | undefined): string {
   if (!name) return '#c9cdd3';
   return COLOR_MAP[name.trim()] ?? '#c9cdd3';
 }
+
+/** ค่านี้เป็น "สี" ที่วาดเป็นจุดสีได้จริงไหม — มิติที่ร้านใช้เป็นอย่างอื่น (เช่น แบบ: หมี/กระต่าย)
+ *  จุดเทาเหมือนกันหมดแยกไม่ออก ให้ component สลับไปวาดชิปข้อความแทน */
+export function isKnownColor(name: string | null | undefined): boolean {
+  return !!name && name.trim() in COLOR_MAP;
+}

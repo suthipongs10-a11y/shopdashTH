@@ -12,6 +12,22 @@ export interface ThemeActionState {
   success?: boolean;
 }
 
+/** __content (socials/variantLabels/เนื้อหา section) เป็นข้อมูลของร้าน ไม่ใช่ token ที่ผูกธีม
+ *  — ต้องรอดทุกการเปลี่ยน/รีเซ็ตธีม (อ่านสดจาก DB กัน cache เก่าทับค่าที่เพิ่งบันทึก) */
+async function contentToKeep(tenantId: string): Promise<Record<string, unknown>> {
+  const db = createAdminClient();
+  const { data } = await db
+    .from('stores')
+    .select('theme_overrides')
+    .eq('tenant_id', tenantId)
+    .single();
+  const overrides = (data?.theme_overrides ?? {}) as Record<string, unknown>;
+  const content = overrides['__content'];
+  return content && typeof content === 'object' && !Array.isArray(content)
+    ? { __content: content }
+    : {};
+}
+
 /** เปลี่ยนธีมร้าน — server ตรวจ tier ตามแพลนเสมอ (ห้ามเชื่อ UI §3.7) */
 export async function setStoreTheme(
   _prev: ThemeActionState,
@@ -28,10 +44,10 @@ export async function setStoreTheme(
   }
 
   const db = createAdminClient();
-  // เปลี่ยนธีม = ล้าง overrides เดิมด้วย (ค่าที่แต่งไว้ผูกกับธีมเก่า)
+  // เปลี่ยนธีม = ล้าง token overrides เดิม (ค่าที่แต่งไว้ผูกกับธีมเก่า) แต่เก็บ __content ไว้
   const { error } = await db
     .from('stores')
-    .update({ theme_code: code, theme_overrides: {} })
+    .update({ theme_code: code, theme_overrides: await contentToKeep(ctx.tenantId) })
     .eq('tenant_id', ctx.tenantId);
   if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
 
@@ -106,7 +122,7 @@ export async function saveThemeOverrides(
   const db = createAdminClient();
   const { error } = await db
     .from('stores')
-    .update({ theme_overrides: overrides })
+    .update({ theme_overrides: { ...(await contentToKeep(ctx.tenantId)), ...overrides } })
     .eq('tenant_id', ctx.tenantId);
   if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
 
@@ -121,7 +137,10 @@ export async function resetThemeOverrides(): Promise<void> {
   if (!(await getStoreUser(ctx))) return;
 
   const db = createAdminClient();
-  await db.from('stores').update({ theme_overrides: {} }).eq('tenant_id', ctx.tenantId);
+  await db
+    .from('stores')
+    .update({ theme_overrides: await contentToKeep(ctx.tenantId) })
+    .eq('tenant_id', ctx.tenantId);
   invalidateTenantCache(ctx.slug);
   revalidatePath('/admin/theme/customize');
   revalidatePath('/');

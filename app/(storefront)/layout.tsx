@@ -7,7 +7,8 @@ import { Footer } from '@/components/storefront/Footer';
 import { MemberBar } from '@/components/storefront/MemberBar';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getThemeContent, type FooterLinkGroup } from '@/lib/theme-content';
+import { getThemeContent, resolveVariantLabels, type FooterLinkGroup } from '@/lib/theme-content';
+import { VariantLabelsProvider } from '@/components/storefront/variant-labels-context';
 import { formatBaht } from '@/lib/format';
 import {
   getTenantContext,
@@ -138,6 +139,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
 
   return (
     <ThemeScope themeCode={ctx.store.theme_code} overrides={ctx.store.theme_overrides}>
+      <VariantLabelsProvider labels={resolveVariantLabels(content)}>
       {/* โหมดปุ่มแชท (ref T1): แถบประกาศดำอยู่บนสุดเหนือ header */}
       {preset.layout?.headerContactButtons && ctx.store.announcement_text && (
         <div className="bg-primary px-4 py-2 text-center text-xs font-medium tracking-wide text-primary-fg">
@@ -184,6 +186,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
         socials={content.socials}
         whyUsTitle={content.whyUsTitle}
       />
+      </VariantLabelsProvider>
     </ThemeScope>
   );
 }

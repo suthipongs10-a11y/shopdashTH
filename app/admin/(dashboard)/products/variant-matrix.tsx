@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import { DEFAULT_VARIANT_LABELS, type VariantLabels } from '@/lib/theme-content';
 import { regenerateVariants, type RegenerateVariantsState } from './actions';
 import { VariantRow, type VariantRowData } from './variant-row';
 
@@ -9,35 +10,39 @@ const initialState: RegenerateVariantsState = {};
 export function VariantMatrix({
   productId,
   variants,
+  labels = DEFAULT_VARIANT_LABELS,
 }: {
   productId: string;
   variants: VariantRowData[];
+  /** ป้ายมิติ variant ของร้าน — ค่ายังลงคอลัมน์ size/color เดิม เปลี่ยนเฉพาะคำที่โชว์ */
+  labels?: Required<VariantLabels>;
 }) {
   const action = regenerateVariants.bind(null, productId);
   const [state, formAction, pending] = useActionState(action, initialState);
+  const isDefault = labels.size === DEFAULT_VARIANT_LABELS.size;
 
   return (
     <div className="space-y-4">
       <form action={formAction} className="flex flex-wrap items-end gap-3">
         <div>
           <label htmlFor="sizes" className="mb-1 block text-sm font-medium text-gray-700">
-            ไซส์ (คั่นด้วย , )
+            {labels.size} (คั่นด้วย , )
           </label>
           <input
             id="sizes"
             name="sizes"
-            placeholder="S, M, L, XL"
+            placeholder={isDefault ? 'S, M, L, XL' : 'เช่น 0-6 เดือน, 6-12 เดือน, 1-2 ปี'}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />
         </div>
         <div>
           <label htmlFor="colors" className="mb-1 block text-sm font-medium text-gray-700">
-            สี (คั่นด้วย , )
+            {labels.color} (คั่นด้วย , )
           </label>
           <input
             id="colors"
             name="colors"
-            placeholder="แดง, น้ำเงิน"
+            placeholder={labels.color === DEFAULT_VARIANT_LABELS.color ? 'แดง, น้ำเงิน' : 'เช่น ลายหมี, ลายกระต่าย'}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
           />
         </div>
@@ -58,12 +63,13 @@ export function VariantMatrix({
         </p>
       )}
       <p className="text-xs text-gray-400">
-        เว้นว่างช่องไซส์หรือสีถ้าสินค้าไม่มีมิตินั้น — กด "สร้าง/เพิ่ม Variant" ซ้ำได้ ระบบจะเพิ่มเฉพาะ combination ที่ยังไม่มี
+        เว้นว่างช่อง{labels.size}หรือ{labels.color}ถ้าสินค้าไม่มีมิตินั้น — กด "สร้าง/เพิ่ม Variant" ซ้ำได้ ระบบจะเพิ่มเฉพาะ combination ที่ยังไม่มี
+        {isDefault && ' — ร้านที่ไม่ใช่เสื้อผ้าเปลี่ยนชื่อมิติได้ที่ ตั้งค่าร้าน'}
       </p>
 
       {variants.length === 0 ? (
         <p className="rounded-xl border border-gray-200 bg-white shadow-sm px-4 py-6 text-center text-sm text-gray-500">
-          ยังไม่มี variant — กรอกไซส์/สีด้านบนแล้วกด "สร้าง/เพิ่ม Variant"
+          ยังไม่มี variant — กรอก{labels.size}/{labels.color}ด้านบนแล้วกด "สร้าง/เพิ่ม Variant"
         </p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">

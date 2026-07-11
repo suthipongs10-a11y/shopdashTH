@@ -1,10 +1,20 @@
 // แถบ CTA คู่ LINE/Facebook (ref T1) — แผงพื้นเขียวอ่อน แบ่งครึ่งด้วยเส้นกลาง
 // สีปุ่ม/พื้นมาจาก brand token (--brand-line / --brand-facebook — ข้อยกเว้นโลโก้แบรนด์ §5.3)
 
-import type { ContactChannels } from '@/lib/theme-content';
+import {
+  DEFAULT_VARIANT_LABELS,
+  type ContactChannels,
+  type VariantLabels,
+} from '@/lib/theme-content';
 import { ArrowRightIcon, FacebookLogoIcon, LineLogoIcon } from './icons';
 
-export function ContactCtaBand({ contact }: { contact: ContactChannels }) {
+export function ContactCtaBand({
+  contact,
+  variantLabels = DEFAULT_VARIANT_LABELS,
+}: {
+  contact: ContactChannels;
+  variantLabels?: Required<VariantLabels>;
+}) {
   const hasLine = !!contact.lineUrl;
   const hasFacebook = !!contact.facebookUrl;
   if (!hasLine && !hasFacebook) return null;
@@ -19,7 +29,7 @@ export function ContactCtaBand({ contact }: { contact: ContactChannels }) {
             </span>
             <div>
               <p className="font-heading text-lg font-bold text-text">สนใจสั่งซื้อ / สอบถามสินค้า</p>
-              <p className="mt-0.5 text-sm text-text-muted">ทักมาได้เลย ตอบไว แนะนำไซส์ให้</p>
+              <p className="mt-0.5 text-sm text-text-muted">ทักมาได้เลย ตอบไว แนะนำ{variantLabels.size}ให้</p>
               <a
                 href={contact.lineUrl}
                 target="_blank"

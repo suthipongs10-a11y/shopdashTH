@@ -7,10 +7,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useCart } from '@/lib/cart';
-import { colorFromName } from '@/lib/color-names';
+import { colorFromName, isKnownColor } from '@/lib/color-names';
 import { variantLabel } from '@/lib/variants';
 import { CloseIcon } from './icons';
 import type { ProductCardData } from './types';
+import { useVariantLabels } from './variant-labels-context';
 
 function uniq<T>(values: (T | null)[]): T[] {
   return [...new Set(values.filter((v): v is T => v !== null))];
@@ -27,9 +28,12 @@ export function QuickViewPanel({
 }) {
   const router = useRouter();
   const cart = useCart(slug);
+  const labels = useVariantLabels(); // ป้ายมิติ variant ของร้าน (ไซส์/สี หรือ ช่วงวัย/แบบ ฯลฯ)
   const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const sizes = useMemo(() => uniq(variants.map((v) => v.size)), [variants]);
   const colors = useMemo(() => uniq(variants.map((v) => v.color)), [variants]);
+  // มิติ "สี" ที่ค่าไม่ใช่สีจริง (เช่น แบบ: หมี/กระต่าย) → ชิปข้อความแทนจุดสี
+  const colorsAsDots = colors.length > 0 && colors.every(isKnownColor);
 
   // เปิดมาพร้อมเลือกตัวแรกที่มีสต๊อกให้เลย (ref แสดง state เลือกแล้ว: สี เบจ + ไซส์ M)
   const firstInStock = useMemo(() => variants.find((v) => v.stock > 0) ?? variants[0], [variants]);
@@ -91,29 +95,46 @@ export function QuickViewPanel({
         {needColor && (
           <div className="mt-3">
             <p className="text-xs text-text-muted">
-              สี{color ? `: ${color}` : ''}
+              {labels.color}
+              {colorsAsDots && color ? `: ${color}` : ''}
             </p>
             <div className="mt-1.5 flex flex-wrap gap-2">
-              {colors.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setColor(color === c ? null : c)}
-                  aria-label={`สี ${c}`}
-                  aria-pressed={color === c}
-                  className={`h-7 w-7 rounded-full border border-border ${
-                    color === c ? 'ring-2 ring-primary ring-offset-2 ring-offset-bg' : ''
-                  }`}
-                  style={{ backgroundColor: colorFromName(c) }}
-                />
-              ))}
+              {colors.map((c) =>
+                colorsAsDots ? (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(color === c ? null : c)}
+                    aria-label={`${labels.color} ${c}`}
+                    aria-pressed={color === c}
+                    className={`h-7 w-7 rounded-full border border-border ${
+                      color === c ? 'ring-2 ring-primary ring-offset-2 ring-offset-bg' : ''
+                    }`}
+                    style={{ backgroundColor: colorFromName(c) }}
+                  />
+                ) : (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(color === c ? null : c)}
+                    aria-pressed={color === c}
+                    className={`rounded-sm border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                      color === c
+                        ? 'border-primary bg-primary text-primary-fg'
+                        : 'border-border text-text hover:border-primary'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ),
+              )}
             </div>
           </div>
         )}
 
         {needSize && (
           <div className="mt-3">
-            <p className="text-xs text-text-muted">ไซส์</p>
+            <p className="text-xs text-text-muted">{labels.size}</p>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {sizes.map((s) => (
                 <button

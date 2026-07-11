@@ -8,6 +8,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { ChevronDownIcon, SearchIcon } from './icons';
+import { useVariantLabels } from './variant-labels-context';
 
 export const SORT_OPTIONS = [
   { value: 'newest', label: 'ใหม่ล่าสุด' },
@@ -59,6 +60,7 @@ export function FilterBar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const labels = useVariantLabels(); // ป้ายมิติ variant ของร้าน (ไซส์/สี หรือ ช่วงวัย/แบบ ฯลฯ)
   const [q, setQ] = useState(searchParams.get('q') ?? '');
 
   function update(key: string, value: string) {
@@ -128,11 +130,11 @@ export function FilterBar({
 
         {sizes.length > 0 && (
           <FilterSelect
-            label="ไซส์"
+            label={labels.size}
             value={searchParams.get('size') ?? ''}
             onChange={(v) => update('size', v)}
           >
-            <option value="">ทุกไซส์</option>
+            <option value="">ทุก{labels.size}</option>
             {sizes.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -143,11 +145,11 @@ export function FilterBar({
 
         {colors.length > 0 && (
           <FilterSelect
-            label="สี"
+            label={labels.color}
             value={searchParams.get('color') ?? ''}
             onChange={(v) => update('color', v)}
           >
-            <option value="">ทุกสี</option>
+            <option value="">ทุก{labels.color}</option>
             {colors.map((c) => (
               <option key={c} value={c}>
                 {c}

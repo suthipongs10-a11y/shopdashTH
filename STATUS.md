@@ -1,7 +1,7 @@
 # STATUS
-- Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
+- Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต + DoD ผ่านครบทุกข้อรวม Lighthouse** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
-- Last session: 2026-07-11
+- Last session: 2026-07-12
 
 ## Done (Phase 6 — Billing v2 + สรุปออร์เดอร์)
 - [x] `supabase/migrations/007_billing_v2.sql` — **apply แล้ว 2026-07-10 (ผู้ใช้รันใน SQL Editor, ตรวจ 12/12 ผ่านด้วย `.tmp-verify-007.mjs`)**: plans.price_renewal, แพ็กเกจใหม่ 4 ตัว (p1-start ฿990/590, p2-shop ฿3,900/1,200, p3-business ฿7,900/2,400, p4-premium ฿15,900/4,900), ปิดขาย starter/pro/premium, flag ใหม่ `theme_customize`, orders.public_token, stores.order_cutoff_time + shipping_note_th
@@ -103,7 +103,7 @@
 - [x] **ร้านเดโม่ `fashionhub`** (.tmp-t3-seed.mjs รันซ้ำได้): แพลน p3-business active 1 ปี, 15 สินค้า (3×5 พอดี — 5 ตัว sale จริง, 3 ตัว NEW, 2 ตัว low stock, 1 ตัวหมด, รูปตรวจกับตาแล้วทุกใบผ่าน R2 จริง), รีวิว 143 รายการ, เพจ 5 หน้า (about/contact + บทความ 3), admin user `fashionhub-owner@shopdash.local` / `Fashionhub!2026`
 - [x] **Loop วิจารณ์ 3 รอบ** (390/768/1440 — `.tmp-t3/r1-r3/`): r1 พบรูปไม่ตรงชื่อ 4 ตัว (เดา model-08..14 ผิด — เปิดรูปดูแล้ว remap+เปลี่ยนชื่อสินค้า, เลิกใช้ model-09/10/14 โทนหลุด)/ไซส์เรียงผิด/hero ทับตัวแบบ/ปุ่มตัวกรองหลุดบนหน้าแรก → r2 แก้ครบ → r3 เพิ่มขีดฆ่าราคาเดิม+% บนหน้าสินค้า, ยืนยัน carousel สไลด์ 2-3 + drawer เมนู/ฟิลเตอร์มือถือ
 - [x] **DoD §6**: องค์ประกอบ ref ครบ (ยกเว้นบันทึกไว้: ช่องค้นแบรนด์→ค้นหาชื่อสินค้าเพราะไม่มี entity แบรนด์, member bar/ผ่อน 0% เป็นเนื้อหาโชว์ — ดู DECISIONS) / anatomy การ์ดครบ tier / มือถือ 2 คอลัมน์+hero หัวไม่ขาด (object-[70%_20%])+drawer / grep hex components/storefront = 0 / tsc+build ผ่าน / **CLS = 0 ทุกรอบวัด**
-- [ ] **DoD §6.6 Lighthouse ≥85 — ยังยืนยันไม่ได้ (2026-07-11)**: วันนี้เครื่องมี dev server โปรเจ็คอื่นรันอยู่ (thaiApp next+prisma :3100, Ubontaxi astro :3002) กดคะแนนทั้งระบบ — control T1 ที่เคยได้ 91 วันนี้เหลือ 69, T2 ที่เคยผ่าน ≥85 เหลือ 52, T3 ได้ 42-48 (คลาสเดียวกับ T2) — optimize ที่ทำแล้ว: carousel mount รูปเฉพาะสไลด์ที่แสดง (ตัดรูปใหญ่ 2 ใบจากโหลดแรก), รูป hover ไม่โหลดบนจอสัมผัส (`pointer-fine:` + display:none), TBT 1,650→1,010ms — **ต้องวัดซ้ำตอนปิด dev server โปรเจ็คอื่น** (`npm run build && npm run start` แล้ว lighthouse ที่ fashionhub.localhost:3000)
+- [x] **DoD §6.6 Lighthouse ≥85 — ผ่านแล้ว (วัดซ้ำ 2026-07-12 ตอนเครื่องว่าง)**: **fashionhub 89-90** (2 รอบ, prod build, mobile) — FCP 2.0-2.1s / LCP 3.3-3.5s / TBT 40-80ms / CLS 0; control simplewear ได้ 93-95 ยืนยันเครื่องพร้อม (optimize ที่ทำไว้ 2026-07-11: carousel mount รูปเฉพาะสไลด์ที่แสดง, รูป hover ไม่โหลดบนจอสัมผัส)
 - เดโม่: `http://fashionhub.localhost:3000` — เหลือ T4
 
 ## Done (Phase 7 ต่อ — ปุ่มโซเชียลใช้จริง + แก้ cache invalidation, 2026-07-11 ตามรายงานเจ้าของ)
@@ -118,13 +118,24 @@
 - [x] **ร้านเดโม่ `luxe`** (.tmp-t4-seed.mjs รันซ้ำได้): แพลน p4-premium, 8 สินค้าราคาพรีเมียม 1,290–5,990 (รูป subset โทน editorial: model-09/10/11/12/14 ที่ T3 ไม่ใช้เพราะโทน moody — เข้าบุคลิก luxury พอดี), **โค้ด WELCOME10 เป็นของจริงในตาราง discount_codes** (percent 10, ขั้นต่ำ 1,000 — ทดสอบผ่าน API ลดจริง ฿329), เพจ about/size-guide/contact, admin `luxe-owner@shopdash.local` / `Luxe!2026`
 - [x] **Loop วิจารณ์ 3 รอบ** (390/768/1440 — `.tmp-t4/r1-r3/`): r1 พบเมนูมือถือไม่เป็น drawer + โลโก้ header ไม่โปร่ง → r2 แก้ครบ → r3 ผ่าน + regression ทุกร้าน ALL PASS (รวม drawer ธีมเดิม + โค้ดมั่วถูกปฏิเสธ)
 - [x] **DoD §6**: องค์ประกอบ ref ครบ (diff บันทึก: hero ใช้แผง ink + portrait เพราะ pool ไม่มีภาพ landscape โทนเข้ม ≥1800px, "ลูกค้า 50,000+" เป็น copy เดโม่แก้ได้ใน __content) / ไม่มีดาว/badge บนการ์ดตามบุคลิก / มือถือ 2 คอลัมน์ + hero หัวไม่ขาด + drawer / grep hex = 0 / build+tsc ผ่าน / **CLS = 0**
-- [ ] **DoD §6.6 Lighthouse ≥85 — รอเครื่องว่าง (เหมือน T3)**: วันนี้ T4 ได้ **72-76 เท่ากับ control T1 (76) ที่เคยได้ 91 ตอนเครื่องว่าง** — T4 อยู่คลาสประสิทธิภาพเดียวกับ T1 ที่ผ่าน DoD แล้วแบบ 1:1 คาดว่าเครื่องว่างจะได้ ~85-91 — วัดซ้ำพร้อม T3
+- [x] **DoD §6.6 Lighthouse ≥85 — ผ่านแล้ว (วัดซ้ำ 2026-07-12 ตอนเครื่องว่าง)**: **luxe 89-91** (2 รอบ, prod build, mobile) — FCP 2.3s / LCP 3.1-3.3s / TBT 20-40ms / CLS 0 — ตรงคาด (คลาสเดียวกับ control T1)
 - เดโม่: `http://luxe.localhost:3000` — **ครบทั้ง 4 เทมเพลต Commerce Premium** 🎉
 
+## Done (Phase 7 ปิดท้าย — Lighthouse T3/T4 ผ่าน + รองรับสินค้ากลุ่มอื่น (ของเล่น/แม่และเด็ก), 2026-07-12)
+- [x] **Lighthouse DoD §6.6 ปิดครบ**: เครื่องว่าง (พอร์ต 3100/3002 ไม่มีอะไรรัน) → prod build → **T3 fashionhub 89-90 / T4 luxe 89-91 / control simplewear 93-95** — CLS 0 ทุกรอบ ✅ **Phase 7 ผ่าน DoD ครบทุกเทมเพลตทุกข้อ**
+- [x] commit บรรทัดตกหล่น `whyUsTitle` ใน storefront layout (ชิ้นส่วน T4 — footer luxe หัวข้อ custom แสดงถูก)
+- [x] **Variant labels ต่อร้าน** (ตามคำสั่งเจ้าของ: เทมเพลต+Dashboard ต้องรับ ของเล่น/ของใช้แม่และเด็ก): ร้านเปลี่ยนป้าย "ไซส์/สี" เป็นคำของหมวดตัวเอง (ช่วงวัย/แบบ ฯลฯ) จากการ์ดใหม่ใน `/admin/settings` (ปุ่มลัด 4 หมวด + กรอกเอง, เฉพาะ owner) — เก็บ `__content.variantLabels` แบบเดียว socials ไม่ต้อง migration, ค่า variant อยู่คอลัมน์ size/color เดิม (ดู DECISIONS)
+- [x] ป้ายมีผลทุกจุด: storefront ผ่าน `VariantLabelsProvider` (FilterBar "ทุกช่วงวัย", CatalogSidebar T3, QuickView T2, VariantSelector หน้าสินค้า + ข้อความ "กรุณาเลือกช่วงวัยและแบบ") / แถบ copy FeatureBand・ServiceBand・ContactCtaBand รับ prop / admin variant matrix (หัวข้อ+label+placeholder ตามหมวด)
+- [x] **มิติที่ไม่ใช่สีจริง render ฉลาดขึ้น**: `isKnownColor()` — จุดสีบนการ์ดแสดงเฉพาะชื่อสีที่วาดได้ (หมี/กระต่าย = จุดเทาซ้ำ → ไม่แสดง), ตัวเลือกใน QuickView/sidebar สลับเป็นชิปข้อความ + เรียงค่านอกตาราง SIZE_ORDER แบบ numeric-aware ("0-1 ปี" < "1-3 ปี")
+- [x] **แก้บั๊กแฝง: สลับธีม/ปรับแต่งสี/รีเซ็ตธีม ล้าง `__content` ทิ้ง** — socials (02d97f4) + เนื้อหาเทมเพลต T1-T4 + variantLabels หายเงียบๆ ถ้าร้านสลับธีม → `contentToKeep()` เก็บ __content ไว้ทั้ง 3 action (ดู DECISIONS)
+- [x] **e2e ผ่าน 21/21** (`.tmp-labels-test.mjs` — ไม่ commit): ตั้งป้ายผ่าน UI จริง → admin/หน้าร้าน/ตัวกรอง (กรอง "2-4 ปี" เจอจิ๊กซอว์ ไม่เจอตุ๊กตา)/หน้าสินค้า/เลือกซื้อได้ปกติ + สลับธีมไปกลับ labels รอด + regression ร้าน demo ยังเป็นไซส์/สี + ร้านเทมเพลตทั้ง 4 HTTP 200
+- [x] ร้านทดสอบ: **shop2 = ร้านของเล่นเดโม่** (ธีมพาสเทล basic-02 + labels ช่วงวัย/แบบ + หมวด "ของเล่นเด็ก" + ตุ๊กตา 4 variants/จิ๊กซอว์ 2 variants จาก `.tmp-labels-seed.mjs` รันซ้ำได้) — เก็บไว้ดูฟีเจอร์นี้ได้เลยที่ `shop2.localhost:3000`
+- [x] `npx tsc --noEmit` + `npm run build` ผ่าน
+
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] **วัด Lighthouse T3+T4 ซ้ำตอนเครื่องว่าง** (ปิด dev server โปรเจ็คอื่น: thaiApp :3100, Ubontaxi :3002 ก่อน) — ปิด DoD §6.6: `npm run build && npm run start` แล้ว lighthouse ที่ fashionhub / luxe (control: simplewear ต้องได้ ~91)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
+- [ ] (ไอเดียต่อยอด variant labels ถ้าเจ้าของต้องการ) รูปเดโม่หมวดของเล่น/แม่และเด็ก + preset ธีมโทนเด็ก — โครงสร้างรองรับแล้ว เหลือแค่ asset
 
 ## Done (Phase 5) — `pnpm build` ผ่าน, migration 005/006 apply แล้ว, DoD ครบ
 - [x] 5.1 `supabase/migrations/005_analytics.sql`: RPC `store_daily_sales`/`store_weekly_sales`/`store_top_products`/`store_sales_summary`/`store_order_status_counts` + `platform_summary`/`platform_new_stores` (นับเฉพาะ confirmed/packing/shipped, วันตัดยอดเวลาไทย §7.6, revoke จาก anon/authenticated) + index `orders_tenant_status_created_idx` — **apply แล้ว 2026-07-09**

@@ -54,6 +54,34 @@ export interface SocialLinks {
 export const SOCIAL_KEYS = ['facebook', 'instagram', 'line', 'tiktok', 'youtube'] as const;
 export type SocialKey = (typeof SOCIAL_KEYS)[number];
 
+/** ป้ายชื่อมิติตัวเลือกสินค้า (variant) — ค่ายังเก็บในคอลัมน์ size/color เดิมเสมอ
+ *  เปลี่ยนเฉพาะป้ายที่โชว์ ให้ร้านนอกกลุ่มแฟชั่น (ของเล่น/แม่และเด็ก) ใช้คำของตัวเองได้
+ *  เช่น ช่วงวัย/แบบ — แก้จากหน้าตั้งค่าร้าน, ว่าง = ไซส์/สี */
+export interface VariantLabels {
+  size?: string;
+  color?: string;
+}
+
+export const DEFAULT_VARIANT_LABELS: Readonly<Required<VariantLabels>> = {
+  size: 'ไซส์',
+  color: 'สี',
+};
+
+/** ชุดป้ายสำเร็จรูปตามกลุ่มสินค้า (ปุ่มลัดในหน้าตั้งค่า — กรอกเองได้เสมอ) */
+export const VARIANT_LABEL_PRESETS: { name: string; size: string; color: string }[] = [
+  { name: 'เสื้อผ้า / แฟชั่น', size: 'ไซส์', color: 'สี' },
+  { name: 'ของเล่นเด็ก', size: 'ช่วงวัย', color: 'แบบ' },
+  { name: 'ของใช้แม่และเด็ก', size: 'ขนาด', color: 'แบบ' },
+  { name: 'รองเท้า / กระเป๋า', size: 'ไซส์', color: 'สี' },
+];
+
+export function resolveVariantLabels(content: ThemeContent): Required<VariantLabels> {
+  return {
+    size: content.variantLabels?.size?.trim() || DEFAULT_VARIANT_LABELS.size,
+    color: content.variantLabels?.color?.trim() || DEFAULT_VARIANT_LABELS.color,
+  };
+}
+
 export interface FeatureListItem {
   title: string;
   sub: string;
@@ -147,6 +175,8 @@ export interface ThemeContent {
   contact?: ContactChannels;
   /** ลิงก์โซเชียล (footer ทุกธีม) — เขียนจากหน้าตั้งค่าร้าน */
   socials?: SocialLinks;
+  /** ป้ายชื่อมิติ variant (ทุกธีม) — เขียนจากหน้าตั้งค่าร้าน */
+  variantLabels?: VariantLabels;
   featureListTitle?: string;
   featureList?: FeatureListItem[];
   /** หมายเหตุใต้ featureList เช่น "ไม่มีระบบตะกร้า" */

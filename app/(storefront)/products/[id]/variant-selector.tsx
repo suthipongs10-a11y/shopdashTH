@@ -5,6 +5,7 @@
 
 import { useMemo, useState } from 'react';
 import { CartIcon } from '@/components/storefront/icons';
+import { useVariantLabels } from '@/components/storefront/variant-labels-context';
 import type { StorefrontVariant } from '@/lib/catalog';
 import { useCart } from '@/lib/cart';
 import { formatBaht, formatBahtRange } from '@/lib/format';
@@ -30,6 +31,7 @@ export function VariantSelector({
   /** ราคาก่อนลด (base_price) — โชว์ขีดฆ่าเมื่อ variant ถูกตั้งราคาต่ำกว่า (ธีม marketplace) */
   compareAtPrice?: number;
 }) {
+  const labels = useVariantLabels(); // ป้ายมิติ variant ของร้าน (ไซส์/สี หรือ ช่วงวัย/แบบ ฯลฯ)
   const sizes = useMemo(() => uniqueDims(variants, 'size'), [variants]);
   const colors = useMemo(() => uniqueDims(variants, 'color'), [variants]);
 
@@ -126,7 +128,7 @@ export function VariantSelector({
 
       {needSize && (
         <div>
-          <p className="mb-2 text-sm font-medium">ไซส์</p>
+          <p className="mb-2 text-sm font-medium">{labels.size}</p>
           <div className="flex flex-wrap gap-2">
             {sizes.map((s) => (
               <button
@@ -144,7 +146,7 @@ export function VariantSelector({
 
       {needColor && (
         <div>
-          <p className="mb-2 text-sm font-medium">สี</p>
+          <p className="mb-2 text-sm font-medium">{labels.color}</p>
           <div className="flex flex-wrap gap-2">
             {colors.map((c) => (
               <button
@@ -174,7 +176,7 @@ export function VariantSelector({
         </p>
       )}
       {!selectionComplete && (
-        <p className="text-sm text-text-muted">กรุณาเลือก{needSize && !size ? 'ไซส์' : ''}{needSize && !size && needColor && !color ? 'และ' : ''}{needColor && !color ? 'สี' : ''}</p>
+        <p className="text-sm text-text-muted">กรุณาเลือก{needSize && !size ? labels.size : ''}{needSize && !size && needColor && !color ? 'และ' : ''}{needColor && !color ? labels.color : ''}</p>
       )}
 
       {/* มือถือ: แถวปุ่มลอยติดขอบล่างจอ (sticky) — desktop อยู่ในตำแหน่งปกติ (§4.6) */}

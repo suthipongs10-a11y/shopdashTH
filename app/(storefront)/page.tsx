@@ -39,6 +39,7 @@ import {
   DEFAULT_FEATURE_LIST_TITLE,
   DEFAULT_USP,
   getThemeContent,
+  resolveVariantLabels,
 } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
@@ -48,6 +49,7 @@ export default async function StorefrontHomePage() {
   const ctx = await getTenantContext();
   const preset = getPreset(ctx.store.theme_code);
   const content = getThemeContent(ctx.store.theme_overrides);
+  const variantLabels = resolveVariantLabels(content);
   const isStoreCard = preset.variants.productCard === 'store';
   const isSimpleCard = preset.variants.productCard === 'simple';
   const isLuxeCard = preset.variants.productCard === 'luxe';
@@ -234,11 +236,15 @@ export default async function StorefrontHomePage() {
       </div>
     ),
     featureBand: (
-      <FeatureBand key="featureBand" title={content.featureBandTitle ?? DEFAULT_FEATURE_BAND_TITLE} />
+      <FeatureBand
+        key="featureBand"
+        title={content.featureBandTitle ?? DEFAULT_FEATURE_BAND_TITLE}
+        variantLabels={variantLabels}
+      />
     ),
     contactCta: content.contact ? (
       <div key="contactCta" className="py-6">
-        <ContactCtaBand contact={content.contact} />
+        <ContactCtaBand contact={content.contact} variantLabels={variantLabels} />
       </div>
     ) : null,
     featureList: (
@@ -327,7 +333,10 @@ export default async function StorefrontHomePage() {
       ) : null,
     serviceBand: (
       <div key="serviceBand" className="pt-4">
-        <ServiceBand title={content.serviceBandTitle ?? 'ระบบและบริการของร้าน'} />
+        <ServiceBand
+          title={content.serviceBandTitle ?? 'ระบบและบริการของร้าน'}
+          variantLabels={variantLabels}
+        />
       </div>
     ),
     categories:

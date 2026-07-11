@@ -3,7 +3,7 @@
 
 import 'server-only';
 import type { ProductCardData } from '@/components/storefront/types';
-import { colorFromName } from '@/lib/color-names';
+import { colorFromName, isKnownColor } from '@/lib/color-names';
 import { publicR2Url } from '@/lib/r2';
 import { fetchRatingSummaries } from '@/lib/reviews';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -58,7 +58,11 @@ function toCard(row: ProductRow): ProductCardData {
   const prices = row.product_variants.map((v) => v.price_override ?? row.base_price);
   const images = [...row.product_images].sort((a, b) => a.sort_order - b.sort_order);
   // จุดสีบนการ์ด (การ์ดแบบ 'store') — สีไม่ซ้ำ เรียงตามลำดับ variant
-  const colorNames = [...new Set(row.product_variants.map((v) => v.color).filter(Boolean))] as string[];
+  // เฉพาะชื่อที่วาดเป็นสีได้จริง: ร้านที่ใช้มิตินี้เป็นอย่างอื่น (แบบ: หมี/กระต่าย)
+  // จุดเทาซ้ำๆ ไม่สื่ออะไร — ไม่แสดงดีกว่า (ตัวเลือกจริงยังอยู่ใน QuickView/หน้าสินค้า)
+  const colorNames = (
+    [...new Set(row.product_variants.map((v) => v.color).filter(Boolean))] as string[]
+  ).filter(isKnownColor);
   // "ลดราคา" = ร้านตั้ง price_override ต่ำกว่า base_price (ข้อมูลจริงจาก DB — ไม่มีคอลัมน์เพิ่ม)
   const priceMin = prices.length > 0 ? Math.min(...prices) : row.base_price;
   const onSale = priceMin < row.base_price;
@@ -189,7 +193,8 @@ export async function fetchRelated(
   return attachRatings(tenantId, rows.slice(0, limit).map(toCard));
 }
 
-/** เรียงไซส์ตามลำดับสวมใส่ (ไม่ใช่ตัวอักษร — ไม่งั้นได้ L M S XL) */
+/** เรียงไซส์ตามลำดับสวมใส่ (ไม่ใช่ตัวอักษร — ไม่งั้นได้ L M S XL)
+ *  ค่านอกตาราง (ร้านที่ใช้มิตินี้เป็นช่วงวัย/ขนาด เช่น "3-6 เดือน") เรียงแบบ numeric-aware */
 const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'FREE'];
 function sizeCompare(a: string, b: string): number {
   const ia = SIZE_ORDER.indexOf(a.toUpperCase());
@@ -197,7 +202,7 @@ function sizeCompare(a: string, b: string): number {
   if (ia !== -1 && ib !== -1) return ia - ib;
   if (ia !== -1) return -1;
   if (ib !== -1) return 1;
-  return a.localeCompare(b, 'th');
+  return a.localeCompare(b, 'th', { numeric: true });
 }
 
 /** ตัวเลือกไซส์/สีทั้งหมดของร้าน (ไว้ทำ FilterBar) */

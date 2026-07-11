@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { publicR2Url } from '@/lib/r2';
 import { createClient } from '@/lib/supabase/server';
+import { getThemeContent, resolveVariantLabels } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { DeleteProductButton } from '../delete-product-button';
 import { ProductForm } from '../product-form';
@@ -49,6 +50,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
   if (!product) notFound();
 
+  // ป้ายมิติ variant ของร้าน (ตั้งได้ในหน้าตั้งค่าร้าน — ร้านของเล่น/แม่และเด็กใช้คำของตัวเอง)
+  const variantLabels = resolveVariantLabels(getThemeContent(ctx.store.theme_overrides));
+
   return (
     <div className="space-y-10">
       <div className="flex items-center justify-between">
@@ -67,8 +71,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-gray-900">ไซส์ / สี (Variant)</h2>
-        <VariantMatrix productId={product.id} variants={variants ?? []} />
+        <h2 className="text-lg font-semibold text-gray-900">
+          {variantLabels.size} / {variantLabels.color} (Variant)
+        </h2>
+        <VariantMatrix productId={product.id} variants={variants ?? []} labels={variantLabels} />
       </section>
 
       <section className="space-y-3">

@@ -7,6 +7,7 @@ import { getTenantContext } from '@/lib/tenant-context';
 import { LineForm } from './line-form';
 import { SettingsForm } from './settings-form';
 import { SocialForm } from './social-form';
+import { VariantLabelsForm } from './variant-labels-form';
 
 export default async function SettingsPage() {
   const ctx = await getTenantContext();
@@ -41,6 +42,14 @@ export default async function SettingsPage() {
           bannerUrl: store.banner_r2_key ? publicR2Url(store.banner_r2_key) : null,
         }}
       />
+
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
+        <h2 className="mb-1 text-sm font-semibold text-gray-900">ประเภทตัวเลือกสินค้า (Variant)</h2>
+        <p className="mb-3 text-xs text-gray-500">
+          ร้านเสื้อผ้าใช้ ไซส์/สี — ร้านของเล่นหรือของใช้แม่และเด็กเปลี่ยนเป็นคำของหมวดตัวเองได้ เช่น ช่วงวัย/แบบ
+        </p>
+        <VariantLabelsForm values={getThemeContent(store.theme_overrides).variantLabels ?? {}} />
+      </section>
 
       <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
         <h2 className="mb-3 text-sm font-semibold text-gray-900">โซเชียลของร้าน</h2>

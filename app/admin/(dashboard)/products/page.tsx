@@ -106,7 +106,7 @@ export default async function ProductsPage() {
         <EmptyState
           icon={<ProductsIcon size={22} />}
           title="ยังไม่มีสินค้า"
-          sub="เริ่มเพิ่มสินค้าชิ้นแรกของร้านคุณ พร้อมรูปภาพและตัวเลือกไซส์/สี"
+          sub="เริ่มเพิ่มสินค้าชิ้นแรกของร้านคุณ พร้อมรูปภาพและตัวเลือกสินค้า (เช่น ไซส์/สี)"
           action={
             <Link href="/admin/products/new" className={btnPrimary}>
               <PlusIcon size={15} />

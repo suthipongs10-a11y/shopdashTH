@@ -3,7 +3,12 @@
 import { revalidatePath } from 'next/cache';
 import { getStoreUser, userRole } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { SOCIAL_KEYS, type SocialLinks } from '@/lib/theme-content';
+import {
+  DEFAULT_VARIANT_LABELS,
+  SOCIAL_KEYS,
+  type SocialLinks,
+  type VariantLabels,
+} from '@/lib/theme-content';
 import { getTenantContext, invalidateTenantCache } from '@/lib/tenant-context';
 
 export interface SettingsState {
@@ -116,6 +121,57 @@ export async function updateSocialLinks(
   const nextOverrides = {
     ...overrides,
     __content: { ...contentObj, socials },
+  };
+
+  const { error } = await db
+    .from('stores')
+    .update({ theme_overrides: nextOverrides })
+    .eq('tenant_id', ctx.tenantId);
+
+  if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+  invalidateTenantCache(ctx.slug);
+  revalidatePath('/admin/settings');
+  revalidatePath('/');
+  return { success: true };
+}
+
+/** ป้ายชื่อมิติ variant ของร้าน (ไซส์/สี → ช่วงวัย/แบบ ฯลฯ) — เก็บใน
+ *  theme_overrides.__content.variantLabels แบบเดียวกับ socials (ไม่ต้อง migration)
+ *  ค่า variant เดิมอยู่คอลัมน์ size/color เหมือนเดิม — เปลี่ยนเฉพาะป้ายที่โชว์ */
+export async function updateVariantLabels(
+  _prevState: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  if (!(await requireUser())) return { error: 'กรุณาเข้าสู่ระบบ' };
+
+  const size = String(formData.get('variant_label_size') ?? '').trim().slice(0, 20);
+  const color = String(formData.get('variant_label_color') ?? '').trim().slice(0, 20);
+  if ((size && !color) || (!size && color)) {
+    return { error: 'กรุณากรอกชื่อมิติให้ครบทั้ง 2 ช่อง (หรือเว้นว่างทั้งคู่เพื่อใช้ ไซส์/สี)' };
+  }
+  // ค่า default ไม่ต้องเก็บ — ให้ resolver ใช้ค่าเริ่มต้นเอง (ร้านเดิมไม่มี key นี้อยู่แล้ว)
+  const labels: VariantLabels = {};
+  if (size && size !== DEFAULT_VARIANT_LABELS.size) labels.size = size;
+  if (color && color !== DEFAULT_VARIANT_LABELS.color) labels.color = color;
+
+  const ctx = await getTenantContext();
+  const db = createAdminClient();
+  const { data: row, error: readErr } = await db
+    .from('stores')
+    .select('theme_overrides')
+    .eq('tenant_id', ctx.tenantId)
+    .single();
+  if (readErr) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+
+  const overrides = (row.theme_overrides ?? {}) as Record<string, unknown>;
+  const contentRaw = overrides['__content'];
+  const contentObj =
+    contentRaw && typeof contentRaw === 'object' && !Array.isArray(contentRaw)
+      ? (contentRaw as Record<string, unknown>)
+      : {};
+  const nextOverrides = {
+    ...overrides,
+    __content: { ...contentObj, variantLabels: labels },
   };
 
   const { error } = await db

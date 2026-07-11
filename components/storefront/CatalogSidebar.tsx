@@ -6,8 +6,9 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { colorFromName } from '@/lib/color-names';
+import { colorFromName, isKnownColor } from '@/lib/color-names';
 import { CheckIcon, ChevronDownIcon, CloseIcon, SearchIcon } from './icons';
+import { useVariantLabels } from './variant-labels-context';
 
 export interface SidebarCategory {
   id: string;
@@ -45,6 +46,9 @@ function FilterSections({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const labels = useVariantLabels(); // ป้ายมิติ variant ของร้าน (ไซส์/สี หรือ ช่วงวัย/แบบ ฯลฯ)
+  // มิติ "สี" ที่ค่าไม่ใช่สีจริง (เช่น แบบ: หมี/กระต่าย) จุดสีเทาแยกไม่ออก — ใช้ชิปข้อความแทน
+  const colorsAsDots = colors.length > 0 && colors.every(isKnownColor);
   const [q, setQ] = useState(searchParams.get('q') ?? '');
 
   const selectedCats = (searchParams.get('category') ?? '').split(',').filter(Boolean);
@@ -220,19 +224,19 @@ function FilterSections({
         </div>
       </div>
 
-      {/* สี — จุดสีจริงจาก variant ของร้าน */}
+      {/* สี — จุดสีจริงจาก variant ของร้าน (มิติที่ไม่ใช่สีจริง → ชิปข้อความ) */}
       {colors.length > 0 && (
         <div>
-          <SectionTitle>สี</SectionTitle>
+          <SectionTitle>{labels.color}</SectionTitle>
           <div className="flex flex-wrap gap-2">
             {colors.map((name) => {
               const selected = activeColor === name;
-              return (
+              return colorsAsDots ? (
                 <button
                   key={name}
                   type="button"
                   title={name}
-                  aria-label={`สี${name}`}
+                  aria-label={`${labels.color} ${name}`}
                   aria-pressed={selected}
                   onClick={() => push((p) => (selected ? p.delete('color') : p.set('color', name)))}
                   className={`h-6 w-6 rounded-full border border-border transition-all ${
@@ -240,17 +244,33 @@ function FilterSections({
                   }`}
                   style={{ backgroundColor: colorFromName(name) }}
                 />
+              ) : (
+                <button
+                  key={name}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => push((p) => (selected ? p.delete('color') : p.set('color', name)))}
+                  className={`rounded-[4px] border px-2 py-1.5 text-xs font-medium transition-colors ${
+                    selected
+                      ? 'border-primary bg-primary text-primary-fg'
+                      : 'border-border bg-bg text-text hover:border-primary'
+                  }`}
+                >
+                  {name}
+                </button>
               );
             })}
           </div>
-          {activeColor && <p className="mt-1.5 text-xs text-text-muted">เลือก: {activeColor}</p>}
+          {colorsAsDots && activeColor && (
+            <p className="mt-1.5 text-xs text-text-muted">เลือก: {activeColor}</p>
+          )}
         </div>
       )}
 
       {/* ไซส์ — ชิป */}
       {sizes.length > 0 && (
         <div>
-          <SectionTitle>ไซส์</SectionTitle>
+          <SectionTitle>{labels.size}</SectionTitle>
           <div className="flex flex-wrap gap-1.5">
             {sizes.map((s) => {
               const selected = activeSize === s;
