@@ -2,9 +2,11 @@
 // P4: เชื่อม LINE OA (feature flag `line_oa`)
 
 import { publicR2Url } from '@/lib/r2';
+import { getThemeContent } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { LineForm } from './line-form';
 import { SettingsForm } from './settings-form';
+import { SocialForm } from './social-form';
 
 export default async function SettingsPage() {
   const ctx = await getTenantContext();
@@ -39,6 +41,11 @@ export default async function SettingsPage() {
           bannerUrl: store.banner_r2_key ? publicR2Url(store.banner_r2_key) : null,
         }}
       />
+
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
+        <h2 className="mb-3 text-sm font-semibold text-gray-900">โซเชียลของร้าน</h2>
+        <SocialForm values={getThemeContent(store.theme_overrides).socials ?? {}} />
+      </section>
 
       {ctx.features.line_oa && (
         <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">

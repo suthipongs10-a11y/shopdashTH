@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { getStoreUser, userRole } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { SOCIAL_KEYS, type SocialLinks } from '@/lib/theme-content';
 import { getTenantContext, invalidateTenantCache } from '@/lib/tenant-context';
 
 export interface SettingsState {
@@ -73,6 +74,57 @@ export async function updateStoreSettings(
 
   if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
   invalidateTenantCache(ctx.slug); // กัน LRU 60s เสิร์ฟค่าเก่า
+  revalidatePath('/admin/settings');
+  revalidatePath('/');
+  return { success: true };
+}
+
+/** ลิงก์โซเชียลของร้าน (ปุ่มวงกลมใน footer ทุกธีม) — เก็บใน theme_overrides.__content.socials
+ *  (jsonb เดิม — ไม่ต้อง migration; resolveThemeStyle อ่านเฉพาะ token จึงไม่กระทบธีม) */
+export async function updateSocialLinks(
+  _prevState: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  if (!(await requireUser())) return { error: 'กรุณาเข้าสู่ระบบ' };
+
+  const socials: SocialLinks = {};
+  for (const key of SOCIAL_KEYS) {
+    const raw = String(formData.get(`social_${key}`) ?? '').trim();
+    if (!raw) continue;
+    if (!/^https?:\/\/.+\..+/.test(raw)) {
+      return { error: `ลิงก์ ${key} ต้องขึ้นต้นด้วย https:// เช่น https://facebook.com/ชื่อเพจ` };
+    }
+    socials[key] = raw.slice(0, 300);
+  }
+
+  const ctx = await getTenantContext();
+  const db = createAdminClient();
+  // merge เข้ากับ __content เดิม — แตะเฉพาะ key socials ไม่ทับเนื้อหาธีมส่วนอื่น
+  const { data: row, error: readErr } = await db
+    .from('stores')
+    .select('theme_overrides')
+    .eq('tenant_id', ctx.tenantId)
+    .single();
+  if (readErr) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+
+  const overrides = (row.theme_overrides ?? {}) as Record<string, unknown>;
+  const contentRaw = overrides['__content'];
+  const contentObj =
+    contentRaw && typeof contentRaw === 'object' && !Array.isArray(contentRaw)
+      ? (contentRaw as Record<string, unknown>)
+      : {};
+  const nextOverrides = {
+    ...overrides,
+    __content: { ...contentObj, socials },
+  };
+
+  const { error } = await db
+    .from('stores')
+    .update({ theme_overrides: nextOverrides })
+    .eq('tenant_id', ctx.tenantId);
+
+  if (error) return { error: 'บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+  invalidateTenantCache(ctx.slug);
   revalidatePath('/admin/settings');
   revalidatePath('/');
   return { success: true };

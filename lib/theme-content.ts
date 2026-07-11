@@ -39,6 +39,18 @@ export interface ContactChannels {
   facebookLabel?: string;
 }
 
+/** ลิงก์โซเชียลของร้าน (ปุ่มวงกลมใน footer) — แก้ได้จากหน้าตั้งค่าร้าน */
+export interface SocialLinks {
+  facebook?: string;
+  instagram?: string;
+  line?: string;
+  tiktok?: string;
+  youtube?: string;
+}
+
+export const SOCIAL_KEYS = ['facebook', 'instagram', 'line', 'tiktok', 'youtube'] as const;
+export type SocialKey = (typeof SOCIAL_KEYS)[number];
+
 export interface FeatureListItem {
   title: string;
   sub: string;
@@ -90,6 +102,8 @@ export interface ThemeContent {
   /** ข้อความเล็กใต้โลโก้ เช่น "BASIC STYLE FOR EVERYDAY" */
   tagline?: string;
   contact?: ContactChannels;
+  /** ลิงก์โซเชียล (footer ทุกธีม) — เขียนจากหน้าตั้งค่าร้าน */
+  socials?: SocialLinks;
   featureListTitle?: string;
   featureList?: FeatureListItem[];
   /** หมายเหตุใต้ featureList เช่น "ไม่มีระบบตะกร้า" */

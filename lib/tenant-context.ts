@@ -84,14 +84,20 @@ interface TenantRow {
 }
 
 // ---------- LRU cache ต่อ process (TTL 60s ตาม §3.8) ----------
+// เก็บบน globalThis: Next.js สร้าง module instance แยกต่อ route bundle — Map ระดับ module
+// ทำให้ invalidateTenantCache จาก server action (bundle admin) ล้างไม่ถึง cache ของ
+// bundle storefront (ค่าใหม่ค้างจนหมด TTL) — globalThis มีตัวเดียวต่อ process จึงล้างถึงกัน
 const TTL_MS = 60_000;
 const MAX_ENTRIES = 500;
-const tenantCache = new Map<string, { row: TenantRow; expires: number }>();
+type TenantCacheEntry = { row: TenantRow; expires: number };
+type ThemeDefaultsEntry = { defaults: Record<string, unknown> | null; expires: number };
+const globalCaches = globalThis as unknown as {
+  __sdTenantCache?: Map<string, TenantCacheEntry>;
+  __sdThemeDefaultsCache?: Map<string, ThemeDefaultsEntry>;
+};
+const tenantCache = (globalCaches.__sdTenantCache ??= new Map());
 // feature_defaults ของธีม (ใช้ resolve flag §3.7) — cache แยกเพราะหลายร้านใช้ธีมเดียวกัน
-const themeDefaultsCache = new Map<
-  string,
-  { defaults: Record<string, unknown> | null; expires: number }
->();
+const themeDefaultsCache = (globalCaches.__sdThemeDefaultsCache ??= new Map());
 
 /** ล้าง cache ของร้าน — เรียกหลังแอดมินแก้ตั้งค่าร้าน เพื่อไม่ให้เห็นค่าเก่าค้าง 60s */
 export function invalidateTenantCache(slug: string): void {

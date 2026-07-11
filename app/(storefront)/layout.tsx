@@ -181,6 +181,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
         contact={content.contact}
         orderingEnabled={orderingEnabled}
         showPayments={preset.layout?.footerPayments}
+        socials={content.socials}
       />
     </ThemeScope>
   );

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ContactChannels, FooterLinkGroup } from '@/lib/theme-content';
+import type { ContactChannels, FooterLinkGroup, SocialLinks } from '@/lib/theme-content';
 import {
   FacebookLogoIcon,
   LineLogoIcon,
@@ -61,13 +61,36 @@ function SocialIcon({ name }: { name: 'facebook' | 'instagram' | 'line' | 'tikto
   }
 }
 
-const SOCIALS = [
-  { name: 'facebook' as const, className: 'bg-brand-facebook' },
-  { name: 'instagram' as const, className: 'bg-brand-instagram' },
-  { name: 'line' as const, className: 'bg-brand-line' },
-  { name: 'tiktok' as const, className: 'bg-brand-tiktok' },
-  { name: 'youtube' as const, className: 'bg-brand-youtube' },
+const SOCIAL_STYLE = [
+  { name: 'facebook' as const, label: 'Facebook', className: 'bg-brand-facebook' },
+  { name: 'instagram' as const, label: 'Instagram', className: 'bg-brand-instagram' },
+  { name: 'line' as const, label: 'LINE', className: 'bg-brand-line' },
+  { name: 'tiktok' as const, label: 'TikTok', className: 'bg-brand-tiktok' },
+  { name: 'youtube' as const, label: 'YouTube', className: 'bg-brand-youtube' },
 ];
+
+/* ปุ่มวงกลมโซเชียล — ลิงก์จริงจากตั้งค่าร้าน แสดงเฉพาะช่องที่กรอก URL ไว้ */
+function SocialRow({ socials }: { socials: SocialLinks }) {
+  const active = SOCIAL_STYLE.filter((s) => socials[s.name]);
+  if (active.length === 0) return null;
+  return (
+    <div className="flex gap-1.5">
+      {active.map((s) => (
+        <a
+          key={s.name}
+          href={socials[s.name]}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={s.label}
+          aria-label={`${s.label} ของร้าน`}
+          className={`flex h-7 w-7 items-center justify-center rounded-full text-primary-fg transition-transform hover:scale-110 ${s.className}`}
+        >
+          <SocialIcon name={s.name} />
+        </a>
+      ))}
+    </div>
+  );
+}
 
 /* แถวโลโก้ช่องทางชำระเงิน (ref T3 — "footer มีโลโก้ payment ครบ") ตัวอักษรสีแบรนด์จริง */
 function PaymentLogos() {
@@ -102,13 +125,16 @@ function FooterFull({
   newsletterText,
   pages,
   showPayments = false,
+  socials = {},
 }: {
   storeName: string;
   linkGroups: FooterLinkGroup[];
   newsletterText: string;
   pages: FooterPageLink[];
   showPayments?: boolean;
+  socials?: SocialLinks;
 }) {
+  const hasSocials = SOCIAL_STYLE.some((s) => socials[s.name]);
   return (
     <footer className="mt-auto border-t border-border bg-bg">
       <div className="mx-auto grid max-w-(--container-max) gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_0.9fr]">
@@ -147,20 +173,16 @@ function FooterFull({
           </div>
         ))}
 
-        {/* social */}
+        {/* social — ลิงก์จริงจากตั้งค่าร้าน (ไม่กรอก = ไม่แสดง) */}
         <div>
-          <p className="text-sm font-semibold text-text">ติดตามเรา</p>
-          <div className="mt-3 flex gap-1.5">
-            {SOCIALS.map((s) => (
-              <span
-                key={s.name}
-                title={s.name}
-                className={`flex h-7 w-7 items-center justify-center rounded-full text-primary-fg ${s.className}`}
-              >
-                <SocialIcon name={s.name} />
-              </span>
-            ))}
-          </div>
+          {hasSocials && (
+            <>
+              <p className="text-sm font-semibold text-text">ติดตามเรา</p>
+              <div className="mt-3">
+                <SocialRow socials={socials} />
+              </div>
+            </>
+          )}
           {pages.length > 0 && (
             <ul className="mt-4 space-y-2 text-xs text-text-muted">
               {pages.map((p) => (
@@ -217,6 +239,7 @@ export function Footer({
   contact,
   orderingEnabled = true,
   showPayments = false,
+  socials = {},
 }: {
   storeName: string;
   address?: string | null;
@@ -233,6 +256,8 @@ export function Footer({
   orderingEnabled?: boolean;
   /** แถวโลโก้ payment ใน footer full (ref T3 — layout.footerPayments) */
   showPayments?: boolean;
+  /** ลิงก์โซเชียล (ปุ่มวงกลม) — ตั้งค่าจากหลังร้าน */
+  socials?: SocialLinks;
 }) {
   if (variant === 'full') {
     return (
@@ -242,6 +267,7 @@ export function Footer({
         newsletterText={newsletterText}
         pages={pages}
         showPayments={showPayments}
+        socials={socials}
       />
     );
   }
@@ -295,6 +321,7 @@ export function Footer({
               </a>
             </p>
           )}
+          <SocialRow socials={socials} />
         </div>
 
         {/* เมนู */}
