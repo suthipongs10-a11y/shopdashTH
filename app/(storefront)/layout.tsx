@@ -182,6 +182,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
         orderingEnabled={orderingEnabled}
         showPayments={preset.layout?.footerPayments}
         socials={content.socials}
+        whyUsTitle={content.whyUsTitle}
       />
     </ThemeScope>
   );
