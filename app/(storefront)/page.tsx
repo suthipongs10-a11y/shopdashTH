@@ -2,14 +2,22 @@
 // basic-01: hero → featured → categories → grid → footer(อยู่ใน layout)
 
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { AnnouncementBar } from '@/components/storefront/AnnouncementBar';
+import { ArticleCards } from '@/components/storefront/ArticleCards';
+import { CatalogSidebar } from '@/components/storefront/CatalogSidebar';
 import { CategoryBannerRow } from '@/components/storefront/CategoryBannerRow';
+import { CategoryCircleRow } from '@/components/storefront/CategoryCircleRow';
 import { ContactCtaBand } from '@/components/storefront/ContactCtaBand';
 import { FeatureBand } from '@/components/storefront/FeatureBand';
 import { FeatureListBand } from '@/components/storefront/FeatureListBand';
+import { FeaturedScroller } from '@/components/storefront/FeaturedScroller';
 import { HeroBanner } from '@/components/storefront/HeroBanner';
+import { HeroCarousel, type HeroSlide } from '@/components/storefront/HeroCarousel';
+import { MemberBenefitsBand } from '@/components/storefront/MemberBenefitsBand';
 import { ProductGrid } from '@/components/storefront/ProductGrid';
 import { SectionHeading } from '@/components/storefront/SectionHeading';
+import { ServiceBand } from '@/components/storefront/ServiceBand';
 import { ToolsRow } from '@/components/storefront/ToolsRow';
 import { UspStrip } from '@/components/storefront/UspStrip';
 import {
@@ -18,7 +26,7 @@ import {
   PackageIcon,
   PhoneIcon,
 } from '@/components/storefront/icons';
-import { fetchFeatured, fetchLatest } from '@/lib/catalog';
+import { fetchFeatured, fetchFilterOptions, fetchLatest } from '@/lib/catalog';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
@@ -42,18 +50,24 @@ export default async function StorefrontHomePage() {
   const detailButtonText = ctx.features.online_ordering ? 'สั่งซื้อ' : 'ดูรายละเอียด';
 
   const db = createAdminClient();
-  const [featuredRaw, latest, { data: categories }, catalog] = await Promise.all([
-    // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2 / แบบ 'simple' โชว์ 4 ใบตาม ref T1
-    fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard ? 4 : 8),
-    fetchLatest(ctx.tenantId),
-    db
-      .from('categories')
-      .select('id, name')
-      .eq('tenant_id', ctx.tenantId)
-      .order('sort_order', { ascending: true }),
-    // section 'catalog' (ธีม one-page) — แคตตาล็อกเต็มบนหน้าแรก
-    preset.sections.includes('catalog') ? fetchLatest(ctx.tenantId, 24) : Promise.resolve([]),
-  ]);
+  const [featuredRaw, latest, { data: categories }, catalog, homeCatalog, filterOptions] =
+    await Promise.all([
+      // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2 / แบบ 'simple' โชว์ 4 ใบตาม ref T1
+      fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard ? 4 : 8),
+      fetchLatest(ctx.tenantId),
+      db
+        .from('categories')
+        .select('id, name')
+        .eq('tenant_id', ctx.tenantId)
+        .order('sort_order', { ascending: true }),
+      // section 'catalog' (ธีม one-page) — แคตตาล็อกเต็มบนหน้าแรก
+      preset.sections.includes('catalog') ? fetchLatest(ctx.tenantId, 24) : Promise.resolve([]),
+      // section 'homeCatalog' (ธีม marketplace — ref T3) — 2 แถว × 5 ใบ
+      preset.sections.includes('homeCatalog') ? fetchLatest(ctx.tenantId, 10) : Promise.resolve([]),
+      preset.sections.includes('homeCatalog')
+        ? fetchFilterOptions(ctx.tenantId)
+        : Promise.resolve({ sizes: [] as string[], colors: [] as string[] }),
+    ]);
 
   // ธีม Commerce: badge "ใหม่" 2 ชิ้นแรก (เรียงตาม created_at ล่าสุดอยู่แล้ว)
   // ดาวรีวิวมาจาก DB จริงใน fetchFeatured (product_reviews — migration 010)
@@ -61,10 +75,24 @@ export default async function StorefrontHomePage() {
     ? featuredRaw.map((p, i) => ({ ...p, badge: i < 2 ? 'ใหม่' : p.badge }))
     : featuredRaw;
 
+  // hero carousel (ref T3) — สไลด์จาก __content.heroSlides ที่มีรูปเท่านั้น
+  const heroSlides: HeroSlide[] = (content.heroSlides ?? [])
+    .filter((s): s is typeof s & { imageUrl: string } => Boolean(s.imageUrl))
+    .map((s) => ({
+      imageUrl: s.imageUrl,
+      eyebrow: s.eyebrow,
+      headline: s.headline,
+      sub: s.sub,
+      ctaText: s.ctaText,
+      ctaHref: s.ctaHref,
+    }));
+
   const sections: Record<ThemeSection, React.ReactNode> = {
     announcement: <AnnouncementBar key="announcement" text={ctx.store.announcement_text} />,
     hero:
-      preset.variants.hero === 'commerce' || preset.variants.hero === 'split-panel' ? (
+      preset.variants.hero === 'carousel' && heroSlides.length > 0 ? (
+        <HeroCarousel key="hero" slides={heroSlides} />
+      ) : preset.variants.hero === 'commerce' || preset.variants.hero === 'split-panel' ? (
         <HeroBanner
           key="hero"
           variant={preset.variants.hero}
@@ -162,6 +190,85 @@ export default async function StorefrontHomePage() {
           note={content.featureListNote}
           noteHighlight={content.featureListNoteHighlight}
         />
+      </div>
+    ),
+    /* --- ชุด T3 "HUB" (marketplace) — ระยะ section 64px (py-8 ต่อฝั่ง §2) --- */
+    categoryCircles:
+      (content.categoryCircles ?? []).length > 0 ? (
+        <div key="categoryCircles" className="pt-7">
+          <CategoryCircleRow circles={content.categoryCircles ?? []} />
+        </div>
+      ) : null,
+    homeCatalog:
+      homeCatalog.length > 0 ? (
+        <section key="homeCatalog" className="mx-auto max-w-(--container-max) px-4 py-8">
+          <div className="grid items-start gap-5 lg:grid-cols-[240px_1fr]">
+            {/* ฟิลเตอร์ทำงานจริง — กดแล้วพาไป /products พร้อม query param */}
+            <Suspense fallback={null}>
+              <CatalogSidebar
+                categories={(categories ?? []).map((c) => ({ id: c.id, name: c.name }))}
+                sizes={filterOptions.sizes}
+                colors={filterOptions.colors}
+                mobileTrigger={false}
+              />
+            </Suspense>
+            <div>
+              <div className="mb-4 flex items-baseline justify-between gap-2">
+                <h2 className="font-heading text-lg font-semibold tracking-tight text-text">
+                  สินค้ามาใหม่
+                </h2>
+                <Link
+                  href="/products"
+                  className="text-sm font-medium text-text-muted transition-colors hover:text-text"
+                >
+                  ดูทั้งหมด →
+                </Link>
+              </div>
+              <ProductGrid
+                products={homeCatalog}
+                cardVariant={preset.variants.productCard}
+                slug={ctx.slug}
+                wishlistEnabled={ctx.features.wishlist}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null,
+    memberBenefits:
+      (content.memberBenefits ?? []).length > 0 ? (
+        <div key="memberBenefits" className="py-4">
+          <MemberBenefitsBand benefits={content.memberBenefits ?? []} />
+        </div>
+      ) : null,
+    featuredScroller:
+      featured.length > 0 ? (
+        <section key="featuredScroller" className="mx-auto max-w-(--container-max) px-4 py-8">
+          <div className="mb-4 flex items-baseline justify-between gap-2">
+            <h2 className="font-heading text-lg font-semibold tracking-tight text-text">
+              สินค้าแนะนำ
+            </h2>
+            <Link
+              href="/products"
+              className="text-sm font-medium text-text-muted transition-colors hover:text-text"
+            >
+              ดูทั้งหมด →
+            </Link>
+          </div>
+          <FeaturedScroller products={featured} />
+        </section>
+      ) : null,
+    articles:
+      (content.articles ?? []).length > 0 ? (
+        <section key="articles" className="mx-auto max-w-(--container-max) px-4 py-8">
+          <h2 className="mb-4 font-heading text-lg font-semibold tracking-tight text-text">
+            {content.articlesTitle ?? 'บทความแฟชั่น / Lookbook'}
+          </h2>
+          <ArticleCards articles={content.articles ?? []} />
+        </section>
+      ) : null,
+    serviceBand: (
+      <div key="serviceBand" className="pt-4">
+        <ServiceBand title={content.serviceBandTitle ?? 'ระบบและบริการของร้าน'} />
       </div>
     ),
     categories:

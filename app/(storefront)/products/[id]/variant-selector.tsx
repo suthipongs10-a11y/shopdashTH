@@ -20,12 +20,15 @@ export function VariantSelector({
   productName,
   imageUrl,
   variants,
+  compareAtPrice,
 }: {
   slug: string;
   productId: string;
   productName: string;
   imageUrl?: string;
   variants: StorefrontVariant[];
+  /** ราคาก่อนลด (base_price) — โชว์ขีดฆ่าเมื่อ variant ถูกตั้งราคาต่ำกว่า (ธีม marketplace) */
+  compareAtPrice?: number;
 }) {
   const sizes = useMemo(() => uniqueDims(variants, 'size'), [variants]);
   const colors = useMemo(() => uniqueDims(variants, 'color'), [variants]);
@@ -59,6 +62,9 @@ export function VariantSelector({
     : prices.length > 0
       ? formatBahtRange(Math.min(...prices), Math.max(...prices))
       : '-';
+  // ลดราคา = ราคาที่โชว์ต่ำกว่า base_price → ขีดฆ่าราคาเดิม (ตรงกับ badge -% บนการ์ด)
+  const shownPrice = selected ? selected.price : prices.length > 0 ? Math.min(...prices) : null;
+  const onSale = compareAtPrice != null && shownPrice != null && shownPrice < compareAtPrice;
 
   function stockForDim(key: 'size' | 'color', value: string): number {
     return variants
@@ -101,7 +107,21 @@ export function VariantSelector({
   return (
     <div className="space-y-5">
       <div className="inline-flex items-baseline gap-2 rounded-lg bg-primary-soft px-4 py-2">
-        <p className="font-heading text-3xl font-bold tracking-tight text-primary">{priceText}</p>
+        <p
+          className={`font-heading text-3xl font-bold tracking-tight ${onSale ? 'text-danger' : 'text-primary'}`}
+        >
+          {priceText}
+        </p>
+        {onSale && (
+          <>
+            <p className="text-base text-text-muted line-through">
+              {formatBaht(compareAtPrice)}
+            </p>
+            <span className="rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-primary-fg">
+              -{Math.round((1 - shownPrice / compareAtPrice) * 100)}%
+            </span>
+          </>
+        )}
       </div>
 
       {needSize && (

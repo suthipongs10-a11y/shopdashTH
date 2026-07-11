@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ProductCardVariant } from '@/themes/types';
 import { formatBahtRange } from '@/lib/format';
+import { HubProductCard } from './HubProductCard';
 import { StoreProductCard } from './StoreProductCard';
 import type { ProductCardData } from './types';
 
@@ -70,6 +71,10 @@ export function ProductCard({
 }) {
   if (variant === 'store') {
     return <StoreProductCard product={product} slug={slug} wishlistEnabled={wishlistEnabled} />;
+  }
+
+  if (variant === 'hub') {
+    return <HubProductCard product={product} />;
   }
 
   const priceText = formatBahtRange(product.priceMin, product.priceMax);

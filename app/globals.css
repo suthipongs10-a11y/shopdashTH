@@ -1,2 +1,10 @@
 @import "tailwindcss";
 @import "../themes/tokens.css";
+
+/* แถวเลื่อนแนวนอน (หมวดวงกลม/สินค้าแนะนำ — ธีม marketplace) ซ่อน scrollbar แต่ยังเลื่อนได้ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

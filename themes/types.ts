@@ -35,8 +35,8 @@ export type ThemeFontName =
   | 'Bai Jamjuree'
   | 'IBM Plex Sans Thai';
 
-export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay' | 'store' | 'simple';
-export type HeroVariant = 'full-bleed' | 'boxed' | 'split' | 'commerce' | 'split-panel';
+export type ProductCardVariant = 'minimal' | 'bordered' | 'overlay' | 'store' | 'simple' | 'hub';
+export type HeroVariant = 'full-bleed' | 'boxed' | 'split' | 'commerce' | 'split-panel' | 'carousel';
 export type CategoryNavVariant = 'topbar' | 'pills' | 'sidebar';
 
 export type ThemeSection =
@@ -63,6 +63,19 @@ export type ThemeSection =
   | 'contactCta'
   /** แถบครีม "ฟีเจอร์ของเว็บ" รายการมีเลขข้อ + หมายเหตุ */
   | 'featureList'
+  /* --- ชุด T3 "HUB" (TEMPLATE_SPEC §3.3 — marketplace) --- */
+  /** แถวหมวดวงกลมรูปสินค้า 9–10 วง เลื่อนแนวนอนได้ */
+  | 'categoryCircles'
+  /** บล็อกแคตตาล็อกหน้าแรก: sidebar ฟิลเตอร์ + grid 5 คอลัมน์ (ฟิลเตอร์พาไป /products) */
+  | 'homeCatalog'
+  /** แถบสิทธิ์สมาชิก 3 ช่อง (ส่วนลด/ส่งฟรี/ผ่อน 0%) */
+  | 'memberBenefits'
+  /** แถวสินค้าแนะนำเลื่อนแนวนอน */
+  | 'featuredScroller'
+  /** การ์ดบทความ/Lookbook 3 ใบมีวันที่ */
+  | 'articles'
+  /** แถบ "ระบบและบริการ" 8 ไอคอน */
+  | 'serviceBand'
   | 'footer';
 
 /** โครง layout ระดับธีม (header/footer) — ค่า default = พฤติกรรมเดิมของทุกธีม */
@@ -75,6 +88,12 @@ export interface ThemeLayout {
   footerVariant?: 'simple' | 'full';
   /** ปุ่ม LINE/Facebook ใน header (ref T1 — ร้านที่ขายผ่านแชท) */
   headerContactButtons?: boolean;
+  /** แถบสมาชิกใต้ header (ref T3 — สมาชิก Silver / คูปอง / คะแนน) */
+  memberBar?: boolean;
+  /** หน้า /products แบบ 2 คอลัมน์: sidebar ฟิลเตอร์ + grid 5 คอลัมน์ (ref T3) */
+  catalogSidebar?: boolean;
+  /** แถวโลโก้ช่องทางชำระเงินใน footer แบบ full (ref T3) */
+  footerPayments?: boolean;
 }
 
 /** ฟีเจอร์หน้าร้านที่ธีมเปิด/ปิดได้ (merge ใน resolveFeatures() §3.7) */

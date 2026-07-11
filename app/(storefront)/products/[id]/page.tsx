@@ -106,6 +106,7 @@ export default async function ProductDetailPage({
                 productName={product.name}
                 imageUrl={product.images[0]}
                 variants={product.variants}
+                compareAtPrice={product.basePrice}
               />
 
               {/* จุดขายความมั่นใจ — ชำระ/ตรวจสอบ/จัดส่ง */}

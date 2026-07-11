@@ -1,7 +1,7 @@
 # STATUS
-- Current phase: 6 (Billing v2 + Order Summary — โมเดลธุรกิจใหม่: agency รับจ้างสร้างเว็บ 4 แพ็กเกจ)
+- Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — T2 ✓ T1 ✓ T3 ✓ เหลือ T4)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
-- Last session: 2026-07-10
+- Last session: 2026-07-11
 
 ## Done (Phase 6 — Billing v2 + สรุปออร์เดอร์)
 - [x] `supabase/migrations/007_billing_v2.sql` — **apply แล้ว 2026-07-10 (ผู้ใช้รันใน SQL Editor, ตรวจ 12/12 ผ่านด้วย `.tmp-verify-007.mjs`)**: plans.price_renewal, แพ็กเกจใหม่ 4 ตัว (p1-start ฿990/590, p2-shop ฿3,900/1,200, p3-business ฿7,900/2,400, p4-premium ฿15,900/4,900), ปิดขาย starter/pro/premium, flag ใหม่ `theme_customize`, orders.public_token, stores.order_cutoff_time + shipping_note_th
@@ -96,8 +96,19 @@
 - [x] **DoD §6 ครบ**: องค์ประกอบ ref เหลือศูนย์/มีเหตุผล (การ์ดขาวแทนดำ — ข้อจำกัด pool, ไอคอน LINE วาดเอง — ไม่มี asset โลโก้ทางการ) / anatomy การ์ดตาม tier / มือถือ 2 คอลัมน์+hero หัวไม่ขาด+drawer / **Lighthouse mobile (prod build): Performance 91, CLS 0** / grep hex ใน components/storefront = 0 / build ผ่าน
 - เดโม่: `http://simplewear.localhost:3000` — เหลือ T3/T4
 
+## Done (Phase 7 ต่อ — เทมเพลต T3 "HUB", 2026-07-11)
+- [x] **ธีม `t3-hub`** (tier 2, ตาม ref: FASHION HUB — marketplace): hero `carousel` (3 สไลด์ ลูกศร+จุด auto 5s หยุดเมื่อ hover + scrim ขาวฝั่งข้อความ), การ์ด `hub` anatomy เต็ม §0.4 (badge -X%/NEW/BEST → รูป 3:4 hover สลับ → จุดสี → ชื่อ → ราคา sale แดง+ขีดฆ่า → ดาว+รีวิว → ชิปไซส์ → สต๊อก พร้อมส่ง/เหลือ X ชิ้น), section ใหม่ `categoryCircles` (10 วงเลื่อนได้) / `homeCatalog` (sidebar+grid บนหน้าแรก) / `memberBenefits` (3 ช่อง) / `featuredScroller` / `articles` (3 ใบมีวันที่ ลิงก์เพจจริง) / `serviceBand` (8 ไอคอน), layout `memberBar`+`catalogSidebar`+`footerPayments`, container 1360px, token ใหม่ `--color-badge-best` (#8b6f47 ตาม §2)
+- [x] **ข้อมูล sale/NEW/BEST เป็นของจริงจาก DB ไม่มีคอลัมน์ใหม่**: ลดราคา = `price_override < base_price` (คำนวณ % ใน toCard + ขีดฆ่าบนหน้าสินค้า), NEW = `created_at` ≤ 14 วัน, BEST = รีวิวจริง ≥ 15, สต๊อกจาก variants — แอดมินตั้งจากหลังร้านได้เลย
+- [x] **หน้า /products แบบ marketplace** (flag `layout.catalogSidebar` — ธีมอื่นไม่กระทบ): sidebar ฟิลเตอร์ทำงานจริงฝั่ง server ทุกตัว — checkbox หลายหมวด (`?category=id1,id2` → `.in()`), ค้นหา, slider ราคา + ปุ่ม 4 ช่วง (`price_min/price_max`), จุดสี, ชิปไซส์ (เรียง S M L XL — แก้ sort ตัวอักษร), checkbox พร้อมส่ง (`instock=1` → `.gt(stock,0)`) + grid 5 คอลัมน์ + drawer ฟิลเตอร์บนมือถือ — ทดสอบจริง `?instock=1&price_max=500` ได้ 8/15 ถูกต้อง
+- [x] **ร้านเดโม่ `fashionhub`** (.tmp-t3-seed.mjs รันซ้ำได้): แพลน p3-business active 1 ปี, 15 สินค้า (3×5 พอดี — 5 ตัว sale จริง, 3 ตัว NEW, 2 ตัว low stock, 1 ตัวหมด, รูปตรวจกับตาแล้วทุกใบผ่าน R2 จริง), รีวิว 143 รายการ, เพจ 5 หน้า (about/contact + บทความ 3), admin user `fashionhub-owner@shopdash.local` / `Fashionhub!2026`
+- [x] **Loop วิจารณ์ 3 รอบ** (390/768/1440 — `.tmp-t3/r1-r3/`): r1 พบรูปไม่ตรงชื่อ 4 ตัว (เดา model-08..14 ผิด — เปิดรูปดูแล้ว remap+เปลี่ยนชื่อสินค้า, เลิกใช้ model-09/10/14 โทนหลุด)/ไซส์เรียงผิด/hero ทับตัวแบบ/ปุ่มตัวกรองหลุดบนหน้าแรก → r2 แก้ครบ → r3 เพิ่มขีดฆ่าราคาเดิม+% บนหน้าสินค้า, ยืนยัน carousel สไลด์ 2-3 + drawer เมนู/ฟิลเตอร์มือถือ
+- [x] **DoD §6**: องค์ประกอบ ref ครบ (ยกเว้นบันทึกไว้: ช่องค้นแบรนด์→ค้นหาชื่อสินค้าเพราะไม่มี entity แบรนด์, member bar/ผ่อน 0% เป็นเนื้อหาโชว์ — ดู DECISIONS) / anatomy การ์ดครบ tier / มือถือ 2 คอลัมน์+hero หัวไม่ขาด (object-[70%_20%])+drawer / grep hex components/storefront = 0 / tsc+build ผ่าน / **CLS = 0 ทุกรอบวัด**
+- [ ] **DoD §6.6 Lighthouse ≥85 — ยังยืนยันไม่ได้ (2026-07-11)**: วันนี้เครื่องมี dev server โปรเจ็คอื่นรันอยู่ (thaiApp next+prisma :3100, Ubontaxi astro :3002) กดคะแนนทั้งระบบ — control T1 ที่เคยได้ 91 วันนี้เหลือ 69, T2 ที่เคยผ่าน ≥85 เหลือ 52, T3 ได้ 42-48 (คลาสเดียวกับ T2) — optimize ที่ทำแล้ว: carousel mount รูปเฉพาะสไลด์ที่แสดง (ตัดรูปใหญ่ 2 ใบจากโหลดแรก), รูป hover ไม่โหลดบนจอสัมผัส (`pointer-fine:` + display:none), TBT 1,650→1,010ms — **ต้องวัดซ้ำตอนปิด dev server โปรเจ็คอื่น** (`npm run build && npm run start` แล้ว lighthouse ที่ fashionhub.localhost:3000)
+- เดโม่: `http://fashionhub.localhost:3000` — เหลือ T4
+
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] เทมเพลต T3 "HUB" / T4 "LUXÉ" ตาม TEMPLATE_SPEC (ทำทีละตัว)
+- [ ] **วัด Lighthouse T3 ซ้ำตอนเครื่องว่าง** (ปิด dev server โปรเจ็คอื่นก่อน) — ปิด DoD §6.6 ของ T3
+- [ ] เทมเพลต T4 "LUXÉ" ตาม TEMPLATE_SPEC §3.4 (ตัวสุดท้าย — ต้องหารูปโทนเข้ม luxury เพิ่ม: pool t2 เป็นโทนสว่างมินิมอล ไม่พอสำหรับ hero เต็มจอโทนเข้ม + Lookbook)
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 

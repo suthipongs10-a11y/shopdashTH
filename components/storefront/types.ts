@@ -24,6 +24,12 @@ export interface ProductCardData {
   hoverImageUrl?: string;
   /** ป้ายบน card เช่น "ใหม่" / "ขายดี" (ธีมกลุ่ม Professional ขึ้นไป) */
   badge?: string;
+  /** ราคาก่อนลด (base_price) — มีค่าเมื่อ variant ถูกตั้ง price_override ต่ำกว่า */
+  compareAtPrice?: number;
+  /** เปอร์เซ็นต์ส่วนลด (badge "-20%" ธีม marketplace) */
+  salePercent?: number;
+  /** ลงขายภายใน 14 วัน (badge "NEW") */
+  isNew?: boolean;
   inStock: boolean;
   /** จุดสีของ variant (ค่า CSS จาก lib/color-names) — การ์ดแบบ 'store' */
   colors?: string[];

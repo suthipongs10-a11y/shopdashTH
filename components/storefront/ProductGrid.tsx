@@ -36,7 +36,10 @@ export function ProductGrid({
       ? 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6'
       : cardVariant === 'simple'
         ? 'grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5'
-        : 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
+        : cardVariant === 'hub'
+          ? // marketplace (ref T3): แน่น 5 คอลัมน์เมื่ออยู่ข้าง sidebar, gap แคบ
+            'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5'
+          : 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
   return (
     <div className={gridClass}>
       {products.map((product) => (

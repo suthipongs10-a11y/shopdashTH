@@ -69,16 +69,45 @@ const SOCIALS = [
   { name: 'youtube' as const, className: 'bg-brand-youtube' },
 ];
 
+/* แถวโลโก้ช่องทางชำระเงิน (ref T3 — "footer มีโลโก้ payment ครบ") ตัวอักษรสีแบรนด์จริง */
+function PaymentLogos() {
+  return (
+    <span className="flex flex-wrap items-center gap-1.5" aria-label="ช่องทางชำระเงินที่รองรับ">
+      <span className="rounded-[3px] border border-border-soft bg-bg px-1.5 py-0.5 text-[10px] font-bold italic text-brand-visa">
+        VISA
+      </span>
+      <span className="rounded-[3px] border border-border-soft bg-bg px-1.5 py-0.5 text-[10px] font-bold text-brand-mastercard">
+        Mastercard
+      </span>
+      <span className="rounded-[3px] border border-border-soft bg-bg px-1.5 py-0.5 text-[10px] font-bold text-brand-jcb">
+        JCB
+      </span>
+      <span className="flex items-center gap-1 rounded-[3px] border border-border-soft bg-bg px-1.5 py-0.5 text-[10px] font-bold text-text">
+        <QrIcon size={11} />
+        PromptPay
+      </span>
+      <span className="rounded-[3px] border border-border-soft bg-bg px-1.5 py-0.5 text-[10px] font-bold text-text">
+        โอนธนาคาร
+      </span>
+      <span className="rounded-[3px] border border-border-soft bg-bg px-1.5 py-0.5 text-[10px] font-bold text-text">
+        เก็บเงินปลายทาง
+      </span>
+    </span>
+  );
+}
+
 function FooterFull({
   storeName,
   linkGroups,
   newsletterText,
   pages,
+  showPayments = false,
 }: {
   storeName: string;
   linkGroups: FooterLinkGroup[];
   newsletterText: string;
   pages: FooterPageLink[];
+  showPayments?: boolean;
 }) {
   return (
     <footer className="mt-auto border-t border-border bg-bg">
@@ -146,6 +175,15 @@ function FooterFull({
         </div>
       </div>
 
+      {showPayments && (
+        <div className="border-t border-border-soft">
+          <div className="mx-auto flex max-w-(--container-max) flex-wrap items-center justify-between gap-2 px-4 py-3">
+            <p className="text-xs font-medium text-text-muted">ช่องทางชำระเงิน</p>
+            <PaymentLogos />
+          </div>
+        </div>
+      )}
+
       <div className="border-t border-border-soft">
         <div className="mx-auto flex max-w-(--container-max) flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-text-muted">
           <p>
@@ -178,6 +216,7 @@ export function Footer({
   newsletterText = 'รับสิทธิพิเศษและโปรโมชั่นก่อนใคร',
   contact,
   orderingEnabled = true,
+  showPayments = false,
 }: {
   storeName: string;
   address?: string | null;
@@ -192,6 +231,8 @@ export function Footer({
   contact?: ContactChannels;
   /** ปิด = ร้านขายผ่านแชท ไม่โชว์ข้อความชำระเงิน PromptPay */
   orderingEnabled?: boolean;
+  /** แถวโลโก้ payment ใน footer full (ref T3 — layout.footerPayments) */
+  showPayments?: boolean;
 }) {
   if (variant === 'full') {
     return (
@@ -200,6 +241,7 @@ export function Footer({
         linkGroups={linkGroups}
         newsletterText={newsletterText}
         pages={pages}
+        showPayments={showPayments}
       />
     );
   }

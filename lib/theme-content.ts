@@ -44,6 +44,39 @@ export interface FeatureListItem {
   sub: string;
 }
 
+/* --- ชุด T3 "HUB" (TEMPLATE_SPEC §3.3 — marketplace) --- */
+
+/** วงกลมหมวดในแถวเลื่อนแนวนอน — href ชี้ /products?category=... หรือฟิลเตอร์อื่น */
+export interface CategoryCircle {
+  label: string;
+  imageUrl: string;
+  href: string;
+}
+
+/** แถบสมาชิกใต้ header — ระบบสมาชิกจริงเป็น Future จึงเป็นเนื้อหาโชว์ของธีม */
+export interface MemberBarContent {
+  /** เช่น "สมาชิก Silver" */
+  title: string;
+  /** เช่น ["คูปองของฉัน 3 ใบ", "คะแนนสะสม 1,250"] */
+  items: string[];
+}
+
+export interface MemberBenefit {
+  icon: 'tag' | 'truck' | 'card';
+  title: string;
+  sub: string;
+}
+
+/** การ์ดบทความ/Lookbook — href ชี้หน้าเพจจริง (/p/slug) */
+export interface ArticleCard {
+  title: string;
+  imageUrl: string;
+  /** วันที่แบบข้อความไทย เช่น "5 ก.ค. 2569" */
+  date: string;
+  href: string;
+  tag?: string;
+}
+
 export interface ThemeContent {
   hero?: Partial<HeroContent>;
   usp?: UspItem[];
@@ -65,6 +98,15 @@ export interface ThemeContent {
   featureListNoteHighlight?: string;
   /** แถบเตือนใต้ header (โหมดเว็บแนะนำสินค้า — สั่งซื้อไม่ได้) */
   disclaimer?: { text: string; highlight?: string };
+  /* --- ชุด T3 "HUB" --- */
+  /** สไลด์ hero carousel (ref T3) — ใช้เมื่อ variant hero = 'carousel' */
+  heroSlides?: Partial<HeroContent>[];
+  categoryCircles?: CategoryCircle[];
+  memberBar?: MemberBarContent;
+  memberBenefits?: MemberBenefit[];
+  articlesTitle?: string;
+  articles?: ArticleCard[];
+  serviceBandTitle?: string;
 }
 
 export const DEFAULT_USP: UspItem[] = [

@@ -34,6 +34,7 @@
   /* โทเคนเสริมชุด Commerce Premium (TEMPLATE_SPEC §2) — preset override ได้ */
   --color-star: #f5a623; /* ดาวรีวิว — สีเดียวทุกธีม (§2) */
   --color-link: #2f6fdd; /* ลิงก์เลขพัสดุ/ดูรายละเอียด (ตาม ref T2) */
+  --color-badge-best: #8b6f47; /* badge "BEST" (§2 — ใหม่=ink, ลดราคา=danger, BEST=สีน้ำตาลนี้) */
 
   /* สีโลโก้แบรนด์ภายนอก (ข้อยกเว้น §5.3 — social/payment เท่านั้น) */
   --brand-facebook: #1877f2;
@@ -82,6 +83,7 @@
   --color-hero-glow: var(--color-hero-glow);
   --color-star: var(--color-star);
   --color-link: var(--color-link);
+  --color-badge-best: var(--color-badge-best);
   --color-brand-facebook: var(--brand-facebook);
   --color-brand-instagram: var(--brand-instagram);
   --color-brand-line: var(--brand-line);

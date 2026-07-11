@@ -12,11 +12,18 @@ export const CATALOG_PAGE_SIZE = 24; // §2.1
 
 export interface CatalogFilters {
   categoryId?: string;
+  /** เลือกหลายหมวดพร้อมกัน (checkbox ฝั่ง sidebar — ธีม marketplace) */
+  categoryIds?: string[];
   size?: string;
   color?: string;
   search?: string;
   sort?: 'newest' | 'price_asc' | 'price_desc';
   page?: number;
+  /** ช่วงราคา (เทียบ base_price — บาทเต็ม) */
+  priceMin?: number;
+  priceMax?: number;
+  /** เฉพาะสินค้าที่มี variant สต๊อก > 0 */
+  inStockOnly?: boolean;
 }
 
 /** ตัดอักขระ wildcard ของ LIKE ออก (`%` `_` `\`) — ค้นหาแบบ substring ตรงตัว (§5.4) */
@@ -28,6 +35,7 @@ interface ProductRow {
   id: string;
   name: string;
   base_price: number;
+  created_at: string;
   product_images: { r2_key: string; sort_order: number }[];
   product_variants: {
     id: string;
@@ -38,7 +46,10 @@ interface ProductRow {
   }[];
 }
 
-const CARD_SELECT =
+/** สินค้า "ใหม่" = ลงขายภายใน 14 วัน (badge NEW ธีม marketplace) */
+const NEW_PRODUCT_DAYS = 14;
+
+const CARD_SELECT = // created_at ใช้คำนวณ badge NEW (toCard)
   'id, name, base_price, created_at, ' +
   'product_images(r2_key, sort_order), ' +
   'product_variants!inner(id, price_override, stock, size, color, is_enabled)';
@@ -48,12 +59,20 @@ function toCard(row: ProductRow): ProductCardData {
   const images = [...row.product_images].sort((a, b) => a.sort_order - b.sort_order);
   // จุดสีบนการ์ด (การ์ดแบบ 'store') — สีไม่ซ้ำ เรียงตามลำดับ variant
   const colorNames = [...new Set(row.product_variants.map((v) => v.color).filter(Boolean))] as string[];
+  // "ลดราคา" = ร้านตั้ง price_override ต่ำกว่า base_price (ข้อมูลจริงจาก DB — ไม่มีคอลัมน์เพิ่ม)
+  const priceMin = prices.length > 0 ? Math.min(...prices) : row.base_price;
+  const onSale = priceMin < row.base_price;
+  const isNew =
+    Date.now() - new Date(row.created_at).getTime() < NEW_PRODUCT_DAYS * 86400e3;
   return {
     id: row.id,
     name: row.name,
     href: `/products/${row.id}`,
-    priceMin: prices.length > 0 ? Math.min(...prices) : row.base_price,
+    priceMin,
     priceMax: prices.length > 0 ? Math.max(...prices) : undefined,
+    compareAtPrice: onSale ? row.base_price : undefined,
+    salePercent: onSale ? Math.round((1 - priceMin / row.base_price) * 100) : undefined,
+    isNew,
     imageUrl: images[0] ? publicR2Url(images[0].r2_key) : undefined,
     hoverImageUrl: images[1] ? publicR2Url(images[1].r2_key) : undefined,
     inStock: row.product_variants.some((v) => v.stock > 0),
@@ -88,8 +107,13 @@ function baseQuery(tenantId: string, filters: CatalogFilters, withCount: boolean
     .eq('product_variants.is_enabled', true);
 
   if (filters.categoryId) q = q.eq('category_id', filters.categoryId);
+  if ((filters.categoryIds ?? []).length > 0) q = q.in('category_id', filters.categoryIds!);
   if (filters.size) q = q.eq('product_variants.size', filters.size);
   if (filters.color) q = q.eq('product_variants.color', filters.color);
+  if (filters.priceMin != null) q = q.gte('base_price', filters.priceMin);
+  if (filters.priceMax != null) q = q.lte('base_price', filters.priceMax);
+  // !inner join — จำกัดเฉพาะสินค้าที่มี variant เปิดขายและสต๊อกเหลือ
+  if (filters.inStockOnly) q = q.gt('product_variants.stock', 0);
   if (filters.search) {
     const term = sanitizeSearch(filters.search);
     // pg_trgm GIN index (migration 006) รองรับ ILIKE — ค้นหาไทยบางส่วน
@@ -165,6 +189,17 @@ export async function fetchRelated(
   return attachRatings(tenantId, rows.slice(0, limit).map(toCard));
 }
 
+/** เรียงไซส์ตามลำดับสวมใส่ (ไม่ใช่ตัวอักษร — ไม่งั้นได้ L M S XL) */
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'FREE'];
+function sizeCompare(a: string, b: string): number {
+  const ia = SIZE_ORDER.indexOf(a.toUpperCase());
+  const ib = SIZE_ORDER.indexOf(b.toUpperCase());
+  if (ia !== -1 && ib !== -1) return ia - ib;
+  if (ia !== -1) return -1;
+  if (ib !== -1) return 1;
+  return a.localeCompare(b, 'th');
+}
+
 /** ตัวเลือกไซส์/สีทั้งหมดของร้าน (ไว้ทำ FilterBar) */
 export async function fetchFilterOptions(
   tenantId: string,
@@ -183,7 +218,7 @@ export async function fetchFilterOptions(
     if (v.size) sizes.add(v.size);
     if (v.color) colors.add(v.color);
   }
-  return { sizes: [...sizes].sort(), colors: [...colors].sort() };
+  return { sizes: [...sizes].sort(sizeCompare), colors: [...colors].sort() };
 }
 
 // ---------- หน้าสินค้า ----------

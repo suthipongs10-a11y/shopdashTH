@@ -4,6 +4,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Footer } from '@/components/storefront/Footer';
+import { MemberBar } from '@/components/storefront/MemberBar';
 import { publicR2Url } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getThemeContent, type FooterLinkGroup } from '@/lib/theme-content';
@@ -157,6 +158,8 @@ export default async function StorefrontLayout({ children }: { children: React.R
         orderingEnabled={orderingEnabled}
         contact={content.contact}
       />
+      {/* แถบสมาชิกใต้ header (ref T3 — เนื้อหาโชว์ของธีม ระบบสมาชิกจริงเป็น Future) */}
+      {preset.layout?.memberBar && content.memberBar && <MemberBar content={content.memberBar} />}
       {/* โหมดเว็บแนะนำสินค้า (ref T1): แถบแจ้งลูกค้าว่าเว็บนี้สั่งซื้อออนไลน์ไม่ได้ */}
       {!orderingEnabled && (
         <div className="border-b border-border-soft bg-surface px-4 py-2 text-center text-xs text-text-muted">
@@ -177,6 +180,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
         newsletterText={content.newsletterText ?? 'รับสิทธิพิเศษและโปรโมชั่นก่อนใครทางอีเมล'}
         contact={content.contact}
         orderingEnabled={orderingEnabled}
+        showPayments={preset.layout?.footerPayments}
       />
     </ThemeScope>
   );
