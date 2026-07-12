@@ -132,7 +132,17 @@
 - [x] ร้านทดสอบ: **shop2 = ร้านของเล่นเดโม่** (ธีมพาสเทล basic-02 + labels ช่วงวัย/แบบ + หมวด "ของเล่นเด็ก" + ตุ๊กตา 4 variants/จิ๊กซอว์ 2 variants จาก `.tmp-labels-seed.mjs` รันซ้ำได้) — เก็บไว้ดูฟีเจอร์นี้ได้เลยที่ `shop2.localhost:3000`
 - [x] `npx tsc --noEmit` + `npm run build` ผ่าน
 
+## Done (Phase 7 ต่อ — หน้า "เนื้อหาเว็บ": CMS เทมเพลต T1-T4 ใน Dashboard, 2026-07-12 ตามคำสั่งเจ้าของ)
+- [x] **`/admin/content` เมนูใหม่ "เนื้อหาเว็บ"** (กลุ่มหน้าร้าน): ร้านแก้ข้อความ+รูปประกอบของเทมเพลตเองได้ครบ — hero/สไลด์ carousel/แถบ USP/utility bar/แบนเนอร์หมวด/ช่องทางแชท T1/featureList/วงกลมหมวด T3/แถบสมาชิก/บทความ/Lookbook+Brand Story T4/ไฮไลต์/perks(โค้ดต้อนรับ)/trust/หัวข้อ footer/newsletter
+- [x] **สถาปัตยกรรม schema-driven** (`lib/content-schema.ts` 21 กลุ่ม + `content-form.tsx` ฟอร์ม generic ตัวเดียว): แต่ละกลุ่มมี `appliesTo(preset)` → โชว์เฉพาะที่ธีมปัจจุบันใช้ (T2 เห็น 6 กลุ่ม, T4 เห็น 8, ธีม basic เห็น empty state ชี้ไปตั้งค่าร้าน) — ไม่มีฟอร์มเฉพาะธีม ธีมใหม่เพิ่มแค่ schema (ดู DECISIONS)
+- [x] server action validate ตาม schema (icon whitelist / href / รูปต้องจาก R2 หรือ path ภายใน / ค่าว่าง = กลับ default ธีม) + merge __content แบบเดียว socials — สิทธิ์ owner+staff
+- [x] **อัปโหลดรูปเนื้อหา**: kind ใหม่ `content_image` → `branding/{tenant}/content/{uuid}.webp` (webp ≤1600px ฝั่ง client เหมือนรูปสินค้า) + preview/เปลี่ยน/ลบในฟอร์ม
+- [x] **e2e ผ่าน 20/20 + อัปโหลดรูป 4/4** (`.tmp-content-test.mjs` prod build + `.tmp-content-image-test.mjs` dev): T2 กลุ่มครบ+ไม่มีกลุ่มธีมอื่น / แก้ hero headline + เพิ่ม USP ผ่าน UI → หน้าร้านเปลี่ยนทันที / T4 กลุ่มครบ+ค่า seed preload / รูปอัปจริง→DB→เสิร์ฟ 200 — backup/restore __content ร้านเดโม่ครบ
+- [x] `tsc --noEmit` + `npm run build` ผ่าน / screenshot `.tmp-shots/content/`
+- ⚠ **ข้อจำกัด dev ที่พบ: R2 CORS อนุญาตเฉพาะ `http://localhost:3000`** — อัปโหลดรูป (เนื้อหา+สินค้า) จาก `{slug}.localhost:3000` โดน browser block มาแต่เดิม → เตรียมสคริปต์ `.tmp-r2-cors.mjs` ให้เจ้าของรันเพิ่ม `http://*.localhost:3000` (แก้ infra ภายนอก — ต้องให้เจ้าของตัดสินใจ) + production เพิ่มโดเมนจริงตาม DEPLOYMENT.md
+
 ## ค้าง / ขั้นตอนถัดไป
+- [ ] **เจ้าของรัน `node .tmp-r2-cors.mjs` หนึ่งครั้ง** (หรือแก้ใน Cloudflare dashboard) — เพิ่ม origin `http://*.localhost:3000` ใน R2 CORS เพื่อให้อัปโหลดรูปจาก admin ของร้าน subdomain ทำงานใน dev
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 - [ ] (ไอเดียต่อยอด variant labels ถ้าเจ้าของต้องการ) รูปเดโม่หมวดของเล่น/แม่และเด็ก + preset ธีมโทนเด็ก — โครงสร้างรองรับแล้ว เหลือแค่ asset

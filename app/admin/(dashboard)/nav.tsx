@@ -9,6 +9,7 @@ import { useState } from 'react';
 import {
   CategoriesIcon,
   CloseIcon,
+  ContentIcon,
   CustomersIcon,
   DashboardIcon,
   DiscountIcon,
@@ -65,6 +66,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'หน้าร้าน',
     items: [
       { href: '/admin/theme', label: 'ธีมร้าน', icon: ThemeIcon },
+      { href: '/admin/content', label: 'เนื้อหาเว็บ', icon: ContentIcon },
       { href: '/admin/pages', label: 'เพจ', icon: PagesIcon },
       { href: '/admin/domain', label: 'โดเมน', icon: DomainIcon, ownerOnly: true },
     ],

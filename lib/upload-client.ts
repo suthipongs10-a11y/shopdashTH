@@ -35,7 +35,7 @@ export async function toWebp(file: File): Promise<Blob> {
   }
 }
 
-export type UploadKind = 'product_image' | 'branding_logo' | 'branding_banner';
+export type UploadKind = 'product_image' | 'branding_logo' | 'branding_banner' | 'content_image';
 
 export interface UploadedImage {
   key: string;

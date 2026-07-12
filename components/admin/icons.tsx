@@ -97,6 +97,16 @@ export function PagesIcon({ size = 18, className }: IconProps) {
   );
 }
 
+export function ContentIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+      <path d="M3.5 9.5h17M7 13h4M7 16h6" />
+      <rect x="14.5" y="12" width="3.5" height="4.5" rx="0.5" />
+    </svg>
+  );
+}
+
 export function ThemeIcon({ size = 18, className }: IconProps) {
   return (
     <svg {...base(size, className)}>

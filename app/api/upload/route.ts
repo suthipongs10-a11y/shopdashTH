@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { getStoreUser } from '@/lib/auth';
 import {
   brandingKey,
+  contentImageKey,
   IMAGE_MIME_EXT,
   MAX_IMAGE_BYTES,
   PRESIGNED_PUT_EXPIRES_SECONDS,
@@ -15,7 +16,7 @@ import {
 } from '@/lib/r2';
 import { getTenantContext, TenantNotFoundError } from '@/lib/tenant-context';
 
-const KINDS = ['product_image', 'branding_logo', 'branding_banner'] as const;
+const KINDS = ['product_image', 'branding_logo', 'branding_banner', 'content_image'] as const;
 type UploadKind = (typeof KINDS)[number];
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -69,6 +70,8 @@ export async function POST(req: Request) {
         return badRequest('ต้องระบุ productId ของสินค้า');
       }
       key = productImageKey(ctx.tenantId, body.productId, body.contentType);
+    } else if (body.kind === 'content_image') {
+      key = contentImageKey(ctx.tenantId);
     } else {
       key = brandingKey(ctx.tenantId, body.kind === 'branding_logo' ? 'logo' : 'banner');
     }

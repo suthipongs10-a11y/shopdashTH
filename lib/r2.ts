@@ -62,6 +62,12 @@ export function brandingKey(tenantId: string, kind: 'logo' | 'banner'): string {
   return `branding/${tenantId}/${kind}.webp`;
 }
 
+/** รูปประกอบเนื้อหาเทมเพลต (hero/แบนเนอร์หมวด/บทความ ฯลฯ — /admin/content)
+ *  key สุ่มเพราะร้านมีได้หลายรูป — รูปเก่าที่เลิกใช้ค้างใน R2 (ยอมรับได้ ขนาดเล็ก) */
+export function contentImageKey(tenantId: string): string {
+  return `branding/${tenantId}/content/${randomUUID()}.webp`;
+}
+
 /** สลิปค่าแพลนที่ร้านจ่ายให้แพลตฟอร์ม (Phase 3) — อยู่ใต้ slips/ จึงถูกกัน public URL อัตโนมัติ */
 export function platformSlipKey(tenantId: string, mime: string): string {
   return `slips/platform/${tenantId}/${randomUUID()}.${IMAGE_MIME_EXT[mime]}`;
