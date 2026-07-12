@@ -139,10 +139,9 @@
 - [x] **อัปโหลดรูปเนื้อหา**: kind ใหม่ `content_image` → `branding/{tenant}/content/{uuid}.webp` (webp ≤1600px ฝั่ง client เหมือนรูปสินค้า) + preview/เปลี่ยน/ลบในฟอร์ม
 - [x] **e2e ผ่าน 20/20 + อัปโหลดรูป 4/4** (`.tmp-content-test.mjs` prod build + `.tmp-content-image-test.mjs` dev): T2 กลุ่มครบ+ไม่มีกลุ่มธีมอื่น / แก้ hero headline + เพิ่ม USP ผ่าน UI → หน้าร้านเปลี่ยนทันที / T4 กลุ่มครบ+ค่า seed preload / รูปอัปจริง→DB→เสิร์ฟ 200 — backup/restore __content ร้านเดโม่ครบ
 - [x] `tsc --noEmit` + `npm run build` ผ่าน / screenshot `.tmp-shots/content/`
-- ⚠ **ข้อจำกัด dev ที่พบ: R2 CORS อนุญาตเฉพาะ `http://localhost:3000`** — อัปโหลดรูป (เนื้อหา+สินค้า) จาก `{slug}.localhost:3000` โดน browser block มาแต่เดิม → เตรียมสคริปต์ `.tmp-r2-cors.mjs` ให้เจ้าของรันเพิ่ม `http://*.localhost:3000` (แก้ infra ภายนอก — ต้องให้เจ้าของตัดสินใจ) + production เพิ่มโดเมนจริงตาม DEPLOYMENT.md
+- [x] **แก้ R2 CORS แล้ว (เจ้าของทำผ่าน Cloudflare Dashboard โดยตรง, 2026-07-12)**: เพิ่ม origin `http://localhost:3000` + `http://*.localhost:3000` ใน bucket `shopdash-prod` — R2 API token ที่แอปใช้มีสิทธิ์แค่ Object Read/Write เขียน CORS (bucket-level) ไม่ได้ (`AccessDenied` ตอนลองรัน `.tmp-r2-cors.mjs`) จึงทำผ่านหน้าเว็บแทน (ไม่ต้องยกระดับสิทธิ์ token) — **ยืนยันด้วย e2e จริงที่ `wearstore.localhost:3000` (`.tmp-cors-verify.mjs` 4/4): อัปโหลดรูปจาก subdomain สำเร็จ ไม่มี CORS error, บันทึกลง DB, รูปเสิร์ฟ 200**
 
 ## ค้าง / ขั้นตอนถัดไป
-- [ ] **เจ้าของรัน `node .tmp-r2-cors.mjs` หนึ่งครั้ง** (หรือแก้ใน Cloudflare dashboard) — เพิ่ม origin `http://*.localhost:3000` ใน R2 CORS เพื่อให้อัปโหลดรูปจาก admin ของร้าน subdomain ทำงานใน dev
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 - [ ] (ไอเดียต่อยอด variant labels ถ้าเจ้าของต้องการ) รูปเดโม่หมวดของเล่น/แม่และเด็ก + preset ธีมโทนเด็ก — โครงสร้างรองรับแล้ว เหลือแค่ asset
