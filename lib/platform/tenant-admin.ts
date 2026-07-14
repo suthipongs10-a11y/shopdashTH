@@ -190,7 +190,7 @@ export async function downgradePrecheck(
   const newPlanFeatures = (newPlan.features ?? {}) as Record<string, unknown>;
   if (activeDomain && newPlanFeatures.custom_domain !== true) {
     warnings.push(
-      `ร้านใช้ custom domain "${activeDomain.domain}" อยู่ แต่แพลนใหม่ไม่รองรับ — โดเมนจะถูกพักการใช้งาน (subdomain .shopdash.co ยังใช้ได้ปกติ)`,
+      `ร้านใช้ custom domain "${activeDomain.domain}" อยู่ แต่แพลนใหม่ไม่รองรับ — โดเมนจะถูกพักการใช้งาน (subdomain .${process.env.ROOT_DOMAIN ?? 'shopdashth.com'} ยังใช้ได้ปกติ)`,
     );
   }
 

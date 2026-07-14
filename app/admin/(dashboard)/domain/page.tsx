@@ -52,7 +52,7 @@ export default async function DomainPage() {
 
   const domain = await getCustomDomain(ctx.tenantId);
   const status = domain ? STATUS_TH[domain.status] : null;
-  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdash.co';
+  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdashth.com';
 
   return (
     <div className="max-w-3xl space-y-6">

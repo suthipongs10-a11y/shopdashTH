@@ -28,7 +28,11 @@ export default async function SignupPage({
         ในหลังร้าน
       </p>
       <div className="mt-8">
-        <SignupForm plans={plans} preselectCode={preselect} />
+        <SignupForm
+          plans={plans}
+          preselectCode={preselect}
+          rootDomain={process.env.ROOT_DOMAIN ?? 'shopdashth.com'}
+        />
       </div>
     </div>
   );

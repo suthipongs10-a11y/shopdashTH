@@ -23,12 +23,12 @@
 ## §1. Infrastructure & DNS (Vercel)
 
 - [ ] เชื่อมโปรเจ็คกับ Vercel, ตั้ง production branch
-- [ ] **Wildcard domain** `*.shopdash.co` → Vercel (subdomain ร้านทุกร้าน) — Vercel ต้องรองรับ wildcard (ต้องใช้ Vercel DNS หรือ verify wildcard)
-- [ ] `admin.shopdash.co` → super admin (middleware map ไว้แล้ว `middleware.ts:55`)
-- [ ] apex `shopdash.co` + `www.shopdash.co` → platform landing/signup (`middleware.ts:59`)
-- [ ] `cname.shopdash.co` → ปลายทางสำหรับ custom domain ของร้าน (ที่เอกสาร DNS ในหน้า `/admin/domain` แนะนำลูกค้า) ตั้งให้ resolve จริง
+- [ ] **Wildcard domain** `*.shopdashth.com` → Vercel (subdomain ร้านทุกร้าน) — Vercel ต้องรองรับ wildcard (ต้องใช้ Vercel DNS หรือ verify wildcard)
+- [ ] `admin.shopdashth.com` → super admin (middleware map ไว้แล้ว `middleware.ts:55`)
+- [ ] apex `shopdashth.com` + `www.shopdashth.com` → platform landing/signup (`middleware.ts:59`)
+- [ ] `cname.shopdashth.com` → ปลายทางสำหรับ custom domain ของร้าน (ที่เอกสาร DNS ในหน้า `/admin/domain` แนะนำลูกค้า) ตั้งให้ resolve จริง
 - [ ] SSL: wildcard + apex + custom domains ออก cert อัตโนมัติ (Vercel) — custom domain ของร้านต้อง add เข้า Vercel ด้วย (ปัจจุบัน verify DNS ในแอป แต่การ provision cert เป็นงาน platform — ตรวจ flow นี้กับโดเมนจริง 1 อัน)
-- [ ] `ROOT_DOMAIN=shopdash.co` ตรงกับโดเมนจริง
+- [ ] `ROOT_DOMAIN=shopdashth.com` ตรงกับโดเมนจริง
 
 ---
 
@@ -45,7 +45,7 @@
 | `R2_BUCKET` | `lib/r2.ts` | `shopdash-prod` |
 | `R2_PUBLIC_BASE_URL` | `lib/r2.ts` + `next.config.ts` | **ถ้าว่าง → next/image remotePattern ว่าง = รูปพัง** |
 | `PLATFORM_PROMPTPAY_ID` / `_NAME` | `/admin/plan` | ดู §0 |
-| `ROOT_DOMAIN` | middleware/domains/sitemap | `shopdash.co` |
+| `ROOT_DOMAIN` | middleware/domains/sitemap | `shopdashth.com` |
 | `CRON_SECRET` | cron routes | `openssl rand -hex 32` (ดู §5) |
 | `SLIP_VERIFY_PROVIDER` | `lib/slip-verify` | `mock` จนกว่ามีจริง |
 | `SLIP_VERIFY_MOCK_MODE` | mock verifier | **`amount_mismatch`** ใน prod (ดู §0) |
@@ -74,7 +74,7 @@
 ## §4. Cloudflare R2
 
 - [ ] Bucket `shopdash-prod` (หรือชื่อตาม `R2_BUCKET`) มีจริง
-- [ ] **CORS**: เพิ่ม origin production (`https://*.shopdash.co` + custom domains ที่ใช้) — presigned PUT อัปโหลดจาก browser ตรงต้องผ่าน CORS (ดู STATUS.md: dev ตั้งไว้แค่ `localhost:3000`)
+- [ ] **CORS**: เพิ่ม origin production (`https://*.shopdashth.com` + custom domains ที่ใช้) — presigned PUT อัปโหลดจาก browser ตรงต้องผ่าน CORS (ดู STATUS.md: dev ตั้งไว้แค่ `localhost:3000`)
 - [ ] Public bucket domain (หรือ CDN) → `R2_PUBLIC_BASE_URL` (ไม่มี `/` ท้าย) — ใช้เสิร์ฟรูปสินค้า/โลโก้/แบนเนอร์
 - [ ] **สลิปห้ามเสิร์ฟผ่าน public domain** — เสิร์ฟผ่าน presigned GET เท่านั้น (โค้ดทำไว้แล้ว `lib/r2.ts`, path `slips/` แยก) ตรวจว่า public bucket ไม่ได้เปิด list/expose path `slips/`
 - [ ] token R2 เป็น Object Read & Write เท่านั้น (least privilege)
@@ -103,7 +103,7 @@
 
 ## §7. Pre-launch smoke test (บนโดเมนจริง)
 
-- [ ] signup ร้านใหม่จาก `shopdash.co/signup` → เปิด `{slug}.shopdash.co/admin` ได้ทันที (trial)
+- [ ] signup ร้านใหม่จาก `shopdashth.com/signup` → เปิด `{slug}.shopdashth.com/admin` ได้ทันที (trial)
 - [ ] เพิ่มสินค้า + อัปรูป (ทดสอบ R2 CORS prod จริง) → เห็นรูปผ่าน next/image
 - [ ] ลูกค้า checkout → **สแกน QR ด้วยแอปธนาคารจริง** ยอด+ชื่อบัญชี PromptPay ของร้านถูกต้อง → อัปสลิป → แอดมินอนุมัติ → สต๊อกตัด
 - [ ] ร้านจ่ายค่าแพลน → super admin เห็นสลิปในคิว → อนุมัติ → ร้าน active

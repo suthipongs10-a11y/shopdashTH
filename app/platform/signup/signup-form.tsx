@@ -36,9 +36,11 @@ function tenantAdminUrl(slug: string): string {
 export function SignupForm({
   plans,
   preselectCode,
+  rootDomain,
 }: {
   plans: SignupPlan[];
   preselectCode?: string;
+  rootDomain: string;
 }) {
   const [planId, setPlanId] = useState<string>(
     plans.find((p) => p.code === preselectCode)?.id ?? plans[0]?.id ?? '',
@@ -186,7 +188,7 @@ export function SignupForm({
             className={inputClass}
             autoComplete="off"
           />
-          <span className="shrink-0 text-sm text-gray-400">.shopdash.co</span>
+          <span className="shrink-0 text-sm text-gray-400">.{rootDomain}</span>
         </div>
         {slugStatus.state === 'checking' && (
           <p className="mt-1 text-xs text-gray-400">กำลังตรวจสอบ…</p>

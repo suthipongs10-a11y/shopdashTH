@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 function tenantBaseUrl(slug: string): string {
   if (process.env.NODE_ENV === 'development') return `http://${slug}.localhost:3000`;
-  return `https://${slug}.${process.env.ROOT_DOMAIN ?? 'shopdash.co'}`;
+  return `https://${slug}.${process.env.ROOT_DOMAIN ?? 'shopdashth.com'}`;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

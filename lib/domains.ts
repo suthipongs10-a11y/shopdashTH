@@ -1,7 +1,7 @@
 // Custom domain (งาน 4.8 — §2.4 v1.1 + §7.5)
 // flow: ร้านกรอกโดเมน → ระบบสร้าง TXT token + แนะนำ DNS → ปุ่ม "ตรวจสอบ DNS" ทำ 3 เช็คแยกข้อ
 // สถานะ: pending → verifying → verified → active / error / suspended (§7.2)
-// subdomain .shopdash.co ใช้ได้เสมอ — custom domain เป็น "เพิ่ม" ไม่ใช่ "แทนที่"
+// subdomain .shopdashth.com ใช้ได้เสมอ — custom domain เป็น "เพิ่ม" ไม่ใช่ "แทนที่"
 
 import 'server-only';
 import { randomBytes } from 'crypto';
@@ -13,7 +13,7 @@ import type { TenantContext } from '@/lib/tenant-context';
 // ค่าที่ DNS ของร้านต้องชี้มา (ตาม instruction ของ Vercel §2.4)
 export const VERCEL_APEX_A = '76.76.21.21';
 export function cnameTarget(): string {
-  return `cname.${process.env.ROOT_DOMAIN ?? 'shopdash.co'}`;
+  return `cname.${process.env.ROOT_DOMAIN ?? 'shopdashth.com'}`;
 }
 
 const DOMAIN_REGEX = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/;
@@ -48,7 +48,7 @@ export async function requestCustomDomain(
   if (!DOMAIN_REGEX.test(domain)) {
     return { ok: false, error: 'รูปแบบโดเมนไม่ถูกต้อง เช่น baannoi.com หรือ shop.baannoi.com' };
   }
-  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdash.co';
+  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdashth.com';
   if (domain === rootDomain || domain.endsWith(`.${rootDomain}`)) {
     return { ok: false, error: 'ใช้โดเมนของ ShopDash เป็น custom domain ไม่ได้' };
   }

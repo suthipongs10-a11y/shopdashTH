@@ -1,6 +1,7 @@
 // Hostname routing (§1.4) — หัวใจ multi-tenancy ฝั่ง frontend
 // Phase 2: resolve slug จาก subdomain แล้วแนบ header x-tenant-slug
 // Phase 3: admin.{root} → /super-admin, root domain (+www) → /platform (landing/signup)
+// ROOT_DOMAIN = shopdashth.com (ตั้งใน env — ค่า default ในไฟล์นี้เป็นแค่ fallback)
 // Phase 4: custom domain → lookup ตาราง custom_domains (status=active) → slug
 
 import { NextResponse, type NextRequest } from 'next/server';
@@ -49,13 +50,13 @@ type HostTarget =
   | { kind: 'unknown' };
 
 function resolveHost(host: string): HostTarget {
-  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdash.co';
+  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdashth.com';
 
-  // production: admin.shopdash.co / dev: admin.localhost
+  // production: admin.shopdashth.com / dev: admin.localhost
   if (host === `admin.${rootDomain}` || host === 'admin.localhost') {
     return { kind: 'super-admin' };
   }
-  // production: shopdash.co + www / dev: www.localhost (localhost เปล่า = demo เพื่อ DX)
+  // production: shopdashth.com + www / dev: www.localhost (localhost เปล่า = demo เพื่อ DX)
   if (host === rootDomain || host === `www.${rootDomain}` || host === 'www.localhost') {
     return { kind: 'platform' };
   }
@@ -79,6 +80,11 @@ function resolveHost(host: string): HostTarget {
   return { kind: 'unknown' };
 }
 
+// ไฟล์ static ใน public/ — ต้องปล่อยผ่านก่อน rewrite
+// (host แพลตฟอร์ม/super-admin rewrite ทุก path เป็น /platform|/super-admin + path → ไฟล์ public จะ 404)
+// ไม่รวม .xml/.txt เพราะ sitemap.xml และ robots.txt เป็น route ต่อ tenant ที่ต้องได้ x-tenant-slug
+const STATIC_FILE = /\.(?:webp|png|jpe?g|gif|svg|ico|css|js|map|woff2?|ttf|mp4|webm)$/i;
+
 export async function middleware(req: NextRequest) {
   // server action redirect() ทำ internal fetch เข้า loopback (Host กลายเป็น localhost:3000)
   // host จริงของผู้ใช้อยู่ใน x-forwarded-host — ต้องอ่านตัวนั้นก่อน (proxy/Vercel ก็ตั้งให้เช่นกัน)
@@ -89,6 +95,8 @@ export async function middleware(req: NextRequest) {
   // cron ถูกเรียกจากโดเมน deployment (เช่น *.vercel.app) ไม่ใช่ host ร้าน —
   // ปล่อยผ่านทุก host, route ตรวจ CRON_SECRET เอง
   if (path.startsWith('/api/cron/')) return NextResponse.next();
+
+  if (STATIC_FILE.test(path)) return NextResponse.next();
 
   let target = resolveHost(host);
 

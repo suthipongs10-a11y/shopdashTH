@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const host =
     h.get('x-forwarded-host') ??
     h.get('host') ??
-    `${ctx.slug}.${process.env.ROOT_DOMAIN ?? 'shopdash.co'}`;
+    `${ctx.slug}.${process.env.ROOT_DOMAIN ?? 'shopdashth.com'}`;
   const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
   const base = `${proto}://${host}`;
 

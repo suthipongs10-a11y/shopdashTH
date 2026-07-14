@@ -1,7 +1,17 @@
 # STATUS
 - Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต + DoD ผ่านครบทุกข้อรวม Lighthouse** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
-- Last session: 2026-07-12
+- **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
+- Last session: 2026-07-14
+
+## Done (Phase 7 ต่อ — โดเมน shopdashth.com + หน้า landing ขาย ShopDash, 2026-07-14 ตามคำสั่งเจ้าของ)
+- [x] **เปลี่ยนโดเมนเป็น `shopdashth.com` ทุกจุด**: `.env.local`/`.env.example` (`ROOT_DOMAIN`) + ค่า fallback ในโค้ด 6 จุด (middleware, lib/domains cname target, sitemap, /admin/domain, super-admin tenant detail, ข้อความ pre-check ดาวน์เกรด) + suffix ในฟอร์ม signup เลิก hardcode `.shopdash.co` → รับ prop `rootDomain` + CLAUDE.md/DEPLOYMENT.md อัปเดตครบ (ดู DECISIONS)
+- [x] **หน้า landing ใหม่ (`/platform` = root domain)** โทน SaaS สะอาด (indigo เดียวกับ Dashboard, IBM Plex Sans Thai): hero + จุดขาย "เงินเข้าบัญชีร้านเต็มจำนวน ไม่หักค่าคอมต่อออร์เดอร์" / **แกลเลอรีเทมเพลต 4 ตัวเป็น screenshot ร้านเดโม่จริง + ปุ่มเข้าร้านเดโม่** / ฟีเจอร์ 6 ข้อ (PromptPay, กันสลิปซ้ำด้วย QR, variant/สต๊อก, ออร์เดอร์-พัสดุ, แก้เนื้อหาเอง, แดชบอร์ด) / 3 ขั้นตอนเริ่มต้น / ตารางราคา 4 แพ็กเกจอ่านจาก DB (2 ชั้น: ปีแรก + ค่าดูแลรายปี, ป้าย "แนะนำ" ที่ p2-shop) / FAQ 6 ข้อ / CTA — header+footer ใหม่ (nav, ลิงก์, metadata+OG)
+- [x] **ป้าย "เทมเพลตนี้อยู่ในแพ็กเกจไหน" คำนวณจาก `plans.allowed_theme_tier` จริง** (ตอนแรก hardcode ผิด: p2-shop ใช้ LUXÉ ได้อยู่แล้ว = โฆษณาผิด) — ราคา/ฟีเจอร์/ป้ายทั้งหมดมาจากตาราง plans เจ้าของแก้ใน Super Admin แล้วหน้าขายเปลี่ยนตามทันที
+- [x] **แก้บั๊กแฝง middleware: ไฟล์ static ใน `public/` โหลดไม่ได้บน host แพลตฟอร์ม/super-admin** (ถูก rewrite เป็น `/platform{path}` → 404, next/image → 400) — เพิ่ม static bypass ก่อน rewrite โดยไม่รวม .xml/.txt (sitemap/robots ต้องได้ x-tenant-slug) — บั๊กนี้ซ่อนมาตลอดเพราะหน้า platform เดิมไม่มีรูปเลย
+- [x] รูปเทมเพลต: `public/marketing/templates/*.webp` (เก็บด้วย `.tmp-landing-shots.mjs` — รันซ้ำได้เมื่อธีมเปลี่ยนหน้าตา)
+- [x] `tsc --noEmit` + `npm run build` ผ่าน + **regression prod build 19/19** (`.tmp-landing-regression.mjs`): landing/รูป/next-image/signup + storefront 4 ร้าน + sitemap ต่อ tenant + admin/super-admin login + หน้ากั้น /platform,/super-admin จาก host ร้าน + landing โชว์ราคาจาก DB จริง — screenshot `.tmp-shots/landing/`
+- ⚠ พบบั๊กเดิมที่ไม่เกี่ยวกับงานนี้ (ยืนยันว่ามีอยู่ก่อนแก้ middleware): **`/robots.txt` ของ storefront ตอบ 404** ทั้งที่ `app/(storefront)/robots.ts` มีอยู่ — ยังไม่แก้ในรอบนี้
 
 ## Done (Phase 6 — Billing v2 + สรุปออร์เดอร์)
 - [x] `supabase/migrations/007_billing_v2.sql` — **apply แล้ว 2026-07-10 (ผู้ใช้รันใน SQL Editor, ตรวจ 12/12 ผ่านด้วย `.tmp-verify-007.mjs`)**: plans.price_renewal, แพ็กเกจใหม่ 4 ตัว (p1-start ฿990/590, p2-shop ฿3,900/1,200, p3-business ฿7,900/2,400, p4-premium ฿15,900/4,900), ปิดขาย starter/pro/premium, flag ใหม่ `theme_customize`, orders.public_token, stores.order_cutoff_time + shipping_note_th
