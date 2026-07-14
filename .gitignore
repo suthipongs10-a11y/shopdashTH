@@ -33,3 +33,7 @@ CLAUDE - Copy.md
 
 # graphify (generated knowledge graph)
 /graphify-out/
+
+# session scratch scripts/screenshots (ไม่ commit ตามธรรมเนียมโปรเจ็ค)
+.tmp-*
+.tmp-*/
