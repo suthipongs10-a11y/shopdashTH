@@ -3,7 +3,12 @@
 // ค่าเก็บใน theme_overrides.__content — เว้นว่าง = ใช้ค่า default ของธีม
 
 import Link from 'next/link';
-import { groupsForPreset, toClientGroup } from '@/lib/content-schema';
+import {
+  type ContentGroupClient,
+  groupsForPreset,
+  heroCropAspect,
+  toClientGroup,
+} from '@/lib/content-schema';
 import { getThemeContent } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
@@ -14,6 +19,17 @@ export default async function ContentPage() {
   const preset = getPreset(ctx.store.theme_code);
   const content = getThemeContent(ctx.store.theme_overrides) as Record<string, unknown>;
   const groups = groupsForPreset(preset);
+
+  // hero สัดส่วนกรอบครอปต่างกันตามธีม — ฉีดเข้า field imageUrl ของกลุ่ม hero
+  const heroAspect = heroCropAspect(preset.variants.hero);
+  const clientGroup = (group: (typeof groups)[number]): ContentGroupClient => {
+    const cg = toClientGroup(group);
+    if (group.id !== 'hero') return cg;
+    return {
+      ...cg,
+      fields: cg.fields.map((f) => (f.key === 'imageUrl' ? { ...f, aspect: heroAspect } : f)),
+    };
+  };
 
   return (
     <div className="space-y-6">
@@ -56,7 +72,7 @@ export default async function ContentPage() {
         groups.map((group) => (
           <ContentGroupForm
             key={group.id}
-            group={toClientGroup(group)}
+            group={clientGroup(group)}
             initial={
               group.kind === 'strings'
                 ? Object.fromEntries(group.fields.map((f) => [f.key, content[f.key]]))

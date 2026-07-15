@@ -31,6 +31,9 @@ export interface ContentFieldDef {
   iconOptions?: ContentIconOption[];
   /** ใน list: รายการที่ไม่กรอกช่องนี้จะถูกตัดทิ้งตอนบันทึก */
   required?: boolean;
+  /** สัดส่วนกรอบครอป (กว้าง/สูง) ของช่องรูป — ตั้งค่าแล้วจะเปิดเครื่องมือครอปตอนอัป
+   *  ให้รูปพอดีกรอบที่ธีมเรนเดอร์เสมอ (hero คำนวณตามธีมด้วย heroCropAspect) */
+  aspect?: number;
 }
 
 export interface ContentGroupDef {
@@ -134,6 +137,7 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         label: 'รูปสไลด์',
         type: 'image',
         required: true,
+        aspect: 3 / 1,
         help: 'แนะนำแนวนอน ~1600×540px (สัดส่วน 3:1) จุดเด่นค่อนไปกลาง-ขวา · jpg/png/webp ≤5MB',
       },
       { key: 'eyebrow', label: 'ข้อความเล็กเหนือหัวข้อ', type: 'text' },
@@ -190,6 +194,7 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         label: 'รูปแบนเนอร์',
         type: 'image',
         required: true,
+        aspect: 3 / 2,
         help: 'แนะนำแนวนอน ~1200×800px (สัดส่วน 3:2) · jpg/png/webp ≤5MB',
       },
       { key: 'title', label: 'ชื่อหมวด', type: 'text', required: true },
@@ -289,6 +294,7 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         label: 'รูป',
         type: 'image',
         required: true,
+        aspect: 1,
         help: 'แนะนำรูปจัตุรัส ≥400×400px (1:1) จุดเด่นอยู่กลางภาพ — แสดงเป็นวงกลม · jpg/png/webp ≤5MB',
       },
       { key: 'label', label: 'ชื่อใต้วงกลม', type: 'text', required: true },
@@ -341,6 +347,7 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         label: 'รูปปก',
         type: 'image',
         required: true,
+        aspect: 16 / 10,
         help: 'แนะนำแนวนอน ~800×500px (สัดส่วน 16:10) · jpg/png/webp ≤5MB',
       },
       { key: 'title', label: 'ชื่อบทความ', type: 'text', required: true },
@@ -371,6 +378,7 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         key: 'imageUrl',
         label: 'รูปใหญ่',
         type: 'image',
+        aspect: 4 / 5,
         help: 'แนะนำแนวตั้ง ~900×1100px (สัดส่วน 4:5) จุดเด่นค่อนไปด้านบน · jpg/png/webp ≤5MB',
       },
       { key: 'eyebrow', label: 'ข้อความเล็ก', type: 'text', placeholder: 'LOOKBOOK' },
@@ -459,4 +467,19 @@ export function groupsForPreset(preset: ThemePreset): ContentGroupDef[] {
 
 export function getContentGroup(id: string): ContentGroupDef | undefined {
   return CONTENT_GROUPS.find((g) => g.id === id);
+}
+
+/** สัดส่วนกรอบครอปของ hero — ต่างกันตามธีมที่เรนเดอร์จริง (HeroBanner):
+ *  commerce = แถบกว้าง 3:1 / split-panel = ครึ่งแผง 3:2 / luxe = รูปตั้งข้าง 4:5 */
+export function heroCropAspect(heroVariant: string): number {
+  switch (heroVariant) {
+    case 'commerce':
+      return 3 / 1;
+    case 'split-panel':
+      return 3 / 2;
+    case 'luxe':
+      return 4 / 5;
+    default:
+      return 3 / 1;
+  }
 }

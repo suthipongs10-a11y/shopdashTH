@@ -6,8 +6,9 @@
 
 import Image from 'next/image';
 import { useActionState, useRef, useState } from 'react';
+import { ImageCropper } from '@/components/admin/ImageCropper';
 import type { ContentFieldDef, ContentGroupClient } from '@/lib/content-schema';
-import { uploadImage, UploadError } from '@/lib/upload-client';
+import { uploadCroppedWebp, uploadImage, UploadError } from '@/lib/upload-client';
 import { saveContentGroup, type ContentActionState } from './actions';
 
 type Values = Record<string, string>;
@@ -35,16 +36,19 @@ function initialValues(fields: ContentFieldDef[], raw: unknown): Values {
 function ImageField({
   value,
   onChange,
+  aspect,
 }: {
   value: string;
   onChange: (url: string) => void;
+  /** ถ้ามี → เปิดเครื่องมือครอปตามสัดส่วนก่อนอัป */
+  aspect?: number;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [cropFile, setCropFile] = useState<File | null>(null);
 
-  async function handleFile(file: File | undefined) {
-    if (!file) return;
+  async function uploadFile(file: File) {
     setError('');
     setUploading(true);
     try {
@@ -54,12 +58,42 @@ function ImageField({
       setError(err instanceof UploadError ? err.message : 'อัปโหลดไม่สำเร็จ กรุณาลองใหม่');
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = '';
     }
+  }
+
+  async function uploadCropped(blob: Blob) {
+    setError('');
+    setUploading(true);
+    try {
+      const uploaded = await uploadCroppedWebp('content_image', blob);
+      onChange(uploaded.publicUrl);
+    } catch (err) {
+      setError(err instanceof UploadError ? err.message : 'อัปโหลดไม่สำเร็จ กรุณาลองใหม่');
+    } finally {
+      setUploading(false);
+      setCropFile(null);
+    }
+  }
+
+  function handleFile(file: File | undefined) {
+    if (!file) return;
+    setError('');
+    // มีสัดส่วนกำหนด → ครอปก่อน / ไม่มี → อัปตรง (แปลง webp+resize ให้)
+    if (aspect) setCropFile(file);
+    else void uploadFile(file);
+    if (fileRef.current) fileRef.current.value = '';
   }
 
   return (
     <div className="flex items-center gap-3">
+      {cropFile && aspect && (
+        <ImageCropper
+          file={cropFile}
+          aspect={aspect}
+          onCancel={() => setCropFile(null)}
+          onCropped={(blob) => void uploadCropped(blob)}
+        />
+      )}
       {value ? (
         <span className="relative block h-16 w-24 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
           <Image src={value} alt="" fill sizes="96px" className="object-cover" unoptimized />
@@ -118,7 +152,7 @@ function Field({
         {field.required && <span className="ml-1 text-rose-500">*</span>}
       </label>
       {field.type === 'image' ? (
-        <ImageField value={value} onChange={onChange} />
+        <ImageField value={value} onChange={onChange} aspect={field.aspect} />
       ) : field.type === 'icon' ? (
         <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
           <option value="">— เลือกไอคอน —</option>

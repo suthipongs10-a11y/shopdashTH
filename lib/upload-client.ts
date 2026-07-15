@@ -42,14 +42,12 @@ export interface UploadedImage {
   publicUrl: string;
 }
 
-/** แปลงรูป → ขอ presigned URL → PUT เข้า R2 — โยน UploadError พร้อมข้อความไทยเมื่อพลาด */
-export async function uploadImage(
+/** ขอ presigned URL → PUT webp เข้า R2 — โยน UploadError พร้อมข้อความไทยเมื่อพลาด */
+async function putWebp(
   kind: UploadKind,
-  file: File,
+  webp: Blob,
   productId?: string,
 ): Promise<UploadedImage> {
-  const webp = await toWebp(file);
-
   const presignRes = await fetch('/api/upload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -84,4 +82,23 @@ export async function uploadImage(
   }
 
   return { key: presign.key, publicUrl: presign.publicUrl };
+}
+
+/** แปลงรูป (webp + resize) → อัปโหลด — ใช้เมื่อไม่ผ่านเครื่องมือครอป */
+export async function uploadImage(
+  kind: UploadKind,
+  file: File,
+  productId?: string,
+): Promise<UploadedImage> {
+  const webp = await toWebp(file);
+  return putWebp(kind, webp, productId);
+}
+
+/** อัปโหลด webp ที่ครอปมาแล้วจาก ImageCropper (สัดส่วน+ขนาดถูกจัดไว้แล้ว) */
+export async function uploadCroppedWebp(
+  kind: UploadKind,
+  blob: Blob,
+  productId?: string,
+): Promise<UploadedImage> {
+  return putWebp(kind, blob, productId);
 }
