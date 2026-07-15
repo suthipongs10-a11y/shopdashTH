@@ -12,7 +12,8 @@
 - [x] แก้จุดสร้าง absolute URL จาก request จริง: `/auth/confirm` (origin จาก host header แทน `request.url`) + `forgot-password` (https + host จริง แทน `http://`)
 - [x] `workers/tenant-proxy.js` + `wrangler.toml` + `README.md` (ขั้นตอน deploy ทั้ง CLI/Dashboard) + `TENANT_PROXY_SECRET` ใน `.env.example` + DEPLOYMENT.md §1/§1.1 เขียนใหม่ตามสถาปัตยกรรมจริง
 - [x] `npx tsc --noEmit` + `npm run build` ผ่าน
-- [ ] **รอเจ้าของทำใน Dashboard** (โค้ดพร้อมแล้ว): deploy Worker + ผูก route `*.shopdashth.com/*` + ตั้ง `TENANT_PROXY_SECRET` ให้ตรงกันทั้ง Worker/Vercel + เพิ่ม Redirect URLs ใน Supabase + R2 CORS `https://*.shopdashth.com` (ดู workers/README.md) — จากนั้นแจ้งให้ยิงเช็ค `{slug}.shopdashth.com`/`admin.shopdashth.com`
+- [x] **LIVE + verified 2026-07-15**: push `main` (d685cf1) → Vercel deploy + เจ้าของ deploy Worker + ตั้ง secret + ผูก route `*.shopdashth.com/*` — ยิงเช็คจริงผ่านหมด: `nene.shopdashth.com` 200 (หน้าร้าน "เนเน่ ช็อป"), `nene…/admin` 307→login, `admin.shopdashth.com` 307→login, wearstore/apex/www OK, slug มั่ว 404 graceful (ไม่มี 525/403 แล้ว, redirect ชี้โดเมนจริงไม่หลุด vercel.app)
+- [ ] **ยังเหลือ (ทำก่อนใช้ฟีเจอร์ที่เกี่ยว)**: (1) R2 bucket CORS เพิ่ม `https://*.shopdashth.com` — จำเป็นตอนอัปรูปสินค้า/เนื้อหาจากหลังร้านบน subdomain (2) Supabase → Auth → Redirect URLs เพิ่ม `https://*.shopdashth.com/**` + `https://admin.shopdashth.com/**` — จำเป็นตอนใช้ลิงก์รีเซ็ตรหัสผ่านทางอีเมล
 
 ## Done (Phase 7 ต่อ — โดเมน shopdashth.com + หน้า landing ขาย ShopDash, 2026-07-14 ตามคำสั่งเจ้าของ)
 - [x] **เปลี่ยนโดเมนเป็น `shopdashth.com` ทุกจุด**: `.env.local`/`.env.example` (`ROOT_DOMAIN`) + ค่า fallback ในโค้ด 6 จุด (middleware, lib/domains cname target, sitemap, /admin/domain, super-admin tenant detail, ข้อความ pre-check ดาวน์เกรด) + suffix ในฟอร์ม signup เลิก hardcode `.shopdash.co` → รับ prop `rootDomain` + CLAUDE.md/DEPLOYMENT.md อัปเดตครบ (ดู DECISIONS)
