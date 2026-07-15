@@ -2,7 +2,17 @@
 - Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต + DoD ผ่านครบทุกข้อรวม Lighthouse** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
-- Last session: 2026-07-14
+- Last session: 2026-07-15
+
+## Done (Deploy fix — subdomain ร้านผ่าน Cloudflare Worker, 2026-07-15 ตามรายงานเจ้าของ)
+- [x] **วินิจฉัย: signup สร้างร้านสำเร็จ แต่ `{slug}.shopdashth.com` เปิดไม่ได้** — ต้นเหตุคือ DNS/deploy ล้วนๆ (ข้อมูลร้านอยู่ครบใน DB) ไล่จาก NXDOMAIN → 525 จนฟันธง
+- [x] **ข้อจำกัดที่พิสูจน์แล้ว**: (1) โดเมนจดกับ **Cloudflare Registrar** → ล็อก NS ที่ Cloudflare เปลี่ยนเป็น Vercel ไม่ได้ (2) โดเมนจด 2026-07-14 → ติดล็อกห้ามย้าย registrar 60 วัน (3) Vercel ออก wildcard cert ให้ไม่ได้ถ้า NS ไม่ใช่ของมัน + **Vercel ตอบ 403 เมื่อ TLS SNI ≠ Host** (ทดสอบด้วย curl ยิงตรง `shopdash-th.vercel.app` + Host ร้าน = 403 ทุกเคสรวมโดเมน valid) → ทริคหลอก SNI ผ่าน Cloudflare ใช้ไม่ได้
+- [x] **ทางออกที่เลือก (เจ้าของเลือกเอง): Cloudflare Worker พร็อกซี** — CF terminate TLS (Universal SSL ครอบ `*.shopdashth.com` ฟรี) → Worker ต่อ Vercel ผ่าน `*.vercel.app` (SNI==Host ผ่าน) + ฝาก host ร้านจริงใน `x-tenant-host` เซ็นด้วย `TENANT_PROXY_SECRET`
+- [x] `middleware.ts`: อ่าน `x-tenant-host` (เมื่อ `x-tenant-proxy` ตรง secret) แทน Host + บังคับ `host`/`x-forwarded-host`/`x-forwarded-proto` จริงลง downstream ทุก branch — dev (ไม่ผ่าน proxy) พฤติกรรมเดิมเป๊ะ
+- [x] แก้จุดสร้าง absolute URL จาก request จริง: `/auth/confirm` (origin จาก host header แทน `request.url`) + `forgot-password` (https + host จริง แทน `http://`)
+- [x] `workers/tenant-proxy.js` + `wrangler.toml` + `README.md` (ขั้นตอน deploy ทั้ง CLI/Dashboard) + `TENANT_PROXY_SECRET` ใน `.env.example` + DEPLOYMENT.md §1/§1.1 เขียนใหม่ตามสถาปัตยกรรมจริง
+- [x] `npx tsc --noEmit` + `npm run build` ผ่าน
+- [ ] **รอเจ้าของทำใน Dashboard** (โค้ดพร้อมแล้ว): deploy Worker + ผูก route `*.shopdashth.com/*` + ตั้ง `TENANT_PROXY_SECRET` ให้ตรงกันทั้ง Worker/Vercel + เพิ่ม Redirect URLs ใน Supabase + R2 CORS `https://*.shopdashth.com` (ดู workers/README.md) — จากนั้นแจ้งให้ยิงเช็ค `{slug}.shopdashth.com`/`admin.shopdashth.com`
 
 ## Done (Phase 7 ต่อ — โดเมน shopdashth.com + หน้า landing ขาย ShopDash, 2026-07-14 ตามคำสั่งเจ้าของ)
 - [x] **เปลี่ยนโดเมนเป็น `shopdashth.com` ทุกจุด**: `.env.local`/`.env.example` (`ROOT_DOMAIN`) + ค่า fallback ในโค้ด 6 จุด (middleware, lib/domains cname target, sitemap, /admin/domain, super-admin tenant detail, ข้อความ pre-check ดาวน์เกรด) + suffix ในฟอร์ม signup เลิก hardcode `.shopdash.co` → รับ prop `rootDomain` + CLAUDE.md/DEPLOYMENT.md อัปเดตครบ (ดู DECISIONS)

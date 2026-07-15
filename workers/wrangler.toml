@@ -1,0 +1,15 @@
+# Cloudflare Worker — พร็อกซี subdomain ร้าน (*.shopdashth.com) → Vercel
+# Deploy ผ่าน CLI:  cd workers && npx wrangler deploy
+# (หรือจะสร้าง/วางโค้ดผ่าน Dashboard ก็ได้ — ดู workers/README.md)
+
+name = "shopdash-tenant-proxy"
+main = "tenant-proxy.js"
+compatibility_date = "2025-07-01"
+
+# ผูก Worker กับทุก subdomain ของ zone (ต้องมี DNS record `*` แบบ Proxied อยู่แล้ว)
+routes = [
+  { pattern = "*.shopdashth.com/*", zone_name = "shopdashth.com" }
+]
+
+# TENANT_PROXY_SECRET เป็น "secret" — อย่าใส่ค่าจริงในไฟล์นี้ (มัน commit ลง git)
+# ตั้งด้วย:  npx wrangler secret put TENANT_PROXY_SECRET

@@ -86,11 +86,22 @@ function resolveHost(host: string): HostTarget {
 const STATIC_FILE = /\.(?:webp|png|jpe?g|gif|svg|ico|css|js|map|woff2?|ttf|mp4|webm)$/i;
 
 export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+
+  // Cloudflare Worker พร็อกซี (workers/tenant-proxy.js) แนบ host ร้านจริงมาใน x-tenant-host
+  // + secret เพราะ Vercel เห็น Host เป็น *.vercel.app (Vercel บังคับ SNI == Host, ออก wildcard
+  // cert ให้ไม่ได้เมื่อ NS ไม่ใช่ของมัน) — ดู DEPLOYMENT.md §1.1
+  const proxySecret = process.env.TENANT_PROXY_SECRET;
+  const viaProxy = !!proxySecret && req.headers.get('x-tenant-proxy') === proxySecret;
+
   // server action redirect() ทำ internal fetch เข้า loopback (Host กลายเป็น localhost:3000)
   // host จริงของผู้ใช้อยู่ใน x-forwarded-host — ต้องอ่านตัวนั้นก่อน (proxy/Vercel ก็ตั้งให้เช่นกัน)
-  const rawHost = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? '';
+  const rawHost =
+    (viaProxy ? req.headers.get('x-tenant-host') : null) ??
+    req.headers.get('x-forwarded-host') ??
+    req.headers.get('host') ??
+    '';
   const host = rawHost.split(':')[0].toLowerCase();
-  const path = req.nextUrl.pathname;
 
   // cron ถูกเรียกจากโดเมน deployment (เช่น *.vercel.app) ไม่ใช่ host ร้าน —
   // ปล่อยผ่านทุก host, route ตรวจ CRON_SECRET เอง
@@ -106,31 +117,53 @@ export async function middleware(req: NextRequest) {
     if (slug) target = { kind: 'tenant', slug };
   }
 
+  // เมื่อมาผ่าน Worker: Vercel เห็น Host เป็น *.vercel.app → ต้องบังคับ host จริงลง downstream
+  // ทุกที่ที่อ่าน host/x-forwarded-host (sitemap, ลิงก์รีเซ็ตรหัส, /auth/confirm) จะได้โดเมนร้านถูก
+  const requestHeaders = new Headers(req.headers);
+  if (viaProxy) {
+    requestHeaders.set('host', host);
+    requestHeaders.set('x-forwarded-host', host);
+    requestHeaders.set('x-forwarded-proto', 'https');
+  }
+
   // /super-admin, /platform เข้าตรงจาก host อื่นไม่ได้ (กัน bypass hostname routing)
   const hitsInternal = INTERNAL_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
 
   if (target.kind === 'super-admin') {
     if (path.startsWith('/platform')) {
-      return NextResponse.rewrite(new URL('/domain-not-configured', req.url));
+      return NextResponse.rewrite(new URL('/domain-not-configured', req.url), {
+        request: { headers: requestHeaders },
+      });
     }
     // /auth/confirm (PKCE) และ /api ใช้ path เดิม
-    if (path.startsWith('/auth/') || path.startsWith('/api/')) return NextResponse.next();
-    return NextResponse.rewrite(new URL(`/super-admin${path === '/' ? '' : path}`, req.url));
+    if (path.startsWith('/auth/') || path.startsWith('/api/')) {
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    }
+    return NextResponse.rewrite(new URL(`/super-admin${path === '/' ? '' : path}`, req.url), {
+      request: { headers: requestHeaders },
+    });
   }
 
   if (target.kind === 'platform') {
     if (path.startsWith('/super-admin')) {
-      return NextResponse.rewrite(new URL('/domain-not-configured', req.url));
+      return NextResponse.rewrite(new URL('/domain-not-configured', req.url), {
+        request: { headers: requestHeaders },
+      });
     }
-    if (path.startsWith('/api/')) return NextResponse.next();
-    return NextResponse.rewrite(new URL(`/platform${path === '/' ? '' : path}`, req.url));
+    if (path.startsWith('/api/')) {
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    }
+    return NextResponse.rewrite(new URL(`/platform${path === '/' ? '' : path}`, req.url), {
+      request: { headers: requestHeaders },
+    });
   }
 
   if (target.kind === 'unknown' || hitsInternal) {
-    return NextResponse.rewrite(new URL('/domain-not-configured', req.url));
+    return NextResponse.rewrite(new URL('/domain-not-configured', req.url), {
+      request: { headers: requestHeaders },
+    });
   }
 
-  const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-tenant-slug', target.slug);
   return NextResponse.next({ request: { headers: requestHeaders } });
 }

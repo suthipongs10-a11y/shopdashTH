@@ -20,15 +20,32 @@
 
 ---
 
-## §1. Infrastructure & DNS (Vercel)
+## §1. Infrastructure & DNS (Vercel + Cloudflare)
+
+> **สถาปัตยกรรมจริง (2026-07-15):** โดเมน `shopdashth.com` จดกับ **Cloudflare Registrar** ซึ่ง
+> **ล็อก nameserver ไว้ที่ Cloudflare เปลี่ยนไม่ได้** → ใช้ wildcard domain ของ Vercel ตรงๆ ไม่ได้
+> (Vercel ออก wildcard cert ให้เฉพาะโดเมนที่ใช้ Vercel NS) — จึงพร็อกซี subdomain ร้านผ่าน
+> **Cloudflare Worker** แทน (ดู §1.1)
 
 - [ ] เชื่อมโปรเจ็คกับ Vercel, ตั้ง production branch
-- [ ] **Wildcard domain** `*.shopdashth.com` → Vercel (subdomain ร้านทุกร้าน) — Vercel ต้องรองรับ wildcard (ต้องใช้ Vercel DNS หรือ verify wildcard)
-- [ ] `admin.shopdashth.com` → super admin (middleware map ไว้แล้ว `middleware.ts:55`)
-- [ ] apex `shopdashth.com` + `www.shopdashth.com` → platform landing/signup (`middleware.ts:59`)
-- [ ] `cname.shopdashth.com` → ปลายทางสำหรับ custom domain ของร้าน (ที่เอกสาร DNS ในหน้า `/admin/domain` แนะนำลูกค้า) ตั้งให้ resolve จริง
-- [ ] SSL: wildcard + apex + custom domains ออก cert อัตโนมัติ (Vercel) — custom domain ของร้านต้อง add เข้า Vercel ด้วย (ปัจจุบัน verify DNS ในแอป แต่การ provision cert เป็นงาน platform — ตรวจ flow นี้กับโดเมนจริง 1 อัน)
+- [ ] apex `shopdashth.com` + `www.shopdashth.com` → Vercel (CNAME **DNS-only**) → platform landing/signup (`middleware.ts`) ✅ ใช้ได้แล้ว
+- [ ] DNS record `*` = CNAME `cname.vercel-dns.com` แบบ **Proxied (เมฆส้ม)** — ให้ Worker จับ (subdomain ร้าน + `admin.`)
 - [ ] `ROOT_DOMAIN=shopdashth.com` ตรงกับโดเมนจริง
+- [ ] `cname.shopdashth.com` → ปลายทางสำหรับ custom domain ของร้าน (เอกสาร DNS ในหน้า `/admin/domain` แนะนำลูกค้า) ตั้งให้ resolve จริง
+
+### §1.1 Cloudflare Worker พร็อกซี subdomain ร้าน (แทน Vercel wildcard)
+
+Vercel ปฏิเสธ request ที่ TLS SNI ≠ Host (403) และออก wildcard cert ให้ไม่ได้เมื่อ NS ไม่ใช่ของมัน (525)
+→ ให้ Cloudflare terminate TLS (Universal SSL ครอบ `*.shopdashth.com` ฟรี) แล้ว **Worker ต่อ Vercel ผ่าน
+`*.vercel.app`** (SNI == Host ผ่าน) พร้อมฝาก host ร้านจริงใน header ที่ `middleware.ts` เชื่อถือ
+
+- [ ] Deploy `workers/tenant-proxy.js` + ผูก route `*.shopdashth.com/*` (ดู `workers/README.md`)
+- [ ] ตั้ง `TENANT_PROXY_SECRET` **ให้ตรงกัน** ทั้งใน Worker (secret) และ env Vercel (Production) แล้ว redeploy
+- [ ] แก้ `ORIGIN_HOST` ใน `tenant-proxy.js` ให้ตรงโดเมน production ของโปรเจกต์ (ปัจจุบัน `shopdash-th.vercel.app`)
+- [ ] (ทางเลือก) ลบ `*.shopdashth.com` ออกจาก Vercel Domains — ไม่ต้องใช้แล้ว, ลบเพื่อไม่ให้ค้าง "Invalid Configuration"
+- [ ] Supabase → Auth → URL Configuration → Redirect URLs: เพิ่ม `https://*.shopdashth.com/**` + `https://admin.shopdashth.com/**` (ลิงก์รีเซ็ตรหัสผ่านทางอีเมล)
+- [ ] ทดสอบ: `curl -sI https://<slug>.shopdashth.com/` → 200/307 (ไม่ใช่ 525/403), `admin.shopdashth.com` เข้า super admin ได้
+- [ ] SSL: apex/www ออก cert โดย Vercel (DNS-only), subdomain ร้านใช้ Universal SSL ของ Cloudflare — custom domain ของร้านยัง add เข้า Vercel เพื่อออก cert (verify flow กับโดเมนจริง 1 อัน)
 
 ---
 
