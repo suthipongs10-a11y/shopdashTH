@@ -2,13 +2,28 @@
 // ผ่าน PromptPay QR "ของแพลตฟอร์ม" + อัปสลิป (§5.3 ข้อ 9–10) — เข้าได้แม้ร้าน locked
 
 import Link from 'next/link';
-import { isRenewalTenant, planChargeAmount } from '@/lib/billing';
+import { computePlanCharge, isRenewalTenant, type PlanChargeInfo } from '@/lib/billing';
 import { formatBaht, formatThaiDate, formatThaiDateTime } from '@/lib/format';
 import { getPlatformPromptpay } from '@/lib/platform-settings';
 import { generatePromptpayQrSvg } from '@/lib/promptpay';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContextAllowLocked } from '@/lib/tenant-context';
+import { DowngradeButton } from './downgrade-button';
 import { PlanSlipUploader } from './plan-slip-uploader';
+
+// ป้ายราคาบนปุ่มเลือกแพลน — ต่างกันตามชนิด (ปีแรก/ต่ออายุ/อัปเกรดส่วนต่าง/ลดแพลน)
+function chargeLabel(c: PlanChargeInfo): string {
+  switch (c.kind) {
+    case 'first':
+      return `${formatBaht(c.amount)}/ปีแรก`;
+    case 'renewal':
+      return `${formatBaht(c.amount)}/ปี (ต่ออายุ)`;
+    case 'upgrade':
+      return `อัปเกรด +${formatBaht(c.amount)}`;
+    case 'downgrade':
+      return 'ลดแพลน · ฟรี';
+  }
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -83,12 +98,15 @@ export default async function MyPlanPage({
   const pendingSub = subs.find((s) => s.status === 'pending');
   const lastRejected = !pendingSub && subs[0]?.status === 'rejected' ? subs[0] : undefined;
 
-  // ปีแรก = ราคาเต็ม (รวมค่าจัดทำ) / เคยชำระแล้ว = ค่าดูแลรายปี
-  const payAmount = payPlan ? planChargeAmount(payPlan, renewal) : 0;
+  // คิดยอด + ชนิด (ปีแรก/ต่ออายุ/อัปเกรดส่วนต่าง/ลดแพลน) เทียบกับแพลนปัจจุบัน
+  const payCharge: PlanChargeInfo | null = payPlan
+    ? computePlanCharge(ctx.plan, payPlan, renewal)
+    : null;
+  const payAmount = payCharge?.amount ?? 0;
 
   const { id: platformPromptpayId, name: platformPromptpayName } = await getPlatformPromptpay();
   let qrSvg: string | null = null;
-  if (payPlan && platformPromptpayId && !pendingSub) {
+  if (payPlan && platformPromptpayId && !pendingSub && payAmount > 0) {
     try {
       qrSvg = await generatePromptpayQrSvg(platformPromptpayId, payAmount);
     } catch {
@@ -159,45 +177,74 @@ export default async function MyPlanPage({
                         : 'border-gray-300 text-gray-700 hover:border-gray-500'
                     }`}
                   >
-                    {p.name_th} · {formatBaht(planChargeAmount(p, renewal))}
-                    {renewal && p.price_renewal !== null ? '/ปี (ต่ออายุ)' : '/ปีแรก'}
+                    {p.name_th} · {chargeLabel(computePlanCharge(ctx.plan, p, renewal))}
                     {p.id === ctx.plan.id && ' (ปัจจุบัน)'}
                   </Link>
                 );
               })}
             </div>
 
-            {payPlan && (
-              <div className="flex flex-wrap items-start gap-6">
-                <div className="w-52 shrink-0">
-                  {qrSvg ? (
-                    <>
-                      {/* SVG จาก lib ฝั่ง server — ไม่ใช่ user input */}
-                      <div
-                        className="rounded-md border border-gray-200 p-2"
-                        dangerouslySetInnerHTML={{ __html: qrSvg }}
-                      />
-                      <p className="mt-2 text-center text-xs text-gray-500">
-                        PromptPay: {platformPromptpayName}
-                      </p>
-                    </>
-                  ) : (
-                    <div className="flex h-52 items-center justify-center rounded-md border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">
-                      ยังไม่สามารถสร้าง QR ได้ (แพลตฟอร์มยังไม่ตั้งค่า PromptPay)
-                    </div>
-                  )}
+            {payPlan &&
+              payCharge &&
+              (payCharge.kind === 'downgrade' ? (
+                <DowngradeButton
+                  planId={payPlan.id}
+                  planName={payPlan.name_th}
+                  amount={`${formatBaht(payPlan.price_renewal ?? payPlan.price_yearly)}/ปี`}
+                />
+              ) : (
+                <div className="flex flex-wrap items-start gap-6">
+                  <div className="w-52 shrink-0">
+                    {qrSvg ? (
+                      <>
+                        {/* SVG จาก lib ฝั่ง server — ไม่ใช่ user input */}
+                        <div
+                          className="rounded-md border border-gray-200 p-2"
+                          dangerouslySetInnerHTML={{ __html: qrSvg }}
+                        />
+                        <p className="mt-2 text-center text-xs text-gray-500">
+                          PromptPay: {platformPromptpayName}
+                        </p>
+                      </>
+                    ) : (
+                      <div className="flex h-52 items-center justify-center rounded-md border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">
+                        ยังไม่สามารถสร้าง QR ได้ (แพลตฟอร์มยังไม่ตั้งค่า PromptPay)
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-64 flex-1 space-y-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      {payCharge.kind === 'upgrade' ? (
+                        <>
+                          อัปเกรดเป็นแพลน <b>{payPlan.name_th}</b> — สแกนจ่ายส่วนต่าง{' '}
+                          <span className="text-xl font-bold text-gray-900">
+                            {formatBaht(payAmount)}
+                          </span>{' '}
+                          (อายุเริ่มนับใหม่ 1 ปีจากวันอนุมัติ)
+                        </>
+                      ) : payCharge.kind === 'renewal' ? (
+                        <>
+                          ต่ออายุแพลน <b>{payPlan.name_th}</b> — สแกนจ่าย{' '}
+                          <span className="text-xl font-bold text-gray-900">
+                            {formatBaht(payAmount)}
+                          </span>{' '}
+                          (ค่าดูแลรายปี)
+                        </>
+                      ) : (
+                        <>
+                          สแกนจ่าย{' '}
+                          <span className="text-xl font-bold text-gray-900">
+                            {formatBaht(payAmount)}
+                          </span>{' '}
+                          สำหรับแพลน <b>{payPlan.name_th}</b> 1 ปี (ปีแรก รวมค่าจัดทำร้าน)
+                        </>
+                      )}{' '}
+                      แล้วแนบสลิปด้านล่าง — ทีมงานตรวจสอบแล้วจะเปิดใช้งานให้ทันที
+                    </p>
+                    <PlanSlipUploader planId={payPlan.id} />
+                  </div>
                 </div>
-                <div className="min-w-64 flex-1 space-y-4">
-                  <p className="text-sm text-gray-600">
-                    สแกนจ่าย <span className="text-xl font-bold text-gray-900">{formatBaht(payAmount)}</span>{' '}
-                    สำหรับแพลน <span className="font-medium">{payPlan.name_th}</span> 1 ปี
-                    {renewal ? ' (ค่าดูแลรายปี)' : ' (ปีแรก รวมค่าจัดทำร้าน)'}
-                    แล้วแนบสลิปด้านล่าง — ทีมงานตรวจสอบแล้วจะเปิดใช้งานให้ทันที
-                  </p>
-                  <PlanSlipUploader planId={payPlan.id} />
-                </div>
-              </div>
-            )}
+              ))}
           </>
         )}
       </section>
