@@ -65,11 +65,20 @@ export async function uploadImage(
     throw new UploadError(presign.error ?? 'ขอสิทธิ์อัปโหลดไม่สำเร็จ');
   }
 
-  const putRes = await fetch(presign.uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'image/webp' },
-    body: webp,
-  });
+  let putRes: Response;
+  try {
+    putRes = await fetch(presign.uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'image/webp' },
+      body: webp,
+    });
+  } catch {
+    // fetch reject (ไม่ใช่ตอบ !ok) = ถูกบล็อกระดับ network/CORS ก่อนถึง R2
+    // มักเกิดเมื่อ CORS ของ bucket ยังไม่อนุญาต origin ของโดเมนร้าน (§3.9)
+    throw new UploadError(
+      'อัปโหลดถูกบล็อก — ที่เก็บรูป (R2) ยังไม่อนุญาตโดเมนนี้ (CORS) กรุณาแจ้งผู้ดูแลระบบตั้งค่า CORS ของ bucket',
+    );
+  }
   if (!putRes.ok) {
     throw new UploadError('อัปโหลดไฟล์เข้าที่เก็บรูปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
   }
