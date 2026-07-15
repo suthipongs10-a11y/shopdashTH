@@ -1,8 +1,8 @@
 // แลก code จากอีเมลรีเซ็ตรหัสผ่าน (PKCE) เป็น session cookie แล้วพาไปหน้าตั้งรหัสผ่านใหม่
 // ลิงก์ในอีเมลจาก supabase.auth.resetPasswordForEmail() ชี้มาที่นี่พร้อม ?code=...&next=...
 
-import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { requestOrigin } from '@/lib/request-origin';
 import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
@@ -11,12 +11,8 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/admin/reset-password';
 
   // ผ่าน Cloudflare Worker → Vercel เห็น request.url เป็น *.vercel.app; ต้องอ่าน host ร้านจริง
-  // จาก header ที่ middleware บังคับไว้ (ไม่งั้น redirect หลุดออกนอกโดเมนร้าน) — ดู middleware.ts
-  const h = await headers();
-  const host = h.get('x-forwarded-host') ?? h.get('host') ?? new URL(request.url).host;
-  const proto =
-    h.get('x-forwarded-proto') ?? (process.env.NODE_ENV === 'development' ? 'http' : 'https');
-  const origin = `${proto}://${host}`;
+  // จาก x-tenant-host (ไม่งั้น redirect หลุดออกนอกโดเมนร้าน) — ดู lib/request-origin.ts
+  const origin = await requestOrigin();
 
   if (code) {
     const supabase = await createClient();

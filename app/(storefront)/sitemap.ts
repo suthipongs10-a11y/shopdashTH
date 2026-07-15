@@ -2,8 +2,8 @@
 // middleware แนบ x-tenant-slug ให้ /sitemap.xml (matcher ไม่ได้ยกเว้น)
 
 import type { MetadataRoute } from 'next';
-import { headers } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { requestOrigin } from '@/lib/request-origin';
 import { getTenantContext } from '@/lib/tenant-context';
 
 export const dynamic = 'force-dynamic';
@@ -16,13 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return []; // host ไม่ใช่ร้าน / ร้าน locked-archived → sitemap ว่าง
   }
 
-  const h = await headers();
-  const host =
-    h.get('x-forwarded-host') ??
-    h.get('host') ??
-    `${ctx.slug}.${process.env.ROOT_DOMAIN ?? 'shopdashth.com'}`;
-  const proto = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-  const base = `${proto}://${host}`;
+  const base = await requestOrigin();
 
   const db = createAdminClient();
   const { data } = await db

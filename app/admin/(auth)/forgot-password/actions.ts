@@ -1,6 +1,6 @@
 'use server';
 
-import { headers } from 'next/headers';
+import { requestOrigin } from '@/lib/request-origin';
 import { createClient } from '@/lib/supabase/server';
 
 export interface ForgotPasswordState {
@@ -15,14 +15,11 @@ export async function requestPasswordReset(
   const email = String(formData.get('email') ?? '').trim();
 
   if (email) {
-    // middleware บังคับ host จริง (โดเมนร้าน) ลง header แม้ผ่าน Cloudflare Worker → Vercel
-    const h = await headers();
-    const host = h.get('host');
-    const proto =
-      h.get('x-forwarded-proto') ?? (process.env.NODE_ENV === 'development' ? 'http' : 'https');
+    // host ร้านจริงจาก x-tenant-host แม้ผ่าน Cloudflare Worker → Vercel (ดู lib/request-origin.ts)
+    const origin = await requestOrigin();
     const supabase = await createClient();
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${proto}://${host}/auth/confirm?next=/admin/reset-password`,
+      redirectTo: `${origin}/auth/confirm?next=/admin/reset-password`,
     });
   }
 
