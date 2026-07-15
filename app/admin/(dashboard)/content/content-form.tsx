@@ -145,7 +145,7 @@ function Field({
           className={inputCls}
         />
       )}
-      {field.help && <p className="mt-1 text-xs text-gray-400">{field.help}</p>}
+      {field.help && <p className="mt-1 text-xs text-gray-500">{field.help}</p>}
     </div>
   );
 }

@@ -110,7 +110,12 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         help: 'เฉพาะธีมที่มีปุ่มรอง (เช่น ลุกซ์) — ธีมอื่นไม่แสดง',
       },
       { key: 'cta2Href', label: 'ลิงก์ปุ่มที่สอง', type: 'href' },
-      { key: 'imageUrl', label: 'รูปแบนเนอร์', type: 'image' },
+      {
+        key: 'imageUrl',
+        label: 'รูปแบนเนอร์',
+        type: 'image',
+        help: 'แนะนำรูปใหญ่คมชัด ≥1600px ให้จุดเด่นอยู่กลางภาพ — ระบบจะครอปให้พอดีกรอบแบนเนอร์ของธีมอัตโนมัติ · jpg/png/webp ≤5MB',
+      },
     ],
   },
   // --- Hero carousel (T3) ---
@@ -124,7 +129,13 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     itemNoun: 'สไลด์',
     appliesTo: (p) => p.variants.hero === 'carousel',
     fields: [
-      { key: 'imageUrl', label: 'รูปสไลด์', type: 'image', required: true },
+      {
+        key: 'imageUrl',
+        label: 'รูปสไลด์',
+        type: 'image',
+        required: true,
+        help: 'แนะนำแนวนอน ~1600×540px (สัดส่วน 3:1) จุดเด่นค่อนไปกลาง-ขวา · jpg/png/webp ≤5MB',
+      },
       { key: 'eyebrow', label: 'ข้อความเล็กเหนือหัวข้อ', type: 'text' },
       { key: 'headline', label: 'หัวข้อใหญ่', type: 'text' },
       { key: 'sub', label: 'ข้อความรอง', type: 'textarea' },
@@ -174,7 +185,13 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     itemNoun: 'แบนเนอร์',
     appliesTo: (p) => p.sections.includes('categoryBanners'),
     fields: [
-      { key: 'imageUrl', label: 'รูปแบนเนอร์', type: 'image', required: true },
+      {
+        key: 'imageUrl',
+        label: 'รูปแบนเนอร์',
+        type: 'image',
+        required: true,
+        help: 'แนะนำแนวนอน ~1200×800px (สัดส่วน 3:2) · jpg/png/webp ≤5MB',
+      },
       { key: 'title', label: 'ชื่อหมวด', type: 'text', required: true },
       { key: 'sub', label: 'คำอธิบายสั้น', type: 'text' },
       { key: 'href', label: 'ลิงก์', type: 'href', placeholder: '/products' },
@@ -267,7 +284,13 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     itemNoun: 'วงกลม',
     appliesTo: (p) => p.sections.includes('categoryCircles'),
     fields: [
-      { key: 'imageUrl', label: 'รูป', type: 'image', required: true },
+      {
+        key: 'imageUrl',
+        label: 'รูป',
+        type: 'image',
+        required: true,
+        help: 'แนะนำรูปจัตุรัส ≥400×400px (1:1) จุดเด่นอยู่กลางภาพ — แสดงเป็นวงกลม · jpg/png/webp ≤5MB',
+      },
       { key: 'label', label: 'ชื่อใต้วงกลม', type: 'text', required: true },
       { key: 'href', label: 'ลิงก์', type: 'href', placeholder: '/products?category=…' },
     ],
@@ -313,7 +336,13 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     itemNoun: 'บทความ',
     appliesTo: (p) => p.sections.includes('articles'),
     fields: [
-      { key: 'imageUrl', label: 'รูปปก', type: 'image', required: true },
+      {
+        key: 'imageUrl',
+        label: 'รูปปก',
+        type: 'image',
+        required: true,
+        help: 'แนะนำแนวนอน ~800×500px (สัดส่วน 16:10) · jpg/png/webp ≤5MB',
+      },
       { key: 'title', label: 'ชื่อบทความ', type: 'text', required: true },
       { key: 'date', label: 'วันที่ (ข้อความ)', type: 'text', placeholder: '5 ก.ค. 2569' },
       { key: 'href', label: 'ลิงก์', type: 'href', placeholder: '/p/ชื่อเพจ' },
@@ -338,7 +367,12 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     contentKey: 'lookbook',
     appliesTo: (p) => p.sections.includes('lookbookSplit'),
     fields: [
-      { key: 'imageUrl', label: 'รูปใหญ่', type: 'image' },
+      {
+        key: 'imageUrl',
+        label: 'รูปใหญ่',
+        type: 'image',
+        help: 'แนะนำแนวตั้ง ~900×1100px (สัดส่วน 4:5) จุดเด่นค่อนไปด้านบน · jpg/png/webp ≤5MB',
+      },
       { key: 'eyebrow', label: 'ข้อความเล็ก', type: 'text', placeholder: 'LOOKBOOK' },
       { key: 'title', label: 'หัวข้อ', type: 'text' },
       { key: 'sub', label: 'ข้อความรอง', type: 'textarea' },
