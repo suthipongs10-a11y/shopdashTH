@@ -4,7 +4,9 @@
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-15
 
-## Done (Deploy fix — subdomain ร้านผ่าน Cloudflare Worker, 2026-07-15 ตามรายงานเจ้าของ)
+## Done (UI contrast + Platform PromptPay ใน DB, 2026-07-15 ตามคำสั่งเจ้าของ)
+- [x] **เพิ่มความชัด UI หลังร้าน/Super Admin** (commit 0a69167): nav/sidebar/การ์ด/ตาราง ตัวหนา+สีเข้มตัดพื้น, ขอบ gray-200→gray-300, active เป็น pill indigo ทึบ, header เส้นใต้หนา `border-b-2`
+- [x] **PromptPay แพลตฟอร์มย้ายเข้า DB + หน้า UI** (`migration 011_platform_settings.sql` — ตาราง single-row + RLS super admin): เมนูใหม่ **Super Admin → "ตั้งค่า"** (`/settings`) กรอก PromptPay ID + ชื่อบัญชี (validate 10/13 หลัก, เตือนห้ามใส่เลขบัญชี), `lib/platform-settings.ts` อ่าน DB→fallback env, หน้า `/admin/plan` สร้าง QR จากค่า DB — **รอเจ้าของรัน migration 011 บน Supabase** (ก่อนรันยังใช้ env เดิมได้)
 - [x] **วินิจฉัย: signup สร้างร้านสำเร็จ แต่ `{slug}.shopdashth.com` เปิดไม่ได้** — ต้นเหตุคือ DNS/deploy ล้วนๆ (ข้อมูลร้านอยู่ครบใน DB) ไล่จาก NXDOMAIN → 525 จนฟันธง
 - [x] **ข้อจำกัดที่พิสูจน์แล้ว**: (1) โดเมนจดกับ **Cloudflare Registrar** → ล็อก NS ที่ Cloudflare เปลี่ยนเป็น Vercel ไม่ได้ (2) โดเมนจด 2026-07-14 → ติดล็อกห้ามย้าย registrar 60 วัน (3) Vercel ออก wildcard cert ให้ไม่ได้ถ้า NS ไม่ใช่ของมัน + **Vercel ตอบ 403 เมื่อ TLS SNI ≠ Host** (ทดสอบด้วย curl ยิงตรง `shopdash-th.vercel.app` + Host ร้าน = 403 ทุกเคสรวมโดเมน valid) → ทริคหลอก SNI ผ่าน Cloudflare ใช้ไม่ได้
 - [x] **ทางออกที่เลือก (เจ้าของเลือกเอง): Cloudflare Worker พร็อกซี** — CF terminate TLS (Universal SSL ครอบ `*.shopdashth.com` ฟรี) → Worker ต่อ Vercel ผ่าน `*.vercel.app` (SNI==Host ผ่าน) + ฝาก host ร้านจริงใน `x-tenant-host` เซ็นด้วย `TENANT_PROXY_SECRET`

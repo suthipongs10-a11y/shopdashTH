@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/tenants', label: 'ร้านค้า' },
   { href: '/subscriptions', label: 'คิวสลิปค่าแพลน' },
   { href: '/plans', label: 'จัดการแพลน' },
+  { href: '/settings', label: 'ตั้งค่า' },
 ];
 
 export function SuperNav({ email }: { email: string }) {

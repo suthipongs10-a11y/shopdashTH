@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { isRenewalTenant, planChargeAmount } from '@/lib/billing';
 import { formatBaht, formatThaiDate, formatThaiDateTime } from '@/lib/format';
+import { getPlatformPromptpay } from '@/lib/platform-settings';
 import { generatePromptpayQrSvg } from '@/lib/promptpay';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContextAllowLocked } from '@/lib/tenant-context';
@@ -85,8 +86,7 @@ export default async function MyPlanPage({
   // ปีแรก = ราคาเต็ม (รวมค่าจัดทำ) / เคยชำระแล้ว = ค่าดูแลรายปี
   const payAmount = payPlan ? planChargeAmount(payPlan, renewal) : 0;
 
-  const platformPromptpayId = process.env.PLATFORM_PROMPTPAY_ID ?? '';
-  const platformPromptpayName = process.env.PLATFORM_PROMPTPAY_NAME ?? 'ShopDash';
+  const { id: platformPromptpayId, name: platformPromptpayName } = await getPlatformPromptpay();
   let qrSvg: string | null = null;
   if (payPlan && platformPromptpayId && !pendingSub) {
     try {
