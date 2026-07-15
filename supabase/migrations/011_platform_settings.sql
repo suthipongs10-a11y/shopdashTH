@@ -18,4 +18,4 @@ alter table platform_settings force row level security;
 -- เฉพาะ super admin เท่านั้นที่อ่าน/แก้ผ่าน RLS (แอปฝั่ง billing อ่านผ่าน service role อยู่แล้ว)
 drop policy if exists platform_settings_super on platform_settings;
 create policy platform_settings_super on platform_settings for all
-  using (auth.is_super_admin()) with check (auth.is_super_admin());
+  using (public.is_super_admin()) with check (public.is_super_admin());
