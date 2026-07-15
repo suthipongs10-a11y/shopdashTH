@@ -29,10 +29,10 @@ export default async function PlanLayout({ children }: { children: React.ReactNo
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <h1 className="text-lg font-semibold text-gray-900">
+          <h1 className="text-lg font-bold text-gray-900">
             เฉพาะเจ้าของร้านเท่านั้นที่จัดการแพลนได้
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm font-medium text-gray-600">
             กรุณาติดต่อเจ้าของร้านเพื่อดำเนินการต่ออายุหรือเปลี่ยนแพลน
           </p>
         </div>
@@ -42,24 +42,27 @@ export default async function PlanLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white shadow-sm">
+      <header className="border-b-2 border-gray-300 bg-white shadow-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-sm font-bold text-white">
               {ctx.store.name.replace(/[^A-Za-zก-๙0-9]/g, '').slice(0, 1).toUpperCase() || 'S'}
             </span>
-            <span className="font-semibold text-gray-900">{ctx.store.name}</span>
+            <span className="font-bold text-gray-900">{ctx.store.name}</span>
             {ctx.status !== 'locked' && (
               <Link
                 href="/admin/orders"
-                className="ml-2 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                className="ml-2 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
               >
                 ← กลับหลังร้าน
               </Link>
             )}
           </div>
           <form action={logout}>
-            <button type="submit" className="text-sm text-gray-500 hover:text-gray-900">
+            <button
+              type="submit"
+              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            >
               ออกจากระบบ
             </button>
           </form>

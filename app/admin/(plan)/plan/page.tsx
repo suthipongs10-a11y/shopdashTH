@@ -101,35 +101,39 @@ export default async function MyPlanPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">แพลนของฉัน</h1>
+      <h1 className="text-2xl font-bold text-gray-900">แพลนของฉัน</h1>
 
-      {notice && <div className={`rounded-md border p-4 text-sm ${notice.tone}`}>{notice.text}</div>}
+      {notice && (
+        <div className={`rounded-md border-2 p-4 text-sm font-medium ${notice.tone}`}>
+          {notice.text}
+        </div>
+      )}
 
-      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
-        <h2 className="mb-3 text-sm font-semibold text-gray-900">แพลนปัจจุบัน</h2>
-        <p className="text-lg font-medium text-gray-900">
+      <section className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
+        <h2 className="mb-3 text-base font-bold text-gray-900">แพลนปัจจุบัน</h2>
+        <p className="text-lg font-bold text-gray-900">
           {ctx.plan.name_th}{' '}
-          <span className="text-sm font-normal text-gray-400">
+          <span className="text-sm font-medium text-gray-600">
             (ปีแรก {formatBaht(ctx.plan.price_yearly)}
             {ctx.plan.price_renewal !== null &&
               ` · ค่าดูแลรายปี ${formatBaht(ctx.plan.price_renewal)}`}
             )
           </span>
         </p>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm font-medium text-gray-600">
           {ctx.status === 'trial'
             ? `ช่วงทดลองใช้ถึง ${expiry ? formatThaiDate(expiry) : '-'}`
             : `ใช้งานได้ถึง ${expiry ? formatThaiDate(expiry) : '-'}`}
         </p>
       </section>
 
-      <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
-        <h2 className="mb-3 text-sm font-semibold text-gray-900">
+      <section className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
+        <h2 className="mb-3 text-base font-bold text-gray-900">
           ชำระค่าแพลน / ต่ออายุ / เปลี่ยนแพลน
         </h2>
 
         {pendingSub ? (
-          <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <div className="rounded-md border-2 border-amber-300 bg-amber-50 p-4 text-sm font-medium text-amber-800">
             ส่งสลิปแล้ว ({formatBaht(pendingSub.amount)} — แพลน {pendingSub.plans?.name_th}) กำลังรอ
             ShopDash ตรวจสอบ อนุมัติแล้วร้านจะใช้งานได้ทันที
           </div>
@@ -199,23 +203,27 @@ export default async function MyPlanPage({
       </section>
 
       {subs.length > 0 && (
-        <section className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">ประวัติการชำระ</h2>
+        <section className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
+          <h2 className="mb-3 text-base font-bold text-gray-900">ประวัติการชำระ</h2>
           <ul className="space-y-2 text-sm">
             {subs.map((s) => (
               <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className="text-gray-400">{formatThaiDateTime(s.created_at)}</span>
-                <span className="text-gray-700">
+                <span className="font-medium text-gray-500">{formatThaiDateTime(s.created_at)}</span>
+                <span className="font-semibold text-gray-800">
                   {s.plans?.name_th} · {formatBaht(s.amount)}
                 </span>
                 {s.status === 'approved' && (
-                  <span className="text-emerald-700">
+                  <span className="font-semibold text-emerald-700">
                     อนุมัติแล้ว (ถึง {formatThaiDate(s.period_end)})
                   </span>
                 )}
-                {s.status === 'pending' && <span className="text-amber-700">รอตรวจสอบ</span>}
+                {s.status === 'pending' && (
+                  <span className="font-semibold text-amber-700">รอตรวจสอบ</span>
+                )}
                 {s.status === 'rejected' && (
-                  <span className="text-rose-600">ปฏิเสธ — {s.reject_reason_th ?? ''}</span>
+                  <span className="font-semibold text-rose-600">
+                    ปฏิเสธ — {s.reject_reason_th ?? ''}
+                  </span>
                 )}
               </li>
             ))}

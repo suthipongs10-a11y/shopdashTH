@@ -95,19 +95,19 @@ function SidebarContent({
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col bg-gray-900 text-gray-300">
+    <div className="flex h-full flex-col border-r border-gray-700 bg-gray-900 text-gray-200">
       {/* หัวร้าน */}
-      <div className="flex items-center gap-2.5 px-5 pb-4 pt-5">
+      <div className="flex items-center gap-2.5 border-b border-white/10 px-5 pb-4 pt-5">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500 text-sm font-bold text-white">
           {storeName.replace(/[^A-Za-zก-๙0-9]/g, '').slice(0, 1).toUpperCase() || 'S'}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-white">{storeName}</p>
+          <p className="truncate text-sm font-bold text-white">{storeName}</p>
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-gray-400 transition-colors hover:text-white"
+            className="inline-flex items-center gap-1 text-xs font-medium text-gray-300 transition-colors hover:text-white"
           >
             เปิดหน้าร้าน
             <ExternalIcon size={11} />
@@ -123,7 +123,7 @@ function SidebarContent({
           return (
             <div key={group.title ?? 'main'}>
               {group.title && (
-                <p className="mb-1 px-2.5 text-[11px] font-semibold tracking-wider text-gray-500">
+                <p className="mb-1 px-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
                   {group.title}
                 </p>
               )}
@@ -138,11 +138,11 @@ function SidebarContent({
                         onClick={onNavigate}
                         className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors ${
                           active
-                            ? 'bg-white/10 font-semibold text-white'
-                            : 'text-gray-400 hover:bg-white/5 hover:text-gray-100'
+                            ? 'bg-indigo-600 font-bold text-white shadow-sm'
+                            : 'font-medium text-gray-200 hover:bg-white/10 hover:text-white'
                         }`}
                       >
-                        <Icon size={17} className={active ? 'text-indigo-400' : 'text-gray-500'} />
+                        <Icon size={17} className={active ? 'text-white' : 'text-gray-300'} />
                         {item.label}
                       </Link>
                     </li>
@@ -155,18 +155,18 @@ function SidebarContent({
       </nav>
 
       {/* ผู้ใช้ + ออกจากระบบ */}
-      <div className="border-t border-white/10 px-3 py-3">
+      <div className="border-t border-white/15 px-3 py-3">
         {userEmail && (
-          <p className="mb-2 truncate px-2.5 text-xs text-gray-500" title={userEmail}>
+          <p className="mb-2 truncate px-2.5 text-xs font-medium text-gray-300" title={userEmail}>
             {userEmail}
           </p>
         )}
         <form action={logout}>
           <button
             type="submit"
-            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-gray-100"
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
           >
-            <LogoutIcon size={17} className="text-gray-500" />
+            <LogoutIcon size={17} className="text-gray-300" />
             ออกจากระบบ
           </button>
         </form>
@@ -194,22 +194,22 @@ export function Nav({
       </aside>
 
       {/* mobile topbar */}
-      <header className="sticky top-0 z-40 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
+      <header className="sticky top-0 z-40 flex items-center gap-3 border-b-2 border-gray-300 bg-white px-4 py-3 shadow-sm lg:hidden">
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label="เปิดเมนู"
-          className="-ml-1 rounded-lg p-1.5 text-gray-600 hover:bg-gray-100"
+          className="-ml-1 rounded-lg p-1.5 text-gray-700 hover:bg-gray-100"
         >
           <MenuIcon size={20} />
         </button>
-        <span className="truncate text-sm font-semibold text-gray-900">{storeName}</span>
+        <span className="truncate text-sm font-bold text-gray-900">{storeName}</span>
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="เปิดหน้าร้าน"
-          className="ml-auto rounded-lg p-1.5 text-gray-500 hover:bg-gray-100"
+          className="ml-auto rounded-lg p-1.5 text-gray-600 hover:bg-gray-100"
         >
           <ExternalIcon size={17} />
         </a>
