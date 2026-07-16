@@ -2,7 +2,11 @@
 - Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต + DoD ผ่านครบทุกข้อรวม Lighthouse** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
-- Last session: 2026-07-15
+- Last session: 2026-07-16
+
+## Done (Phase 7 ต่อ — ยกเครื่อง UI หน้าแดชบอร์ด Store Admin, 2026-07-16)
+- [x] **`/admin/dashboard` ดีไซน์ใหม่** (commit c918779, 3 ไฟล์ presentational ล้วน): `StatTile` การ์ด gradient พาสเทล + icon chip ลอย (แทน StatCard แบน) / pipeline การ์ด gradient + chevron + สรุป "ค้างรวม N รายการ" / **สินค้าขายดีเป็น list มีเหรียญอันดับ 1-2-3 + แถบสัดส่วนยอดขาย** (เดิมเป็นตารางเปล่า) / กราฟ line→**area** เติม gradient + bar gradient แนวตั้ง + `ChartHead` (icon chip + ยอดรวม) / upgrade panel การ์ด gradient + star chip / สต๊อกใกล้หมดห่อ overflow-x + badge จำนวนที่หัวการ์ด / skeleton `loading.tsx` ปรับเป็น rounded-2xl ให้ทรงตรงการ์ดจริง
+- [x] `npx tsc --noEmit` + `npm run build` ผ่าน / **ตรวจด้วยตา (screenshot จริง)**: wearstore (p2-shop, ไม่มี full analytics) เห็น stat tile + pipeline + upgrade panel + low stock ครบ; fashionhub (p3-business, full) เห็นกราฟ area/bar + หัวการ์ด + สินค้าขายดี empty state render ครบทุกส่วน — ไม่มี hardcode color นอก storefront (แดชบอร์ดแอดมินใช้ palette เทา/indigo ได้ตาม §8.5)
 
 ## Done (UI contrast + Platform PromptPay ใน DB, 2026-07-15 ตามคำสั่งเจ้าของ)
 - [x] **เพิ่มความชัด UI หลังร้าน/Super Admin** (commit 0a69167): nav/sidebar/การ์ด/ตาราง ตัวหนา+สีเข้มตัดพื้น, ขอบ gray-200→gray-300, active เป็น pill indigo ทึบ, header เส้นใต้หนา `border-b-2`
