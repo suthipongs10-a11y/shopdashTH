@@ -181,6 +181,21 @@ export async function seedStarterPack(
       .eq('tenant_id', tenantId);
     if (storeError) throw new Error(`stores.__content: ${storeError.message}`);
 
+    // ---------- feature overrides ของ pack (ถ้ามี) — เช่น pack บริการปิด online_ordering ----------
+    if (pack.featureOverrides && Object.keys(pack.featureOverrides).length > 0) {
+      const { data: tenantRow } = await db
+        .from('tenants')
+        .select('feature_overrides')
+        .eq('id', tenantId)
+        .single();
+      const existing = (tenantRow?.feature_overrides ?? {}) as Record<string, unknown>;
+      const { error: flagError } = await db
+        .from('tenants')
+        .update({ feature_overrides: { ...existing, ...pack.featureOverrides } })
+        .eq('id', tenantId);
+      if (flagError) throw new Error(`tenants.feature_overrides: ${flagError.message}`);
+    }
+
     return { ok: true };
   } catch (err) {
     // เก็บกวาดแถวที่ seed ค้างครึ่งทาง — ให้ร้าน fallback เป็นร้านเปล่าสะอาดๆ แบบเดิม

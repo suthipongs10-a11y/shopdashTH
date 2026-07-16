@@ -202,6 +202,12 @@
 - [x] `startMode` ผ่าน API → provisionTenant ข้าม seed เมื่อเลือกว่าง (log แยกจากเคส seed พลาด) — ร้านว่างเติมทีหลังได้ที่เมนู "เนื้อหาเว็บ"
 - [x] tsc + build ผ่าน — **เจ้าของทดสอบ: เปิด shopdashth.com/signup เห็นการ์ด 2 ใบ, ลอง signup ทั้งสองโหมด**
 
+## Done (Phase 7 ต่อ — starter packs ธุรกิจบริการ 3 ชุด, 2026-07-16)
+- [x] pack `aircon` / `handyman` / `transport` (บริการ 6 รายการ/pack + รีวิว + เนื้อหาครบ + เพจ how-to-book) — โหมด "แนะนำบริการ+ติดต่อผ่านแชท" ผ่าน featureOverrides ปิด online_ordering
+- [x] รูป flat illustration 21 ไฟล์ generate ด้วย `scripts/gen-service-images.mjs` (commit ถาวร) → `public/demo/services/*` — pack โผล่หน้า signup ทันที (asset ครบ)
+- [x] แดชบอร์ดรู้จักโหมดแชท: ไม่เตือนแดง PromptPay + checklist สลับเป็นตั้งช่องทาง LINE/โซเชียล
+- [x] tsc + build ผ่าน — **เจ้าของทดสอบ: signup เลือก "ล้าง-ติดตั้งแอร์" → ได้เว็บบริการโหมดแชท ไม่มีตะกร้า**
+
 ## ค้าง / ขั้นตอนถัดไป
 - [ ] **รัน migration 012 + 013 ใน Supabase SQL Editor** (012 = starter store + ธีม T1-T4 เข้า registry, 013 = LINE token แพลตฟอร์ม)
 - [ ] ตั้งค่าใน Dashboard: UptimeRobot 2 monitors (DEPLOYMENT §8.1) / Upstash env / LINE token ที่ Super Admin → ตั้งค่า

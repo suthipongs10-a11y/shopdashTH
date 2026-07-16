@@ -53,6 +53,10 @@ export interface StarterPack {
   code: string;
   /** ชื่อโชว์ในตัวเลือก "ร้านคุณขายอะไร" หน้า signup */
   nameTh: string;
+  /** flag ที่ pack ตั้งให้ร้าน (merge ลง tenants.feature_overrides) — เช่น pack กลุ่มธุรกิจ
+   *  บริการปิด online_ordering ให้เว็บเป็นโหมด "แนะนำบริการ + ติดต่อผ่านแชท" (ref T1)
+   *  super admin แก้คืนได้รายร้านจากหน้า feature overrides เดิม */
+  featureOverrides?: Record<string, boolean>;
   /** ไฟล์รูปที่ pack ต้องใช้ (relative จาก public/) — ใช้เช็คว่า asset ครบก่อนเปิดให้เลือก */
   requiredAssets: string[];
   categories: string[];

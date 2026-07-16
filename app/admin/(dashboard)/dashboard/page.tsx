@@ -29,6 +29,7 @@ import { formatBaht } from '@/lib/format';
 import { ORDER_STATUS_TH, type OrderStatus } from '@/lib/orders/status';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/tenant-context';
+import { getThemeContent } from '@/lib/theme-content';
 import { SalesCharts } from './sales-charts';
 import { SampleDataBanner } from './sample-data-banner';
 
@@ -164,15 +165,30 @@ export default async function DashboardPage() {
 
   // onboarding checklist — โชว์จนกว่าจะครบ 3 ข้อ (ร้านใหม่เห็นทางไปต่อชัดๆ)
   const promptpaySet = !!ctx.store.promptpay_id?.trim();
+  // ร้านโหมดแชท (pack ธุรกิจบริการ / T1 ปิดขายผ่านเว็บโดยเจตนา) — ไม่ต้องนู้ดเรื่อง PromptPay
+  // แต่หัวใจของโหมดนี้คือช่องทางติดต่อ (โซเชียล/LINE) แทน
+  const chatMode = ctx.featureOverrides?.['online_ordering'] === false;
+  const contentForChecklist = getThemeContent(ctx.store.theme_overrides);
+  const hasContactChannel =
+    Object.values(contentForChecklist.socials ?? {}).some((v) => !!v) ||
+    !!contentForChecklist.contact?.lineUrl ||
+    !!contentForChecklist.contact?.facebookUrl;
   const onboardingSteps = [
-    {
-      done: promptpaySet,
-      label: 'ตั้ง PromptPay รับเงิน',
-      sub: promptpaySet
-        ? 'ร้านรับเงินได้แล้ว'
-        : 'สำคัญที่สุด — ระหว่างยังไม่ตั้ง ระบบปิดปุ่มสั่งซื้อบนหน้าร้านให้ชั่วคราว',
-      href: '/admin/settings',
-    },
+    chatMode
+      ? {
+          done: hasContactChannel,
+          label: 'เพิ่มช่องทางติดต่อ (LINE / โซเชียล)',
+          sub: 'ร้านโหมดแนะนำบริการ — ลูกค้าติดต่องานผ่านแชท ตั้งลิงก์ที่ ตั้งค่าร้าน > โซเชียลของร้าน หรือ เนื้อหาเว็บ',
+          href: '/admin/settings',
+        }
+      : {
+          done: promptpaySet,
+          label: 'ตั้ง PromptPay รับเงิน',
+          sub: promptpaySet
+            ? 'ร้านรับเงินได้แล้ว'
+            : 'สำคัญที่สุด — ระหว่างยังไม่ตั้ง ระบบปิดปุ่มสั่งซื้อบนหน้าร้านให้ชั่วคราว',
+          href: '/admin/settings',
+        },
     {
       done: (ownProductCount ?? 0) > 0,
       label: 'มีสินค้าของคุณเองอย่างน้อย 1 ชิ้น',
@@ -206,8 +222,8 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <PageHeader title="แดชบอร์ด" description="ข้อมูล 30 วันล่าสุด (เวลาไทย)" />
 
-      {/* ยังไม่ตั้ง PromptPay = รับเงินไม่ได้ — เตือนแรงสุดก่อนทุกอย่าง */}
-      {!promptpaySet && (
+      {/* ยังไม่ตั้ง PromptPay = รับเงินไม่ได้ — เตือนแรงสุดก่อนทุกอย่าง (ยกเว้นร้านโหมดแชทที่ปิดขายผ่านเว็บโดยเจตนา) */}
+      {!promptpaySet && !chatMode && (
         <div className="rounded-xl border-2 border-rose-300 bg-rose-50 px-4 py-3.5">
           <p className="text-sm font-bold text-rose-800">
             ⚠️ ร้านของคุณยังรับเงินไม่ได้ — ยังไม่ได้ตั้ง PromptPay
