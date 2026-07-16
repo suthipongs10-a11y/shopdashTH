@@ -8,70 +8,17 @@
 //
 // ไฟล์นี้เป็น data ล้วน — logic การ seed อยู่ lib/starter-pack.ts
 
-import type { ThemeContent } from '@/lib/theme-content';
+import type { StarterPack, StarterProduct } from '@/lib/starter-packs/types';
 
-export interface StarterReview {
-  rating: number;
-  author: string;
-  comment: string;
-  /** สร้าง created_at ย้อนหลังกี่วัน (กระจายให้ดูเป็นรีวิวสะสมจริง) */
-  daysAgo: number;
-}
-
-export interface StarterVariantTweak {
-  size: string | null;
-  color: string | null;
-  stock?: number;
-  price_override?: number;
-}
-
-export interface StarterProduct {
-  name: string;
-  description_md: string;
-  /** ชื่อหมวดใน pack (ต้องตรงกับ categories ด้านล่าง) */
-  category: string;
-  base_price: number;
-  is_featured?: boolean;
-  /** static paths — รูปแรกคือรูปหลัก รูปถัดไปคือรูป hover/แกลเลอรี */
-  images: string[];
-  /** มิติ variant — [null] = สินค้าไม่มีมิตินั้น */
-  sizes: (string | null)[];
-  colors: (string | null)[];
-  /** สต๊อกต่อ variant (ค่าเดียวใช้ทุก combination) */
-  stock: number;
-  /** ราคา override ทุก variant (ใส่ต่ำกว่า base_price = ป้ายลดราคาบนธีม T3) */
-  price_override?: number;
-  /** ปรับ variant รายตัว เช่น ตั้งสต๊อกต่ำให้เห็นแถบเตือนบนแดชบอร์ด */
-  variant_tweaks?: StarterVariantTweak[];
-  /** วันที่สร้างย้อนหลังกี่วัน — ≤14 วัน = ป้าย NEW บนธีม T3 */
-  created_days_ago: number;
-  /** รีวิว ≥15 รายการ = ป้าย BEST บนธีม T3 */
-  reviews: StarterReview[];
-}
-
-export interface StarterPage {
-  slug: string;
-  title: string;
-  body_md: string;
-  sort_order: number;
-}
-
-export interface StarterPack {
-  code: string;
-  categories: string[];
-  products: StarterProduct[];
-  /** seed เฉพาะแพลนที่มี flag custom_pages (สร้าง/แก้เพจไม่ได้ = อย่ายัดเพจให้) */
-  pages: StarterPage[];
-  /** เนื้อหาเทมเพลต — เขียนคีย์ครบทั้ง T1-T4 ธีมไหนไม่ใช้ก็เพิกเฉย (สลับธีมแล้วรอด) */
-  content: ThemeContent;
-  /** ใส่เพิ่มใน content เมื่อร้านมีเพจ (บทความ T3 ลิงก์ไป /p/{slug} จริง) */
-  contentWithPages: Partial<ThemeContent>;
-}
+export type { StarterProduct };
 
 const IMG = (file: string) => `/demo/t2/${file}`;
 
 export const FASHION_PACK: StarterPack = {
   code: 'fashion',
+  nameTh: 'เสื้อผ้า / แฟชั่น',
+  // ชุดรูปแฟชั่นอยู่ใน repo แล้ว (public/demo/t2) — pack นี้พร้อมเสมอ
+  requiredAssets: ['demo/t2/hero-01.jpg'],
   categories: ['เสื้อยืด', 'เสื้อเชิ้ต', 'กางเกง', 'เดรส'],
 
   products: [

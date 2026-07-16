@@ -33,18 +33,27 @@ function tenantAdminUrl(slug: string): string {
   return `${protocol}//${slug}.${root}${port}/admin`;
 }
 
+export interface SignupPack {
+  code: string;
+  nameTh: string;
+}
+
 export function SignupForm({
   plans,
   preselectCode,
   rootDomain,
+  packs = [],
 }: {
   plans: SignupPlan[];
   preselectCode?: string;
   rootDomain: string;
+  /** starter pack ที่ asset พร้อม — มีตัวเดียว = ไม่ต้องถาม ใช้ตัวนั้นเลย */
+  packs?: SignupPack[];
 }) {
   const [planId, setPlanId] = useState<string>(
     plans.find((p) => p.code === preselectCode)?.id ?? plans[0]?.id ?? '',
   );
+  const [packCode, setPackCode] = useState<string>(packs[0]?.code ?? '');
   const [slug, setSlug] = useState('');
   const [slugStatus, setSlugStatus] = useState<SlugStatus>({ state: 'idle' });
   const [submitting, setSubmitting] = useState(false);
@@ -95,6 +104,7 @@ export function SignupForm({
           password: form.get('password'),
           phone: form.get('phone'),
           planId,
+          storeType: packCode || undefined,
         }),
       });
       const data = (await res.json()) as { ok?: boolean; slug?: string; error?: string };
@@ -165,6 +175,37 @@ export function SignupForm({
           ))}
         </div>
       </div>
+
+      {/* ประเภทร้าน = starter pack ตัวอย่างที่จะได้ตอนเปิดร้าน — โชว์เมื่อมีให้เลือกจริง */}
+      {packs.length > 1 && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-gray-700">
+            ร้านคุณขายอะไร (เราจะจัดร้านตัวอย่างให้ตรงแนว)
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {packs.map((pack) => (
+              <label
+                key={pack.code}
+                className={`cursor-pointer rounded-lg border p-3 text-center text-sm ${
+                  packCode === pack.code
+                    ? 'border-gray-900 bg-gray-900 text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="storeType"
+                  value={pack.code}
+                  checked={packCode === pack.code}
+                  onChange={() => setPackCode(pack.code)}
+                  className="sr-only"
+                />
+                <span className="block font-medium">{pack.nameTh}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
         <label htmlFor="storeName" className="mb-1 block text-sm font-medium text-gray-700">

@@ -6,8 +6,9 @@
 // (ได้ร้านเปล่าแบบเดิม) — ห้ามทำให้ signup ล้มเพราะของตกแต่ง
 
 import 'server-only';
+import { getStarterPack } from '@/lib/starter-packs';
+import type { StarterProduct } from '@/lib/starter-packs/types';
 import type { createAdminClient } from '@/lib/supabase/admin';
-import { FASHION_PACK, type StarterProduct } from '@/lib/starter-packs/fashion';
 import type { ThemeContent } from '@/lib/theme-content';
 
 type AdminDb = ReturnType<typeof createAdminClient>;
@@ -51,9 +52,10 @@ function buildVariantRows(tenantId: string, productId: string, p: StarterProduct
 export async function seedStarterPack(
   db: AdminDb,
   tenantId: string,
-  opts: { customPages: boolean },
+  opts: { customPages: boolean; packCode?: string | null },
 ): Promise<SeedResult> {
-  const pack = FASHION_PACK;
+  // ไม่รู้จัก code / asset ไม่ครบ = fallback เป็น pack แฟชั่น (ห้ามได้ร้านเปล่า)
+  const pack = getStarterPack(opts.packCode);
   try {
     // ---------- หมวดหมู่ ----------
     const { data: cats, error: catError } = await db

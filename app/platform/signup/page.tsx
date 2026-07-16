@@ -1,5 +1,6 @@
 // หน้า signup public (§5.3 ข้อ 1–2) — เลือกแพลน + กรอกข้อมูลร้าน + slug realtime check
 
+import { listAvailablePacks } from '@/lib/starter-packs';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { SignupForm, type SignupPlan } from './signup-form';
 
@@ -32,6 +33,7 @@ export default async function SignupPage({
           plans={plans}
           preselectCode={preselect}
           rootDomain={process.env.ROOT_DOMAIN ?? 'shopdashth.com'}
+          packs={listAvailablePacks()}
         />
       </div>
     </div>

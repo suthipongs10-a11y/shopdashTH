@@ -52,6 +52,8 @@ export interface ProvisionInput {
   password: string;
   phone: string;
   planId: string;
+  /** starter pack ตามประเภทร้านที่เลือกตอน signup — ว่าง/ไม่รู้จัก = pack แฟชั่น */
+  packCode?: string;
 }
 
 export type ProvisionResult =
@@ -71,7 +73,7 @@ const STARTER_THEME_BY_PLAN: Record<string, string> = {
 
 export async function provisionTenant(input: ProvisionInput): Promise<ProvisionResult> {
   const db = createAdminClient();
-  const { storeName, slug, email, password, phone, planId } = input;
+  const { storeName, slug, email, password, phone, planId, packCode } = input;
 
   // ---------- validate ก่อนสร้างอะไรทั้งนั้น ----------
   const slugCheck = await checkSlug(slug);
@@ -173,9 +175,10 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
   const features = (plan.features ?? {}) as Record<string, boolean>;
   const seeded = await seedStarterPack(db, tenantId, {
     customPages: features.custom_pages === true,
+    packCode,
   });
   if (seeded.ok) {
-    await logTenantEvent(tenantId, 'provision:starter_pack', 'ok', { pack: 'fashion' });
+    await logTenantEvent(tenantId, 'provision:starter_pack', 'ok', { pack: packCode ?? 'fashion' });
   } else {
     await logTenantEvent(tenantId, 'provision:starter_pack', 'error', { cause: seeded.error });
     const { error: categoryError } = await db
