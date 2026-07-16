@@ -43,6 +43,7 @@ interface ProductRow {
   base_price: number;
   status: string;
   is_featured: boolean;
+  is_sample: boolean;
   categories: { name: string } | null;
   product_images: { r2_key: string; sort_order: number }[];
 }
@@ -53,7 +54,7 @@ export default async function ProductsPage() {
   const [{ data: products }, { data: lowStockData }] = await Promise.all([
     supabase
       .from('products')
-      .select('id, name, base_price, status, is_featured, categories(name), product_images(r2_key, sort_order)')
+      .select('id, name, base_price, status, is_featured, is_sample, categories(name), product_images(r2_key, sort_order)')
       .eq('tenant_id', ctx.tenantId)
       .order('created_at', { ascending: false }),
     supabase
@@ -153,8 +154,15 @@ export default async function ProductsPage() {
                           )}
                         </span>
                         <span className="min-w-0">
-                          <span className="block truncate font-medium text-gray-900 group-hover:text-indigo-600">
-                            {product.name}
+                          <span className="flex items-center gap-2">
+                            <span className="block truncate font-medium text-gray-900 group-hover:text-indigo-600">
+                              {product.name}
+                            </span>
+                            {product.is_sample && (
+                              <span className="shrink-0 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700">
+                                ตัวอย่าง
+                              </span>
+                            )}
                           </span>
                           {product.is_featured && (
                             <span className="mt-0.5 inline-flex items-center gap-1 text-xs text-amber-600">

@@ -4,6 +4,15 @@
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-16
 
+## Done (Phase 7 ต่อ — Starter Store: ร้านใหม่มีข้อมูลตัวอย่างเต็มร้านทันทีหลัง signup, 2026-07-16 ตามคำสั่งเจ้าของ)
+- [x] **โจทย์**: ลูกค้า trial สมัครเสร็จเจอร้านเปล่า → ถอดใจ — ต้องเริ่มด้วยร้านสวยมีสินค้า/รูป/เนื้อหาครบ แล้วให้แก้เป็นของตัวเอง (ดู DECISIONS 2026-07-16)
+- [x] `supabase/migrations/012_starter_pack.sql` — **ยังไม่ apply (รอเจ้าของรันใน SQL Editor)**: `is_sample` ใน products/categories/pages + upsert ธีม t1-simple/t2-store/t3-hub/t4-luxe เข้า theme_registry (เดิมอยู่แต่ใน DB จริงผ่านสคริปต์ .tmp — install ใหม่จะชน FK)
+- [x] **Starter pack "แฟชั่นเบสิก"** (`lib/starter-packs/fashion.ts` data ล้วน + `lib/starter-pack.ts` seeder): หมวด 4, สินค้า 10 (variants ไซส์/สี, 1 ตัว sale — ป้าย T3, 1 variant สต๊อกต่ำ — โชว์แถบเตือน, backdate created_at กันป้าย NEW ขึ้นทุกตัว), รีวิวไทย ~57 รายการ (1 ตัว ≥15 = ป้าย BEST), `__content` ครบคีย์ T1-T4 (hero/slides/แบนเนอร์หมวด/วงกลมหมวด/lookbook/brand story/highlights/member benefits/tagline), เพจ about + how-to-order เฉพาะแพลนมี custom_pages — รูปทั้งหมด static `/demo/t2/*` อ้างตรงใน r2_key (publicR2Url รองรับ path ขึ้นต้น `/` แล้ว — ไม่พึ่ง R2 ตอน provision)
+- [x] **provisionTenant**: ธีมเริ่มต้นตามแพลน (p1→t1-simple, p2→t2-store, p3→t3-hub, p4→t4-luxe) + step 7 ใหม่ seed starter pack แบบ non-fatal (พลาด = เก็บกวาดแถวค้าง + fallback หมวด "สินค้าทั้งหมด" เดิม + log `provision:starter_pack` ลง provisioning_logs)
+- [x] **หลังร้าน**: badge "ตัวอย่าง" ในตารางสินค้า / แบนเนอร์แดชบอร์ด "กำลังแสดงสินค้าตัวอย่าง N รายการ" + ปุ่ม "ลบข้อมูลตัวอย่างทั้งหมด" (confirm 2 ชั้น; หมวดที่มีสินค้าจริงค้าง → ถอด flag แทนลบ) / **แก้ record ตัวอย่าง = flag เคลียร์ทันที** (updateProduct/Category/Page) กันปุ่มลบกวาดของที่ลูกค้าแก้แล้ว / สินค้า is_sample ไม่นับโควตา max_products
+- [x] `npx tsc --noEmit` + `npm run build` ผ่าน (สภาพแวดล้อม CI — dummy env)
+- [ ] **ค้างตรวจกับ DB จริง (เครื่องเจ้าของ)**: รัน migration 012 → signup ร้านทดสอบ 1 ร้าน/แพลน → เช็คหน้าร้าน+แดชบอร์ด+ปุ่มลบตัวอย่าง → ลบร้านทดสอบ
+
 ## Done (Phase 7 ต่อ — ยกเครื่อง UI หน้าแดชบอร์ด Store Admin, 2026-07-16)
 - [x] **`/admin/dashboard` ดีไซน์ใหม่** (commit c918779, 3 ไฟล์ presentational ล้วน): `StatTile` การ์ด gradient พาสเทล + icon chip ลอย (แทน StatCard แบน) / pipeline การ์ด gradient + chevron + สรุป "ค้างรวม N รายการ" / **สินค้าขายดีเป็น list มีเหรียญอันดับ 1-2-3 + แถบสัดส่วนยอดขาย** (เดิมเป็นตารางเปล่า) / กราฟ line→**area** เติม gradient + bar gradient แนวตั้ง + `ChartHead` (icon chip + ยอดรวม) / upgrade panel การ์ด gradient + star chip / สต๊อกใกล้หมดห่อ overflow-x + badge จำนวนที่หัวการ์ด / skeleton `loading.tsx` ปรับเป็น rounded-2xl ให้ทรงตรงการ์ดจริง
 - [x] `npx tsc --noEmit` + `npm run build` ผ่าน / **ตรวจด้วยตา (screenshot จริง)**: wearstore (p2-shop, ไม่มี full analytics) เห็น stat tile + pipeline + upgrade panel + low stock ครบ; fashionhub (p3-business, full) เห็นกราฟ area/bar + หัวการ์ด + สินค้าขายดี empty state render ครบทุกส่วน — ไม่มี hardcode color นอก storefront (แดชบอร์ดแอดมินใช้ palette เทา/indigo ได้ตาม §8.5)

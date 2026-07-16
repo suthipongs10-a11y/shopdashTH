@@ -53,7 +53,7 @@ export async function renameCategory(
   const supabase = await createClient();
   const { error } = await supabase
     .from('categories')
-    .update({ name })
+    .update({ name, is_sample: false })
     .eq('id', id)
     .eq('tenant_id', ctx.tenantId);
 

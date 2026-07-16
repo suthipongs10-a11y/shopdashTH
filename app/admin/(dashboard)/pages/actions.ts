@@ -103,7 +103,7 @@ export async function updatePage(
   const db = createAdminClient();
   const { error } = await db
     .from('pages')
-    .update({ ...parsed.fields, updated_at: new Date().toISOString() })
+    .update({ ...parsed.fields, is_sample: false, updated_at: new Date().toISOString() })
     .eq('id', pageId)
     .eq('tenant_id', auth.ctx.tenantId);
 

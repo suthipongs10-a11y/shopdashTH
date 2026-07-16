@@ -67,10 +67,12 @@ export async function assertUnderProductLimit(ctx: TenantContext): Promise<void>
   if (max < 0) return;
 
   const db = createAdminClient();
+  // สินค้าตัวอย่างจาก starter pack ไม่นับโควตา — ของแถมจากระบบต้องไม่กินสิทธิ์ลูกค้า
   const { count, error } = await db
     .from('products')
     .select('id', { count: 'exact', head: true })
-    .eq('tenant_id', ctx.tenantId);
+    .eq('tenant_id', ctx.tenantId)
+    .eq('is_sample', false);
 
   if (error) throw new Error(`นับจำนวนสินค้าไม่สำเร็จ: ${error.message}`);
   if ((count ?? 0) >= max) {

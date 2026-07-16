@@ -27,8 +27,10 @@ import {
 } from '@/lib/analytics';
 import { formatBaht } from '@/lib/format';
 import { ORDER_STATUS_TH, type OrderStatus } from '@/lib/orders/status';
+import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/tenant-context';
 import { SalesCharts } from './sales-charts';
+import { SampleDataBanner } from './sample-data-banner';
 
 export const dynamic = 'force-dynamic';
 
@@ -142,10 +144,16 @@ export default async function DashboardPage() {
   const ctx = await getTenantContext();
   const full = ctx.features.analytics_dashboard;
 
-  const [summary, statusCounts, lowStock] = await Promise.all([
+  const supabase = await createClient();
+  const [summary, statusCounts, lowStock, { count: sampleCount }] = await Promise.all([
     getStoreSalesSummary(ctx.tenantId),
     getStoreOrderStatusCounts(ctx.tenantId),
     getLowStockVariants(ctx.tenantId),
+    supabase
+      .from('products')
+      .select('id', { count: 'exact', head: true })
+      .eq('tenant_id', ctx.tenantId)
+      .eq('is_sample', true),
   ]);
 
   let daily: DailySalesPoint[] = [];
@@ -165,6 +173,9 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <PageHeader title="แดชบอร์ด" description="ข้อมูล 30 วันล่าสุด (เวลาไทย)" />
+
+      {/* ข้อมูลตัวอย่างจาก starter pack — โชว์จนกว่าจะแก้เป็นของจริง/ลบหมด */}
+      {(sampleCount ?? 0) > 0 && <SampleDataBanner productCount={sampleCount ?? 0} />}
 
       {/* การ์ดตัวเลขสรุป — นับเฉพาะออร์เดอร์ยืนยันแล้ว */}
       <div className={`grid gap-4 sm:grid-cols-2 ${full ? 'lg:grid-cols-3' : ''}`}>

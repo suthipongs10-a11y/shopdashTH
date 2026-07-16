@@ -4,6 +4,7 @@
 
 import 'server-only';
 import { logTenantEvent } from '@/lib/platform/tenant-admin';
+import { seedStarterPack } from '@/lib/starter-pack';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{2,29}$/;
@@ -59,6 +60,15 @@ export type ProvisionResult =
 
 const TRIAL_DAYS = 7;
 
+// ธีมเริ่มต้นตามแพลน — ให้ตรงกับเทมเพลตที่หน้า landing ใช้ขายแพลนนั้น (ลูกค้าเห็นภาพไหน
+// ตอนตัดสินใจสมัคร ต้องได้ภาพนั้น) — แพลนอื่น/แพลนเก่า fallback เป็น basic-01
+const STARTER_THEME_BY_PLAN: Record<string, string> = {
+  'p1-start': 't1-simple',
+  'p2-shop': 't2-store',
+  'p3-business': 't3-hub',
+  'p4-premium': 't4-luxe',
+};
+
 export async function provisionTenant(input: ProvisionInput): Promise<ProvisionResult> {
   const db = createAdminClient();
   const { storeName, slug, email, password, phone, planId } = input;
@@ -69,7 +79,7 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
 
   const { data: plan } = await db
     .from('plans')
-    .select('id, is_active')
+    .select('id, code, is_active, features')
     .eq('id', planId)
     .maybeSingle();
   if (!plan || !plan.is_active) return { ok: false, error: 'ไม่พบแพลนที่เลือก' };
@@ -81,7 +91,9 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
   async function rollback(failedStep: string, cause: string): Promise<void> {
     await logTenantEvent(tenantId, `provision:${failedStep}`, 'error', { slug, cause });
     if (tenantId) {
-      // categories/stores อ้าง tenant — ลบลูกก่อนแม่
+      // ลบลูกก่อนแม่ — products (ตัวอย่าง) อ้าง categories, categories/stores อ้าง tenant
+      await db.from('products').delete().eq('tenant_id', tenantId);
+      await db.from('pages').delete().eq('tenant_id', tenantId);
       await db.from('categories').delete().eq('tenant_id', tenantId);
       await db.from('stores').delete().eq('tenant_id', tenantId);
       await db.from('tenants').delete().eq('id', tenantId);
@@ -141,28 +153,40 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
   }
   await logTenantEvent(tenantId, 'provision:app_metadata', 'ok', { user_id: userId });
 
-  // ---------- step 6: INSERT stores (ค่า default, ธีม basic-01) ----------
+  // ---------- step 6: INSERT stores (ธีมเริ่มต้นตามแพลน — ตรงกับภาพที่หน้า landing ขาย) ----------
+  const themeCode = STARTER_THEME_BY_PLAN[plan.code as string] ?? 'basic-01';
   const { error: storeError } = await db.from('stores').insert({
     tenant_id: tenantId,
     name: storeName,
     phone,
-    theme_code: 'basic-01',
+    theme_code: themeCode,
   });
   if (storeError) {
     await rollback('store', storeError.message);
     return { ok: false, error: 'สร้างข้อมูลร้านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
   }
-  await logTenantEvent(tenantId, 'provision:store', 'ok', { name: storeName });
+  await logTenantEvent(tenantId, 'provision:store', 'ok', { name: storeName, theme_code: themeCode });
 
-  // ---------- step 7: หมวดหมู่ตัวอย่าง ----------
-  const { error: categoryError } = await db
-    .from('categories')
-    .insert({ tenant_id: tenantId, name: 'สินค้าทั้งหมด', sort_order: 0 });
-  if (categoryError) {
-    await rollback('category', categoryError.message);
-    return { ok: false, error: 'สร้างหมวดหมู่เริ่มต้นไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+  // ---------- step 7: Starter Store — seed ข้อมูลตัวอย่างเต็มร้าน (non-fatal) ----------
+  // ลูกค้า trial ต้องเห็นร้านสวยพร้อมสินค้า/รูป/เนื้อหาทันที ไม่ใช่หน้าว่าง — ถ้า seed พลาด
+  // ห้ามล้ม signup: fallback เป็นหมวดเปล่า "สินค้าทั้งหมด" แบบเดิม (§5.3 เดิม) แล้ว log ไว้
+  const features = (plan.features ?? {}) as Record<string, boolean>;
+  const seeded = await seedStarterPack(db, tenantId, {
+    customPages: features.custom_pages === true,
+  });
+  if (seeded.ok) {
+    await logTenantEvent(tenantId, 'provision:starter_pack', 'ok', { pack: 'fashion' });
+  } else {
+    await logTenantEvent(tenantId, 'provision:starter_pack', 'error', { cause: seeded.error });
+    const { error: categoryError } = await db
+      .from('categories')
+      .insert({ tenant_id: tenantId, name: 'สินค้าทั้งหมด', sort_order: 0 });
+    if (categoryError) {
+      await rollback('category', categoryError.message);
+      return { ok: false, error: 'สร้างหมวดหมู่เริ่มต้นไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
+    }
+    await logTenantEvent(tenantId, 'provision:category', 'ok', { fallback: true });
   }
-  await logTenantEvent(tenantId, 'provision:category', 'ok', {});
 
   await logTenantEvent(tenantId, 'provision:done', 'ok', { slug, trial_ends_at: trialEndsAt });
   return { ok: true, tenantId: newTenantId, slug };

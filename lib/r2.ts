@@ -80,11 +80,14 @@ export function isSlipKey(key: string): boolean {
 
 // ---------- URLs ----------
 
-/** URL สาธารณะสำหรับรูปสินค้า/แบรนดิ้ง — ห้ามใช้กับสลิป */
+/** URL สาธารณะสำหรับรูปสินค้า/แบรนดิ้ง — ห้ามใช้กับสลิป
+ *  key ขึ้นต้นด้วย '/' = static asset ใน public/ (รูปตัวอย่างจาก starter pack —
+ *  DECISIONS 2026-07-16) เสิร์ฟจากแอปตรงๆ ไม่ประกอบ R2 base URL */
 export function publicR2Url(key: string): string {
   if (isSlipKey(key)) {
     throw new Error('Slip files must be served via presigned GET URL only');
   }
+  if (key.startsWith('/')) return key;
   return `${requiredEnv('R2_PUBLIC_BASE_URL')}/${key}`;
 }
 
