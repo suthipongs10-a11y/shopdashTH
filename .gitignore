@@ -34,6 +34,8 @@ CLAUDE - Copy.md
 # graphify (generated knowledge graph)
 /graphify-out/
 
-# session scratch scripts/screenshots (ไม่ commit ตามธรรมเนียมโปรเจ็ค)
+# session scratch scripts/screenshots — เฉพาะของทิ้งจริงๆ เท่านั้น!
+# สคริปต์ seed/e2e ที่ต้องรันซ้ำได้ ให้เก็บใน scripts/ แล้ว commit (ดู scripts/README.md
+# — ธีม T1-T4 เคยหายจาก repo เพราะติดอยู่ใน .tmp-* มาแล้ว)
 .tmp-*
 .tmp-*/
