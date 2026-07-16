@@ -202,6 +202,11 @@
 - [x] `startMode` ผ่าน API → provisionTenant ข้าม seed เมื่อเลือกว่าง (log แยกจากเคส seed พลาด) — ร้านว่างเติมทีหลังได้ที่เมนู "เนื้อหาเว็บ"
 - [x] tsc + build ผ่าน — **เจ้าของทดสอบ: เปิด shopdashth.com/signup เห็นการ์ด 2 ใบ, ลอง signup ทั้งสองโหมด**
 
+## Done (Phase 7 ต่อ — พักชุดแท็กซี่/ช่าง + เปิดใช้ pack ของเล่น, 2026-07-16 ตามคำสั่งเจ้าของ)
+- [x] **ถอดชุดธุรกิจบริการออกจากหน้าบ้านทั้งหมด** (เก็บโค้ดไว้): pack แอร์/ช่าง/รถ ออกจาก registry + `supabase/migrations/015_remove_service_themes.sql` ถอนธีม S1-S3 (**รอรันใน SQL Editor — รันได้ปลอดภัยแม้ยังไม่เคยรัน 014**)
+- [x] **pack "ของเล่น / แม่และเด็ก" ใช้งานได้จริงแล้ว**: รูป flat illustration พาสเทล 12 ไฟล์ generate จาก `scripts/gen-service-images.mjs` → `public/demo/toys/*.webp` — ตัวเลือกโผล่หน้า signup อัตโนมัติ (asset ครบ), เปลี่ยนเป็นรูปถ่ายจริงชื่อเดิมทับได้ทุกเมื่อ
+- [x] `tsc` + `npm run build` ผ่าน — **ทดสอบ: รัน 015 → หน้า signup เหลือตัวเลือก เสื้อผ้า/ของเล่น → signup เลือกของเล่น ได้ร้านเด็กพาสเทลครบ**
+
 ## Done (Phase 7 ต่อ — เทมเพลตธุรกิจบริการรถ 3 ตัว S1/S2/S3, 2026-07-16 ตามคำสั่งเจ้าของ "ให้ได้ตามรูป")
 - [x] section กลางใหม่ 6 ตัว (ServiceHero+InquiryPanel แผงจองเปิด LINE/โทร, ServiceCards, VehicleCards, RouteCards, TestimonialsBand, FaqList) + ต่อเข้า composition หน้าแรก — content-driven ทั้งหมด แก้ผ่าน __content
 - [x] preset `s1-premier` (กรมท่า-ทอง serif) / `s2-travel` (ฟ้า-ขาว) / `s3-taxi` (น้ำเงินแท็กซี่) + รูป flat illustration (hero/รถ/เส้นทาง) จาก `scripts/gen-service-images.mjs`

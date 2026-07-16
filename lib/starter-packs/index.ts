@@ -6,13 +6,15 @@ import 'server-only';
 import { existsSync } from 'fs';
 import path from 'path';
 import { FASHION_PACK } from '@/lib/starter-packs/fashion';
-import { AIRCON_PACK, HANDYMAN_PACK, TRANSPORT_PACK } from '@/lib/starter-packs/services';
 import { TOYS_PACK } from '@/lib/starter-packs/toys';
 import type { StarterPack } from '@/lib/starter-packs/types';
 
 export const DEFAULT_PACK_CODE = FASHION_PACK.code;
 
-const ALL_PACKS: StarterPack[] = [FASHION_PACK, TOYS_PACK, AIRCON_PACK, HANDYMAN_PACK, TRANSPORT_PACK];
+// pack กลุ่มธุรกิจบริการ (aircon/handyman/transport — lib/starter-packs/services.ts) ถูกถอด
+// ออกจาก registry ตามคำสั่งเจ้าของ 2026-07-16 ("เอาออกไปก่อน") — โค้ด/ธีม S1-S3 ยังอยู่ครบ
+// อยากเปิดคืนแค่ import แล้วเติมกลับใน list นี้ + รัน migration ลง theme_registry
+const ALL_PACKS: StarterPack[] = [FASHION_PACK, TOYS_PACK];
 
 // เช็คครั้งเดียวต่อ process — ไฟล์ใน public/ ไม่เปลี่ยนระหว่างรัน (เปลี่ยนได้ตอน deploy เท่านั้น)
 const readiness = new Map<string, boolean>();

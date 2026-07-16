@@ -185,3 +185,96 @@ for (const [file, kind] of Object.entries(ROUTES)) {
   await sharp(Buffer.from(routeSvg(kind))).webp({ quality: 85 }).toFile(`public/demo/services/routes/${file}.webp`);
 }
 console.log('OK routes');
+
+// ---------- ชุดรูป starter pack "ของเล่น / แม่และเด็ก" (flat illustration พาสเทล) ----------
+// เจ้าของสั่ง 2026-07-16: ปิดงาน pack ของเล่นด้วยรูป generate (เปลี่ยนเป็นรูปถ่ายจริงทีหลังได้)
+
+const TP = { pink: '#f9d3e0', pinkDeep: '#c76e93', mint: '#cdeee1', mintDeep: '#4f9e82', cream: '#fdf3dd', creamDeep: '#d9a441', sky: '#d7e9fb', skyDeep: '#5b87c5', ink: '#7a5b66' };
+
+// ของเล่นแต่ละชิ้นวาดด้วย shape ล้วน (viewBox 100x100)
+const TOYS_ART = {
+  bear: `<circle cx="50" cy="58" r="26" fill="${TP.ink}"/><circle cx="30" cy="34" r="10" fill="${TP.ink}"/><circle cx="70" cy="34" r="10" fill="${TP.ink}"/>
+    <circle cx="30" cy="34" r="5" fill="${TP.pink}"/><circle cx="70" cy="34" r="5" fill="${TP.pink}"/>
+    <circle cx="50" cy="46" r="17" fill="${TP.ink}"/><ellipse cx="50" cy="52" rx="9" ry="7" fill="#fff" opacity="0.9"/>
+    <circle cx="43" cy="43" r="2.4" fill="#fff"/><circle cx="57" cy="43" r="2.4" fill="#fff"/><circle cx="50" cy="50" r="2.6" fill="${TP.ink}"/>
+    <ellipse cx="34" cy="70" rx="8" ry="10" fill="${TP.ink}"/><ellipse cx="66" cy="70" rx="8" ry="10" fill="${TP.ink}"/>`,
+  rabbit: `<ellipse cx="42" cy="22" rx="6" ry="16" fill="#fff"/><ellipse cx="58" cy="22" rx="6" ry="16" fill="#fff"/>
+    <ellipse cx="42" cy="22" rx="3" ry="11" fill="${TP.pink}"/><ellipse cx="58" cy="22" rx="3" ry="11" fill="${TP.pink}"/>
+    <circle cx="50" cy="50" r="20" fill="#fff"/><circle cx="44" cy="47" r="2.2" fill="${TP.ink}"/><circle cx="56" cy="47" r="2.2" fill="${TP.ink}"/>
+    <circle cx="50" cy="53" r="2" fill="${TP.pinkDeep}"/><ellipse cx="50" cy="80" rx="17" ry="13" fill="#fff"/>`,
+  blocks: `<rect x="22" y="52" width="26" height="26" rx="3" fill="${TP.pinkDeep}"/><rect x="52" y="52" width="26" height="26" rx="3" fill="${TP.skyDeep}"/>
+    <rect x="37" y="24" width="26" height="26" rx="3" fill="${TP.creamDeep}"/>
+    <text x="35" y="72" font-size="15" fill="#fff" font-family="sans-serif" font-weight="bold">A</text>
+    <text x="65" y="72" font-size="15" fill="#fff" font-family="sans-serif" font-weight="bold" text-anchor="middle">B</text>
+    <text x="50" y="44" font-size="15" fill="#fff" font-family="sans-serif" font-weight="bold" text-anchor="middle">C</text>`,
+  puzzle: `<path d="M25 30 h20 a6 6 0 0 1 10 0 h20 v20 a6 6 0 0 0 0 10 v20 h-20 a6 6 0 0 1 -10 0 h-20 v-20 a6 6 0 0 0 0-10 z" fill="${TP.mintDeep}"/>
+    <path d="M25 30 h20 a6 6 0 0 1 10 0 h20 v20 a6 6 0 0 0 0 10" fill="${TP.skyDeep}" opacity="0.55"/>`,
+  car: `<rect x="20" y="46" width="60" height="22" rx="8" fill="${TP.skyDeep}"/><path d="M32 46 l8 -13 h20 l8 13 z" fill="${TP.skyDeep}"/>
+    <rect x="42" y="37" width="16" height="9" rx="2" fill="#fff" opacity="0.9"/>
+    <circle cx="35" cy="70" r="8" fill="${TP.ink}"/><circle cx="65" cy="70" r="8" fill="${TP.ink}"/>
+    <circle cx="35" cy="70" r="3.4" fill="#fff"/><circle cx="65" cy="70" r="3.4" fill="#fff"/>
+    <path d="M20 57 h-8" stroke="${TP.pinkDeep}" stroke-width="3" stroke-linecap="round"/>`,
+  onesie: `<path d="M35 24 h30 l12 10 -7 9 -5 -4 v25 a8 8 0 0 1 -8 8 h-4 a4 4 0 0 1 -3 -2 a4 4 0 0 1 -3 2 h-4 a8 8 0 0 1 -8 -8 v-25 l-5 4 -7 -9 z" fill="#fff"/>
+    <circle cx="50" cy="27" r="2" fill="${TP.pink}"/><circle cx="50" cy="35" r="2" fill="${TP.pink}"/>
+    <circle cx="50" cy="52" r="7" fill="${TP.pink}" opacity="0.7"/>`,
+  blanket: `<rect x="24" y="30" width="52" height="44" rx="6" fill="#fff"/><rect x="24" y="30" width="52" height="12" rx="6" fill="${TP.mint}"/>
+    <path d="M40 54 l2.2 4.6 5 .7 -3.6 3.5 .9 5 -4.5 -2.4 -4.5 2.4 .9 -5 -3.6 -3.5 5 -.7 z" fill="${TP.creamDeep}"/>
+    <path d="M62 50 l1.8 3.7 4 .6 -2.9 2.8 .7 4 -3.6 -1.9 -3.6 1.9 .7 -4 -2.9 -2.8 4 -.6 z" fill="${TP.pinkDeep}" opacity="0.8"/>`,
+  teether: `<circle cx="50" cy="56" r="20" fill="none" stroke="${TP.creamDeep}" stroke-width="9"/>
+    <circle cx="50" cy="30" r="12" fill="${TP.mintDeep}"/><circle cx="45.5" cy="28" r="2" fill="#fff"/><circle cx="54.5" cy="28" r="2" fill="#fff"/>
+    <ellipse cx="42" cy="20" rx="3.4" ry="6" fill="${TP.mintDeep}"/><ellipse cx="58" cy="20" rx="3.4" ry="6" fill="${TP.mintDeep}"/>`,
+  mobile: `<path d="M26 26 q24 -14 48 0" fill="none" stroke="${TP.ink}" stroke-width="3.4" stroke-linecap="round"/>
+    <line x1="32" y1="28" x2="32" y2="44" stroke="${TP.ink}" stroke-width="2"/><line x1="50" y1="21" x2="50" y2="52" stroke="${TP.ink}" stroke-width="2"/><line x1="68" y1="28" x2="68" y2="44" stroke="${TP.ink}" stroke-width="2"/>
+    <path d="M32 44 l5.5 9 h-11 z" fill="${TP.creamDeep}"/><circle cx="68" cy="50" r="6.5" fill="${TP.pinkDeep}"/>
+    <path d="M50 52 l2.6 5.3 5.8 .8 -4.2 4.1 1 5.8 -5.2 -2.7 -5.2 2.7 1 -5.8 -4.2 -4.1 5.8 -.8 z" fill="${TP.skyDeep}"/>`,
+};
+
+function toyCardSvg(art, bg, softAccent) { // การ์ด 3:4 (900x1200)
+  return `<svg width="900" height="1200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="1200" fill="${bg}"/>
+  <circle cx="140" cy="150" r="170" fill="#ffffff" opacity="0.5"/>
+  <circle cx="790" cy="1050" r="220" fill="${softAccent}" opacity="0.45"/>
+  <circle cx="800" cy="170" r="46" fill="#ffffff" opacity="0.6"/>
+  <circle cx="110" cy="1010" r="34" fill="#ffffff" opacity="0.6"/>
+  <ellipse cx="450" cy="905" rx="255" ry="26" fill="${TP.ink}" opacity="0.10"/>
+  <g transform="translate(150 300) scale(6)">${art}</g>
+</svg>`;
+}
+
+function toysHeroSvg() { // hero กว้าง (1920x900) — หมี + บล็อก + ดาว
+  return `<svg width="1920" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fdeff4"/><stop offset="1" stop-color="${TP.pink}"/>
+  </linearGradient></defs>
+  <rect width="1920" height="900" fill="url(#tg)"/>
+  <circle cx="1620" cy="150" r="80" fill="#fff" opacity="0.55"/>
+  <circle cx="180" cy="740" r="110" fill="${TP.mint}" opacity="0.65"/>
+  <circle cx="760" cy="150" r="42" fill="${TP.cream}" opacity="0.9"/>
+  <ellipse cx="1330" cy="800" rx="430" ry="36" fill="${TP.ink}" opacity="0.10"/>
+  <g transform="translate(1080 240) scale(5.2)">${TOYS_ART.bear}</g>
+  <g transform="translate(880 560) scale(2.6)">${TOYS_ART.blocks}</g>
+  <g transform="translate(1560 500) scale(2.4)">${TOYS_ART.car}</g>
+  <path d="M320 200 l7 14 15 2 -11 11 3 15 -14 -7 -14 7 3 -15 -11 -11 15 -2 z" fill="${TP.creamDeep}" opacity="0.8"/>
+  <path d="M540 640 l5 10 11 1.5 -8 8 2 11 -10 -5 -10 5 2 -11 -8 -8 11 -1.5 z" fill="${TP.pinkDeep}" opacity="0.6"/>
+</svg>`;
+}
+
+const TOY_FILES = {
+  'toy-01': [TOYS_ART.bear, TP.pink, TP.mint],
+  'toy-02': [TOYS_ART.mobile, TP.sky, TP.pink],
+  'toy-03': [TOYS_ART.puzzle, TP.cream, TP.mint],
+  'toy-04': [TOYS_ART.blocks, TP.mint, TP.cream],
+  'toy-05': [TOYS_ART.car, TP.cream, TP.sky],
+  'toy-06': [TOYS_ART.onesie, TP.pink, TP.cream],
+  'toy-07': [TOYS_ART.blanket, TP.mint, TP.pink],
+  'toy-08': [TOYS_ART.teether, TP.sky, TP.mint],
+  'cat-01': [TOYS_ART.puzzle, TP.mint, TP.cream],
+  'cat-02': [TOYS_ART.rabbit, TP.pink, TP.mint],
+  'cat-03': [TOYS_ART.onesie, TP.cream, TP.pink],
+};
+mkdirSync('public/demo/toys', { recursive: true });
+await sharp(Buffer.from(toysHeroSvg())).webp({ quality: 85 }).toFile('public/demo/toys/hero-01.webp');
+for (const [file, [art, bg, accent]] of Object.entries(TOY_FILES)) {
+  await sharp(Buffer.from(toyCardSvg(art, bg, accent))).webp({ quality: 85 }).toFile(`public/demo/toys/${file}.webp`);
+}
+console.log('OK toys');
