@@ -42,3 +42,30 @@ export async function savePlatformPromptpay(
   revalidatePath('/settings');
   return { done: true };
 }
+
+export async function savePlatformLineToken(
+  _prev: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  const user = await getSuperAdminUser();
+  if (!user) return { error: 'ไม่มีสิทธิ์ดำเนินการ' };
+
+  // ว่าง = ปิดแจ้งเตือน (เก็บ null) — ไม่ validate รูปแบบ token เพราะ LINE ไม่ประกาศ format ตายตัว
+  const token = String(formData.get('line_token') ?? '').trim();
+
+  const db = createAdminClient();
+  const { error } = await db
+    .from('platform_settings')
+    .upsert({ id: 1, line_channel_access_token: token || null, updated_at: new Date().toISOString() });
+
+  if (error) {
+    return { error: `บันทึกไม่สำเร็จ: ${error.message} (ตรวจว่ารัน migration 013 บน Supabase แล้ว)` };
+  }
+
+  await logTenantEvent(null, 'platform_line_updated', 'ok', {
+    actor: user.email ?? user.id,
+    enabled: !!token,
+  });
+  revalidatePath('/settings');
+  return { done: true };
+}

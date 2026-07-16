@@ -1,15 +1,16 @@
 // ตั้งค่าแพลตฟอร์ม (Super Admin) — PromptPay รับเงินค่าแพลน (เก็บใน DB, migration 011)
 // อ่านค่าที่เก็บใน DB เพื่อเติมฟอร์ม (ว่าง = ยังไม่เคยตั้ง → ระบบ fallback ไป env)
 
-import { getPlatformPromptpay, getPlatformPromptpayStored } from '@/lib/platform-settings';
-import { PlatformPromptpayForm } from './settings-form';
+import { getPlatformPromptpay, getPlatformPromptpayStored, hasPlatformLineToken } from '@/lib/platform-settings';
+import { PlatformLineForm, PlatformPromptpayForm } from './settings-form';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PlatformSettingsPage() {
-  const [stored, effective] = await Promise.all([
+  const [stored, effective, lineEnabled] = await Promise.all([
     getPlatformPromptpayStored(),
     getPlatformPromptpay(),
+    hasPlatformLineToken(),
   ]);
 
   return (
@@ -22,7 +23,10 @@ export default async function PlatformSettingsPage() {
         </span>
       </p>
 
-      <PlatformPromptpayForm promptpayId={stored.id} promptpayName={stored.name} />
+      <div className="space-y-6">
+        <PlatformPromptpayForm promptpayId={stored.id} promptpayName={stored.name} />
+        <PlatformLineForm hasToken={lineEnabled} />
+      </div>
     </div>
   );
 }

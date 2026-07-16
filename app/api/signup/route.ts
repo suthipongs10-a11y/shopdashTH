@@ -2,8 +2,10 @@
 // service role — validate ทุกอย่างฝั่ง server ไม่เชื่อ client
 
 import { NextResponse, type NextRequest } from 'next/server';
+import { notifyPlatformNewTenant } from '@/lib/platform/line';
 import { checkSlug, provisionTenant } from '@/lib/provisioning';
 import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 interface SignupBody {
   storeName?: string;
@@ -54,6 +56,18 @@ export async function POST(req: NextRequest) {
 
   const result = await provisionTenant({ storeName, slug, email, password, phone, planId });
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
+
+  // แจ้งเจ้าของแพลตฟอร์มทาง LINE (fire-and-forget — ห้ามหน่วง response ของลูกค้า)
+  void (async () => {
+    const db = createAdminClient();
+    const { data: plan } = await db.from('plans').select('name_th').eq('id', planId).maybeSingle();
+    await notifyPlatformNewTenant({
+      storeName,
+      slug: result.slug,
+      planName: (plan?.name_th as string | undefined) ?? planId,
+      email,
+    });
+  })().catch(() => undefined);
 
   return NextResponse.json({ ok: true, slug: result.slug });
 }

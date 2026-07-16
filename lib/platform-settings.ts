@@ -43,3 +43,15 @@ export async function getPlatformPromptpayStored(): Promise<PlatformPromptpay> {
     name: raw?.promptpay_name?.trim() ?? '',
   };
 }
+
+/** มี LINE token ของแพลตฟอร์มตั้งไว้ไหม (DB หรือ env) — ใช้โชว์สถานะในหน้าตั้งค่า */
+export async function hasPlatformLineToken(): Promise<boolean> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from('platform_settings')
+    .select('line_channel_access_token')
+    .eq('id', 1)
+    .maybeSingle();
+  const fromDb = !error ? (data?.line_channel_access_token as string | null) : null;
+  return !!(fromDb?.trim() || process.env.PLATFORM_LINE_CHANNEL_TOKEN?.trim());
+}

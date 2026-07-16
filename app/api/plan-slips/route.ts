@@ -4,7 +4,8 @@
 
 import { NextResponse } from 'next/server';
 import { getStoreUser } from '@/lib/auth';
-import { createSubscriptionRequest } from '@/lib/billing';
+import { createSubscriptionRequest, isRenewalTenant, planChargeAmount } from '@/lib/billing';
+import { notifyPlatformPlanSlip } from '@/lib/platform/line';
 import { IMAGE_MIME_EXT, MAX_IMAGE_BYTES, platformSlipKey, putObject } from '@/lib/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContextAllowLocked, TenantNotFoundError } from '@/lib/tenant-context';
@@ -43,6 +44,20 @@ export async function POST(req: Request) {
 
     const result = await createSubscriptionRequest(ctx.tenantId, planId, key);
     if (!result.ok) return bad(result.error);
+
+    // แจ้งเจ้าของแพลตฟอร์มทาง LINE — สลิปค้างคิวช่วง trial คือจุดเสีย conversion
+    void (async () => {
+      const [{ data: planRow }, renewal] = await Promise.all([
+        db.from('plans').select('name_th, price_yearly, price_renewal').eq('id', planId).maybeSingle(),
+        isRenewalTenant(ctx.tenantId),
+      ]);
+      await notifyPlatformPlanSlip({
+        storeName: ctx.store.name,
+        slug: ctx.slug,
+        planName: (planRow?.name_th as string | undefined) ?? planId,
+        amount: planRow ? planChargeAmount(planRow, renewal) : 0,
+      });
+    })().catch(() => undefined);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
