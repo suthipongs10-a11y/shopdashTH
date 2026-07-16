@@ -4,6 +4,17 @@
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-16
 
+## Done (Phase 7 ต่อ — ชุด hardening 8 ข้อ + แผงสถานะระบบ, 2026-07-16 ตามคำสั่งเจ้าของ "ทำทั้ง 8 ข้อ")
+- [x] **(1) แจ้งเตือน LINE เจ้าของแพลตฟอร์ม**: ร้าน signup ใหม่ + สลิปค่าแพลนเข้าคิว → LINE OA ของเจ้าของ (`lib/platform/line.ts`, fire-and-forget) — token ตั้งได้ที่ **Super Admin → ตั้งค่า** (migration 013 — **รอรันใน SQL Editor**) หรือ env `PLATFORM_LINE_CHANNEL_TOKEN`
+- [x] **(2+9) ระบบสถานะ/health**: `lib/platform/health.ts` เช็ค Supabase DB + Auth + R2 (เขียนไฟล์จริง) + config ครบไหม → **แผง "สถานะระบบ" บนแดชบอร์ด Super Admin** (latency + สาเหตุภาษาไทย) + `GET /api/health` สำหรับ uptime monitor (ตอบ ok/down เท่านั้น, 503 เมื่อล่ม, cache 30s) — วิธีตั้ง UptimeRobot อยู่ DEPLOYMENT §8.1 (ต้อง monitor ทั้ง /api/health และร้านผ่าน Worker)
+- [x] **(3) หน้ากฎหมาย PDPA**: `/privacy` + `/terms` บน layout landing + ลิงก์ footer + บรรทัดยอมรับใต้ปุ่ม signup — เนื้อหาอธิบายบทบาท controller/processor และ retention 90 วัน (มีหมายเหตุให้ทนายตรวจเมื่อโต)
+- [x] **(4) กติกาสคริปต์**: `scripts/README.md` — รายการสคริปต์ .tmp ในเครื่องเจ้าของที่ต้องกู้เข้า repo (seed ร้านเดโม่ T1-T4 ฯลฯ) + ชื่อปลายทาง + เตือนใน .gitignore — **เจ้าของต้องกู้ไฟล์จากเครื่องตัวเอง** (clone นี้ไม่มีไฟล์)
+- [x] **(5) Rate limit ข้าม instance**: รองรับ Upstash Redis (env `UPSTASH_REDIS_REST_URL/TOKEN` — ว่าง = in-memory เดิม, Redis ล่ม = fail-open) — สมัคร Upstash แล้วตั้ง env บน Vercel ตาม DEPLOYMENT §8
+- [x] **(6) แก้บั๊ก robots.txt 404** (ค้างจาก 2026-07-14): Next ไม่รองรับ robots.ts ใน route group → ย้ายเป็น `app/robots.ts` แยกกติกาตาม host — **ทดสอบ prod build จริงผ่าน 3 ชนิด host** (ร้าน=rules+sitemap ต่อร้าน 200, platform=เปิด index, super-admin=ปิดทั้งเว็บ, sitemap regression 200)
+- [x] **(7) Onboarding + PromptPay gate**: ร้านไม่ตั้ง PromptPay = ระบบสั่งซื้อปิดอัตโนมัติ (clamp ใน buildContext + server ตรวจซ้ำใน /api/checkout — ปิดช่องเดิมที่ T1 กันแค่ UI ด้วย) + แบนเนอร์แดง "รับเงินไม่ได้" + checklist 3 ข้อบนแดชบอร์ดร้าน (PromptPay/สินค้าจริงชิ้นแรก/ที่อยู่ร้าน)
+- [x] **(8) Starter pack ของเล่น/แม่และเด็ก**: data ครบ 8 สินค้า (ป้าย ช่วงวัย/แบบ) + registry เช็ค asset — **เหลือเจ้าของหารูป 12 ไฟล์วางตาม `public/demo/toys/README.md`** (network เครื่องพัฒนาโดนบล็อกคลังรูป stock) → ตัวเลือก "ร้านคุณขายอะไร" โผล่บนหน้า signup เองเมื่อรูปครบ
+- [x] `tsc --noEmit` + `npm run build` ผ่านทุก commit (7 commits แยกตามข้อ)
+
 ## Done (Phase 7 ต่อ — Starter Store: ร้านใหม่มีข้อมูลตัวอย่างเต็มร้านทันทีหลัง signup, 2026-07-16 ตามคำสั่งเจ้าของ)
 - [x] **โจทย์**: ลูกค้า trial สมัครเสร็จเจอร้านเปล่า → ถอดใจ — ต้องเริ่มด้วยร้านสวยมีสินค้า/รูป/เนื้อหาครบ แล้วให้แก้เป็นของตัวเอง (ดู DECISIONS 2026-07-16)
 - [x] `supabase/migrations/012_starter_pack.sql` — **ยังไม่ apply (รอเจ้าของรันใน SQL Editor)**: `is_sample` ใน products/categories/pages + upsert ธีม t1-simple/t2-store/t3-hub/t4-luxe เข้า theme_registry (เดิมอยู่แต่ใน DB จริงผ่านสคริปต์ .tmp — install ใหม่จะชน FK)
@@ -180,6 +191,10 @@
 - [x] **แก้ R2 CORS แล้ว (เจ้าของทำผ่าน Cloudflare Dashboard โดยตรง, 2026-07-12)**: เพิ่ม origin `http://localhost:3000` + `http://*.localhost:3000` ใน bucket `shopdash-prod` — R2 API token ที่แอปใช้มีสิทธิ์แค่ Object Read/Write เขียน CORS (bucket-level) ไม่ได้ (`AccessDenied` ตอนลองรัน `.tmp-r2-cors.mjs`) จึงทำผ่านหน้าเว็บแทน (ไม่ต้องยกระดับสิทธิ์ token) — **ยืนยันด้วย e2e จริงที่ `wearstore.localhost:3000` (`.tmp-cors-verify.mjs` 4/4): อัปโหลดรูปจาก subdomain สำเร็จ ไม่มี CORS error, บันทึกลง DB, รูปเสิร์ฟ 200**
 
 ## ค้าง / ขั้นตอนถัดไป
+- [ ] **รัน migration 012 + 013 ใน Supabase SQL Editor** (012 = starter store + ธีม T1-T4 เข้า registry, 013 = LINE token แพลตฟอร์ม)
+- [ ] ตั้งค่าใน Dashboard: UptimeRobot 2 monitors (DEPLOYMENT §8.1) / Upstash env / LINE token ที่ Super Admin → ตั้งค่า
+- [ ] กู้สคริปต์ .tmp จากเครื่องเจ้าของเข้า `scripts/` ตาม `scripts/README.md`
+- [ ] หารูป pack ของเล่น 12 ไฟล์ตาม `public/demo/toys/README.md` → ตัวเลือกประเภทร้านเปิดเอง
 - [ ] Slip Verify provider จริง (ยืนยันเงินเข้า — จุดขาย P4) — **สมัคร SlipOK/EasySlip เมื่อมีลูกค้า P4 รายแรก** ตามที่ตกลง 2026-07-10 (qr_payload ที่เก็บแล้วส่งให้ provider ได้เลย ประหยัดกว่าส่งรูป)
 - [ ] Production hardening ที่เหลือ = ค่าจริงบน Vercel/Supabase/R2 ตาม DEPLOYMENT.md §0–§5 (ทำตอนจะ deploy จริง)
 - [ ] (ไอเดียต่อยอด variant labels ถ้าเจ้าของต้องการ) รูปเดโม่หมวดของเล่น/แม่และเด็ก + preset ธีมโทนเด็ก — โครงสร้างรองรับแล้ว เหลือแค่ asset
