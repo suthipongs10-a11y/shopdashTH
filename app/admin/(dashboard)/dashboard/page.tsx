@@ -2,6 +2,7 @@
 // analytics_dashboard (Pro/Premium §5.1). ตัวเลขทั้งหมดนับเฉพาะออร์เดอร์ยืนยันแล้ว (confirmed+)
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import {
   AlertIcon,
   BahtIcon,
@@ -12,17 +13,7 @@ import {
   SlipIcon,
   StarIcon,
 } from '@/components/admin/icons';
-import {
-  Badge,
-  btnPrimary,
-  Card,
-  EmptyState,
-  PageHeader,
-  StatCard,
-  tdClass,
-  thClass,
-  trHover,
-} from '@/components/admin/ui';
+import { Badge, btnPrimary, Card, EmptyState, PageHeader, tdClass, thClass, trHover } from '@/components/admin/ui';
 import {
   getLowStockVariants,
   getStoreDailySales,
@@ -41,7 +32,86 @@ import { SalesCharts } from './sales-charts';
 
 export const dynamic = 'force-dynamic';
 
-// สถานะที่ต้อง "ตามงาน" (ยังไม่ปิดจบ) — แสดงเป็นการ์ดค้างต่อสถานะ
+/* ---------- ไอคอนเล็กเฉพาะหน้านี้ ---------- */
+
+function ChevronRight({ className }: { className?: string }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="m9 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+/* ---------- Stat tile: การ์ด gradient พาสเทล + icon chip ลอย ---------- */
+
+type TileTone = 'emerald' | 'indigo' | 'violet';
+
+const TILE: Record<TileTone, { grad: string; chip: string; blob: string }> = {
+  emerald: {
+    grad: 'from-emerald-50 to-white',
+    chip: 'bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600',
+    blob: 'bg-emerald-200/50',
+  },
+  indigo: {
+    grad: 'from-indigo-50 to-white',
+    chip: 'bg-gradient-to-br from-indigo-100 to-indigo-50 text-indigo-600',
+    blob: 'bg-indigo-200/50',
+  },
+  violet: {
+    grad: 'from-violet-50 to-white',
+    chip: 'bg-gradient-to-br from-violet-100 to-violet-50 text-violet-600',
+    blob: 'bg-violet-200/50',
+  },
+};
+
+function StatTile({
+  label,
+  value,
+  sub,
+  icon,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+  icon: ReactNode;
+  tone: TileTone;
+}) {
+  const t = TILE[tone];
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br ${t.grad} p-5 shadow-sm`}
+    >
+      <div className={`pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full ${t.blob} blur-2xl`} />
+      <div className="relative flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-semibold text-gray-600">{label}</p>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900">{value}</p>
+          {sub && <p className="mt-1.5 text-xs font-medium text-gray-500">{sub}</p>}
+        </div>
+        <span
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-sm ring-4 ring-white/80 ${t.chip}`}
+        >
+          {icon}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- ออร์เดอร์ค้างต่อสถานะ ---------- */
+
 const PIPELINE: {
   status: OrderStatus;
   icon: React.ComponentType<{ size?: number; className?: string }>;
@@ -53,11 +123,19 @@ const PIPELINE: {
   { status: 'packing', icon: BoxIcon, tone: 'indigo' },
 ];
 
-const PIPE_TONES: Record<string, string> = {
-  amber: 'bg-amber-50 text-amber-600',
-  violet: 'bg-violet-50 text-violet-600',
-  sky: 'bg-sky-50 text-sky-600',
-  indigo: 'bg-indigo-50 text-indigo-600',
+const PIPE_STYLES: Record<string, { chip: string; grad: string }> = {
+  amber: { chip: 'bg-amber-100 text-amber-600', grad: 'from-amber-50 to-white' },
+  violet: { chip: 'bg-violet-100 text-violet-600', grad: 'from-violet-50 to-white' },
+  sky: { chip: 'bg-sky-100 text-sky-600', grad: 'from-sky-50 to-white' },
+  indigo: { chip: 'bg-indigo-100 text-indigo-600', grad: 'from-indigo-50 to-white' },
+};
+
+/* ---------- เหรียญอันดับสินค้าขายดี ---------- */
+
+const RANK_STYLES: Record<number, string> = {
+  0: 'bg-amber-100 text-amber-700 ring-amber-200',
+  1: 'bg-slate-100 text-slate-600 ring-slate-300',
+  2: 'bg-orange-100 text-orange-700 ring-orange-200',
 };
 
 export default async function DashboardPage() {
@@ -81,30 +159,33 @@ export default async function DashboardPage() {
     ]);
   }
 
+  const totalPending = PIPELINE.reduce((sum, p) => sum + (statusCounts[p.status] ?? 0), 0);
+  const maxRev = Math.max(...top.map((p) => p.revenue), 1);
+
   return (
     <div className="space-y-8">
       <PageHeader title="แดชบอร์ด" description="ข้อมูล 30 วันล่าสุด (เวลาไทย)" />
 
       {/* การ์ดตัวเลขสรุป — นับเฉพาะออร์เดอร์ยืนยันแล้ว */}
       <div className={`grid gap-4 sm:grid-cols-2 ${full ? 'lg:grid-cols-3' : ''}`}>
-        <StatCard
+        <StatTile
           label="ยอดขาย 30 วัน"
           value={formatBaht(summary.revenue)}
           sub="เฉพาะออร์เดอร์ที่ยืนยันแล้ว"
-          icon={<BahtIcon size={20} />}
+          icon={<BahtIcon size={22} />}
           tone="emerald"
         />
-        <StatCard
+        <StatTile
           label="ออร์เดอร์ 30 วัน"
           value={summary.order_count.toLocaleString('th-TH')}
-          icon={<OrdersIcon size={20} />}
+          icon={<OrdersIcon size={22} />}
           tone="indigo"
         />
         {full && (
-          <StatCard
+          <StatTile
             label="ยอดเฉลี่ยต่อออร์เดอร์"
             value={formatBaht(summary.avg_order_value)}
-            icon={<StarIcon size={18} />}
+            icon={<StarIcon size={20} />}
             tone="violet"
           />
         )}
@@ -112,27 +193,41 @@ export default async function DashboardPage() {
 
       {/* ออร์เดอร์ค้างต่อสถานะ */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-gray-900">ออร์เดอร์ที่ต้องดำเนินการ</h2>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="text-sm font-bold text-gray-900">ออร์เดอร์ที่ต้องดำเนินการ</h2>
+          {totalPending > 0 && (
+            <span className="text-xs font-medium text-gray-500">
+              ค้างรวม {totalPending.toLocaleString('th-TH')} รายการ
+            </span>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {PIPELINE.map(({ status, icon: Icon, tone }) => (
-            <Link
-              key={status}
-              href={`/admin/orders?status=${status}`}
-              className="group rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
-            >
-              <span
-                className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${PIPE_TONES[tone]}`}
+          {PIPELINE.map(({ status, icon: Icon, tone }) => {
+            const s = PIPE_STYLES[tone];
+            const count = statusCounts[status] ?? 0;
+            return (
+              <Link
+                key={status}
+                href={`/admin/orders?status=${status}`}
+                className={`group relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br ${s.grad} p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md`}
               >
-                <Icon size={18} />
-              </span>
-              <p className="text-2xl font-bold tracking-tight text-gray-900">
-                {(statusCounts[status] ?? 0).toLocaleString('th-TH')}
-              </p>
-              <p className="mt-0.5 text-xs text-gray-500 group-hover:text-indigo-600">
-                {ORDER_STATUS_TH[status]}
-              </p>
-            </Link>
-          ))}
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl ring-4 ring-white/70 ${s.chip}`}
+                  >
+                    <Icon size={18} />
+                  </span>
+                  <ChevronRight className="text-gray-300 transition-all group-hover:translate-x-0.5 group-hover:text-gray-500" />
+                </div>
+                <p className="mt-3 text-2xl font-bold tracking-tight text-gray-900">
+                  {count.toLocaleString('th-TH')}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                  {ORDER_STATUS_TH[status]}
+                </p>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -141,47 +236,65 @@ export default async function DashboardPage() {
         <>
           <SalesCharts daily={daily} weekly={weekly} />
 
-          <Card title="สินค้าขายดี (30 วัน)" padded={false}>
+          <Card
+            title="สินค้าขายดี"
+            description="เรียงตามยอดขาย 30 วันล่าสุด"
+            padded={false}
+          >
             {top.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-gray-500">
-                ยังไม่มีข้อมูลการขายในช่วง 30 วันนี้
-              </p>
+              <div className="px-5 py-12 text-center">
+                <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-violet-50 text-violet-500">
+                  <StarIcon size={20} />
+                </span>
+                <p className="text-sm font-medium text-gray-500">ยังไม่มีข้อมูลการขายในช่วง 30 วันนี้</p>
+              </div>
             ) : (
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr>
-                    <th className={thClass}>#</th>
-                    <th className={thClass}>สินค้า</th>
-                    <th className={`${thClass} text-right`}>จำนวนที่ขาย</th>
-                    <th className={`${thClass} text-right`}>ยอดขาย</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {top.map((p, i) => (
-                    <tr key={p.product_name} className={trHover}>
-                      <td className={`${tdClass} text-gray-400`}>{i + 1}</td>
-                      <td className={`${tdClass} font-medium text-gray-900`}>{p.product_name}</td>
-                      <td className={`${tdClass} text-right`}>
-                        {p.qty.toLocaleString('th-TH')} ชิ้น
-                      </td>
-                      <td className={`${tdClass} text-right font-semibold text-gray-900`}>
-                        {formatBaht(p.revenue)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ol className="divide-y divide-gray-100">
+                {top.map((p, i) => (
+                  <li key={p.product_name} className="flex items-center gap-4 px-5 py-3.5">
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ring-1 ring-inset ${
+                        RANK_STYLES[i] ?? 'bg-indigo-50 text-indigo-500 ring-indigo-100'
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-gray-900">{p.product_name}</p>
+                      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-400"
+                          style={{ width: `${Math.max((p.revenue / maxRev) * 100, 4)}%` }}
+                        />
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-bold text-gray-900">{formatBaht(p.revenue)}</p>
+                      <p className="mt-0.5 text-xs text-gray-500">{p.qty.toLocaleString('th-TH')} ชิ้น</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             )}
           </Card>
         </>
       ) : (
-        <div className="rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 p-8 text-center">
-          <p className="text-sm font-medium text-gray-700">
-            กราฟยอดขายรายวัน/รายสัปดาห์ และสินค้าขายดี มีในแพลน Pro ขึ้นไป
-          </p>
-          <Link href="/admin/plan" className={`${btnPrimary} mt-4`}>
-            อัปเกรดแพลน
-          </Link>
+        <div className="relative overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-violet-50 to-white p-8 text-center shadow-sm">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-violet-200/40 blur-2xl" />
+          <div className="relative">
+            <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-indigo-100 text-violet-600 shadow-sm ring-4 ring-white/80">
+              <StarIcon size={22} />
+            </span>
+            <p className="text-sm font-semibold text-gray-800">
+              กราฟยอดขายรายวัน/รายสัปดาห์ และสินค้าขายดี มีในแพลน Pro ขึ้นไป
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              ปลดล็อกการวิเคราะห์ยอดขายแบบเต็มเพื่อดูแนวโน้มและสินค้าทำเงิน
+            </p>
+            <Link href="/admin/plan" className={`${btnPrimary} mt-5`}>
+              อัปเกรดแพลน
+            </Link>
+          </div>
         </div>
       )}
 
@@ -189,52 +302,52 @@ export default async function DashboardPage() {
       <Card
         title="สต๊อกใกล้หมด"
         description="ต่ำกว่าเกณฑ์เตือนที่ตั้งไว้ต่อตัวเลือกสินค้า"
+        actions={lowStock.length > 0 ? <Badge tone="warning">{lowStock.length} รายการ</Badge> : undefined}
         padded={false}
       >
         {lowStock.length === 0 ? (
           <div className="px-4 py-8">
-            <EmptyState
-              icon={<CheckCircleIcon size={22} />}
-              title="สต๊อกทุกรายการอยู่ในระดับปกติ"
-            />
+            <EmptyState icon={<CheckCircleIcon size={22} />} title="สต๊อกทุกรายการอยู่ในระดับปกติ" />
           </div>
         ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr>
-                <th className={thClass}>สินค้า</th>
-                <th className={thClass}>ตัวเลือก</th>
-                <th className={`${thClass} text-right`}>คงเหลือ</th>
-                <th className={`${thClass} text-right`}>เกณฑ์เตือน</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lowStock.map((v) => (
-                <tr key={`${v.productId}-${v.label}`} className={trHover}>
-                  <td className={tdClass}>
-                    <Link
-                      href={`/admin/products/${v.productId}`}
-                      className="font-medium text-gray-900 hover:text-indigo-600 hover:underline"
-                    >
-                      {v.productName}
-                    </Link>
-                  </td>
-                  <td className={`${tdClass} text-gray-500`}>{v.label}</td>
-                  <td className={`${tdClass} text-right`}>
-                    {v.stock === 0 ? (
-                      <Badge tone="danger">
-                        <AlertIcon size={11} />
-                        หมด
-                      </Badge>
-                    ) : (
-                      <Badge tone="warning">เหลือ {v.stock.toLocaleString('th-TH')}</Badge>
-                    )}
-                  </td>
-                  <td className={`${tdClass} text-right text-gray-400`}>{v.threshold}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr>
+                  <th className={thClass}>สินค้า</th>
+                  <th className={thClass}>ตัวเลือก</th>
+                  <th className={`${thClass} text-right`}>คงเหลือ</th>
+                  <th className={`${thClass} text-right`}>เกณฑ์เตือน</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {lowStock.map((v) => (
+                  <tr key={`${v.productId}-${v.label}`} className={trHover}>
+                    <td className={tdClass}>
+                      <Link
+                        href={`/admin/products/${v.productId}`}
+                        className="font-medium text-gray-900 hover:text-indigo-600 hover:underline"
+                      >
+                        {v.productName}
+                      </Link>
+                    </td>
+                    <td className={`${tdClass} text-gray-500`}>{v.label}</td>
+                    <td className={`${tdClass} text-right`}>
+                      {v.stock === 0 ? (
+                        <Badge tone="danger">
+                          <AlertIcon size={11} />
+                          หมด
+                        </Badge>
+                      ) : (
+                        <Badge tone="warning">เหลือ {v.stock.toLocaleString('th-TH')}</Badge>
+                      )}
+                    </td>
+                    <td className={`${tdClass} text-right text-gray-400`}>{v.threshold}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </div>
