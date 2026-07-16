@@ -180,6 +180,14 @@ export const getTenantContextAllowLocked = cache(async (): Promise<TenantContext
 
 async function buildContext(tenant: TenantRow): Promise<TenantContext> {
   const themeDefaults = await loadThemeDefaults(tenant.stores.theme_code);
+  const features = resolveFeatures(
+    tenant.plans,
+    { feature_overrides: tenant.feature_overrides ?? {} },
+    { feature_defaults: themeDefaults },
+  );
+  // ร้านยังไม่ตั้ง PromptPay = รับเงินไม่ได้จริง → บังคับปิดระบบสั่งซื้อทั้งหน้าร้านและ API
+  // (ชนะทุก override — เปิดคืนอัตโนมัติทันทีที่ตั้ง PromptPay ในตั้งค่าร้าน)
+  if (!tenant.stores.promptpay_id?.trim()) features.online_ordering = false;
   return {
     tenantId: tenant.id,
     slug: tenant.slug,
@@ -189,10 +197,6 @@ async function buildContext(tenant: TenantRow): Promise<TenantContext> {
     featureOverrides: tenant.feature_overrides ?? {},
     store: tenant.stores,
     plan: tenant.plans,
-    features: resolveFeatures(
-      tenant.plans,
-      { feature_overrides: tenant.feature_overrides ?? {} },
-      { feature_defaults: themeDefaults },
-    ),
+    features,
   };
 }

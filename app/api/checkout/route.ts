@@ -28,6 +28,14 @@ export async function POST(req: Request) {
 
   try {
     const ctx = await getTenantContext();
+    // กันยิง API ตรง (UI ซ่อนปุ่มอยู่แล้ว): ร้านโหมดแชท (T1) และร้านที่ยังไม่ตั้ง PromptPay
+    // (รับเงินไม่ได้จริง — clamp ใน buildContext) ต้องสร้างออร์เดอร์ไม่ได้
+    if (!ctx.features.online_ordering) {
+      return NextResponse.json(
+        { error: 'ร้านนี้ยังไม่เปิดรับคำสั่งซื้อออนไลน์ กรุณาติดต่อร้านโดยตรง' },
+        { status: 403 },
+      );
+    }
     const result = await createOrder(
       ctx,
       body.items ?? [],

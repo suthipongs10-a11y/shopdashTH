@@ -145,16 +145,48 @@ export default async function DashboardPage() {
   const full = ctx.features.analytics_dashboard;
 
   const supabase = await createClient();
-  const [summary, statusCounts, lowStock, { count: sampleCount }] = await Promise.all([
-    getStoreSalesSummary(ctx.tenantId),
-    getStoreOrderStatusCounts(ctx.tenantId),
-    getLowStockVariants(ctx.tenantId),
-    supabase
-      .from('products')
-      .select('id', { count: 'exact', head: true })
-      .eq('tenant_id', ctx.tenantId)
-      .eq('is_sample', true),
-  ]);
+  const [summary, statusCounts, lowStock, { count: sampleCount }, { count: ownProductCount }] =
+    await Promise.all([
+      getStoreSalesSummary(ctx.tenantId),
+      getStoreOrderStatusCounts(ctx.tenantId),
+      getLowStockVariants(ctx.tenantId),
+      supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', ctx.tenantId)
+        .eq('is_sample', true),
+      supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', ctx.tenantId)
+        .eq('is_sample', false),
+    ]);
+
+  // onboarding checklist — โชว์จนกว่าจะครบ 3 ข้อ (ร้านใหม่เห็นทางไปต่อชัดๆ)
+  const promptpaySet = !!ctx.store.promptpay_id?.trim();
+  const onboardingSteps = [
+    {
+      done: promptpaySet,
+      label: 'ตั้ง PromptPay รับเงิน',
+      sub: promptpaySet
+        ? 'ร้านรับเงินได้แล้ว'
+        : 'สำคัญที่สุด — ระหว่างยังไม่ตั้ง ระบบปิดปุ่มสั่งซื้อบนหน้าร้านให้ชั่วคราว',
+      href: '/admin/settings',
+    },
+    {
+      done: (ownProductCount ?? 0) > 0,
+      label: 'มีสินค้าของคุณเองอย่างน้อย 1 ชิ้น',
+      sub: 'แก้สินค้าตัวอย่างให้เป็นของคุณ หรือเพิ่มสินค้าใหม่',
+      href: '/admin/products',
+    },
+    {
+      done: !!ctx.store.address?.trim(),
+      label: 'ใส่ที่อยู่/ข้อมูลติดต่อร้าน',
+      sub: 'แสดงท้ายหน้าร้านให้ลูกค้าเชื่อถือและติดต่อได้',
+      href: '/admin/settings',
+    },
+  ];
+  const onboardingIncomplete = onboardingSteps.some((s) => !s.done);
 
   let daily: DailySalesPoint[] = [];
   let weekly: WeeklySalesPoint[] = [];
@@ -173,6 +205,59 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <PageHeader title="แดชบอร์ด" description="ข้อมูล 30 วันล่าสุด (เวลาไทย)" />
+
+      {/* ยังไม่ตั้ง PromptPay = รับเงินไม่ได้ — เตือนแรงสุดก่อนทุกอย่าง */}
+      {!promptpaySet && (
+        <div className="rounded-xl border-2 border-rose-300 bg-rose-50 px-4 py-3.5">
+          <p className="text-sm font-bold text-rose-800">
+            ⚠️ ร้านของคุณยังรับเงินไม่ได้ — ยังไม่ได้ตั้ง PromptPay
+          </p>
+          <p className="mt-1 text-sm font-medium text-rose-700">
+            ระบบปิดปุ่มสั่งซื้อบนหน้าร้านให้ชั่วคราว (ลูกค้ายังเข้าชมสินค้าได้ปกติ) —
+            ตั้งเบอร์ PromptPay ของร้านที่{' '}
+            <Link href="/admin/settings" className="font-bold underline">
+              ตั้งค่าร้าน
+            </Link>{' '}
+            แล้วปุ่มสั่งซื้อจะเปิดให้อัตโนมัติทันที
+          </p>
+        </div>
+      )}
+
+      {/* onboarding checklist — 3 ก้าวแรกของร้านใหม่ */}
+      {onboardingIncomplete && (
+        <div className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-5 shadow-sm">
+          <p className="text-sm font-bold text-indigo-900">
+            เริ่มต้นร้านให้พร้อมขาย (
+            {onboardingSteps.filter((s) => s.done).length}/{onboardingSteps.length})
+          </p>
+          <ul className="mt-3 space-y-2.5">
+            {onboardingSteps.map((step) => (
+              <li key={step.label} className="flex items-start gap-3">
+                <span
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                    step.done
+                      ? 'bg-emerald-500 text-white'
+                      : 'border-2 border-indigo-300 bg-white text-transparent'
+                  }`}
+                >
+                  ✓
+                </span>
+                <span className="min-w-0 text-sm">
+                  <Link
+                    href={step.href}
+                    className={`font-semibold ${
+                      step.done ? 'text-gray-400 line-through' : 'text-gray-900 hover:text-indigo-600'
+                    }`}
+                  >
+                    {step.label}
+                  </Link>
+                  {!step.done && <span className="block text-xs font-medium text-gray-500">{step.sub}</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* ข้อมูลตัวอย่างจาก starter pack — โชว์จนกว่าจะแก้เป็นของจริง/ลบหมด */}
       {(sampleCount ?? 0) > 0 && <SampleDataBanner productCount={sampleCount ?? 0} />}
