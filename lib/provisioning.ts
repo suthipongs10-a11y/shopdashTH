@@ -54,6 +54,8 @@ export interface ProvisionInput {
   planId: string;
   /** starter pack ตามประเภทร้านที่เลือกตอน signup — ว่าง/ไม่รู้จัก = pack แฟชั่น */
   packCode?: string;
+  /** ลูกค้าเลือกเองตอน signup: true (default) = ร้านพร้อมข้อมูลตัวอย่าง, false = ร้านว่างเริ่มจากศูนย์ */
+  sampleData?: boolean;
 }
 
 export type ProvisionResult =
@@ -73,7 +75,7 @@ const STARTER_THEME_BY_PLAN: Record<string, string> = {
 
 export async function provisionTenant(input: ProvisionInput): Promise<ProvisionResult> {
   const db = createAdminClient();
-  const { storeName, slug, email, password, phone, planId, packCode } = input;
+  const { storeName, slug, email, password, phone, planId, packCode, sampleData = true } = input;
 
   // ---------- validate ก่อนสร้างอะไรทั้งนั้น ----------
   const slugCheck = await checkSlug(slug);
@@ -172,15 +174,23 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
   // ---------- step 7: Starter Store — seed ข้อมูลตัวอย่างเต็มร้าน (non-fatal) ----------
   // ลูกค้า trial ต้องเห็นร้านสวยพร้อมสินค้า/รูป/เนื้อหาทันที ไม่ใช่หน้าว่าง — ถ้า seed พลาด
   // ห้ามล้ม signup: fallback เป็นหมวดเปล่า "สินค้าทั้งหมด" แบบเดิม (§5.3 เดิม) แล้ว log ไว้
+  // ลูกค้าเลือก "ร้านว่าง" ตอน signup = ข้าม seed ไปหมวดเปล่าเลย (ยังกดเติมทีหลังได้ที่
+  // /admin/content) — seed พลาดก็ตกทางเดียวกัน
   const features = (plan.features ?? {}) as Record<string, boolean>;
-  const seeded = await seedStarterPack(db, tenantId, {
-    customPages: features.custom_pages === true,
-    packCode,
-  });
+  const seeded = sampleData
+    ? await seedStarterPack(db, tenantId, {
+        customPages: features.custom_pages === true,
+        packCode,
+      })
+    : ({ ok: false, error: 'skipped' } as const);
   if (seeded.ok) {
     await logTenantEvent(tenantId, 'provision:starter_pack', 'ok', { pack: packCode ?? 'fashion' });
   } else {
-    await logTenantEvent(tenantId, 'provision:starter_pack', 'error', { cause: seeded.error });
+    if (sampleData) {
+      await logTenantEvent(tenantId, 'provision:starter_pack', 'error', { cause: seeded.error });
+    } else {
+      await logTenantEvent(tenantId, 'provision:starter_pack', 'ok', { skipped: 'user_chose_blank' });
+    }
     const { error: categoryError } = await db
       .from('categories')
       .insert({ tenant_id: tenantId, name: 'สินค้าทั้งหมด', sort_order: 0 });
@@ -188,7 +198,8 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
       await rollback('category', categoryError.message);
       return { ok: false, error: 'สร้างหมวดหมู่เริ่มต้นไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
     }
-    await logTenantEvent(tenantId, 'provision:category', 'ok', { fallback: true });
+    // fallback=true คือ seed พลาดแล้วถอยมาหมวดเปล่า; ลูกค้าเลือกร้านว่างเอง = ไม่ใช่ fallback
+    await logTenantEvent(tenantId, 'provision:category', 'ok', { fallback: sampleData });
   }
 
   await logTenantEvent(tenantId, 'provision:done', 'ok', { slug, trial_ends_at: trialEndsAt });

@@ -16,6 +16,8 @@ interface SignupBody {
   planId?: string;
   /** ประเภทร้าน → starter pack (ไม่รู้จัก/ว่าง = pack แฟชั่น — validate ใน getStarterPack) */
   storeType?: string;
+  /** ลูกค้าเลือกตอนสมัคร: 'sample' (default) = ร้านพร้อมข้อมูลตัวอย่าง, 'blank' = ร้านว่าง */
+  startMode?: string;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,7 +59,18 @@ export async function POST(req: NextRequest) {
   if (!planId) return NextResponse.json({ error: 'กรุณาเลือกแพลน' }, { status: 400 });
 
   const packCode = typeof body.storeType === 'string' ? body.storeType.trim() : undefined;
-  const result = await provisionTenant({ storeName, slug, email, password, phone, planId, packCode });
+  // ค่าอื่นนอกจาก 'blank' = ได้ข้อมูลตัวอย่าง (default ปลอดภัยฝั่งสวย)
+  const sampleData = body.startMode !== 'blank';
+  const result = await provisionTenant({
+    storeName,
+    slug,
+    email,
+    password,
+    phone,
+    planId,
+    packCode,
+    sampleData,
+  });
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
 
   // แจ้งเจ้าของแพลตฟอร์มทาง LINE (fire-and-forget — ห้ามหน่วง response ของลูกค้า)

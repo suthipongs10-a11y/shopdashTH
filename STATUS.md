@@ -197,6 +197,11 @@
 - [x] `tsc --noEmit` + `npm run build` ผ่าน / screenshot `.tmp-shots/content/`
 - [x] **แก้ R2 CORS แล้ว (เจ้าของทำผ่าน Cloudflare Dashboard โดยตรง, 2026-07-12)**: เพิ่ม origin `http://localhost:3000` + `http://*.localhost:3000` ใน bucket `shopdash-prod` — R2 API token ที่แอปใช้มีสิทธิ์แค่ Object Read/Write เขียน CORS (bucket-level) ไม่ได้ (`AccessDenied` ตอนลองรัน `.tmp-r2-cors.mjs`) จึงทำผ่านหน้าเว็บแทน (ไม่ต้องยกระดับสิทธิ์ token) — **ยืนยันด้วย e2e จริงที่ `wearstore.localhost:3000` (`.tmp-cors-verify.mjs` 4/4): อัปโหลดรูปจาก subdomain สำเร็จ ไม่มี CORS error, บันทึกลง DB, รูปเสิร์ฟ 200**
 
+## Done (Phase 7 ต่อ — ตัวเลือกจุดเริ่มต้นร้านตอน signup, 2026-07-16)
+- [x] การ์ดเลือก 2 แบบพร้อมรูปเทียบ (screenshot ร้านเดโม่จริง vs wireframe ร้านว่างที่สร้างใหม่) — default "พร้อมตัวอย่าง (แนะนำ)", เลือกประเภทร้านโชว์เฉพาะโหมดตัวอย่าง
+- [x] `startMode` ผ่าน API → provisionTenant ข้าม seed เมื่อเลือกว่าง (log แยกจากเคส seed พลาด) — ร้านว่างเติมทีหลังได้ที่เมนู "เนื้อหาเว็บ"
+- [x] tsc + build ผ่าน — **เจ้าของทดสอบ: เปิด shopdashth.com/signup เห็นการ์ด 2 ใบ, ลอง signup ทั้งสองโหมด**
+
 ## ค้าง / ขั้นตอนถัดไป
 - [ ] **รัน migration 012 + 013 ใน Supabase SQL Editor** (012 = starter store + ธีม T1-T4 เข้า registry, 013 = LINE token แพลตฟอร์ม)
 - [ ] ตั้งค่าใน Dashboard: UptimeRobot 2 monitors (DEPLOYMENT §8.1) / Upstash env / LINE token ที่ Super Admin → ตั้งค่า

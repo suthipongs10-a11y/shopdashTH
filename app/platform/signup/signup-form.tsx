@@ -3,6 +3,7 @@
 // ฟอร์ม signup — เช็ค slug realtime (debounce 400ms) + POST /api/signup
 // สำเร็จแล้วโชว์ลิงก์เข้า {slug}.<root>/admin (session cookie แยกต่อ host จึงให้ login ที่ร้าน)
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 export interface SignupPlan {
@@ -54,6 +55,7 @@ export function SignupForm({
     plans.find((p) => p.code === preselectCode)?.id ?? plans[0]?.id ?? '',
   );
   const [packCode, setPackCode] = useState<string>(packs[0]?.code ?? '');
+  const [startMode, setStartMode] = useState<'sample' | 'blank'>('sample');
   const [slug, setSlug] = useState('');
   const [slugStatus, setSlugStatus] = useState<SlugStatus>({ state: 'idle' });
   const [submitting, setSubmitting] = useState(false);
@@ -105,6 +107,7 @@ export function SignupForm({
           phone: form.get('phone'),
           planId,
           storeType: packCode || undefined,
+          startMode,
         }),
       });
       const data = (await res.json()) as { ok?: boolean; slug?: string; error?: string };
@@ -176,8 +179,101 @@ export function SignupForm({
         </div>
       </div>
 
-      {/* ประเภทร้าน = starter pack ตัวอย่างที่จะได้ตอนเปิดร้าน — โชว์เมื่อมีให้เลือกจริง */}
-      {packs.length > 1 && (
+      {/* จุดเริ่มต้นร้าน — ลูกค้าเลือกเอง: ร้านพร้อมข้อมูลตัวอย่าง vs ร้านว่าง (มีรูปเทียบให้เห็น) */}
+      <div>
+        <p className="mb-2 text-sm font-medium text-gray-700">เลือกจุดเริ่มต้นของร้านคุณ</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label
+            className={`cursor-pointer overflow-hidden rounded-xl border-2 transition-colors ${
+              startMode === 'sample'
+                ? 'border-gray-900 ring-1 ring-gray-900'
+                : 'border-gray-200 hover:border-gray-400'
+            }`}
+          >
+            <input
+              type="radio"
+              name="startMode"
+              value="sample"
+              checked={startMode === 'sample'}
+              onChange={() => setStartMode('sample')}
+              className="sr-only"
+            />
+            <span className="relative block aspect-[1440/1000] bg-gray-100">
+              <Image
+                src="/marketing/templates/t2-store.webp"
+                alt="ตัวอย่างร้านที่มีสินค้าตัวอย่างครบ"
+                fill
+                sizes="(max-width: 640px) 100vw, 300px"
+                className="object-cover object-top"
+              />
+              <span className="absolute left-2 top-2 rounded-full bg-gray-900 px-2 py-0.5 text-[11px] font-semibold text-white">
+                แนะนำ
+              </span>
+            </span>
+            <span className="block p-3">
+              <span className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
+                    startMode === 'sample' ? 'border-gray-900' : 'border-gray-300'
+                  }`}
+                >
+                  {startMode === 'sample' && <span className="h-2 w-2 rounded-full bg-gray-900" />}
+                </span>
+                เริ่มพร้อมข้อมูลตัวอย่าง
+              </span>
+              <span className="mt-1 block text-xs leading-relaxed text-gray-500">
+                ได้ร้านสวยครบทันที: สินค้าตัวอย่างพร้อมรูป หมวดหมู่ และแบนเนอร์ —
+                แค่แก้เป็นสินค้าของคุณ หรือลบทั้งชุดได้ในคลิกเดียวเมื่อพร้อม
+              </span>
+            </span>
+          </label>
+
+          <label
+            className={`cursor-pointer overflow-hidden rounded-xl border-2 transition-colors ${
+              startMode === 'blank'
+                ? 'border-gray-900 ring-1 ring-gray-900'
+                : 'border-gray-200 hover:border-gray-400'
+            }`}
+          >
+            <input
+              type="radio"
+              name="startMode"
+              value="blank"
+              checked={startMode === 'blank'}
+              onChange={() => setStartMode('blank')}
+              className="sr-only"
+            />
+            <span className="relative block aspect-[1440/1000] bg-gray-100">
+              <Image
+                src="/marketing/signup/start-blank.webp"
+                alt="ตัวอย่างร้านว่างที่ยังไม่มีสินค้า"
+                fill
+                sizes="(max-width: 640px) 100vw, 300px"
+                className="object-cover object-top"
+              />
+            </span>
+            <span className="block p-3">
+              <span className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
+                    startMode === 'blank' ? 'border-gray-900' : 'border-gray-300'
+                  }`}
+                >
+                  {startMode === 'blank' && <span className="h-2 w-2 rounded-full bg-gray-900" />}
+                </span>
+                เริ่มจากร้านว่าง
+              </span>
+              <span className="mt-1 block text-xs leading-relaxed text-gray-500">
+                โครงเว็บเปล่า ไม่มีสินค้าตัวอย่าง — เหมาะเมื่อคุณมีรูปและข้อมูลสินค้าพร้อมลงเองอยู่แล้ว
+                (เปลี่ยนใจทีหลังกดเติมชุดตัวอย่างได้ที่เมนู "เนื้อหาเว็บ")
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      {/* ประเภทร้าน = starter pack ตัวอย่างที่จะได้ — โชว์เมื่อเลือกแบบมีตัวอย่าง และมี pack >1 */}
+      {startMode === 'sample' && packs.length > 1 && (
         <div>
           <p className="mb-2 text-sm font-medium text-gray-700">
             ร้านคุณขายอะไร (เราจะจัดร้านตัวอย่างให้ตรงแนว)
