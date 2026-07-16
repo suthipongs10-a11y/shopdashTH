@@ -150,15 +150,34 @@ export async function seedStarterPack(
     }
 
     // ---------- เนื้อหาเทมเพลต (__content) — คีย์ครบ T1-T4 ธีมไหนไม่ใช้ก็เพิกเฉย ----------
-    // ร้านเพิ่งถูกสร้าง theme_overrides = {} เสมอ จึงเขียนทับได้ตรงๆ
+    // MERGE ไม่ทับทั้งก้อน: ร้าน provision ใหม่ theme_overrides={} → ได้ผลเดิมเป๊ะ; แต่ร้านเก่า
+    // ที่กดปุ่ม "เติมเนื้อหาตัวอย่าง" ต้องเก็บ token สีธีม + socials + variantLabels ที่ตั้งไว้
+    // (top-level keys คงไว้; __content เดิม merge กับ pack — pack ชนะเฉพาะคีย์ที่ตัวเองมี)
     // บทความ (T3) ลิงก์ไป /p/{slug} — ใส่เฉพาะเมื่อ seed เพจจริง กันลิงก์ 404
-    const content: ThemeContent = {
+    const packContent: ThemeContent = {
       ...pack.content,
       ...(opts.customPages ? pack.contentWithPages : {}),
     };
+    const { data: storeRow } = await db
+      .from('stores')
+      .select('theme_overrides')
+      .eq('tenant_id', tenantId)
+      .single();
+    const existingOverrides = (storeRow?.theme_overrides ?? {}) as Record<string, unknown>;
+    const existingContent =
+      existingOverrides['__content'] &&
+      typeof existingOverrides['__content'] === 'object' &&
+      !Array.isArray(existingOverrides['__content'])
+        ? (existingOverrides['__content'] as ThemeContent)
+        : {};
     const { error: storeError } = await db
       .from('stores')
-      .update({ theme_overrides: { __content: content } })
+      .update({
+        theme_overrides: {
+          ...existingOverrides,
+          __content: { ...existingContent, ...packContent },
+        },
+      })
       .eq('tenant_id', tenantId);
     if (storeError) throw new Error(`stores.__content: ${storeError.message}`);
 

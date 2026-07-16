@@ -4,6 +4,13 @@
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-16
 
+## Done (Phase 7 ต่อ — ปุ่ม "เติมเนื้อหาตัวอย่าง" สำหรับร้านเก่า/สลับธีมแล้วหน้าโล่ง, 2026-07-16)
+- [x] **โจทย์**: เจ้าของรัน migration 012+013 แล้ว แต่ร้านเก่าสลับธีมยังเห็นหน้าโล่ง — เพราะ starter pack seed เฉพาะร้านใหม่ตอน signup, สลับธีมเปลี่ยนแค่หน้าตาไม่เติมเนื้อหา/สินค้า (ถูกตามดีไซน์ ดู DECISIONS 2026-07-16)
+- [x] **ปุ่ม "เติมเนื้อหา + สินค้าตัวอย่าง"** บนหน้า `/admin/content` (เจ้าของเลือก: เติมทั้งเนื้อหาและสินค้าเสมอ) — เลือกแนวร้านได้ถ้ามี pack พร้อม >1, confirm 2 ชั้น, เตือนถ้ามีตัวอย่างเดิม
+- [x] **แก้ seedStarterPack ให้ปลอดภัยกับร้านเก่า**: เปลี่ยนจากเขียนทับ theme_overrides ทั้งก้อน → **merge __content** (เก็บสีธีม/socials/variantLabels ที่ร้านตั้งไว้) — provisioning ผลเดิมเป๊ะ (overrides ว่าง)
+- [x] **action ล้าง is_sample เดิมก่อน seed** (idempotent — กดซ้ำสินค้าไม่ซ้อน, หมวดที่มีสินค้าจริงอ้าง → ถอด flag กัน FK ชน); ของจริงของร้านไม่ถูกแตะ
+- [x] `tsc --noEmit` + `npm run build` ผ่าน — **เจ้าของทดสอบจริง: เปิด /admin/content ของร้านเก่า → กดปุ่ม → เปิดหน้าร้านดูว่าเนื้อหา+สินค้าครบ และสีธีมที่ตั้งไว้ไม่หาย**
+
 ## Done (Phase 7 ต่อ — ชุด hardening 8 ข้อ + แผงสถานะระบบ, 2026-07-16 ตามคำสั่งเจ้าของ "ทำทั้ง 8 ข้อ")
 - [x] **(1) แจ้งเตือน LINE เจ้าของแพลตฟอร์ม**: ร้าน signup ใหม่ + สลิปค่าแพลนเข้าคิว → LINE OA ของเจ้าของ (`lib/platform/line.ts`, fire-and-forget) — token ตั้งได้ที่ **Super Admin → ตั้งค่า** (migration 013 — **รอรันใน SQL Editor**) หรือ env `PLATFORM_LINE_CHANNEL_TOKEN`
 - [x] **(2+9) ระบบสถานะ/health**: `lib/platform/health.ts` เช็ค Supabase DB + Auth + R2 (เขียนไฟล์จริง) + config ครบไหม → **แผง "สถานะระบบ" บนแดชบอร์ด Super Admin** (latency + สาเหตุภาษาไทย) + `GET /api/health` สำหรับ uptime monitor (ตอบ ok/down เท่านั้น, 503 เมื่อล่ม, cache 30s) — วิธีตั้ง UptimeRobot อยู่ DEPLOYMENT §8.1 (ต้อง monitor ทั้ง /api/health และร้านผ่าน Worker)

@@ -9,16 +9,27 @@ import {
   heroCropAspect,
   toClientGroup,
 } from '@/lib/content-schema';
+import { listAvailablePacks } from '@/lib/starter-packs';
+import { createClient } from '@/lib/supabase/server';
 import { getThemeContent } from '@/lib/theme-content';
 import { getTenantContext } from '@/lib/tenant-context';
 import { getPreset } from '@/themes/presets';
 import { ContentGroupForm } from './content-form';
+import { LoadSampleCard } from './load-sample-card';
 
 export default async function ContentPage() {
   const ctx = await getTenantContext();
   const preset = getPreset(ctx.store.theme_code);
   const content = getThemeContent(ctx.store.theme_overrides) as Record<string, unknown>;
   const groups = groupsForPreset(preset);
+
+  const supabase = await createClient();
+  const { count: sampleProductCount } = await supabase
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('tenant_id', ctx.tenantId)
+    .eq('is_sample', true);
+  const packs = listAvailablePacks();
 
   // hero สัดส่วนกรอบครอปต่างกันตามธีม — ฉีดเข้า field imageUrl ของกลุ่ม hero
   const heroAspect = heroCropAspect(preset.variants.hero);
@@ -56,6 +67,8 @@ export default async function ContentPage() {
           ดูหน้าร้าน ↗
         </a>
       </div>
+
+      <LoadSampleCard packs={packs} hasSampleProducts={(sampleProductCount ?? 0) > 0} />
 
       {groups.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
