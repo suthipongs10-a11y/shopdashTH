@@ -103,6 +103,19 @@ export type ThemeSection =
   | 'luxePerks'
   /** แถบ payment + SSL + จำนวนลูกค้า */
   | 'trustBar'
+  /* --- ชุดเทมเพลตธุรกิจบริการรถ (S1 premier / S2 travel / S3 taxi — ref เจ้าของ 2026-07-16) --- */
+  /** hero รูปเต็มกว้าง + ข้อความซ้าย + แผงฟอร์ม "จองการเดินทาง" ขวา (เปิด LINE/โทร) */
+  | 'serviceHero'
+  /** การ์ดบริการ 4 ใบ ไอคอน+ลิงก์ (ใช้ข้อมูล highlights) */
+  | 'serviceCards'
+  /** การ์ดรถพร้อม spec ชิป + ราคาเริ่มต้น */
+  | 'vehicles'
+  /** การ์ดเส้นทางยอดนิยม + ราคา (ref S2) */
+  | 'routes'
+  /** การ์ดรีวิวลูกค้า 3 ใบ (คำพูด+ชื่อ+ดาว) */
+  | 'testimonials'
+  /** คำถามที่พบบ่อย accordion */
+  | 'faq'
   | 'footer';
 
 /** โครง layout ระดับธีม (header/footer) — ค่า default = พฤติกรรมเดิมของทุกธีม */

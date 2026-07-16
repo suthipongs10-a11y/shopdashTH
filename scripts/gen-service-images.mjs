@@ -83,3 +83,105 @@ for (const [code, pack] of Object.entries(PACKS)) {
   }
   console.log('OK', code);
 }
+
+// ---------- ชุดรูปเทมเพลตบริการรถ S1/S2/S3 (ref เจ้าของ 2026-07-16) ----------
+// รถ = flat silhouette สีเดียว + hero โทนธีม + รูปเส้นทาง (ภูเขา/ทะเล/วัด แบบ flat)
+
+const bus = F('M3 7.2c0-.8.6-1.4 1.4-1.4h15.2c.8 0 1.4.6 1.4 1.4v7.6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z') +
+  C(7, 16.8, 1.9, 'var(--deep)') + C(17, 16.8, 1.9, 'var(--deep)') +
+  C(7, 16.8, 0.8, 'white') + C(17, 16.8, 0.8, 'white') +
+  `<rect x="4.6" y="7.6" width="3.2" height="2.8" rx="0.4" fill="white" opacity="0.85"/>` +
+  `<rect x="8.9" y="7.6" width="3.2" height="2.8" rx="0.4" fill="white" opacity="0.85"/>` +
+  `<rect x="13.2" y="7.6" width="3.2" height="2.8" rx="0.4" fill="white" opacity="0.85"/>` +
+  `<path d="M3 12.4h18" stroke="white" stroke-width="0.7" opacity="0.6"/>`;
+ICONS.bus = bus;
+ICONS.suv = F('M3 12.5 5 8.6a1.5 1.5 0 0 1 1.3-.8h9.4c.5 0 1 .2 1.3.6l2.6 3 1.4.5c.6.2 1 .8 1 1.4v2a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1v-2c0-.5.4-1 1-1.2z') +
+  C(7.4, 16.9, 2, 'var(--deep)') + C(16.6, 16.9, 2, 'var(--deep)') +
+  C(7.4, 16.9, 0.85, 'white') + C(16.6, 16.9, 0.85, 'white') +
+  `<rect x="6.4" y="9" width="3.4" height="2.4" rx="0.4" fill="white" opacity="0.85"/>` +
+  `<rect x="11" y="9" width="3.2" height="2.4" rx="0.4" fill="white" opacity="0.85"/>`;
+
+const THEME_SETS = {
+  s1: { // premier — กรมท่า+ทอง
+    dir: 'public/demo/services/premier',
+    bgTop: '#101c3c', bgBot: '#0a1226', deep: '#c9a45c', soft: '#c9a45c',
+    vehicles: { 'veh-01': 'van', 'veh-02': 'van', 'veh-03': 'sedan', 'veh-04': 'sedan' },
+  },
+  s2: { // travel — ฟ้าอ่อน+น้ำเงิน
+    dir: 'public/demo/services/travel',
+    bgTop: '#eaf4fd', bgBot: '#cfe6f9', deep: '#15559f', soft: '#8fc1ec',
+    vehicles: { 'veh-01': 'sedan', 'veh-02': 'suv', 'veh-03': 'van', 'veh-04': 'bus' },
+  },
+  s3: { // taxi — ขาว+น้ำเงินแท็กซี่
+    dir: 'public/demo/services/taxi',
+    bgTop: '#eef4fc', bgBot: '#d7e6f8', deep: '#1656b8', soft: '#9dbfe8',
+    vehicles: { 'veh-01': 'sedan', 'veh-02': 'suv', 'veh-03': 'van', 'veh-04': 'pickup' },
+  },
+};
+
+function vehicleCardSvg(set, icon) { // การ์ดรถ 4:3 (800x600)
+  return `<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${set.bgTop}"/><stop offset="1" stop-color="${set.bgBot}"/>
+  </linearGradient></defs>
+  <rect width="800" height="600" fill="url(#vg)"/>
+  <circle cx="120" cy="90" r="110" fill="${set.soft}" opacity="0.18"/>
+  <circle cx="700" cy="520" r="150" fill="${set.soft}" opacity="0.18"/>
+  <ellipse cx="400" cy="470" rx="260" ry="26" fill="${set.deep}" opacity="0.15"/>
+  <g transform="translate(190 130)">${iconSvg(icon, set.deep, 420)}</g>
+</svg>`;
+}
+
+function serviceHeroSvg(set) { // hero กว้าง 1920x900 — พื้นไล่โทน + รถ + เส้นขอบฟ้าเมือง
+  const city = `<path d="M0 620 h60 v-90 h50 v50 h70 v-140 h55 v80 h65 v-50 h50 v110 h80 v-70 h55 v40 h70 v-120 h50 v100 h60 v-60 h55 v90 h75 v-130 h50 v110 h60 v-40 h55 v60 h70 v-100 h50 v90 h60 v-50 h55 v80 h70 v-110 h50 v90 h60 v-40 h55 v70 h80 v-90 h50 v80 h60 V620 H1920 V900 H0 Z"
+    fill="${set.deep}" opacity="0.12"/>`;
+  return `<svg width="1920" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${set.bgTop}"/><stop offset="1" stop-color="${set.bgBot}"/>
+  </linearGradient></defs>
+  <rect width="1920" height="900" fill="url(#hg)"/>
+  <circle cx="1660" cy="140" r="90" fill="${set.soft}" opacity="0.35"/>
+  ${city}
+  <ellipse cx="900" cy="790" rx="440" ry="34" fill="${set.deep}" opacity="0.18"/>
+  <g transform="translate(560 320)">${iconSvg('van', set.deep, 680)}</g>
+</svg>`;
+}
+
+// รูปเส้นทาง S2 (16:10 = 800x500) — ท้องฟ้า + ทิวเขา/ทะเล/วัด flat
+function routeSvg(kind) {
+  const sky = `<defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#dff0fd"/><stop offset="1" stop-color="#bcdcf5"/></linearGradient></defs>
+    <rect width="800" height="500" fill="url(#rg)"/>
+    <circle cx="660" cy="105" r="52" fill="#f5c95e"/>`;
+  const sea = `<rect y="330" width="800" height="170" fill="#3f8ecb"/>
+    <rect y="330" width="800" height="24" fill="#ffffff" opacity="0.35"/>
+    <path d="M0 380 q40 -12 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 V500 H0 Z" fill="#2e77b3"/>
+    <path d="M60 470 l60 -10 60 10 V500 H60 Z" fill="#f0e3c0"/>`;
+  const mountains = `<path d="M-40 500 L220 210 L430 470 Z" fill="#3f7d5f"/>
+    <path d="M260 500 L520 170 L820 500 Z" fill="#2f6a4e"/>
+    <path d="M470 500 L660 300 L860 500 Z" fill="#498a69"/>
+    <rect y="460" width="800" height="40" fill="#3d7a58"/>`;
+  const temple = `<rect y="430" width="800" height="70" fill="#7fae8f"/>
+    <path d="M400 120 l14 60 h-28 Z" fill="#d8a437"/>
+    <path d="M352 200 h96 l-12 40 h-72 Z" fill="#e3b34a"/>
+    <path d="M330 260 h140 l-14 44 h-112 Z" fill="#d8a437"/>
+    <path d="M300 322 h200 l-14 48 h-172 Z" fill="#e3b34a"/>
+    <rect x="272" y="386" width="256" height="44" rx="4" fill="#c9932e"/>`;
+  const body = kind === 'sea' ? sea : kind === 'temple' ? temple : mountains;
+  return `<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">${sky}${body}</svg>`;
+}
+
+for (const set of Object.values(THEME_SETS)) {
+  mkdirSync(set.dir, { recursive: true });
+  await sharp(Buffer.from(serviceHeroSvg(set))).webp({ quality: 85 }).toFile(`${set.dir}/hero-01.webp`);
+  for (const [file, icon] of Object.entries(set.vehicles)) {
+    await sharp(Buffer.from(vehicleCardSvg(set, icon))).webp({ quality: 85 }).toFile(`${set.dir}/${file}.webp`);
+  }
+  console.log('OK', set.dir);
+}
+mkdirSync('public/demo/services/routes', { recursive: true });
+const ROUTES = { 'route-sea': 'sea', 'route-sea2': 'sea', 'route-mountain': 'mountain', 'route-mountain2': 'mountain', 'route-temple': 'temple' };
+for (const [file, kind] of Object.entries(ROUTES)) {
+  await sharp(Buffer.from(routeSvg(kind))).webp({ quality: 85 }).toFile(`public/demo/services/routes/${file}.webp`);
+}
+console.log('OK routes');

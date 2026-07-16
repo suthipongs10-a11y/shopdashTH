@@ -7,6 +7,12 @@ import { AnnouncementBar } from '@/components/storefront/AnnouncementBar';
 import { ArticleCards } from '@/components/storefront/ArticleCards';
 import { CatalogSidebar } from '@/components/storefront/CatalogSidebar';
 import { CategoryBannerRow } from '@/components/storefront/CategoryBannerRow';
+import { FaqList } from '@/components/storefront/FaqList';
+import { RouteCards } from '@/components/storefront/RouteCards';
+import { ServiceCards } from '@/components/storefront/ServiceCards';
+import { ServiceHero } from '@/components/storefront/ServiceHero';
+import { TestimonialsBand } from '@/components/storefront/TestimonialsBand';
+import { VehicleCards } from '@/components/storefront/VehicleCards';
 import { CategoryCircleRow } from '@/components/storefront/CategoryCircleRow';
 import { ContactCtaBand } from '@/components/storefront/ContactCtaBand';
 import { FeatureBand } from '@/components/storefront/FeatureBand';
@@ -221,6 +227,51 @@ export default async function StorefrontHomePage() {
         <TrustBar trustText={content.trustText} />
       </div>
     ),
+    /* --- ชุดเทมเพลตธุรกิจบริการรถ (S1/S2/S3) --- */
+    serviceHero: (
+      <ServiceHero
+        key="serviceHero"
+        hero={content.hero}
+        storeName={ctx.store.name}
+        inquiry={content.inquiry}
+        lineUrl={content.contact?.lineUrl || content.socials?.line || undefined}
+        phone={ctx.store.phone}
+        badges={content.heroBadges}
+      />
+    ),
+    serviceCards:
+      (content.highlights ?? []).length > 0 ? (
+        <ServiceCards
+          key="serviceCards"
+          title={content.servicesTitle ?? 'บริการของเรา'}
+          items={content.highlights ?? []}
+        />
+      ) : null,
+    vehicles:
+      (content.vehicles ?? []).length > 0 ? (
+        <VehicleCards
+          key="vehicles"
+          title={content.vehiclesTitle ?? 'รถของเรา'}
+          sub={content.vehiclesSub}
+          items={content.vehicles ?? []}
+        />
+      ) : null,
+    routes:
+      (content.routes ?? []).length > 0 ? (
+        <RouteCards key="routes" title={content.routesTitle ?? 'เส้นทางยอดนิยม'} items={content.routes ?? []} />
+      ) : null,
+    testimonials:
+      (content.testimonials ?? []).length > 0 ? (
+        <TestimonialsBand
+          key="testimonials"
+          title={content.testimonialsTitle ?? 'ลูกค้าของเรา พูดถึงเรา'}
+          items={content.testimonials ?? []}
+        />
+      ) : null,
+    faq:
+      (content.faq ?? []).length > 0 ? (
+        <FaqList key="faq" title={content.faqTitle ?? 'คำถามที่พบบ่อย'} items={content.faq ?? []} />
+      ) : null,
     categoryBanners:
       (content.categoryBanners ?? []).length > 0 ? (
         <div key="categoryBanners" className="py-2">

@@ -129,6 +129,12 @@ export async function middleware(req: NextRequest) {
   // robots.txt เป็น metadata route ที่ root ของ app เท่านั้น (Next ไม่รองรับใน route group)
   // — host แพลตฟอร์ม/super-admin ห้าม rewrite เป็น /platform/robots.txt (404) ให้ผ่านตรง
   // พร้อมบอกชนิด host ให้ app/robots.ts เลือกกติกา (host ร้านไหลตาม flow ปกติด้านล่าง)
+  // เครื่องมือ dev: หน้า preview ธีม (gate ด้วย THEME_PREVIEW=1 ในตัว page — production ตอบ 404)
+  // route อยู่ root ของ app จึงห้าม rewrite ตาม host
+  if (path.startsWith('/theme-preview')) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
   if (path === '/robots.txt' && (target.kind === 'platform' || target.kind === 'super-admin')) {
     requestHeaders.set('x-robots-host-kind', target.kind);
     return NextResponse.next({ request: { headers: requestHeaders } });

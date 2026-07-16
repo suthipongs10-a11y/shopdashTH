@@ -1,13 +1,15 @@
 // แถบ USP 4 ไอคอน (TEMPLATE_SPEC §0.3 / ref T2: ใต้ hero) — ไอคอนซ้าย + หัวหนา + บรรทัดรองเทา
 
 import type { UspItem } from '@/lib/theme-content';
-import { ClockIcon, HeadsetIcon, LockIcon, TruckIcon } from './icons';
+import { ClockIcon, HeadsetIcon, LockIcon, ShieldIcon, TagIcon, TruckIcon } from './icons';
 
 const ICONS = {
   truck: TruckIcon,
   clock: ClockIcon,
   lock: LockIcon,
   headset: HeadsetIcon,
+  tag: TagIcon,
+  shield: ShieldIcon,
 } as const;
 
 export function UspStrip({

@@ -16,7 +16,7 @@ export interface HeroContent {
 }
 
 export interface UspItem {
-  icon: 'truck' | 'clock' | 'lock' | 'headset';
+  icon: 'truck' | 'clock' | 'lock' | 'headset' | 'tag' | 'shield';
   title: string;
   sub: string;
 }
@@ -145,6 +145,8 @@ export interface HighlightItem {
   icon: 'star' | 'shield' | 'package' | 'headset' | 'truck' | 'tag';
   title: string;
   sub: string;
+  /** ใส่แล้วการ์ดมีลิงก์ "ดูรายละเอียด →" (เทมเพลตบริการใช้เป็นการ์ด "บริการของเรา") */
+  href?: string;
 }
 
 /** แถว Size Guide / โค้ดลูกค้าใหม่ / newsletter (ref T4) */
@@ -160,8 +162,68 @@ export interface LuxePerksContent {
   newsletterSub?: string;
 }
 
+/* --- ชุดเทมเพลตธุรกิจบริการรถ (S1 premier / S2 travel / S3 taxi — ref เจ้าของ 2026-07-16) --- */
+
+/** ฟอร์ม "จองการเดินทาง" ใน hero — ไม่มี backend จอง: ปุ่มประกอบข้อความสรุปแล้วเปิด LINE/โทร */
+export interface InquiryContent {
+  title?: string;
+  sub?: string;
+  /** ตัวเลือก "ประเภทบริการ" ใน dropdown */
+  serviceOptions?: string[];
+  /** ป้ายปุ่ม เช่น "ตรวจสอบราคาและจอง" */
+  buttonText?: string;
+}
+
+/** การ์ดรถ (รถของเรา/ประเภทรถ) — spec เป็นชิปข้อความ เช่น "10 ที่นั่ง" "Wi-Fi" */
+export interface VehicleCardContent {
+  imageUrl: string;
+  title: string;
+  subtitle?: string;
+  specs?: string[];
+  /** ราคาเริ่มต้น (บาท) — ไม่ใส่ = ไม่โชว์ราคา */
+  priceFrom?: number;
+  href?: string;
+}
+
+/** การ์ดเส้นทางยอดนิยม (ref S2) */
+export interface RouteCardContent {
+  imageUrl: string;
+  title: string;
+  /** เช่น "2 ชม." */
+  duration?: string;
+  priceFrom?: number;
+  href?: string;
+}
+
+export interface TestimonialContent {
+  text: string;
+  author: string;
+  /** เช่น "นักธุรกิจ" / "เดินทางไปพัทยา" */
+  role?: string;
+}
+
+export interface FaqItemContent {
+  q: string;
+  a: string;
+}
+
 export interface ThemeContent {
   hero?: Partial<HeroContent>;
+  /* --- ชุดเทมเพลตบริการรถ --- */
+  inquiry?: InquiryContent;
+  /** ชิปใต้ headline ใน serviceHero เช่น ["ตรงเวลา","ปลอดภัย","เป็นส่วนตัว"] */
+  heroBadges?: string[];
+  /** หัวข้อการ์ดบริการ (section serviceCards — ใช้ข้อมูล highlights) */
+  servicesTitle?: string;
+  vehiclesTitle?: string;
+  vehiclesSub?: string;
+  vehicles?: VehicleCardContent[];
+  routesTitle?: string;
+  routes?: RouteCardContent[];
+  testimonialsTitle?: string;
+  testimonials?: TestimonialContent[];
+  faqTitle?: string;
+  faq?: FaqItemContent[];
   usp?: UspItem[];
   categoryBanners?: CategoryBanner[];
   /** แถบ utility ดำบนสุด — ข้อความซ้าย 2 รายการ */
