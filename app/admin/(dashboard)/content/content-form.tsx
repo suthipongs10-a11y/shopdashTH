@@ -26,6 +26,9 @@ function initialValues(fields: ContentFieldDef[], raw: unknown): Values {
       out[field.key] = value.filter((v) => typeof v === 'string').join('\n');
     } else if (typeof value === 'string') {
       out[field.key] = value;
+    } else if (typeof value === 'number') {
+      // field type 'number' (เช่น ราคาเริ่มต้น) เก็บใน __content เป็นตัวเลขจริง
+      out[field.key] = String(value);
     } else {
       out[field.key] = '';
     }

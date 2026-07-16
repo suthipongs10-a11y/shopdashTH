@@ -34,11 +34,19 @@ function isAllowedHref(url: string): boolean {
   return url.startsWith('/') || /^https?:\/\/.+/.test(url);
 }
 
-/** คืนค่า string ที่ผ่าน validate แล้ว หรือ null = ทิ้งค่านี้ / โยนข้อความ error เมื่อค่าผิดรูป */
-function sanitizeField(field: ContentFieldDef, raw: unknown): string | string[] | null {
+/** คืนค่าที่ผ่าน validate แล้ว หรือ null = ทิ้งค่านี้ / โยนข้อความ error เมื่อค่าผิดรูป */
+function sanitizeField(field: ContentFieldDef, raw: unknown): string | string[] | number | null {
   const value = typeof raw === 'string' ? raw.trim() : '';
   if (!value) return null;
   switch (field.type) {
+    case 'number': {
+      // เก็บเป็น number จริงใน __content (component เช็ค typeof === 'number' ก่อนโชว์ราคา)
+      const n = Number(value.replace(/[,\s]/g, ''));
+      if (!Number.isFinite(n) || n < 0) {
+        throw new Error(`"${field.label}" ต้องเป็นตัวเลขไม่ติดลบ`);
+      }
+      return Math.round(n);
+    }
     case 'text':
       return value.slice(0, TEXT_MAX);
     case 'textarea':
@@ -73,7 +81,10 @@ function sanitizeRecord(
   const out: Record<string, unknown> = {};
   for (const field of fields) {
     const value = sanitizeField(field, raw[field.key]);
-    if (value !== null && (typeof value === 'string' || value.length > 0)) {
+    if (
+      value !== null &&
+      (typeof value === 'string' || typeof value === 'number' || value.length > 0)
+    ) {
       out[field.key] = value;
     }
   }

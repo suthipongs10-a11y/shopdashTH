@@ -57,6 +57,9 @@ export interface StarterPack {
    *  บริการปิด online_ordering ให้เว็บเป็นโหมด "แนะนำบริการ + ติดต่อผ่านแชท" (ref T1)
    *  super admin แก้คืนได้รายร้านจากหน้า feature overrides เดิม */
   featureOverrides?: Record<string, boolean>;
+  /** ธีมที่เหมาะกับ pack นี้ — provisioning ใช้แทนธีมตามแพลน "เมื่อ tier ไม่เกินสิทธิ์แพลน"
+   *  (เฉพาะตอนลูกค้าเลือกเริ่มแบบมีข้อมูลตัวอย่าง) */
+  themeCode?: string;
   /** ไฟล์รูปที่ pack ต้องใช้ (relative จาก public/) — ใช้เช็คว่า asset ครบก่อนเปิดให้เลือก */
   requiredAssets: string[];
   categories: string[];

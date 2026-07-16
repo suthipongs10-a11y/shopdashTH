@@ -350,7 +350,14 @@ export const TRANSPORT_PACK: StarterPack = {
   code: 'transport',
   nameTh: 'รถยก-แท็กซี่-รถรับจ้าง',
   featureOverrides: { online_ordering: false },
-  requiredAssets: ['demo/services/transport/hero-01.webp', 'demo/services/transport/svc-01.webp'],
+  // ร้าน pack นี้ได้เทมเพลตแท็กซี่ (s3-taxi) ตอน signup — hero มีแผงจองการเดินทางเปิด LINE/โทร
+  themeCode: 's3-taxi',
+  requiredAssets: [
+    'demo/services/transport/hero-01.webp',
+    'demo/services/transport/svc-01.webp',
+    'demo/services/taxi/hero-01.webp',
+    'demo/services/taxi/veh-01.webp',
+  ],
   categories: ['รถยก-รถสไลด์', 'รถรับส่ง', 'ขนของ-ขนย้าย'],
   products: [
     {
@@ -441,17 +448,47 @@ export const TRANSPORT_PACK: StarterPack = {
     },
   ],
   pages: SERVICE_PAGES,
-  content: serviceContent({
-    dir: 'transport',
-    eyebrow: 'CAR SERVICE',
-    headline: 'เรียกรถได้ทุกงาน ตลอด 24 ชม.',
-    sub: 'รถยก รถเหมา รถขนของ — แจ้งงานทางแชท ประเมินราคาทันที',
-    tagline: 'ON THE ROAD FOR YOU',
-    storyTitle: 'ทุกเส้นทาง เราไปถึง',
-    storyBody:
-      'ทีมรถของเราพร้อมให้บริการทั้งงานฉุกเฉินและงานนัดหมาย คนขับผ่านการคัดเลือก ราคาแจ้งก่อนออกรถทุกครั้ง ไม่มีบวกเพิ่มหน้างาน',
-    variantLabels: { size: 'พื้นที่บริการ', color: 'ประเภทรถ' },
-  }),
+  content: {
+    ...serviceContent({
+      dir: 'transport',
+      eyebrow: 'CAR SERVICE',
+      headline: 'เรียกรถได้ทุกงาน ตลอด 24 ชม.',
+      sub: 'รถยก รถเหมา รถขนของ — แจ้งงานทางแชท ประเมินราคาทันที',
+      tagline: 'ON THE ROAD FOR YOU',
+      storyTitle: 'ทุกเส้นทาง เราไปถึง',
+      storyBody:
+        'ทีมรถของเราพร้อมให้บริการทั้งงานฉุกเฉินและงานนัดหมาย คนขับผ่านการคัดเลือก ราคาแจ้งก่อนออกรถทุกครั้ง ไม่มีบวกเพิ่มหน้างาน',
+      variantLabels: { size: 'พื้นที่บริการ', color: 'ประเภทรถ' },
+    }),
+    // เนื้อหาชุดเทมเพลตแท็กซี่ (s3-taxi — ref เจ้าของ): hero โทนน้ำเงิน + แผงจอง + การ์ดรถ + รีวิว
+    hero: {
+      headline: 'เดินทางสะดวก ปลอดภัย ในราคาสบายกระเป๋า',
+      sub: 'รถยก รถเหมา รถขนของ — แจ้งงานทางแชท ประเมินราคาทันที',
+      ctaText: 'ดูบริการและราคา',
+      ctaHref: '/products',
+      imageUrl: '/demo/services/taxi/hero-01.webp',
+    },
+    heroBadges: ['คนขับสุภาพ', 'รถสะอาด', 'ตรงเวลา'],
+    inquiry: {
+      title: 'จองรถออนไลน์',
+      sub: 'เดินทางทันที หรือจองล่วงหน้า',
+      serviceOptions: ['รถยก-รถสไลด์', 'แท็กซี่เหมา/รับส่งสนามบิน', 'รถตู้เหมาพร้อมคนขับ', 'รถกระบะขนของ/ขนย้าย'],
+      buttonText: 'ค้นหารถและราคา',
+    },
+    vehiclesTitle: 'ประเภทรถของเรา',
+    vehicles: [
+      { imageUrl: '/demo/services/taxi/veh-01.webp', title: 'รถเก๋ง (4 ที่นั่ง)', specs: ['ผู้โดยสาร 1-4 ท่าน', 'กระเป๋า 1-2 ใบ'], href: '/products' },
+      { imageUrl: '/demo/services/taxi/veh-02.webp', title: 'รถ SUV/MPV (6 ที่นั่ง)', specs: ['ผู้โดยสาร 1-6 ท่าน', 'กระเป๋า 2-4 ใบ'], href: '/products' },
+      { imageUrl: '/demo/services/taxi/veh-03.webp', title: 'รถตู้ (10 ที่นั่ง)', specs: ['ผู้โดยสาร 1-10 ท่าน', 'กระเป๋า 4-6 ใบ'], href: '/products' },
+      { imageUrl: '/demo/services/taxi/veh-04.webp', title: 'รถกระบะขนของ', specs: ['ขนของ/ขนย้าย', 'มีคนช่วยยก'], href: '/products' },
+    ],
+    testimonialsTitle: 'รีวิวจากลูกค้าของเรา',
+    testimonials: [
+      { text: 'รถเสียกลางดึก โทรมา 40 นาทีถึง บริการไวมาก ราคาแจ้งก่อนออกรถ ไม่มีบวกเพิ่มครับ', author: 'คุณเก่ง', role: 'ใช้บริการรถยก' },
+      { text: 'จองไปสนามบินเช้ามืด มารับตรงเวลาเป๊ะ คนขับสุภาพ ช่วยยกกระเป๋าด้วยค่ะ', author: 'คุณปุ้ม', role: 'รับส่งสนามบิน' },
+      { text: 'เหมารถตู้พาครอบครัวไปทำบุญต่างจังหวัด รถสะอาด ขับนิ่ม ราคาชัดเจนครับ', author: 'คุณแอ๋ม', role: 'เหมารายวัน' },
+    ],
+  },
   contentWithPages: {
     articles: [
       { title: 'เกี่ยวกับทีมงานของเรา', imageUrl: IMG_T('hero-01.webp'), date: 'บทความจากร้าน', href: '/p/about' },

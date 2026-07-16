@@ -6,6 +6,7 @@
 import type { ThemePreset } from '@/themes/types';
 
 export type ContentFieldType =
+  | 'number'
   | 'text'
   | 'textarea'
   /** URL รูป — อัปโหลดผ่าน R2 (kind: content_image) หรือใช้รูปเดิม */
@@ -409,11 +410,12 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     contentKey: 'highlights',
     maxItems: 4,
     itemNoun: 'ไฮไลต์',
-    appliesTo: (p) => p.sections.includes('highlights'),
+    appliesTo: (p) => p.sections.includes('highlights') || p.sections.includes('serviceCards'),
     fields: [
       { key: 'icon', label: 'ไอคอน', type: 'icon', iconOptions: HIGHLIGHT_ICONS },
       { key: 'title', label: 'หัวข้อ', type: 'text', required: true },
       { key: 'sub', label: 'คำอธิบาย', type: 'text' },
+      { key: 'href', label: 'ลิงก์ (ธีมบริการ — ปุ่ม "ดูรายละเอียด")', type: 'href' },
     ],
   },
   {
@@ -457,6 +459,96 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
         type: 'text',
         placeholder: 'รับสิทธิพิเศษและโปรโมชั่นก่อนใครทางอีเมล',
       },
+    ],
+  },
+  /* --- ชุดเทมเพลตธุรกิจบริการรถ (S1/S2/S3 — ref เจ้าของ 2026-07-16) --- */
+  {
+    id: 'inquiry',
+    title: 'แผงฟอร์ม "จองการเดินทาง" (ใน hero)',
+    description: 'ลูกค้ากรอกแล้วระบบสรุปข้อความเปิด LINE ของร้าน (ตั้ง LINE ที่ ตั้งค่าร้าน > โซเชียล) หรือโทรหาร้าน',
+    kind: 'object',
+    contentKey: 'inquiry',
+    appliesTo: (p) => p.sections.includes('serviceHero'),
+    fields: [
+      { key: 'title', label: 'หัวข้อแผง', type: 'text', placeholder: 'จองการเดินทาง' },
+      { key: 'sub', label: 'ข้อความรอง', type: 'text' },
+      { key: 'serviceOptions', label: 'ตัวเลือกประเภทบริการ (บรรทัดละ 1 รายการ)', type: 'lines' },
+      { key: 'buttonText', label: 'ข้อความปุ่ม', type: 'text', placeholder: 'ตรวจสอบราคาและจอง' },
+    ],
+  },
+  {
+    id: 'serviceStrings',
+    title: 'หัวข้อ section ธีมบริการ + ชิปใต้ headline',
+    kind: 'strings',
+    appliesTo: (p) => p.sections.includes('serviceHero'),
+    fields: [
+      { key: 'heroBadges', label: 'ชิปใต้หัวข้อใหญ่ (บรรทัดละ 1 คำ เช่น ตรงเวลา)', type: 'lines' },
+      { key: 'servicesTitle', label: 'หัวข้อการ์ดบริการ', type: 'text', placeholder: 'บริการของเรา' },
+      { key: 'vehiclesTitle', label: 'หัวข้อการ์ดรถ', type: 'text', placeholder: 'รถของเรา' },
+      { key: 'vehiclesSub', label: 'ข้อความรองการ์ดรถ', type: 'text' },
+      { key: 'routesTitle', label: 'หัวข้อเส้นทางยอดนิยม', type: 'text', placeholder: 'เส้นทางยอดนิยม' },
+      { key: 'testimonialsTitle', label: 'หัวข้อรีวิวลูกค้า', type: 'text', placeholder: 'ลูกค้าของเรา พูดถึงเรา' },
+      { key: 'faqTitle', label: 'หัวข้อคำถามที่พบบ่อย', type: 'text', placeholder: 'คำถามที่พบบ่อย' },
+    ],
+  },
+  {
+    id: 'vehicles',
+    title: 'การ์ดรถ (รถของเรา / ประเภทรถ)',
+    kind: 'list',
+    contentKey: 'vehicles',
+    maxItems: 8,
+    itemNoun: 'รถ',
+    appliesTo: (p) => p.sections.includes('vehicles'),
+    fields: [
+      { key: 'imageUrl', label: 'รูปรถ', type: 'image', required: true, aspect: 4 / 3, help: 'แนะนำ ~800×600px (4:3) · jpg/png/webp ≤5MB' },
+      { key: 'title', label: 'ชื่อรถ', type: 'text', required: true, placeholder: 'รถตู้ VIP 10 ที่นั่ง' },
+      { key: 'subtitle', label: 'ชื่อรอง (อังกฤษ)', type: 'text', placeholder: 'Luxury Van' },
+      { key: 'specs', label: 'สเปค (บรรทัดละ 1 ชิป เช่น 10 ที่นั่ง)', type: 'lines' },
+      { key: 'priceFrom', label: 'ราคาเริ่มต้น (บาท — เว้นว่างถ้าไม่โชว์)', type: 'number' },
+      { key: 'href', label: 'ลิงก์', type: 'href', placeholder: '/products' },
+    ],
+  },
+  {
+    id: 'routes',
+    title: 'เส้นทางยอดนิยม',
+    kind: 'list',
+    contentKey: 'routes',
+    maxItems: 5,
+    itemNoun: 'เส้นทาง',
+    appliesTo: (p) => p.sections.includes('routes'),
+    fields: [
+      { key: 'imageUrl', label: 'รูปเส้นทาง', type: 'image', required: true, aspect: 16 / 10, help: 'แนะนำ ~800×500px (16:10) · jpg/png/webp ≤5MB' },
+      { key: 'title', label: 'ชื่อเส้นทาง', type: 'text', required: true, placeholder: 'กรุงเทพฯ – พัทยา' },
+      { key: 'duration', label: 'เวลาเดินทาง', type: 'text', placeholder: '2 ชม.' },
+      { key: 'priceFrom', label: 'ราคาเริ่มต้น (บาท)', type: 'number' },
+      { key: 'href', label: 'ลิงก์', type: 'href', placeholder: '/products' },
+    ],
+  },
+  {
+    id: 'testimonials',
+    title: 'รีวิวลูกค้า (การ์ดคำพูด 3 ใบ)',
+    kind: 'list',
+    contentKey: 'testimonials',
+    maxItems: 3,
+    itemNoun: 'รีวิว',
+    appliesTo: (p) => p.sections.includes('testimonials'),
+    fields: [
+      { key: 'text', label: 'คำพูดลูกค้า', type: 'textarea', required: true },
+      { key: 'author', label: 'ชื่อลูกค้า', type: 'text', required: true, placeholder: 'คุณสมชาย ว.' },
+      { key: 'role', label: 'บทบาท/บริบท', type: 'text', placeholder: 'เดินทางไป พัทยา' },
+    ],
+  },
+  {
+    id: 'faq',
+    title: 'คำถามที่พบบ่อย (FAQ)',
+    kind: 'list',
+    contentKey: 'faq',
+    maxItems: 8,
+    itemNoun: 'คำถาม',
+    appliesTo: (p) => p.sections.includes('faq'),
+    fields: [
+      { key: 'q', label: 'คำถาม', type: 'text', required: true },
+      { key: 'a', label: 'คำตอบ', type: 'textarea', required: true },
     ],
   },
 ];

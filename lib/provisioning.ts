@@ -5,7 +5,9 @@
 import 'server-only';
 import { logTenantEvent } from '@/lib/platform/tenant-admin';
 import { seedStarterPack } from '@/lib/starter-pack';
+import { getStarterPack } from '@/lib/starter-packs';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getPreset } from '@/themes/presets';
 
 export const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{2,29}$/;
 
@@ -83,7 +85,7 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
 
   const { data: plan } = await db
     .from('plans')
-    .select('id, code, is_active, features')
+    .select('id, code, is_active, features, allowed_theme_tier')
     .eq('id', planId)
     .maybeSingle();
   if (!plan || !plan.is_active) return { ok: false, error: 'ไม่พบแพลนที่เลือก' };
@@ -157,8 +159,19 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
   }
   await logTenantEvent(tenantId, 'provision:app_metadata', 'ok', { user_id: userId });
 
-  // ---------- step 6: INSERT stores (ธีมเริ่มต้นตามแพลน — ตรงกับภาพที่หน้า landing ขาย) ----------
-  const themeCode = STARTER_THEME_BY_PLAN[plan.code as string] ?? 'basic-01';
+  // ---------- step 6: INSERT stores — ธีมเริ่มต้น ----------
+  // ลำดับ: (1) pack ที่ลูกค้าเลือกระบุธีมเฉพาะทาง (เช่น รถยก-แท็กซี่ → s3-taxi) และ tier
+  // ไม่เกินสิทธิ์แพลน → ใช้ธีมนั้น (2) ไม่งั้นธีมตามแพลน (ตรงภาพที่หน้า landing ขาย)
+  // เริ่มแบบร้านว่าง = ไม่ผูกกับ pack → ใช้ธีมตามแพลนเสมอ
+  let themeCode = STARTER_THEME_BY_PLAN[plan.code as string] ?? 'basic-01';
+  if (sampleData) {
+    const packTheme = getStarterPack(packCode).themeCode;
+    if (packTheme) {
+      const packPreset = getPreset(packTheme);
+      const allowedTier = (plan as { allowed_theme_tier?: number }).allowed_theme_tier ?? 1;
+      if (packPreset.code === packTheme && packPreset.tier <= allowedTier) themeCode = packTheme;
+    }
+  }
   const { error: storeError } = await db.from('stores').insert({
     tenant_id: tenantId,
     name: storeName,
