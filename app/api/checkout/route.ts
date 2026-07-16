@@ -15,7 +15,7 @@ interface CheckoutRequestBody {
 }
 
 export async function POST(req: Request) {
-  if (isRateLimited(`checkout:${clientIp(req)}`, 10, 60_000)) {
+  if (await isRateLimited(`checkout:${clientIp(req)}`, 10, 60_000)) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 

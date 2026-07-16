@@ -87,7 +87,7 @@ async function tryAutoVerify(
 }
 
 export async function POST(req: Request) {
-  if (isRateLimited(`slips:${clientIp(req)}`, 6, 60_000)) {
+  if (await isRateLimited(`slips:${clientIp(req)}`, 6, 60_000)) {
     return bad(RATE_LIMIT_MESSAGE, 429);
   }
 

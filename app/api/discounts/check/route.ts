@@ -14,7 +14,7 @@ interface CheckBody {
 
 export async function POST(req: Request) {
   // กัน brute-force เดาโค้ดส่วนลด
-  if (isRateLimited(`discount-check:${clientIp(req)}`, 20, 60_000)) {
+  if (await isRateLimited(`discount-check:${clientIp(req)}`, 20, 60_000)) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 

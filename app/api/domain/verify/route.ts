@@ -22,7 +22,7 @@ export async function POST() {
     }
 
     // DNS lookup จริงหลายรายการต่อคลิก — จำกัดต่อร้าน
-    if (isRateLimited(`domain-verify:${ctx.tenantId}`, 10, 600_000)) {
+    if (await isRateLimited(`domain-verify:${ctx.tenantId}`, 10, 600_000)) {
       return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
     }
 

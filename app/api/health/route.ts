@@ -10,7 +10,7 @@ import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  if (isRateLimited(`health:${clientIp(req)}`, 20, 60_000)) {
+  if (await isRateLimited(`health:${clientIp(req)}`, 20, 60_000)) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 

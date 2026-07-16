@@ -21,7 +21,7 @@ const PHONE_REGEX = /^0\d{8,9}$/;
 
 export async function POST(req: NextRequest) {
   // สมัครร้านสร้าง auth user + แถวหลายตาราง — จำกัดแน่นกว่าตัวอื่น
-  if (isRateLimited(`signup:${clientIp(req)}`, 5, 3_600_000)) {
+  if (await isRateLimited(`signup:${clientIp(req)}`, 5, 3_600_000)) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 // GET /api/signup?slug=xxx — เช็ค slug ว่างแบบ realtime ระหว่างพิมพ์
 export async function GET(req: NextRequest) {
   // เช็ค slug realtime (debounce ฝั่ง client 400ms) — เพดานกันยิง scan
-  if (isRateLimited(`slug-check:${clientIp(req)}`, 30, 60_000)) {
+  if (await isRateLimited(`slug-check:${clientIp(req)}`, 30, 60_000)) {
     return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 
