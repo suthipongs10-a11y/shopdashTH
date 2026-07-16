@@ -56,6 +56,7 @@ export function SignupForm({
   );
   const [packCode, setPackCode] = useState<string>(packs[0]?.code ?? '');
   const [startMode, setStartMode] = useState<'sample' | 'blank'>('sample');
+  const [showPassword, setShowPassword] = useState(false);
   const [slug, setSlug] = useState('');
   const [slugStatus, setSlugStatus] = useState<SlugStatus>({ state: 'idle' });
   const [submitting, setSubmitting] = useState(false);
@@ -364,14 +365,40 @@ export function SignupForm({
         <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
           รหัสผ่าน (อย่างน้อย 8 ตัวอักษร)
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          minLength={8}
-          className={inputClass}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            required
+            minLength={8}
+            className={`${inputClass} pr-11`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+            title={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-gray-400 hover:text-gray-700"
+          >
+            {showPassword ? (
+              /* ตาขีดฆ่า = กดเพื่อซ่อน */
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                <path d="M10.73 5.08A10.4 10.4 0 0 1 12 5c7 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68" />
+                <path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.39-1.61" />
+                <line x1="2" y1="2" x2="22" y2="22" />
+              </svg>
+            ) : (
+              /* ตาเปิด = กดเพื่อแสดง */
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
+        <p className="mt-1 text-xs text-gray-400">กดรูปตาเพื่อดูรหัสที่พิมพ์ — จดเก็บไว้ให้ดีนะครับ</p>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
