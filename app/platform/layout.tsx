@@ -131,8 +131,14 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
           </div>
         </div>
 
-        <div className="border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-          © {year} ShopDash · {ROOT_DOMAIN}
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+          <span>© {year} ShopDash · {ROOT_DOMAIN}</span>
+          <Link href="/terms" className="hover:text-slate-600">
+            ข้อตกลงการใช้งาน
+          </Link>
+          <Link href="/privacy" className="hover:text-slate-600">
+            นโยบายความเป็นส่วนตัว
+          </Link>
         </div>
       </footer>
     </div>

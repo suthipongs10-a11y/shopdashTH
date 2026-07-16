@@ -246,6 +246,17 @@ export function SignupForm({
       >
         {submitting ? 'กำลังสร้างร้าน…' : 'เปิดร้านเลย'}
       </button>
+
+      <p className="text-center text-xs text-gray-400">
+        การกด &ldquo;เปิดร้านเลย&rdquo; ถือว่ายอมรับ{' '}
+        <a href="/terms" target="_blank" className="underline hover:text-gray-600">
+          ข้อตกลงการใช้งาน
+        </a>{' '}
+        และ{' '}
+        <a href="/privacy" target="_blank" className="underline hover:text-gray-600">
+          นโยบายความเป็นส่วนตัว
+        </a>
+      </p>
     </form>
   );
 }
