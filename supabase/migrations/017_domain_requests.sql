@@ -30,10 +30,14 @@ alter table domain_requests enable row level security;
 alter table domain_requests force row level security;
 
 -- super admin จัดการได้หมด / ร้านอ่านของตัวเอง (เขียนผ่าน service role ใน route/action เท่านั้น)
+-- helper อยู่ schema public (public.is_super_admin / public.app_tenant_id — ดู 001_init.sql:
+-- Supabase ไม่ให้สร้างฟังก์ชันใน schema auth แม้เอกสาร §3.2 จะเขียนเป็น auth.*)
+drop policy if exists dreq_super_all on domain_requests;
 create policy dreq_super_all on domain_requests for all
-  using (auth.is_super_admin()) with check (auth.is_super_admin());
+  using (public.is_super_admin()) with check (public.is_super_admin());
+drop policy if exists dreq_tenant_read on domain_requests;
 create policy dreq_tenant_read on domain_requests for select
-  using (tenant_id = auth.tenant_id());
+  using (tenant_id = public.app_tenant_id());
 
 -- custom_domains: โดเมนที่แพลตฟอร์มดูแล (จด/ต่ออายุให้) + วันหมดอายุบริการรายปี
 alter table custom_domains
