@@ -1,15 +1,41 @@
-// เนื้อหา mock สำหรับหน้า preview ธีมบริการรถ — copy ตาม ref ทั้ง 3 เทมเพลตของเจ้าของ
-// (ร้านจริงได้เนื้อหาจาก starter pack transport + แก้เองที่ "เนื้อหาเว็บ")
+// เนื้อหา mock สำหรับหน้า preview ธีม — copy ตาม ref ของเจ้าของ
+// (ร้านจริงได้เนื้อหาจาก starter pack + แก้เองที่ "เนื้อหาเว็บ")
 
+import type { ProductCardData } from '@/components/storefront/types';
+import { TOYS_PACK } from '@/lib/starter-packs/toys';
 import type { ThemeContent } from '@/lib/theme-content';
 
 export const PREVIEW_STORE_NAMES: Record<string, string> = {
   's1-premier': 'สยาม พรีเมียร์ ไดรฟ์',
   's2-travel': 'ไทยทราเวลคาร์',
   's3-taxi': 'แท็กซี่ไทยเซอร์วิส',
+  'toys-01': 'ลิตเติ้ลจอย',
+};
+
+/** สินค้า mock สำหรับ preview ธีมที่โชว์การ์ดสินค้าจริง (ข้อมูลจาก starter pack) */
+export const PREVIEW_PRODUCTS: Record<string, ProductCardData[]> = {
+  'toys-01': TOYS_PACK.products.slice(0, 5).map((p, i) => ({
+    id: `preview-${i}`,
+    name: p.name,
+    href: '#',
+    priceMin: p.price_override ?? p.base_price,
+    imageUrl: p.images[0],
+    inStock: true,
+    rating: { score: '5.0', count: p.reviews.length },
+    variants: [
+      { id: `preview-v-${i}`, size: p.sizes[0], color: p.colors[0], price: p.price_override ?? p.base_price, stock: p.stock },
+    ],
+  })),
+};
+
+/** หมวด mock สำหรับ nav ของ preview */
+export const PREVIEW_CATEGORIES: Record<string, string[]> = {
+  'toys-01': TOYS_PACK.categories,
 };
 
 export const PREVIEW_CONTENT: Record<string, ThemeContent> = {
+  // ธีมของเล่นเด็ก — ใช้เนื้อหาจริงของ starter pack (source of truth เดียว)
+  'toys-01': TOYS_PACK.content,
   's1-premier': {
     hero: {
       eyebrow: 'เหนือระดับ…ในทุกการเดินทาง',

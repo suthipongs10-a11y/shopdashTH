@@ -12,11 +12,15 @@ const IMG = (file: string) => `/demo/toys/${file}`;
 export const TOYS_PACK: StarterPack = {
   code: 'toys',
   nameTh: 'ของเล่น / แม่และเด็ก',
+  // ธีมประจำ pack — "ลิตเติ้ลจอย" (ref ภาพ Little Joy จากเจ้าของ 2026-07-17, tier 1 ทุกแพลนใช้ได้)
+  themeCode: 'toys-01',
   requiredAssets: [
     'demo/toys/hero-01.webp',
+    'demo/toys/hero-02.webp',
     'demo/toys/cat-01.webp',
     'demo/toys/cat-02.webp',
     'demo/toys/cat-03.webp',
+    'demo/toys/cat-04.webp',
     'demo/toys/toy-01.webp',
     'demo/toys/toy-02.webp',
     'demo/toys/toy-03.webp',
@@ -208,14 +212,44 @@ export const TOYS_PACK: StarterPack = {
   ],
 
   content: {
+    // hero แบบ ref Little Joy — แผงฟ้าอ่อน (split-panel) ข้อความซ้าย รูปขวา ปุ่มชมพู "ช้อปเลย"
     hero: {
-      eyebrow: 'FOR LITTLE ONES',
-      headline: 'ของเล่นดีๆ เพื่อวัยแห่งการเรียนรู้',
-      sub: 'ของเล่นเสริมพัฒนาการและของใช้เด็ก ปลอดภัย ได้มาตรฐาน คัดมาเพื่อลูกน้อยของคุณ',
-      ctaText: 'เลือกของให้ลูกน้อย',
+      headline: 'ของเล่นเสริมพัฒนาการ',
+      headline2: 'สำหรับเจ้าตัวน้อย',
+      sub: 'สินค้าคุณภาพดี ปลอดภัย ราคาน่ารัก เพื่อรอยยิ้มและพัฒนาการที่ดีของลูกน้อย',
+      ctaText: 'ช้อปเลย',
       ctaHref: '/products',
-      imageUrl: IMG('hero-01.webp'),
+      imageUrl: IMG('hero-02.webp'),
     },
+    // แถบ utility โทนอ่อนบนสุด (ref: ยินดีต้อนรับ + จัดส่งทั่วไทย + ชำระเงินสะดวก)
+    utility: [
+      { icon: 'heart', text: 'ยินดีต้อนรับสู่ร้านของเรา' },
+      { icon: 'truck', text: 'จัดส่งทั่วไทย ชำระผ่าน PromptPay' },
+    ],
+    usp: [
+      { icon: 'shield', title: 'สินค้าปลอดภัย', sub: 'คัดสรรตามมาตรฐานสำหรับเด็ก' },
+      { icon: 'truck', title: 'จัดส่งรวดเร็ว', sub: 'ทั่วไทย 1-3 วันทำการ' },
+      { icon: 'headset', title: 'บริการลูกค้า', sub: 'พร้อมดูแลและให้คำแนะนำ' },
+      { icon: 'lock', title: 'ชำระเงินปลอดภัย', sub: 'สแกน PromptPay ยืนยันไว' },
+    ],
+    testimonialsTitle: 'คุณพ่อคุณแม่รีวิว',
+    testimonials: [
+      {
+        text: 'สินค้าคุณภาพดีมากค่ะ ลูกชอบของเล่นมาก จัดส่งเร็วประทับใจค่ะ',
+        author: 'คุณแม่อ้อม',
+        role: 'กรุงเทพมหานคร',
+      },
+      {
+        text: 'จิ๊กซอว์ไม้งานเรียบร้อย ลูกนั่งเล่นได้นานขึ้นจริงค่ะ',
+        author: 'คุณแม่เนย',
+        role: 'เชียงใหม่',
+      },
+      {
+        text: 'ผ้าห่มมัสลินนุ่มมาก ลูกไม่แพ้ ราคาน่ารัก จะอุดหนุนอีกแน่นอนค่ะ',
+        author: 'คุณแม่ฝน',
+        role: 'ขอนแก่น',
+      },
+    ],
     heroSlides: [
       {
         eyebrow: 'FOR LITTLE ONES',
@@ -241,9 +275,11 @@ export const TOYS_PACK: StarterPack = {
         imageUrl: IMG('cat-02.webp'),
       },
     ],
+    // ใช้ทั้ง section 'categoryBanners' (T2) และ 'categoryCards' (toys-01 — การ์ด+pill พาสเทล)
     categoryBanners: [
       { title: 'ของเล่นเสริมพัฒนาการ', sub: 'เรียนรู้ผ่านการเล่น', imageUrl: IMG('cat-01.webp'), href: '/products' },
       { title: 'ตุ๊กตา', sub: 'เพื่อนซี้ตัวนุ่มของลูก', imageUrl: IMG('cat-02.webp'), href: '/products' },
+      { title: 'เสื้อผ้าเด็ก', sub: 'นุ่มสบายทุกช่วงวัย', imageUrl: IMG('cat-04.webp'), href: '/products' },
       { title: 'ของใช้แม่และเด็ก', sub: 'ครบทุกอย่างที่แม่ต้องใช้', imageUrl: IMG('cat-03.webp'), href: '/products' },
     ],
     categoryCircles: [
@@ -280,7 +316,7 @@ export const TOYS_PACK: StarterPack = {
       { icon: 'package', title: 'แพ็คอย่างดี', sub: 'ห่อกันกระแทกทุกออร์เดอร์' },
       { icon: 'truck', title: 'จัดส่งทั่วไทย', sub: 'มีเลขพัสดุติดตามได้' },
     ],
-    tagline: 'SAFE TOYS FOR HAPPY KIDS',
+    tagline: 'ของเล่น & แม่และเด็ก',
     variantLabels: { size: 'ช่วงวัย', color: 'แบบ' },
   },
 

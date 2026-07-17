@@ -19,6 +19,7 @@ import { preset as t4Luxe } from './t4-luxe';
 import { preset as s1Premier } from './s1-premier';
 import { preset as s2Travel } from './s2-travel';
 import { preset as s3Taxi } from './s3-taxi';
+import { preset as toys01 } from './toys-01';
 
 /** เรียงตามตาราง §4.5 (+ ชุด Commerce Premium ตาม TEMPLATE_SPEC) */
 export const THEME_PRESET_LIST: ThemePreset[] = [
@@ -40,6 +41,7 @@ export const THEME_PRESET_LIST: ThemePreset[] = [
   s1Premier,
   s2Travel,
   s3Taxi,
+  toys01,
 ];
 
 export const THEME_PRESETS: Record<string, ThemePreset> = Object.fromEntries(

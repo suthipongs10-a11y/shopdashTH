@@ -7,6 +7,7 @@ import { AnnouncementBar } from '@/components/storefront/AnnouncementBar';
 import { ArticleCards } from '@/components/storefront/ArticleCards';
 import { CatalogSidebar } from '@/components/storefront/CatalogSidebar';
 import { CategoryBannerRow } from '@/components/storefront/CategoryBannerRow';
+import { CategoryCardRow } from '@/components/storefront/CategoryCardRow';
 import { FaqList } from '@/components/storefront/FaqList';
 import { RouteCards } from '@/components/storefront/RouteCards';
 import { ServiceCards } from '@/components/storefront/ServiceCards';
@@ -35,6 +36,7 @@ import {
   MapPinIcon,
   PackageIcon,
   PhoneIcon,
+  StarIcon,
 } from '@/components/storefront/icons';
 import { fetchFeatured, fetchFilterOptions, fetchLatest } from '@/lib/catalog';
 import { publicR2Url } from '@/lib/r2';
@@ -59,6 +61,7 @@ export default async function StorefrontHomePage() {
   const isStoreCard = preset.variants.productCard === 'store';
   const isSimpleCard = preset.variants.productCard === 'simple';
   const isLuxeCard = preset.variants.productCard === 'luxe';
+  const isToyCard = preset.variants.productCard === 'toy';
   // §3.1 (ref T1): ปุ่มการ์ดตาม flag — เว็บแนะนำสินค้า = "ดูรายละเอียด", มีระบบสั่งซื้อ = "สั่งซื้อ"
   const detailButtonText = ctx.features.online_ordering ? 'สั่งซื้อ' : 'ดูรายละเอียด';
 
@@ -66,7 +69,8 @@ export default async function StorefrontHomePage() {
   const [featuredRaw, latest, { data: categories }, catalog, homeCatalog, filterOptions] =
     await Promise.all([
       // การ์ดแบบ 'store' โชว์แถวเดียว 6 ใบตาม ref T2 / 'simple' 4 ใบตาม ref T1 / 'luxe' 4 ใบใหญ่ตาม ref T4
-      fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard || isLuxeCard ? 4 : 8),
+      // 'toy' แถวเดียว 5 ใบตาม ref Little Joy
+      fetchFeatured(ctx.tenantId, isStoreCard ? 6 : isSimpleCard || isLuxeCard ? 4 : isToyCard ? 5 : 8),
       fetchLatest(ctx.tenantId),
       db
         .from('categories')
@@ -131,6 +135,7 @@ export default async function StorefrontHomePage() {
           }
           eyebrow={content.hero?.eyebrow ?? (preset.variants.hero === 'commerce' ? 'NEW COLLECTION' : undefined)}
           headline={content.hero?.headline ?? ctx.store.name}
+          headline2={content.hero?.headline2}
           subline={content.hero?.sub}
           ctaText={content.hero?.ctaText ?? 'ช้อปเลย'}
           ctaHref={content.hero?.ctaHref ?? '/products'}
@@ -145,7 +150,13 @@ export default async function StorefrontHomePage() {
           ctaHref="/products"
         />
       ),
-    usp: <UspStrip key="usp" items={content.usp ?? DEFAULT_USP} tone={isLuxeCard ? 'band' : 'plain'} />,
+    usp: (
+      <UspStrip
+        key="usp"
+        items={content.usp ?? DEFAULT_USP}
+        tone={isLuxeCard || isToyCard ? 'band' : 'plain'}
+      />
+    ),
     featured:
       featured.length > 0 ? (
         <section key="featured" className="mx-auto max-w-(--container-max) px-4 py-12">
@@ -160,6 +171,13 @@ export default async function StorefrontHomePage() {
             <h2 className="mb-5 font-heading text-lg font-semibold tracking-tight text-text">
               สินค้าแนะนำ
             </h2>
+          ) : isToyCard ? (
+            // หัว section แบบ ref Little Joy — กลางหน้า มีดาวประดับสองข้าง
+            <div className="mb-8 flex items-center justify-center gap-2.5">
+              <StarIcon size={17} className="text-star" aria-hidden />
+              <h2 className="font-heading text-2xl font-semibold text-text">สินค้าแนะนำ</h2>
+              <StarIcon size={17} className="text-star" aria-hidden />
+            </div>
           ) : isSimpleCard ? (
             // หัว section แบบ ref T1 — กลางหน้า + เส้นใต้สั้น
             <div className="mb-8 text-center">
@@ -198,6 +216,16 @@ export default async function StorefrontHomePage() {
               <Link
                 href="/products"
                 className="inline-block border border-text px-10 py-3 text-sm font-medium tracking-wide text-text transition-colors hover:bg-primary hover:text-primary-fg"
+              >
+                ดูสินค้าทั้งหมด
+              </Link>
+            </div>
+          )}
+          {isToyCard && (
+            <div className="mt-9 text-center">
+              <Link
+                href="/products"
+                className="inline-block rounded-full bg-surface px-8 py-3 text-sm font-semibold text-text transition-colors hover:bg-accent hover:text-primary-fg"
               >
                 ดูสินค้าทั้งหมด
               </Link>
@@ -266,11 +294,21 @@ export default async function StorefrontHomePage() {
           key="testimonials"
           title={content.testimonialsTitle ?? 'ลูกค้าของเรา พูดถึงเรา'}
           items={content.testimonials ?? []}
+          centered={isToyCard}
         />
       ) : null,
     faq:
       (content.faq ?? []).length > 0 ? (
         <FaqList key="faq" title={content.faqTitle ?? 'คำถามที่พบบ่อย'} items={content.faq ?? []} />
+      ) : null,
+    /* --- ธีมของเล่นเด็ก (ref Little Joy) — การ์ดหมวด + ปุ่ม pill พาสเทล --- */
+    categoryCards:
+      (content.categoryBanners ?? []).length > 0 ? (
+        <CategoryCardRow
+          key="categoryCards"
+          title="หมวดหมู่สินค้า"
+          banners={content.categoryBanners ?? []}
+        />
       ) : null,
     categoryBanners:
       (content.categoryBanners ?? []).length > 0 ? (

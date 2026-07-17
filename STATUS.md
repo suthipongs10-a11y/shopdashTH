@@ -2,7 +2,16 @@
 - Current phase: 7 (TEMPLATE_SPEC "Commerce Premium" — **ครบทั้ง 4 เทมเพลต + DoD ผ่านครบทุกข้อรวม Lighthouse** T2 ✓ T1 ✓ T3 ✓ T4 ✓)
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
-- Last session: 2026-07-16
+- Last session: 2026-07-17
+
+## Done (Phase 7 ต่อ — ธีม "ลิตเติ้ลจอย" toys-01 ตาม ref ภาพ Little Joy, 2026-07-17 ตามคำสั่งเจ้าของ)
+- [x] **โจทย์**: เจ้าของส่งภาพ ref เว็บ "Little Joy ของเล่น & แม่และเด็ก" ให้สร้างเทมเพลทเต็มรูปแบบสำหรับ pack ของเล่น
+- [x] **preset `toys-01`** (tier 1 ทุกแพลนเลือกได้): โทนฟ้าอ่อน-ชมพูพาสเทล ฟอนต์ Mitr/Prompt radius ใหญ่ — hero `split-panel` (แผงฟ้า + headline 2 สี + ปุ่มชมพู "ช้อปเลย") → การ์ดหมวด pill พาสเทล → สินค้าแนะนำ 5 ใบ → แถบ USP ฟ้า → รีวิวคุณพ่อคุณแม่ → footer full / layout: utility bar โทน soft + search จริง
+- [x] **ชิ้นใหม่ที่ใช้ซ้ำได้ (token ล้วน ไม่มี hex ใน component — grep ตรวจแล้ว)**: ProductCardVariant `toy` (`ToyProductCard` — หัวใจ wishlist + ราคา accent + ดาวรีวิวจริง + ปุ่ม "หยิบใส่ตะกร้า" เต็มกว้าง เปิด QuickView), section `categoryCards` (`CategoryCardRow` — pill สลับ 4 โทนจาก token อนุพันธ์ใหม่ `accent-soft`/`star-soft`), `ThemeLayout.utilityBarTone: 'soft'`, `HeroContent.headline2` (บรรทัดสองสี primary — แก้ได้ที่ "เนื้อหาเว็บ"), `TestimonialsBand` prop `centered` + ดาวเปลี่ยนเป็น `--color-star` ตามสเปค
+- [x] **TOYS_PACK**: `themeCode: 'toys-01'` + เนื้อหาตาม ref (hero/utility/usp 4 ข้อ/รีวิวคุณแม่ 3 ราย/การ์ดหมวด 4 ใบ) + รูป generate เพิ่ม `hero-02.webp` (โทนฟ้าเข้าชุดแผง hero) + `cat-04.webp` (เสื้อผ้าเด็ก) ใน `scripts/gen-service-images.mjs`
+- [x] `supabase/migrations/016_toys_theme.sql` — upsert toys-01 เข้า theme_registry (**รอเจ้าของรันใน SQL Editor**)
+- [x] theme-preview ขยายให้ render header/hero/การ์ดหมวด/การ์ดสินค้า mock/footer จริง — **ตรวจด้วยตา (screenshot desktop 1440 + mobile 390)**: โครง/สี/ปุ่มตรง ref, มือถือ hamburger + grid 2 คอลัมน์
+- [x] `tsc --noEmit` + `npm run build` ผ่าน
 
 ## Done (Phase 7 ต่อ — ปุ่ม "เติมเนื้อหาตัวอย่าง" สำหรับร้านเก่า/สลับธีมแล้วหน้าโล่ง, 2026-07-16)
 - [x] **โจทย์**: เจ้าของรัน migration 012+013 แล้ว แต่ร้านเก่าสลับธีมยังเห็นหน้าโล่ง — เพราะ starter pack seed เฉพาะร้านใหม่ตอน signup, สลับธีมเปลี่ยนแค่หน้าตาไม่เติมเนื้อหา/สินค้า (ถูกตามดีไซน์ ดู DECISIONS 2026-07-16)

@@ -5,6 +5,8 @@
 export interface HeroContent {
   eyebrow: string;
   headline: string;
+  /** หัวข้อบรรทัดสองสีเน้น (primary) — ธีมของเล่นเด็ก (ref Little Joy: บรรทัดสองสีชมพู) */
+  headline2?: string;
   sub: string;
   ctaText: string;
   ctaHref: string;
@@ -226,8 +228,8 @@ export interface ThemeContent {
   faq?: FaqItemContent[];
   usp?: UspItem[];
   categoryBanners?: CategoryBanner[];
-  /** แถบ utility ดำบนสุด — ข้อความซ้าย 2 รายการ */
-  utility?: { icon: 'truck' | 'clock'; text: string }[];
+  /** แถบ utility ดำบนสุด — ข้อความซ้าย 2 รายการ ('heart' สำหรับข้อความต้อนรับธีมของเล่นเด็ก) */
+  utility?: { icon: 'truck' | 'clock' | 'heart'; text: string }[];
   featureBandTitle?: string;
   footerLinkGroups?: FooterLinkGroup[];
   newsletterText?: string;

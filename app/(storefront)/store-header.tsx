@@ -28,8 +28,14 @@ import type { ContactChannels } from '@/lib/theme-content';
 import type { CategoryNavVariant, ThemeLayout } from '@/themes/types';
 
 interface UtilityItem {
-  icon: 'truck' | 'clock';
+  icon: 'truck' | 'clock' | 'heart';
   text: string;
+}
+
+function UtilityIcon({ icon }: { icon: UtilityItem['icon'] }) {
+  if (icon === 'clock') return <ClockIcon size={13} />;
+  if (icon === 'heart') return <HeartIcon size={13} />;
+  return <TruckIcon size={13} />;
 }
 
 export function StoreHeader({
@@ -77,13 +83,20 @@ export function StoreHeader({
     <>
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur-md">
       {commerce ? (
-        /* utility bar ดำ (ref T2): ซ้าย 2 รายการมีไอคอน / ขวา 3 ลิงก์ */
-        <div className="bg-primary text-primary-fg">
+        /* utility bar (ref T2): ซ้าย 2 รายการมีไอคอน / ขวา 3 ลิงก์
+           โทน 'soft' (ref Little Joy) = พื้น surface ตัวอักษรเทา แทนพื้นสี primary */
+        <div
+          className={
+            layout.utilityBarTone === 'soft'
+              ? 'border-b border-border-soft bg-surface text-text-muted'
+              : 'bg-primary text-primary-fg'
+          }
+        >
           <div className="mx-auto flex max-w-(--container-max) items-center justify-between gap-4 px-4 py-1.5 text-xs">
             <span className="flex min-w-0 items-center gap-5">
               {utilityItems.map((item) => (
                 <span key={item.text} className="inline-flex items-center gap-1.5 truncate">
-                  {item.icon === 'clock' ? <ClockIcon size={13} /> : <TruckIcon size={13} />}
+                  <UtilityIcon icon={item.icon} />
                   {item.text}
                 </span>
               ))}

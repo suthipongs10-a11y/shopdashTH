@@ -5,6 +5,7 @@ import { formatBahtRange } from '@/lib/format';
 import { HubProductCard } from './HubProductCard';
 import { LuxeProductCard } from './LuxeProductCard';
 import { StoreProductCard } from './StoreProductCard';
+import { ToyProductCard } from './ToyProductCard';
 import type { ProductCardData } from './types';
 
 function CardImage({ product }: { product: ProductCardData }) {
@@ -72,6 +73,10 @@ export function ProductCard({
 }) {
   if (variant === 'store') {
     return <StoreProductCard product={product} slug={slug} wishlistEnabled={wishlistEnabled} />;
+  }
+
+  if (variant === 'toy') {
+    return <ToyProductCard product={product} slug={slug} wishlistEnabled={wishlistEnabled} />;
   }
 
   if (variant === 'hub') {

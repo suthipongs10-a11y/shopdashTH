@@ -45,7 +45,9 @@ export type ProductCardVariant =
   | 'simple'
   | 'hub'
   /** LUXÉ (ref T4): รูปใหญ่ 3:4 + จุดสี + ชื่อ + ราคา — ไม่มีดาว/badge (§5.6) */
-  | 'luxe';
+  | 'luxe'
+  /** ธีมของเล่นเด็ก (ref Little Joy): การ์ดขาวมน หัวใจ wishlist + ราคา accent + ดาว + ปุ่ม "หยิบใส่ตะกร้า" เต็มกว้าง */
+  | 'toy';
 export type HeroVariant =
   | 'full-bleed'
   | 'boxed'
@@ -116,12 +118,17 @@ export type ThemeSection =
   | 'testimonials'
   /** คำถามที่พบบ่อย accordion */
   | 'faq'
+  /* --- ชุดธีมของเล่นเด็ก (ref Little Joy) --- */
+  /** การ์ดหมวดหมู่: การ์ดขาว รูปมน + ชื่อกลาง + ปุ่ม pill พาสเทลสลับสี */
+  | 'categoryCards'
   | 'footer';
 
 /** โครง layout ระดับธีม (header/footer) — ค่า default = พฤติกรรมเดิมของทุกธีม */
 export interface ThemeLayout {
   /** แถบ utility ดำบนสุด (ของ ref T2) แทนแถบส่งฟรีแบบเดิม */
   utilityBar?: boolean;
+  /** โทนของ utility bar: 'brand' (ดีฟอลต์ — พื้นสี primary) / 'soft' (พื้น surface ตัวอักษรเทา — ref Little Joy) */
+  utilityBarTone?: 'brand' | 'soft';
   /** ช่องค้นหาจริงใน header (แทนไอคอนแว่นขยาย) */
   headerSearch?: boolean;
   /** footer: simple (ดีฟอลต์) / full (ref T2) / dark (ref T4 — พื้นดำ + "ทำไมต้องเลือก" 7 ไอคอน) */

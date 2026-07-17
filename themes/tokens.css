@@ -27,6 +27,8 @@
   --color-danger-soft: color-mix(in oklab, var(--color-danger) 10%, transparent);
   --color-success-soft: color-mix(in oklab, var(--color-success) 12%, transparent);
   --color-primary-soft: color-mix(in oklab, var(--color-primary) 8%, transparent);
+  --color-accent-soft: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  --color-star-soft: color-mix(in oklab, var(--color-star) 18%, transparent);
   --color-primary-ring: color-mix(in oklab, var(--color-primary) 35%, transparent);
   --color-primary-deep: color-mix(in oklab, var(--color-primary) 82%, var(--color-text));
   --color-hero-glow: color-mix(in oklab, var(--color-primary-fg) 12%, transparent);
@@ -78,6 +80,8 @@
   --color-danger-soft: var(--color-danger-soft);
   --color-success-soft: var(--color-success-soft);
   --color-primary-soft: var(--color-primary-soft);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-star-soft: var(--color-star-soft);
   --color-primary-ring: var(--color-primary-ring);
   --color-primary-deep: var(--color-primary-deep);
   --color-hero-glow: var(--color-hero-glow);

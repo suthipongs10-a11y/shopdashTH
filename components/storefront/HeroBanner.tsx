@@ -7,6 +7,8 @@ interface HeroBannerProps {
   variant?: HeroVariant;
   imageUrl?: string;
   headline?: string;
+  /** หัวข้อบรรทัดสองสี primary (variant 'split-panel' — ref Little Joy) */
+  headline2?: string;
   subline?: string;
   ctaText?: string;
   ctaHref?: string;
@@ -87,6 +89,7 @@ export function HeroBanner({
   variant = 'boxed',
   imageUrl,
   headline,
+  headline2,
   subline,
   ctaText,
   ctaHref,
@@ -209,6 +212,12 @@ export function HeroBanner({
             {headline && (
               <h1 className="whitespace-pre-line font-heading text-3xl font-bold leading-tight tracking-tight text-text md:text-[40px] md:leading-[1.15]">
                 {headline}
+                {headline2 && (
+                  <>
+                    {'\n'}
+                    <span className="text-primary">{headline2}</span>
+                  </>
+                )}
               </h1>
             )}
             {subline && <p className="text-sm text-text-muted md:text-base">{subline}</p>}

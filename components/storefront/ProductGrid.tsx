@@ -42,7 +42,10 @@ export function ProductGrid({
           : cardVariant === 'luxe'
             ? // LUXÉ (ref T4): การ์ดใหญ่ 4 คอลัมน์ gap กว้าง — จังหวะหายใจแบบหรู
               'grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-7'
-            : 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
+            : cardVariant === 'toy'
+              ? // ของเล่นเด็ก (ref Little Joy): แถวเดียว 5 ใบบน desktop
+                'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5'
+              : 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6';
   return (
     <div className={gridClass}>
       {products.map((product) => (

@@ -104,6 +104,12 @@ export const CONTENT_GROUPS: ContentGroupDef[] = [
     fields: [
       { key: 'eyebrow', label: 'ข้อความเล็กเหนือหัวข้อ', type: 'text', placeholder: 'NEW COLLECTION' },
       { key: 'headline', label: 'หัวข้อใหญ่', type: 'text', placeholder: 'เช่น SUMMER 2026' },
+      {
+        key: 'headline2',
+        label: 'หัวข้อบรรทัดสอง (สีเน้น)',
+        type: 'text',
+        help: 'เฉพาะธีมที่รองรับ (เช่น ลิตเติ้ลจอย) — แสดงต่อจากหัวข้อใหญ่เป็นสีธีม',
+      },
       { key: 'sub', label: 'ข้อความรอง', type: 'textarea' },
       { key: 'ctaText', label: 'ข้อความปุ่มหลัก', type: 'text', placeholder: 'ช้อปเลย' },
       { key: 'ctaHref', label: 'ลิงก์ปุ่มหลัก', type: 'href', placeholder: '/products' },
