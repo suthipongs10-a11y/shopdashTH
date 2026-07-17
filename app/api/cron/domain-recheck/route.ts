@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
   const results: { domain: string; ok: boolean; failCount: number }[] = [];
 
   for (const row of domains) {
-    const check = await runDomainChecks(row);
+    // โดเมน managed (แพลตฟอร์มจดเอง) ไม่มี TXT ยืนยันเจ้าของ — วัดจาก CNAME/A พอ
+    const check = await runDomainChecks(row, { skipTxt: row.managed });
     const stillOk = check.status === 'active';
     const failCount = stillOk ? 0 : row.recheck_fail_count + 1;
     const becameError = !stillOk && failCount >= FAIL_DAYS_BEFORE_ERROR;

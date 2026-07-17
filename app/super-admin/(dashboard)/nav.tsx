@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'แดชบอร์ด' },
   { href: '/tenants', label: 'ร้านค้า' },
   { href: '/subscriptions', label: 'คิวสลิปค่าแพลน' },
+  { href: '/domain-requests', label: 'คำขอโดเมน' },
   { href: '/plans', label: 'จัดการแพลน' },
   { href: '/settings', label: 'ตั้งค่า' },
 ];

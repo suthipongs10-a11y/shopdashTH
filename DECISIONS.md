@@ -254,3 +254,13 @@ pack "ของเล่น / แม่และเด็ก" ที่ data ค
 (ค) รูปเพิ่ม 2 ไฟล์ใน generator เดิม: hero-02 (โทนฟ้า #dcedfb = --color-secondary ของธีม ให้กลืนแผง split-panel) + cat-04 (เสื้อผ้าเด็ก) และ cat-03 เปลี่ยน art เป็นผ้าห่ม (เดิมซ้ำ onesie กับหมวดเสื้อผ้า)
 (ง) theme-preview อัปเกรดเป็นเครื่องมือกลาง: ธีมที่มี layout.utilityBar ใช้ StoreHeader/Footer จริง + hero/categoryCards/การ์ดสินค้า mock จาก TOYS_PACK (source of truth เดียว ไม่ copy เนื้อหา)
 (จ) migration 016 upsert toys-01 เข้า theme_registry
+
+## 2026-07-17 — Custom domain เปลี่ยนเป็นบริการ "ทีมงานจัดการให้" ฿590/ปี (เจ้าของสั่ง)
+บริบท: flow self-service เดิม (ลูกค้าตั้ง DNS เอง + ปุ่มตรวจ 3 เช็ค) ใช้งานจริงไม่ครบ — สถาปัตยกรรม CF Worker ครอบแค่ *.shopdashth.com โดเมนลูกค้าต้องถูก add เข้า Vercel มือทีละอัน และไม่เคยทดสอบกับโดเมนจริง ประกอบกับกลุ่มลูกค้า (ร้านเล็ก) ไม่ควรต้องรู้เรื่อง DNS
+ตัดสินใจ (เจ้าของเลือกทั้ง 4 ข้อ): ราคา ฿590/ปี **รวมค่าจดโดเมนปีแรก/ค่าต่ออายุ** + เก็บรายปี + เมนูเปิดเฉพาะแพลน Pro+ ตามเดิม (ตรงหน้า pricing) + ทำทันที
+รูปแบบ: ตาราง `domain_requests` แยกจาก `custom_domains` (คำขอ/การเงิน แยกจากสถานะ routing จริง — คำขอถูกปฏิเสธ/ยกเลิกไม่แตะของที่ใช้งานอยู่) จ่ายเงิน pattern เดียวกับสลิปค่าแพลนทุกจุด (PromptPay แพลตฟอร์ม + อัปสลิป + LINE แจ้ง + คิว super admin) / ปุ่ม "ทำเสร็จ" ของแอดมินคือจุดเดียวที่เขียน custom_domains (active + managed + service_ends_at 1 ปี; ต่ออายุ = ขยายจาก max(วันนี้, วันหมดเดิม))
+จุดตัดสินใจย่อยที่ควรรู้:
+(ก) **managed domain ข้ามเช็ค TXT**: TXT มีไว้พิสูจน์ความเป็นเจ้าของตอน self-service — โดเมน managed แพลตฟอร์มจดเอง ไม่มีใครไปตั้ง TXT → ถ้าไม่ข้าม cron re-check จะตีเป็น error หลัง 3 วัน (แก้ใน runDomainChecks รับ opts.skipTxt)
+(ข) ราคาเป็น constant ในโค้ด (`DOMAIN_SERVICE_PRICE_YEARLY` — snapshot ลง amount ต่อคำขอ) ยังไม่ทำ UI แก้ราคา — เปลี่ยนราคา = แก้ constant เดียว deploy (ทำ UI เมื่อราคาเริ่มขยับบ่อย)
+(ค) การคืนเงินเมื่อปฏิเสธหลังจ่ายแล้ว = งาน manual (UI บอกลูกค้าว่า "ทีมงานจะติดต่อกลับเรื่องการคืนเงิน") — ไม่มี refund flow ในระบบ
+(ง) ยังไม่มี automation Vercel Domains API — ขั้น add เข้า Vercel เป็นมือใน checklist (DEPLOYMENT §โดเมนลูกค้า) เหมาะกับปริมาณหลักหน่วย/เดือน ถ้าถึงหลักสิบค่อยทำ automation

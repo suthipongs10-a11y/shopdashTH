@@ -4,6 +4,16 @@
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-17
 
+## Done (Phase 7 ต่อ — บริการโดเมนส่วนตัว ฿590/ปี แอดมินจัดการให้, 2026-07-17 ตามคำสั่งเจ้าของ)
+- [x] **โจทย์**: flow custom domain เดิมให้ลูกค้าตั้ง DNS เอง (ใช้จริงไม่ได้เพราะยังต้อง add โดเมนเข้า Vercel มือ + ยังไม่เคยทดสอบโดเมนจริง) — เจ้าของสั่งเปลี่ยนเป็น "ลูกค้าส่งชื่อโดเมนมา ทีมงานจัดการให้ คิด ฿590/ปี (จดใหม่รวมค่าโดเมนปีแรก + ต่ออายุรายปี)"
+- [x] `supabase/migrations/017_domain_requests.sql` — ตาราง `domain_requests` (state: awaiting_payment→slip_uploaded→in_progress→completed/rejected/cancelled) + RLS (super all / tenant read self) + `custom_domains.managed` + `service_ends_at` — **รอเจ้าของรันใน SQL Editor**
+- [x] **ฝั่งร้าน `/admin/domain` (Pro+ เดิม, เจ้าของร้านเท่านั้น)**: ฟอร์มส่งชื่อโดเมน+หมายเหตุ → QR PromptPay แพลตฟอร์ม ฿590 + อัปสลิป (`/api/domain-slips` — hash กันสลิปซ้ำ, LINE แจ้งเจ้าของแพลตฟอร์ม) → timeline 5 ขั้น → โดเมน active โชว์วันหมดอายุ + ปุ่ม "ต่ออายุ ฿590/ปี" เมื่อเหลือ ≤45 วัน + ประวัติคำขอ / ยกเลิกได้เฉพาะยังไม่จ่าย / ถูกปฏิเสธเห็นเหตุผล
+- [x] **ฝั่ง Super Admin → "คำขอโดเมน"**: คิวรอตรวจสลิป (รูปสลิป presigned) + คิวกำลังดำเนินการ (checklist ขั้นตอน + ปุ่ม "ตรวจ DNS" reuse `runDomainChecks`) + อนุมัติ/ปฏิเสธ(เหตุผล)/ทำเสร็จ (upsert `custom_domains` active+managed หรือขยายอายุ +1 ปี) + รายการโดเมนใกล้หมดอายุ + ประวัติ
+- [x] **แก้บั๊ก interaction**: cron `domain-recheck` เดิมเช็ค TXT เสมอ → โดเมน managed (แพลตฟอร์มจดเอง ไม่มี TXT) จะโดนตีเป็น error หลัง 3 วัน — เพิ่ม `runDomainChecks(row, {skipTxt})` ให้ managed วัดจาก CNAME/A เท่านั้น
+- [x] ถอด flow self-service เดิม: `requestCustomDomain` + `/api/domain/verify` + หน้า DNS instructions ฝั่งลูกค้า (ฟังก์ชันตรวจ DNS ยังอยู่ — เป็นเครื่องมือแอดมิน+cron) / อัปเดต copy landing (FAQ + bullet แพลน) เป็น "บริการเสริม 590 บาท/ปี"
+- [x] ขั้นตอน ops ต่อ 1 คำขอเขียนไว้ที่ `DEPLOYMENT.md §โดเมนลูกค้า` (จด registrar → DNS → add Vercel → ตรวจ DNS → ทำเสร็จ)
+- [x] `tsc --noEmit` + `npm run build` ผ่าน
+
 ## Done (Phase 7 ต่อ — ธีม "ลิตเติ้ลจอย" toys-01 ตาม ref ภาพ Little Joy, 2026-07-17 ตามคำสั่งเจ้าของ)
 - [x] **โจทย์**: เจ้าของส่งภาพ ref เว็บ "Little Joy ของเล่น & แม่และเด็ก" ให้สร้างเทมเพลทเต็มรูปแบบสำหรับ pack ของเล่น
 - [x] **preset `toys-01`** (tier 1 ทุกแพลนเลือกได้): โทนฟ้าอ่อน-ชมพูพาสเทล ฟอนต์ Mitr/Prompt radius ใหญ่ — hero `split-panel` (แผงฟ้า + headline 2 สี + ปุ่มชมพู "ช้อปเลย") → การ์ดหมวด pill พาสเทล → สินค้าแนะนำ 5 ใบ → แถบ USP ฟ้า → รีวิวคุณพ่อคุณแม่ → footer full / layout: utility bar โทน soft + search จริง

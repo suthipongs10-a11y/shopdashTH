@@ -78,3 +78,16 @@ export async function notifyPlatformPlanSlip(args: {
     `💸 สลิปค่าแพลนเข้าคิวรอตรวจ\nร้าน: ${args.storeName} (${args.slug})\nแพลน: ${args.planName}\nยอด: ฿${args.amount.toLocaleString('th-TH')}\nตรวจที่ Super Admin > อนุมัติค่าแพลน`,
   );
 }
+
+export async function notifyPlatformDomainSlip(args: {
+  storeName: string;
+  slug: string;
+  domain: string;
+  kind: 'new' | 'renewal';
+  amount: number;
+}): Promise<void> {
+  await sendPlatformLineMessage(
+    'domain_slip',
+    `🌐 สลิปค่าบริการโดเมนเข้าคิวรอตรวจ\nร้าน: ${args.storeName} (${args.slug})\nโดเมน: ${args.domain} (${args.kind === 'renewal' ? 'ต่ออายุ' : 'จดใหม่'})\nยอด: ฿${args.amount.toLocaleString('th-TH')}\nตรวจที่ Super Admin > คำขอโดเมน`,
+  );
+}

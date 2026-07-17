@@ -59,7 +59,7 @@ function planHighlights(plan: PlanCard): string[] {
   if (plan.features.custom_pages) items.push('สร้างเพจเนื้อหาเองได้ (เกี่ยวกับเรา ฯลฯ)');
   if (plan.features.discount_codes) items.push('โค้ดส่วนลด');
   if (plan.features.line_oa) items.push('แจ้งเตือนออร์เดอร์เข้า LINE');
-  if (plan.features.custom_domain) items.push('ใช้โดเมนของร้านเองได้');
+  if (plan.features.custom_domain) items.push('ใช้โดเมนของร้านเองได้ (บริการเสริม 590 บาท/ปี)');
   if (plan.features.analytics_dashboard) items.push('แดชบอร์ดวิเคราะห์ยอดขาย');
   if (plan.features.slip_verify_api) items.push('ตรวจสลิปอัตโนมัติ');
   if (plan.max_staff > 0) items.push(`เพิ่มพนักงานได้ ${plan.max_staff} คน`);
@@ -176,7 +176,7 @@ const FAQ = [
   },
   {
     q: 'ใช้โดเมนของร้านเองได้ไหม?',
-    a: 'ได้ตั้งแต่แพ็กเกจร้านค้าขึ้นไป ระบบมีหน้าตรวจ DNS ที่บอกเป็นภาษาไทยว่าต้องตั้งค่าอะไรและตอนนี้ผิดตรงไหน โดยที่อยู่ .' + ROOT_DOMAIN + ' เดิมก็ยังใช้ได้ควบคู่กัน',
+    a: 'ได้ตั้งแต่แพ็กเกจร้านค้าขึ้นไป — บริการเสริม 590 บาท/ปี ทีมงานจดโดเมนและตั้งค่าให้ทุกขั้นตอน ไม่ต้องมีความรู้เรื่อง DNS เลย โดยที่อยู่ .' + ROOT_DOMAIN + ' เดิมก็ยังใช้ได้ควบคู่กัน',
   },
   {
     q: 'ต้องมีความรู้ทางเทคนิคไหม?',

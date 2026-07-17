@@ -1,124 +1,158 @@
 'use client';
 
-// UI ตั้งค่า custom domain — ฟอร์มกรอกโดเมน + ปุ่ม "ตรวจสอบ DNS" รายงานผล 3 เช็คแยกข้อ (§7.5)
+// ชิ้นส่วน client ของหน้า "โดเมนของตัวเอง" (บริการ ฿590/ปี — ทีมงานจัดการให้):
+// ฟอร์มส่งคำขอ / อัปสลิป (pattern เดียวกับสลิปค่าแพลน §7.3 ปุ่ม disable ระหว่างส่ง) /
+// ปุ่มยกเลิกคำขอ / ปุ่มขอต่ออายุ
 
-import { useActionState, useState } from 'react';
-import { submitDomain, type DomainActionState } from './actions';
+import { useRouter } from 'next/navigation';
+import { useActionState, useRef, useState } from 'react';
+import {
+  cancelRequestAction,
+  renewDomainAction,
+  requestDomainAction,
+  type DomainActionState,
+} from './actions';
 
-interface CheckItem {
-  name: string;
-  passed: boolean;
-  detail: string;
-}
+const IDLE: DomainActionState = {};
 
-export function DomainForm({ currentDomain }: { currentDomain: string | null }) {
-  const [state, formAction, pending] = useActionState<DomainActionState, FormData>(
-    submitDomain,
-    {},
-  );
-
+export function DomainRequestForm() {
+  const [state, formAction, pending] = useActionState(requestDomainAction, IDLE);
   return (
-    <form action={formAction} className="flex flex-wrap items-end gap-3">
-      <div className="min-w-64 flex-1">
+    <form action={formAction} className="space-y-4">
+      <div>
         <label htmlFor="domain" className="mb-1 block text-sm font-medium text-gray-700">
-          โดเมนของร้าน (เช่น baannoi.com หรือ www.baannoi.com)
+          ชื่อโดเมนที่ต้องการ
         </label>
         <input
           id="domain"
           name="domain"
-          defaultValue={currentDomain ?? ''}
-          placeholder="baannoi.com"
           required
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          placeholder="เช่น baannoi.com"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+        <p className="mt-1 text-xs text-gray-400">
+          ชื่อโดเมนขึ้นอยู่กับความว่าง — ทีมงานจะตรวจสอบให้ก่อนดำเนินการ ถ้าไม่ว่างจะติดต่อกลับ
+        </p>
+      </div>
+      <div>
+        <label htmlFor="note" className="mb-1 block text-sm font-medium text-gray-700">
+          หมายเหตุถึงทีมงาน (ไม่บังคับ)
+        </label>
+        <input
+          id="note"
+          name="note"
+          placeholder="เช่น ชื่อสำรองถ้าโดเมนแรกไม่ว่าง หรือเบอร์/LINE สำหรับติดต่อกลับ"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
       </div>
+      {state.error && <p className="text-sm text-rose-600">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
+        className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
-        {pending ? 'กำลังบันทึก…' : currentDomain ? 'เปลี่ยนโดเมน' : 'เริ่มตั้งค่าโดเมน'}
+        {pending ? 'กำลังส่งคำขอ…' : 'ส่งคำขอโดเมน'}
       </button>
-      {state.error && <p className="w-full text-sm text-rose-600">{state.error}</p>}
-      {state.success && (
-        <p className="w-full text-sm text-emerald-700">
-          บันทึกแล้ว — ตั้งค่า DNS ตามคำแนะนำด้านล่าง แล้วกด &ldquo;ตรวจสอบ DNS&rdquo;
-        </p>
-      )}
     </form>
   );
 }
 
-export function VerifyButton() {
-  const [checking, setChecking] = useState(false);
-  const [checks, setChecks] = useState<CheckItem[] | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
+export function DomainSlipUploader({ requestId }: { requestId: string }) {
+  const router = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function verify() {
-    setChecking(true);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const file = fileRef.current?.files?.[0];
+    if (!file) {
+      setError('กรุณาเลือกไฟล์สลิป');
+      return;
+    }
     setError(null);
+    setUploading(true);
     try {
-      const res = await fetch('/api/domain/verify', { method: 'POST' });
-      const json = (await res.json()) as {
-        status?: string;
-        checks?: CheckItem[];
-        error?: string;
-      };
-      if (!res.ok || !json.checks) {
-        setError(json.error ?? 'ตรวจสอบไม่สำเร็จ');
-        setChecks(null);
+      const form = new FormData();
+      form.set('requestId', requestId);
+      form.set('file', file);
+      const res = await fetch('/api/domain-slips', { method: 'POST', body: form });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        setError(data.error ?? 'อัปโหลดไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
         return;
       }
-      setChecks(json.checks);
-      setStatus(json.status ?? null);
+      router.refresh();
     } catch {
       setError('เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
     } finally {
-      setChecking(false);
+      setUploading(false);
     }
   }
 
   return (
-    <div className="space-y-3">
-      <button
-        type="button"
-        onClick={verify}
-        disabled={checking}
-        className="rounded-md border border-gray-900 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-50"
-      >
-        {checking ? 'กำลังตรวจสอบ DNS…' : 'ตรวจสอบ DNS'}
-      </button>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div>
+        <label htmlFor="domain-slip" className="mb-1 block text-sm font-medium text-gray-700">
+          แนบสลิปโอนเงิน (jpg / png / webp ไม่เกิน 5MB)
+        </label>
+        <input
+          id="domain-slip"
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-gray-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-gray-800"
+        />
+      </div>
       {error && <p className="text-sm text-rose-600">{error}</p>}
-      {checks && (
-        <div className="space-y-2">
-          {checks.map((c) => (
-            <div
-              key={c.name}
-              className={`rounded-md border px-3 py-2 text-sm ${
-                c.passed
-                  ? 'border-green-200 bg-emerald-50 text-green-800'
-                  : 'border-amber-200 bg-amber-50 text-amber-800'
-              }`}
-            >
-              <p className="font-medium">
-                {c.passed ? '✓' : '✗'} {c.name}
-              </p>
-              <p className="mt-0.5 text-xs">{c.detail}</p>
-            </div>
-          ))}
-          {status === 'active' && (
-            <p className="text-sm font-medium text-emerald-700">
-              🎉 โดเมนพร้อมใช้งานแล้ว — ลูกค้าเปิดร้านผ่านโดเมนนี้ได้ทันที
-            </p>
-          )}
-          {status !== 'active' && (
-            <p className="text-xs text-gray-400">
-              DNS อาจใช้เวลาเผยแพร่ (propagation) ได้ถึง 24 ชั่วโมง — แก้ค่าแล้วรอสักครู่ก่อนตรวจใหม่
-            </p>
-          )}
-        </div>
-      )}
-    </div>
+      <button
+        type="submit"
+        disabled={uploading}
+        className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
+      >
+        {uploading ? 'กำลังอัปโหลด…' : 'ส่งสลิปให้ทีมงานตรวจสอบ'}
+      </button>
+    </form>
+  );
+}
+
+export function CancelRequestButton({ requestId }: { requestId: string }) {
+  const [state, formAction, pending] = useActionState(
+    cancelRequestAction.bind(null, requestId),
+    IDLE,
+  );
+  return (
+    <form
+      action={formAction}
+      onSubmit={(e) => {
+        if (!confirm('ยกเลิกคำขอโดเมนนี้?')) e.preventDefault();
+      }}
+      className="inline"
+    >
+      {state.error && <p className="mb-2 text-sm text-rose-600">{state.error}</p>}
+      <button
+        type="submit"
+        disabled={pending}
+        className="text-sm font-medium text-gray-400 underline underline-offset-2 hover:text-rose-600 disabled:opacity-50"
+      >
+        {pending ? 'กำลังยกเลิก…' : 'ยกเลิกคำขอ'}
+      </button>
+    </form>
+  );
+}
+
+export function RenewDomainButton() {
+  const [state, formAction, pending] = useActionState(renewDomainAction, IDLE);
+  return (
+    <form action={formAction}>
+      {state.error && <p className="mb-2 text-sm text-rose-600">{state.error}</p>}
+      <button
+        type="submit"
+        disabled={pending}
+        className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:opacity-50"
+      >
+        {pending ? 'กำลังสร้างคำขอ…' : 'ต่ออายุโดเมน ฿590/ปี'}
+      </button>
+    </form>
   );
 }

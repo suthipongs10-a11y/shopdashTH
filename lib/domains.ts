@@ -4,19 +4,17 @@
 // subdomain .shopdashth.com ใช้ได้เสมอ — custom domain เป็น "เพิ่ม" ไม่ใช่ "แทนที่"
 
 import 'server-only';
-import { randomBytes } from 'crypto';
 import dns from 'dns/promises';
 import { logTenantEvent } from '@/lib/platform/tenant-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
-import type { TenantContext } from '@/lib/tenant-context';
 
-// ค่าที่ DNS ของร้านต้องชี้มา (ตาม instruction ของ Vercel §2.4)
+// ค่าที่ DNS ต้องชี้มา (ตาม instruction ของ Vercel §2.4) — โชว์ใน checklist ของ super admin
+// หมายเหตุ 2026-07-17: flow self-service เดิมถูกแทนด้วย "คำขอโดเมน" (lib/domain-requests.ts,
+// แอดมินจัดการ DNS ให้ ฿590/ปี) — ฟังก์ชันตรวจ DNS ในไฟล์นี้ยังใช้: เครื่องมือ super admin + cron
 export const VERCEL_APEX_A = '76.76.21.21';
 export function cnameTarget(): string {
   return `cname.${process.env.ROOT_DOMAIN ?? 'shopdashth.com'}`;
 }
-
-const DOMAIN_REGEX = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/;
 
 export interface CustomDomainRow {
   id: string;
@@ -27,6 +25,10 @@ export interface CustomDomainRow {
   last_error_th: string | null;
   recheck_fail_count: number;
   checked_at: string | null;
+  /** โดเมนที่แพลตฟอร์มจด/ดูแลให้ (บริการ ฿590/ปี — migration 017) */
+  managed: boolean;
+  /** วันหมดอายุบริการรายปี (เฉพาะ managed) */
+  service_ends_at: string | null;
 }
 
 export async function getCustomDomain(tenantId: string): Promise<CustomDomainRow | null> {
@@ -37,50 +39,6 @@ export async function getCustomDomain(tenantId: string): Promise<CustomDomainRow
     .eq('tenant_id', tenantId)
     .maybeSingle();
   return (data as CustomDomainRow) ?? null;
-}
-
-/** ร้านกรอก/เปลี่ยนโดเมน — 1 ร้าน 1 โดเมน (v1.1) เปลี่ยนโดเมน = reset token+สถานะ */
-export async function requestCustomDomain(
-  ctx: TenantContext,
-  rawDomain: string,
-): Promise<{ ok: true; row: CustomDomainRow } | { ok: false; error: string }> {
-  const domain = rawDomain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-  if (!DOMAIN_REGEX.test(domain)) {
-    return { ok: false, error: 'รูปแบบโดเมนไม่ถูกต้อง เช่น baannoi.com หรือ shop.baannoi.com' };
-  }
-  const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdashth.com';
-  if (domain === rootDomain || domain.endsWith(`.${rootDomain}`)) {
-    return { ok: false, error: 'ใช้โดเมนของ ShopDash เป็น custom domain ไม่ได้' };
-  }
-
-  const db = createAdminClient();
-  const token = randomBytes(16).toString('hex');
-  const { data, error } = await db
-    .from('custom_domains')
-    .upsert(
-      {
-        tenant_id: ctx.tenantId,
-        domain,
-        verification_token: token,
-        status: 'pending',
-        last_error_th: null,
-        recheck_fail_count: 0,
-        checked_at: null,
-      },
-      { onConflict: 'tenant_id' },
-    )
-    .select('*')
-    .single();
-
-  if (error || !data) {
-    if (error?.code === '23505') {
-      return { ok: false, error: 'โดเมนนี้ถูกใช้กับร้านอื่นแล้ว' };
-    }
-    return { ok: false, error: 'บันทึกโดเมนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง' };
-  }
-
-  await logTenantEvent(ctx.tenantId, 'custom_domain_requested', 'ok', { domain });
-  return { ok: true, row: data as CustomDomainRow };
 }
 
 export interface DomainCheckItem {
@@ -106,8 +64,13 @@ async function safeResolveTxt(domain: string): Promise<string[]> {
 /**
  * ตรวจ DNS 3 เช็คแยกและรายงานแยกข้อ (§7.5):
  * (1) TXT shopdash-verify={token}  (2) CNAME/A ชี้ถูก  (3) HTTPS ตอบสนอง
+ * opts.skipTxt: โดเมนที่แพลตฟอร์มจด/ดูแลเอง (managed) ไม่ต้องยืนยันความเป็นเจ้าของด้วย TXT
+ * — สถานะวัดจากเช็ค CNAME/A อย่างเดียว (ไม่งั้น cron จะตีโดเมน managed เป็น error ผิดๆ)
  */
-export async function runDomainChecks(row: CustomDomainRow): Promise<DomainCheckResult> {
+export async function runDomainChecks(
+  row: CustomDomainRow,
+  opts: { skipTxt?: boolean } = {},
+): Promise<DomainCheckResult> {
   const checks: DomainCheckItem[] = [];
   const expectedTxt = `shopdash-verify=${row.verification_token}`;
 
@@ -124,18 +87,27 @@ export async function runDomainChecks(row: CustomDomainRow): Promise<DomainCheck
     };
   }
 
-  // ---------- (1) TXT verification ----------
-  const txtRecords = await safeResolveTxt(row.domain);
-  const txtOk = txtRecords.includes(expectedTxt);
-  checks.push({
-    name: 'TXT ยืนยันความเป็นเจ้าของ',
-    passed: txtOk,
-    detail: txtOk
-      ? `พบ TXT "${expectedTxt}" ถูกต้อง`
-      : txtRecords.length > 0
-        ? `พบ TXT ${txtRecords.map((t) => `"${t.slice(0, 40)}"`).join(', ')} — ต้องมี "${expectedTxt}"`
-        : `ไม่พบ TXT record — ต้องเพิ่มค่า "${expectedTxt}" ที่โดเมน ${row.domain}`,
-  });
+  // ---------- (1) TXT verification (ข้ามเมื่อ managed — ระบบเป็นคนจดโดเมนเอง) ----------
+  let txtOk = true;
+  if (opts.skipTxt) {
+    checks.push({
+      name: 'TXT ยืนยันความเป็นเจ้าของ',
+      passed: true,
+      detail: 'ข้าม — โดเมนที่ระบบดูแลเอง ไม่ต้องยืนยันความเป็นเจ้าของ',
+    });
+  } else {
+    const txtRecords = await safeResolveTxt(row.domain);
+    txtOk = txtRecords.includes(expectedTxt);
+    checks.push({
+      name: 'TXT ยืนยันความเป็นเจ้าของ',
+      passed: txtOk,
+      detail: txtOk
+        ? `พบ TXT "${expectedTxt}" ถูกต้อง`
+        : txtRecords.length > 0
+          ? `พบ TXT ${txtRecords.map((t) => `"${t.slice(0, 40)}"`).join(', ')} — ต้องมี "${expectedTxt}"`
+          : `ไม่พบ TXT record — ต้องเพิ่มค่า "${expectedTxt}" ที่โดเมน ${row.domain}`,
+    });
+  }
 
   // ---------- (2) CNAME (www/subdomain) หรือ A record (apex) ----------
   const target = cnameTarget();
