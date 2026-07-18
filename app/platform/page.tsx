@@ -97,6 +97,16 @@ const TEMPLATES = [
     tier: 3,
     desc: 'โทนหรู ตัวอักษร serif เหมาะแบรนด์ที่ขายภาพลักษณ์และสินค้าราคาสูง',
   },
+  {
+    // ธีม toys-01 (ลิตเติ้ลจอย) — ยังไม่มีร้านเดโม่จริง: hasDemo=false → ปุ่มพาไป signup แทน
+    // เมื่อเจ้าของสร้างร้านเดโม่ (signup ด้วยชุด "ของเล่น / แม่และเด็ก" slug=littlejoy) ค่อยลบ hasDemo ออก
+    slug: 'littlejoy',
+    img: '/marketing/templates/toys-01.webp',
+    name: 'LITTLE JOY',
+    tier: 1,
+    desc: 'โทนพาสเทลฟ้า-ชมพูสำหรับร้านของเล่น แม่และเด็ก — การ์ดหมวดหมู่น่ารัก รีวิวคุณพ่อคุณแม่ และปุ่มหยิบใส่ตะกร้าครบทุกการ์ดสินค้า',
+    hasDemo: false,
+  },
 ];
 
 /** แพ็กเกจถูกที่สุดที่เลือกธีม tier นี้ได้ — plans เรียงตามราคาแล้ว */
@@ -394,7 +404,7 @@ export default async function PlatformLandingPage() {
             </h2>
             <p className="mt-3 leading-relaxed text-slate-600">
               ทุกเทมเพลตออกแบบมาให้ขายของได้จริงและใช้งานลื่นบนมือถือ
-              เปลี่ยนข้อความ รูป และสีได้เองจากหลังร้าน — กดเข้าไปดูร้านเดโม่จริงได้ทุกตัว
+              เปลี่ยนข้อความ รูป และสีได้เองจากหลังร้าน — กดเข้าไปดูร้านเดโม่จริงได้
             </p>
           </div>
 
@@ -414,15 +424,25 @@ export default async function PlatformLandingPage() {
                     </span>
                   </div>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{tpl.desc}</p>
-                  <a
-                    href={demoUrl(tpl.slug)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
-                  >
-                    ดูตัวอย่างร้านจริง
-                    <span aria-hidden>→</span>
-                  </a>
+                  {('hasDemo' in tpl && tpl.hasDemo === false) ? (
+                    <a
+                      href="/signup"
+                      className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+                    >
+                      สร้างร้านด้วยเทมเพลตนี้
+                      <span aria-hidden>→</span>
+                    </a>
+                  ) : (
+                    <a
+                      href={demoUrl(tpl.slug)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+                    >
+                      ดูตัวอย่างร้านจริง
+                      <span aria-hidden>→</span>
+                    </a>
+                  )}
                 </div>
               </article>
             ))}
