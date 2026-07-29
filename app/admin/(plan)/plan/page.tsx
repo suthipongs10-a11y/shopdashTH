@@ -109,7 +109,7 @@ export default async function MyPlanPage({
 
   const { id: platformPromptpayId, name: platformPromptpayName } = await getPlatformPromptpay();
   let qrSvg: string | null = null;
-  if (payPlan && platformPromptpayId && !pendingSub && payAmount > 0) {
+  if (!FREE_LAUNCH && payPlan && platformPromptpayId && !pendingSub && payAmount > 0) {
     try {
       qrSvg = await generatePromptpayQrSvg(platformPromptpayId, payAmount);
     } catch {
@@ -150,6 +150,18 @@ export default async function MyPlanPage({
         </p>
       </section>
 
+      {/* ช่วงเปิดตัวใช้ฟรี: ซ่อนช่องจ่ายเงินทั้งหมด (โค้ดอยู่ครบ — เปิดคืนเมื่อเริ่มเก็บเงิน) */}
+      {FREE_LAUNCH && (
+        <section className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-5">
+          <h2 className="mb-1 text-base font-bold text-gray-900">ช่วงเปิดตัว — ใช้ฟรีทุกฟีเจอร์</h2>
+          <p className="text-sm text-gray-600">
+            ยังไม่ต้องชำระค่าแพลนใดๆ ทั้งสิ้น — เมื่อเริ่มเก็บค่าบริการ ทีมงานจะแจ้งล่วงหน้า
+            หากต้องการเปลี่ยนแพลน (เพิ่มโควตาสินค้า/เทมเพลต) ติดต่อทีมงานได้เลย เปลี่ยนให้ฟรีช่วงนี้
+          </p>
+        </section>
+      )}
+
+      {!FREE_LAUNCH && (
       <section className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
         <h2 className="mb-3 text-base font-bold text-gray-900">
           ชำระค่าแพลน / ต่ออายุ / เปลี่ยนแพลน
@@ -253,8 +265,9 @@ export default async function MyPlanPage({
           </>
         )}
       </section>
+      )}
 
-      {subs.length > 0 && (
+      {!FREE_LAUNCH && subs.length > 0 && (
         <section className="rounded-xl border border-gray-300 bg-white shadow-sm p-5">
           <h2 className="mb-3 text-base font-bold text-gray-900">ประวัติการชำระ</h2>
           <ul className="space-y-2 text-sm">

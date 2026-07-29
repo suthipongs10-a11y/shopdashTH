@@ -3,6 +3,7 @@
 // Sidebar ของ Store Admin — เมนูจัดกลุ่ม + ไอคอน, active เป็น pill ขาวบนพื้นเข้ม
 // desktop: คอลัมน์ซ้าย sticky เต็มสูง / mobile: topbar + drawer ซ้าย
 
+import { DOMAIN_SERVICE_OPEN } from '@/lib/free-launch';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -68,7 +69,10 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/theme', label: 'ธีมร้าน', icon: ThemeIcon },
       { href: '/admin/content', label: 'เนื้อหาเว็บ', icon: ContentIcon },
       { href: '/admin/pages', label: 'เพจ', icon: PagesIcon },
-      { href: '/admin/domain', label: 'โดเมน', icon: DomainIcon, ownerOnly: true },
+      // ซ่อนจนกว่าบริการโดเมนพร้อมเปิด (DOMAIN_SERVICE_OPEN — lib/free-launch.ts)
+      ...(DOMAIN_SERVICE_OPEN
+        ? [{ href: '/admin/domain', label: 'โดเมน', icon: DomainIcon, ownerOnly: true }]
+        : []),
     ],
   },
   {

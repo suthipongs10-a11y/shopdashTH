@@ -2,6 +2,7 @@
 // flow ฝั่งร้าน: ส่งชื่อโดเมนที่อยากได้ → สแกน QR จ่าย ฿590 + อัปสลิป → ติดตามสถานะ
 // ทีมงานจดโดเมน + ตั้งค่าให้ → โดเมนใช้งานได้ (ต่ออายุปีละครั้งจากหน้านี้)
 
+import { DOMAIN_SERVICE_OPEN } from '@/lib/free-launch';
 import { getStoreUser, userRole } from '@/lib/auth';
 import {
   DOMAIN_SERVICE_PRICE_YEARLY,
@@ -89,6 +90,19 @@ export default async function DomainPage() {
   const ctx = await getTenantContext();
   const user = await getStoreUser(ctx);
   const rootDomain = process.env.ROOT_DOMAIN ?? 'shopdashth.com';
+
+  // บริการโดเมนยังไม่เปิดให้ลูกค้า (ops ยังไม่พร้อม — DOMAIN_SERVICE_OPEN ใน lib/free-launch.ts)
+  if (!DOMAIN_SERVICE_OPEN) {
+    return (
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
+        <h1 className="text-lg font-semibold text-gray-900">โดเมนของตัวเอง — เร็วๆ นี้</h1>
+        <p className="mt-2 text-sm text-gray-500">
+          บริการใช้โดเมนของร้านเอง (เช่น baannoi.com) กำลังจะเปิดให้ใช้เร็วๆ นี้ — ตอนนี้ที่อยู่ร้าน{' '}
+          {ctx.slug}.{rootDomain} ใช้งานได้เต็มรูปแบบตามปกติครับ
+        </p>
+      </div>
+    );
+  }
 
   if (user && userRole(user) !== 'store_owner') {
     return (

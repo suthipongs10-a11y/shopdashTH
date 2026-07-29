@@ -1,6 +1,7 @@
 // Layout ของ shopdashth.com (หน้า public: landing / pricing / signup)
 // ไม่ผูก tenant context — เป็นหน้าแพลตฟอร์มกลาง (ธีม/token ของ storefront ไม่เกี่ยวกับหน้านี้)
 
+import { SHOW_PRICING } from '@/lib/free-launch';
 import type { Metadata } from 'next';
 import { IBM_Plex_Sans_Thai } from 'next/font/google';
 import Link from 'next/link';
@@ -32,7 +33,8 @@ export const metadata: Metadata = {
 const NAV = [
   { href: '/#templates', label: 'เทมเพลต' },
   { href: '/#features', label: 'ฟีเจอร์' },
-  { href: '/#pricing', label: 'ราคา' },
+  // ลิงก์ราคาซ่อนช่วงเปิดตัว (SHOW_PRICING — lib/free-launch.ts)
+  ...(SHOW_PRICING ? [{ href: '/#pricing', label: 'ราคา' }] : []),
   { href: '/#faq', label: 'คำถามที่พบบ่อย' },
 ];
 
@@ -99,9 +101,11 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
                 </a>
               </li>
               <li>
-                <a href="/#pricing" className="hover:text-slate-900">
-                  แพ็กเกจและราคา
-                </a>
+                {SHOW_PRICING && (
+                  <a href="/#pricing" className="hover:text-slate-900">
+                    แพ็กเกจและราคา
+                  </a>
+                )}
               </li>
             </ul>
           </div>

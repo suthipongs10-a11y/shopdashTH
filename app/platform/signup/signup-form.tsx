@@ -3,6 +3,7 @@
 // ฟอร์ม signup — เช็ค slug realtime (debounce 400ms) + POST /api/signup
 // สำเร็จแล้วโชว์ลิงก์เข้า {slug}.<root>/admin (session cookie แยกต่อ host จึงให้ login ที่ร้าน)
 
+import { SHOW_PRICING } from '@/lib/free-launch';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
@@ -168,11 +169,17 @@ export function SignupForm({
               />
               <span className="block font-medium">{plan.name_th}</span>
               <span className={planId === plan.id ? 'text-gray-300' : 'text-gray-400'}>
-                ฿{plan.price_yearly.toLocaleString('th-TH')}/ปีแรก
-                {plan.price_renewal !== null && (
-                  <span className="block text-xs">
-                    ต่ออายุ ฿{plan.price_renewal.toLocaleString('th-TH')}/ปี
-                  </span>
+                {SHOW_PRICING ? (
+                  <>
+                    ฿{plan.price_yearly.toLocaleString('th-TH')}/ปีแรก
+                    {plan.price_renewal !== null && (
+                      <span className="block text-xs">
+                        ต่ออายุ ฿{plan.price_renewal.toLocaleString('th-TH')}/ปี
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  'ฟรีช่วงเปิดตัว'
                 )}
               </span>
             </label>

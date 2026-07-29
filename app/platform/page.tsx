@@ -2,7 +2,7 @@
 // เนื้อหาราคาอ่านจากตาราง plans (is_active) เสมอ — แก้ราคาจาก Super Admin แล้วหน้านี้เปลี่ยนตาม
 // ภาพเทมเพลตใน public/marketing/templates/* = screenshot ของร้านเดโม่จริง (ไม่ใช่ mockup)
 
-import { FREE_LAUNCH } from '@/lib/free-launch';
+import { DOMAIN_SERVICE_OPEN, FREE_LAUNCH, SHOW_PRICING, SLIP_VERIFY_OPEN } from '@/lib/free-launch';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -60,9 +60,11 @@ function planHighlights(plan: PlanCard): string[] {
   if (plan.features.custom_pages) items.push('สร้างเพจเนื้อหาเองได้ (เกี่ยวกับเรา ฯลฯ)');
   if (plan.features.discount_codes) items.push('โค้ดส่วนลด');
   if (plan.features.line_oa) items.push('แจ้งเตือนออร์เดอร์เข้า LINE');
-  if (plan.features.custom_domain) items.push('ใช้โดเมนของร้านเองได้ (บริการเสริม 590 บาท/ปี)');
+  // ซ่อนจนกว่า ops โดเมน/ผู้ให้บริการตรวจสลิปจริงจะพร้อม (lib/free-launch.ts)
+  if (plan.features.custom_domain && DOMAIN_SERVICE_OPEN)
+    items.push('ใช้โดเมนของร้านเองได้ (บริการเสริม 590 บาท/ปี)');
   if (plan.features.analytics_dashboard) items.push('แดชบอร์ดวิเคราะห์ยอดขาย');
-  if (plan.features.slip_verify_api) items.push('ตรวจสลิปอัตโนมัติ');
+  if (plan.features.slip_verify_api && SLIP_VERIFY_OPEN) items.push('ตรวจสลิปอัตโนมัติ');
   if (plan.max_staff > 0) items.push(`เพิ่มพนักงานได้ ${plan.max_staff} คน`);
   return items;
 }
@@ -180,6 +182,8 @@ const FAQ = [
       : 'สมัครแล้วใช้งานได้ทันที 7 วันแบบไม่ต้องจ่าย เมื่อพอใจให้เข้าหน้า "แพ็กเกจของฉัน" ในหลังร้าน สแกน QR พร้อมเพย์แล้วอัปโหลดสลิป ทีมงานอนุมัติแล้วร้านจะเปิดใช้งานเต็มปี',
   },
   {
+    // อ้างตารางราคาที่ถูกซ่อนช่วงเปิดตัว
+    show: SHOW_PRICING,
     q: 'ปีถัดไปจ่ายเท่าไร?',
     a: 'ปีแรกเป็นค่าจัดทำระบบรวมค่าใช้งาน ส่วนปีถัดไปจ่ายเฉพาะ "ค่าดูแลรายปี" ซึ่งถูกกว่ามาก (ดูตัวเลขในตารางราคาด้านบน)',
   },
@@ -188,6 +192,8 @@ const FAQ = [
     a: 'ได้ อัปเกรดแล้วฟีเจอร์เปิดใช้ทันที ส่วนการลดแพ็กเกจ ข้อมูลเดิมจะไม่ถูกลบทิ้ง สินค้าที่เกินโควตายังขายได้ตามปกติ เพียงแต่เพิ่มใหม่ไม่ได้จนกว่าจะต่ำกว่าโควตา',
   },
   {
+    // บริการโดเมนยังไม่เปิดให้ลูกค้า (ops ยังไม่พร้อม)
+    show: DOMAIN_SERVICE_OPEN,
     q: 'ใช้โดเมนของร้านเองได้ไหม?',
     a: 'ได้ตั้งแต่แพ็กเกจร้านค้าขึ้นไป — บริการเสริม 590 บาท/ปี ทีมงานจดโดเมนและตั้งค่าให้ทุกขั้นตอน ไม่ต้องมีความรู้เรื่อง DNS เลย โดยที่อยู่ .' + ROOT_DOMAIN + ' เดิมก็ยังใช้ได้ควบคู่กัน',
   },
@@ -384,10 +390,15 @@ export default async function PlatformLandingPage() {
               head: 'เปิดร้านได้ในวันเดียว',
               sub: 'ไม่ต้องจ้างทำเว็บ ไม่ต้องดูแลเซิร์ฟเวอร์ ลงสินค้าแล้วขายได้เลย',
             },
-            {
-              head: 'เริ่มต้นปีละ ' + (cheapest ? formatBaht(cheapest.price_yearly) : '฿990'),
-              sub: 'จ่ายรายปี รู้ต้นทุนล่วงหน้า ปีถัดไปเหลือเพียงค่าดูแลรายปี',
-            },
+            FREE_LAUNCH
+              ? {
+                  head: 'ช่วงเปิดตัวใช้ฟรี',
+                  sub: 'ทุกแพ็กเกจใช้ฟรี ไม่จำกัดเวลา — เริ่มเก็บค่าบริการเมื่อไหร่จะแจ้งล่วงหน้า',
+                }
+              : {
+                  head: 'เริ่มต้นปีละ ' + (cheapest ? formatBaht(cheapest.price_yearly) : '฿990'),
+                  sub: 'จ่ายรายปี รู้ต้นทุนล่วงหน้า ปีถัดไปเหลือเพียงค่าดูแลรายปี',
+                },
           ].map((item) => (
             <div key={item.head}>
               <p className="font-semibold text-slate-900">{item.head}</p>
@@ -507,7 +518,8 @@ export default async function PlatformLandingPage() {
         </div>
       </section>
 
-      {/* ---------- PRICING ---------- */}
+      {/* ---------- PRICING (ซ่อนช่วงเปิดตัว — SHOW_PRICING ใน lib/free-launch.ts) ---------- */}
+      {SHOW_PRICING && (
       <section id="pricing" className="scroll-mt-20 bg-white py-20">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto max-w-2xl text-center">
@@ -585,6 +597,7 @@ export default async function PlatformLandingPage() {
           </p>
         </div>
       </section>
+      )}
 
       {/* ---------- FAQ ---------- */}
       <section id="faq" className="scroll-mt-20 border-t border-slate-200 bg-slate-50 py-20">
@@ -597,7 +610,7 @@ export default async function PlatformLandingPage() {
           </div>
 
           <div className="mt-10 space-y-3">
-            {FAQ.map((item) => (
+            {FAQ.filter((item) => item.show !== false).map((item) => (
               <details
                 key={item.q}
                 className="group rounded-xl border border-slate-200 bg-white px-5 py-4 [&_summary::-webkit-details-marker]:hidden"

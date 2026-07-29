@@ -10,3 +10,16 @@ export const FREE_LAUNCH = true;
 
 /** ข้อความมาตรฐานช่วงเปิดตัว — ใช้ซ้ำทุกจุดให้เหมือนกัน */
 export const FREE_LAUNCH_LABEL = 'ช่วงเปิดตัว — ใช้ฟรี ไม่จำกัดเวลา';
+
+/** โชว์ราคา/ช่องชำระเงินฝั่งลูกค้าหรือไม่ — ช่วงเปิดตัวซ่อนทั้งหมด (section ราคา landing,
+ *  ราคาบนหน้า signup, บล็อกจ่ายเงินหน้า "แพลนของฉัน") — โค้ดอยู่ครบ เปิดคืนเมื่อเริ่มเก็บเงิน */
+export const SHOW_PRICING = !FREE_LAUNCH;
+
+/** บริการโดเมนส่วนตัว ฿590/ปี เปิดให้ลูกค้าเห็นหรือยัง — เปิด (true) เมื่อ ops พร้อมจริง:
+ *  ตั้ง DNS cname.shopdashth.com + ทดสอบ flow กับโดเมนจริง 1 อันตาม DEPLOYMENT §โดเมนลูกค้า
+ *  (ปิดอยู่ = ซ่อนเมนู "โดเมน" ฝั่งร้าน + FAQ/bullet บน landing — คิว Super Admin ยังอยู่) */
+export const DOMAIN_SERVICE_OPEN = false;
+
+/** โฆษณา "ตรวจสลิปอัตโนมัติ" ได้หรือยัง — ยังเป็น MockSlipVerifier (DEPLOYMENT §6)
+ *  ห้ามเปิดจนกว่าจะเสียบ provider ตรวจสลิปจริง */
+export const SLIP_VERIFY_OPEN = false;

@@ -5,6 +5,7 @@
 - Last session: 2026-07-17
 
 ## Done (Phase 7 ต่อ — ช่วงเปิดตัวใช้ฟรี ไม่จำกัดเวลา, 2026-07-17 ตามคำสั่งเจ้าของ)
+- [x] **ซ่อนของที่ยังไม่ใช้ (เจ้าของสั่ง "แค่ปิดไม่ให้แสดง ห้ามเอาออก")** — flag เพิ่มใน `lib/free-launch.ts`: `SHOW_PRICING` (ซ่อน section ราคา landing + ลิงก์ nav/footer + FAQ ราคา + ตัวเลขเงินหน้า signup → "ฟรีช่วงเปิดตัว" + บล็อกจ่ายเงิน/ประวัติชำระหน้า "แพลนของฉัน" → การ์ด "ใช้ฟรีทุกฟีเจอร์ เปลี่ยนแพลนติดต่อทีมงาน"), `DOMAIN_SERVICE_OPEN=false` (ซ่อนเมนู "โดเมน" ฝั่งร้าน → หน้า "เร็วๆ นี้", FAQ/bullet โดเมนบน landing — เปิดเมื่อ ops พร้อม: cname + ทดสอบโดเมนจริง), `SLIP_VERIFY_OPEN=false` (ไม่โฆษณา "ตรวจสลิปอัตโนมัติ" จนกว่าจะเสียบ provider จริง) — คิว Super Admin ทุกตัวคงเดิม
 - [x] **โจทย์**: เอา trial 7 วันออก ให้ใช้ฟรีไปก่อนเพื่อหาบั๊ก/ปัญหา จนกว่าระบบจะนิ่ง
 - [x] สวิตช์เดียว `lib/free-launch.ts` (`FREE_LAUNCH = true`) — ระบบ trial/cron ล็อกร้านไม่ถูกรื้อ แค่ปิดไว้: signup ใหม่ได้ `trial_ends_at = null`, cron `subscription-sweep` no-op ทั้งตัว (ไม่มีร้านโดน grace/locked/archived), copy ทุกจุดสลับตาม flag (landing/signup/terms/หน้าแพลนของฉัน/LINE notify/เมนู nav)
 - [x] `supabase/migrations/018_free_launch.sql` — ร้าน trial เดิม `trial_ends_at = null` (แบนเนอร์นับถอยหลังหาย) + ปลดล็อกร้านที่โดนล็อกเพราะ trial หมดโดยไม่เคยมี subscription — **รอเจ้าของรันใน SQL Editor**
