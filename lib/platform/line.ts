@@ -63,7 +63,7 @@ export async function notifyPlatformNewTenant(args: {
 }): Promise<void> {
   await sendPlatformLineMessage(
     'new_tenant',
-    `🎉 ร้านใหม่สมัคร ShopDash\nร้าน: ${args.storeName}\nโดเมน: ${args.slug}\nแพลน: ${args.planName}\nอีเมล: ${args.email}\n(trial 7 วันเริ่มนับแล้ว)`,
+    `🎉 ร้านใหม่สมัคร ShopDash\nร้าน: ${args.storeName}\nโดเมน: ${args.slug}\nแพลน: ${args.planName}\nอีเมล: ${args.email}\n(ช่วงเปิดตัว — ใช้ฟรีไม่จำกัดเวลา)`,
   );
 }
 

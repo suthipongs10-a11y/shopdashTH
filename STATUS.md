@@ -4,6 +4,13 @@
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-17
 
+## Done (Phase 7 ต่อ — ช่วงเปิดตัวใช้ฟรี ไม่จำกัดเวลา, 2026-07-17 ตามคำสั่งเจ้าของ)
+- [x] **โจทย์**: เอา trial 7 วันออก ให้ใช้ฟรีไปก่อนเพื่อหาบั๊ก/ปัญหา จนกว่าระบบจะนิ่ง
+- [x] สวิตช์เดียว `lib/free-launch.ts` (`FREE_LAUNCH = true`) — ระบบ trial/cron ล็อกร้านไม่ถูกรื้อ แค่ปิดไว้: signup ใหม่ได้ `trial_ends_at = null`, cron `subscription-sweep` no-op ทั้งตัว (ไม่มีร้านโดน grace/locked/archived), copy ทุกจุดสลับตาม flag (landing/signup/terms/หน้าแพลนของฉัน/LINE notify/เมนู nav)
+- [x] `supabase/migrations/018_free_launch.sql` — ร้าน trial เดิม `trial_ends_at = null` (แบนเนอร์นับถอยหลังหาย) + ปลดล็อกร้านที่โดนล็อกเพราะ trial หมดโดยไม่เคยมี subscription — **รอเจ้าของรันใน SQL Editor**
+- [x] วิธีปิดช่วงฟรี (กลับมาเก็บเงิน) เขียนไว้ในคอมเมนต์หัวไฟล์ `lib/free-launch.ts`: ตั้ง flag = false + ตั้งเส้นตายใหม่ให้ร้านที่ trial_ends_at เป็น null (มี SQL ตัวอย่างให้)
+- [x] `tsc --noEmit` + `npm run build` ผ่าน
+
 ## Done (Phase 7 ต่อ — บริการโดเมนส่วนตัว ฿590/ปี แอดมินจัดการให้, 2026-07-17 ตามคำสั่งเจ้าของ)
 - [x] **โจทย์**: flow custom domain เดิมให้ลูกค้าตั้ง DNS เอง (ใช้จริงไม่ได้เพราะยังต้อง add โดเมนเข้า Vercel มือ + ยังไม่เคยทดสอบโดเมนจริง) — เจ้าของสั่งเปลี่ยนเป็น "ลูกค้าส่งชื่อโดเมนมา ทีมงานจัดการให้ คิด ฿590/ปี (จดใหม่รวมค่าโดเมนปีแรก + ต่ออายุรายปี)"
 - [x] `supabase/migrations/017_domain_requests.sql` — ตาราง `domain_requests` (state: awaiting_payment→slip_uploaded→in_progress→completed/rejected/cancelled) + RLS (super all / tenant read self) + `custom_domains.managed` + `service_ends_at` — **เจ้าของรันแล้ว 2026-07-17** (บทเรียน: policy ต้องอ้าง `public.is_super_admin()`/`public.app_tenant_id()` — helper อยู่ schema public ไม่ใช่ auth.* ตามเอกสาร §3.2 เพราะ Supabase ห้ามสร้างฟังก์ชันใน schema auth)

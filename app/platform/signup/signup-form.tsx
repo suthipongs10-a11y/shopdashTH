@@ -147,7 +147,7 @@ export function SignupForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">เลือกแพลน (ทดลองฟรี 7 วัน)</p>
+        <p className="mb-2 text-sm font-medium text-gray-700">เลือกแพลน (ช่วงเปิดตัวใช้ฟรีทุกแพลน)</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {plans.map((plan) => (
             <label

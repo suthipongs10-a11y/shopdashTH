@@ -1,6 +1,7 @@
 // หน้า "แพลนของฉัน" (§2.3 [P3]) — แพลนปัจจุบัน, วันหมดอายุ, จ่ายค่าแพลน/ขออัปเกรด
 // ผ่าน PromptPay QR "ของแพลตฟอร์ม" + อัปสลิป (§5.3 ข้อ 9–10) — เข้าได้แม้ร้าน locked
 
+import { FREE_LAUNCH } from '@/lib/free-launch';
 import Link from 'next/link';
 import { computePlanCharge, isRenewalTenant, type PlanChargeInfo } from '@/lib/billing';
 import { formatBaht, formatThaiDate, formatThaiDateTime } from '@/lib/format';
@@ -49,7 +50,9 @@ interface SubHistoryRow {
 const STATUS_NOTICE: Record<string, { tone: string; text: string }> = {
   trial: {
     tone: 'border-indigo-100 bg-indigo-50 text-indigo-700',
-    text: 'ร้านอยู่ในช่วงทดลองใช้ — ชำระค่าแพลนด้านล่างเพื่อใช้งานต่อหลังหมดช่วงทดลอง',
+    text: FREE_LAUNCH
+      ? 'ช่วงเปิดตัว — ใช้งานได้ฟรีเต็มระบบ ไม่จำกัดเวลา ยังไม่ต้องชำระค่าแพลน (เริ่มเก็บเมื่อไหร่ทีมงานจะแจ้งล่วงหน้า)'
+      : 'ร้านอยู่ในช่วงทดลองใช้ — ชำระค่าแพลนด้านล่างเพื่อใช้งานต่อหลังหมดช่วงทดลอง',
   },
   grace: {
     tone: 'border-amber-200 bg-amber-50 text-amber-800',
@@ -140,7 +143,9 @@ export default async function MyPlanPage({
         </p>
         <p className="mt-1 text-sm font-medium text-gray-600">
           {ctx.status === 'trial'
-            ? `ช่วงทดลองใช้ถึง ${expiry ? formatThaiDate(expiry) : '-'}`
+            ? expiry
+              ? `ช่วงทดลองใช้ถึง ${formatThaiDate(expiry)}`
+              : 'ช่วงเปิดตัว — ใช้ฟรี ไม่จำกัดเวลา'
             : `ใช้งานได้ถึง ${expiry ? formatThaiDate(expiry) : '-'}`}
         </p>
       </section>

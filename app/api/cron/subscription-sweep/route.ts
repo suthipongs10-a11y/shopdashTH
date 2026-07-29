@@ -6,6 +6,7 @@
 // เรียกโดย Vercel Cron: GET พร้อม Authorization: Bearer {CRON_SECRET}
 
 import { NextResponse, type NextRequest } from 'next/server';
+import { FREE_LAUNCH } from '@/lib/free-launch';
 import { logTenantEvent } from '@/lib/platform/tenant-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { invalidateTenantCache } from '@/lib/tenant-context';
@@ -31,6 +32,11 @@ export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret || auth !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  // ช่วงเปิดตัวใช้ฟรี (lib/free-launch.ts): ไม่เดิน state machine เลย — ไม่มีร้านโดนล็อก/หมดอายุ
+  if (FREE_LAUNCH) {
+    return NextResponse.json({ ok: true, skipped: 'free_launch' });
   }
 
   const db = createAdminClient();

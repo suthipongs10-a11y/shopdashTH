@@ -2,6 +2,7 @@
 // ทุก step เขียน provisioning_logs / step ใด fail → rollback ทุกอย่างที่สร้างไปแล้ว (ข้อ 8)
 // supabase-js ไม่มี transaction ข้าม Auth+DB จึงใช้ compensation แบบเดียวกับ stock (DECISIONS)
 
+import { FREE_LAUNCH } from '@/lib/free-launch';
 import 'server-only';
 import { logTenantEvent } from '@/lib/platform/tenant-admin';
 import { seedStarterPack } from '@/lib/starter-pack';
@@ -127,8 +128,10 @@ export async function provisionTenant(input: ProvisionInput): Promise<ProvisionR
   userId = created.user.id;
   await logTenantEvent(null, 'provision:auth_user', 'ok', { slug, user_id: userId });
 
-  // ---------- step 4: INSERT tenants (trial 7 วัน) ----------
-  const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  // ---------- step 4: INSERT tenants (trial 7 วัน — ช่วงเปิดตัวใช้ฟรีไม่มีวันหมด) ----------
+  const trialEndsAt = FREE_LAUNCH
+    ? null
+    : new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
   const { data: tenant, error: tenantError } = await db
     .from('tenants')
     .insert({ slug, plan_id: planId, status: 'trial', trial_ends_at: trialEndsAt })

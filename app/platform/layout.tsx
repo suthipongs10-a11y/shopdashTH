@@ -19,11 +19,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(`https://${ROOT_DOMAIN}`),
   title: 'ShopDash — เปิดร้านออนไลน์ของคุณเอง รับเงินเข้าบัญชีร้านเต็มจำนวน',
   description:
-    'ระบบร้านค้าออนไลน์สำหรับร้านค้าไทย — หน้าร้านสวยพร้อมใช้ รับชำระผ่าน PromptPay เข้าบัญชีร้านโดยตรง ไม่หักค่าคอมต่อออร์เดอร์ จัดการสินค้า สต๊อก และออร์เดอร์ในที่เดียว ทดลองฟรี 7 วัน',
+    'ระบบร้านค้าออนไลน์สำหรับร้านค้าไทย — หน้าร้านสวยพร้อมใช้ รับชำระผ่าน PromptPay เข้าบัญชีร้านโดยตรง ไม่หักค่าคอมต่อออร์เดอร์ จัดการสินค้า สต๊อก และออร์เดอร์ในที่เดียว ช่วงเปิดตัวใช้ฟรี',
   openGraph: {
     title: 'ShopDash — เปิดร้านออนไลน์ของคุณเอง',
     description:
-      'หน้าร้านสวยพร้อมใช้ + PromptPay เข้าบัญชีร้านโดยตรง ไม่หักค่าคอมต่อออร์เดอร์ ทดลองฟรี 7 วัน',
+      'หน้าร้านสวยพร้อมใช้ + PromptPay เข้าบัญชีร้านโดยตรง ไม่หักค่าคอมต่อออร์เดอร์ ช่วงเปิดตัวใช้ฟรี',
     type: 'website',
     locale: 'th_TH',
   },
@@ -63,7 +63,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
               href="/signup"
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
             >
-              เปิดร้านฟรี 7 วัน
+              เปิดร้านฟรี
             </Link>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
             <ul className="mt-3 space-y-2 text-sm text-slate-500">
               <li>
                 <Link href="/signup" className="hover:text-slate-900">
-                  เปิดร้านใหม่ (ฟรี 7 วัน)
+                  เปิดร้านใหม่ (ฟรี)
                 </Link>
               </li>
               <li>

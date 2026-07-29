@@ -25,7 +25,7 @@ export default async function SignupPage({
     <div className="mx-auto max-w-xl px-4 py-12">
       <h1 className="text-2xl font-bold text-gray-900">เปิดร้านใหม่</h1>
       <p className="mt-2 text-sm text-gray-500">
-        ทดลองใช้ฟรี 7 วันทุกแพลน — ระหว่างทดลองใช้ ชำระค่าแพลนได้จากหน้า &ldquo;แพลนของฉัน&rdquo;
+        ช่วงเปิดตัวใช้ฟรีทุกแพลน ไม่จำกัดเวลา — เมื่อเริ่มเก็บค่าบริการ ทีมงานจะแจ้งล่วงหน้าและชำระได้จากหน้า &ldquo;แพลนของฉัน&rdquo;
         ในหลังร้าน
       </p>
       <div className="mt-8">

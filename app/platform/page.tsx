@@ -2,6 +2,7 @@
 // เนื้อหาราคาอ่านจากตาราง plans (is_active) เสมอ — แก้ราคาจาก Super Admin แล้วหน้านี้เปลี่ยนตาม
 // ภาพเทมเพลตใน public/marketing/templates/* = screenshot ของร้านเดโม่จริง (ไม่ใช่ mockup)
 
+import { FREE_LAUNCH } from '@/lib/free-launch';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -153,7 +154,7 @@ const STEPS = [
   {
     n: '1',
     title: 'สมัครและเลือกแพ็กเกจ',
-    desc: 'ตั้งชื่อร้านกับที่อยู่เว็บของคุณ เช่น baannoi.' + ROOT_DOMAIN + ' — ใช้งานได้ทันที ทดลองฟรี 7 วัน ยังไม่ต้องจ่าย',
+    desc: 'ตั้งชื่อร้านกับที่อยู่เว็บของคุณ เช่น baannoi.' + ROOT_DOMAIN + (FREE_LAUNCH ? ' — ใช้งานได้ทันที ช่วงเปิดตัวใช้ฟรี ไม่จำกัดเวลา' : ' — ใช้งานได้ทันที ทดลองฟรี 7 วัน ยังไม่ต้องจ่าย'),
   },
   {
     n: '2',
@@ -174,7 +175,9 @@ const FAQ = [
   },
   {
     q: 'จ่ายค่าแพ็กเกจอย่างไร?',
-    a: 'สมัครแล้วใช้งานได้ทันที 7 วันแบบไม่ต้องจ่าย เมื่อพอใจให้เข้าหน้า "แพ็กเกจของฉัน" ในหลังร้าน สแกน QR พร้อมเพย์แล้วอัปโหลดสลิป ทีมงานอนุมัติแล้วร้านจะเปิดใช้งานเต็มปี',
+    a: FREE_LAUNCH
+      ? 'ช่วงเปิดตัวนี้สมัครแล้วใช้งานได้ฟรีทุกฟีเจอร์ ไม่จำกัดเวลา — เมื่อเริ่มเก็บค่าบริการทีมงานจะแจ้งล่วงหน้า และชำระได้จากหน้า "แพ็กเกจของฉัน" ในหลังร้าน (สแกน QR พร้อมเพย์ + อัปโหลดสลิป)'
+      : 'สมัครแล้วใช้งานได้ทันที 7 วันแบบไม่ต้องจ่าย เมื่อพอใจให้เข้าหน้า "แพ็กเกจของฉัน" ในหลังร้าน สแกน QR พร้อมเพย์แล้วอัปโหลดสลิป ทีมงานอนุมัติแล้วร้านจะเปิดใช้งานเต็มปี',
   },
   {
     q: 'ปีถัดไปจ่ายเท่าไร?',
@@ -310,7 +313,7 @@ export default async function PlatformLandingPage() {
         <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 lg:grid-cols-2 lg:items-center lg:py-24">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
-              สำหรับร้านค้าไทย · ทดลองฟรี 7 วัน
+              สำหรับร้านค้าไทย · {FREE_LAUNCH ? 'ช่วงเปิดตัวใช้ฟรี ไม่จำกัดเวลา' : 'ทดลองฟรี 7 วัน'}
             </span>
             <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl">
               เปิดร้านออนไลน์ของคุณเอง
@@ -328,7 +331,7 @@ export default async function PlatformLandingPage() {
                 href="/signup"
                 className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
               >
-                เริ่มเปิดร้านฟรี 7 วัน
+                เริ่มเปิดร้านฟรี{FREE_LAUNCH ? '' : ' 7 วัน'}
               </Link>
               <a
                 href="#templates"
@@ -514,7 +517,7 @@ export default async function PlatformLandingPage() {
             </h2>
             <p className="mt-3 leading-relaxed text-slate-600">
               ปีแรกรวมค่าจัดทำระบบและตั้งค่าร้านให้ ปีถัดไปจ่ายเพียงค่าดูแลรายปี
-              ทุกแพ็กเกจทดลองใช้ฟรี 7 วันก่อนตัดสินใจ
+              {FREE_LAUNCH ? 'ช่วงเปิดตัว: ทุกแพ็กเกจใช้ฟรี ไม่จำกัดเวลา' : 'ทุกแพ็กเกจทดลองใช้ฟรี 7 วันก่อนตัดสินใจ'}
             </p>
           </div>
 
@@ -619,13 +622,13 @@ export default async function PlatformLandingPage() {
             เปิดร้านวันนี้ ขายได้ตั้งแต่วันนี้
           </h2>
           <p className="mt-4 leading-relaxed text-slate-300">
-            ทดลองใช้ฟรี 7 วันแบบเต็มระบบ ไม่ต้องผูกบัตร ถ้าไม่ชอบก็หยุดได้เลย
+            {FREE_LAUNCH ? 'ช่วงเปิดตัวใช้ฟรีแบบเต็มระบบ ไม่จำกัดเวลา ไม่ต้องผูกบัตร' : 'ทดลองใช้ฟรี 7 วันแบบเต็มระบบ ไม่ต้องผูกบัตร ถ้าไม่ชอบก็หยุดได้เลย'}
           </p>
           <Link
             href="/signup"
             className="mt-8 inline-block rounded-lg bg-white px-7 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100"
           >
-            เริ่มเปิดร้านฟรี 7 วัน
+            เริ่มเปิดร้านฟรี{FREE_LAUNCH ? '' : ' 7 วัน'}
           </Link>
         </div>
       </section>
