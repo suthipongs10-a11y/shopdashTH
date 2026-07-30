@@ -3,9 +3,11 @@
 // ค้นหาออร์เดอร์สำหรับลูกค้า — ต้องกรอก เลขออร์เดอร์ + เบอร์โทร ตรงกันทั้งคู่
 // (§2.1 — กัน enumeration) ตอบ "ไม่พบ" แบบเดียวกันทุกกรณี ไม่บอกว่าผิดช่องไหน
 
+import { headers } from 'next/headers';
 import type { TrackedOrder } from '@/components/storefront/types';
 import { trackingUrl } from '@/lib/carriers';
 import type { Carrier, OrderStatus } from '@/lib/orders/status';
+import { isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext } from '@/lib/tenant-context';
 
@@ -24,6 +26,13 @@ export async function trackOrder(_prevState: TrackState, formData: FormData): Pr
 
   if (!orderNumber || !phone) {
     return { error: 'กรุณากรอกเลขออร์เดอร์และเบอร์โทรศัพท์', searched: true, orderNumber, phone };
+  }
+
+  // กันยิงรัวไล่เดาคู่ เลขออร์เดอร์+เบอร์โทร (key ร่วมกับ /api/orders/status — ผิวเดียวกัน)
+  const fwd = (await headers()).get('x-forwarded-for');
+  const ip = fwd ? fwd.split(',')[0].trim() : 'unknown';
+  if (await isRateLimited(`track:${ip}`, 15, 60_000)) {
+    return { error: RATE_LIMIT_MESSAGE, searched: true, orderNumber, phone };
   }
 
   const ctx = await getTenantContext();

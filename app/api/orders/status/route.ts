@@ -4,10 +4,16 @@
 
 import { NextResponse } from 'next/server';
 import { trackingUrl } from '@/lib/carriers';
+import { clientIp, isRateLimited, RATE_LIMIT_MESSAGE } from '@/lib/rate-limit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, TenantLockedError, TenantNotFoundError } from '@/lib/tenant-context';
 
 export async function GET(req: Request): Promise<NextResponse> {
+  // key `track:` ร่วมกับ server action หน้า /track — งบเดารวมกันทั้งสองช่องทาง
+  if (await isRateLimited(`track:${clientIp(req)}`, 15, 60_000)) {
+    return NextResponse.json({ found: false, error: RATE_LIMIT_MESSAGE }, { status: 429 });
+  }
+
   const url = new URL(req.url);
   const orderNumber = (url.searchParams.get('num') ?? '').trim().toUpperCase();
   const phone = (url.searchParams.get('phone') ?? '').trim();
