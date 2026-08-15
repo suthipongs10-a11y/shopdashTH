@@ -9,7 +9,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.scripts.json",
     "verify:render": "node scripts/verify-render.mjs",
-    "test": "node --experimental-strip-types scripts/test-timeline.ts"
+    "test": "node --experimental-strip-types scripts/test-timeline.ts",
+    "test:ui": "node scripts/test-ui.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",

@@ -7,6 +7,8 @@ export interface RenderedClip {
   id: string;
   /** ลำดับ hook ที่ใช้เรนเดอร์คลิปนี้ (เริ่มที่ 0) */
   hookIndex: number;
+  /** ตั้งชื่อไว้ตั้งแต่ตอนเรนเดอร์ เพื่อไม่ให้เปลี่ยนตามชื่อสินค้าที่แก้ทีหลัง และไม่ชนกันเอง */
+  fileName: string;
   labelTh: string;
   hookText: string;
   blob: Blob;
@@ -17,6 +19,7 @@ export interface RenderedClip {
 
 export function RenderPanel({
   supportReason,
+  musicAllowed,
   busy,
   progressLabel,
   progressRatio,
@@ -34,6 +37,8 @@ export function RenderPanel({
   onDownloadAll,
 }: {
   supportReason: string | null;
+  /** สูตร voice-only ไม่รับเพลงประกอบ */
+  musicAllowed: boolean;
   busy: boolean;
   progressLabel: string;
   progressRatio: number;
@@ -77,7 +82,12 @@ export function RenderPanel({
         </label>
 
         <div className="flex items-center gap-2 rounded-lg border border-[var(--color-line)] bg-[var(--color-panel-2)] px-3 py-2.5 text-xs">
-          {musicName ? (
+          {!musicAllowed ? (
+            <span className="text-[var(--color-muted)]">
+              สูตรนี้ใช้เสียงพูดล้วน ไม่ใส่เพลง
+              <span className="mt-0.5 block text-[10px]">คลิปที่ชนะในข้อมูลไม่มีเพลงประกอบสักตัว</span>
+            </span>
+          ) : musicName ? (
             <>
               <span className="min-w-0 flex-1 truncate">🎵 {musicName}</span>
               <button type="button" onClick={onClearMusic} className="flex-none text-[var(--color-danger)]">
@@ -106,7 +116,7 @@ export function RenderPanel({
         </div>
       </div>
 
-      <p className="text-[11px] leading-relaxed text-[var(--color-muted)]">
+      <p className={`text-[11px] leading-relaxed text-[var(--color-muted)] ${musicAllowed ? '' : 'hidden'}`}>
         ใช้เพลงจากคลังเพลงเชิงพาณิชย์ของแพลตฟอร์มเท่านั้น — เพลงลิขสิทธิ์ทั่วไปจะทำให้คลิปถูกปิดเสียงหรือถูกจำกัดการมองเห็น
       </p>
 

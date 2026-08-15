@@ -35,6 +35,19 @@ export async function requestScript(args: {
   return data.script;
 }
 
+/** วางข้อความที่ copy จากแอปช้อปปิ้ง แล้วให้ Gemini แยกฟิลด์ให้ */
+export async function requestParse(raw: string, signal?: AbortSignal): Promise<ProductInput> {
+  const res = await fetch('/api/parse', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ raw }),
+    signal,
+  });
+  if (!res.ok) throw new Error(await readError(res));
+  const data = (await res.json()) as { product: ProductInput };
+  return data.product;
+}
+
 export async function requestVoiceLine(args: {
   text: string;
   voiceName: string;

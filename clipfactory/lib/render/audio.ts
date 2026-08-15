@@ -36,8 +36,11 @@ export async function buildMixedAudio(args: {
   voice: VoiceSegment[];
   music?: AudioBuffer | null;
   musicGain?: number;
+  /** สูตร voice-only ชนะด้วยเสียงพูดล้วน — ห้ามผสมเพลงแม้ผู้ใช้จะแนบไฟล์มา */
+  allowMusic?: boolean;
 }): Promise<AudioBuffer | null> {
-  const { timeline, voice, music } = args;
+  const { timeline, voice } = args;
+  const music = args.allowMusic === false ? null : (args.music ?? null);
   if (!voice.length && !music) return null;
 
   const totalSec = Math.max(0.5, timeline.totalSec);

@@ -32,10 +32,8 @@ function linesOf(script: GeneratedScript, hookIndex: number, template: FormatTem
       key: voiceKey('scene', i),
     })),
   ];
-  // สูตรที่ไม่มีเสียงพูดไม่ต้องมีซีน CTA แยก เพราะไม่มีเวลาให้อ่าน
-  if (template.audio !== 'music-only') {
-    out.push({ kind: 'cta', caption: script.cta, fallbackSec: 2, key: voiceKey('cta') });
-  }
+  // ทุกสูตรต้องมี CTA บนจอ — สูตรที่ไม่มีเสียงพูดก็แค่ไม่มีเสียงอ่าน แต่ข้อความยังต้องขึ้น
+  out.push({ kind: 'cta', caption: script.cta, fallbackSec: 2, key: voiceKey('cta') });
   return out;
 }
 

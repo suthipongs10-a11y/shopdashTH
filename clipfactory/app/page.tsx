@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ProductForm } from '@/components/ProductForm';
+import { PasteImport } from '@/components/PasteImport';
+import { JobLibrary } from '@/components/JobLibrary';
+import { buildShotList } from '@/components/ScriptExport';
 import { TemplatePicker } from '@/components/TemplatePicker';
 import { ScriptPanel } from '@/components/ScriptPanel';
 import { VoicePanel } from '@/components/VoicePanel';
@@ -9,11 +12,28 @@ import { AssetPanel, type Asset } from '@/components/AssetPanel';
 import { PreviewStage, type VoiceCue } from '@/components/PreviewStage';
 import { RenderPanel, type RenderedClip } from '@/components/RenderPanel';
 import { ErrorNote, Pill, Section } from '@/components/ui';
-import { downloadBlob, requestScript, revokeSegments, safeFilename, synthesizeLines } from '@/lib/client-api';
+import {
+  downloadBlob,
+  requestParse,
+  requestScript,
+  revokeSegments,
+  safeFilename,
+  synthesizeLines,
+} from '@/lib/client-api';
+import {
+  clearDraft,
+  deleteJob as removeJob,
+  loadDraft,
+  loadJobs,
+  saveDraft,
+  saveJob,
+  type JobDraft,
+  type SavedJob,
+} from '@/lib/storage';
 import { buildMixedAudio, decodeAudio } from '@/lib/render/audio';
 import { checkSupport, renderClip } from '@/lib/render/encode';
 import { buildTimeline, voiceLines } from '@/lib/render/timeline';
-import { TEMPLATES } from '@/lib/templates';
+import { clampDuration, durationRange, TEMPLATES } from '@/lib/templates';
 import {
   DEFAULT_RENDER,
   DEFAULT_THEME,
@@ -67,6 +87,12 @@ export default function StudioPage() {
   const [renderRatio, setRenderRatio] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
 
+  const [jobs, setJobs] = useState<SavedJob[]>([]);
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState('');
+  const [parseBusy, setParseBusy] = useState(false);
+  const [restored, setRestored] = useState(false);
+
   const [error, setError] = useState('');
   const [warning, setWarning] = useState('');
   const [hasKey, setHasKey] = useState<boolean | null>(null);
@@ -75,6 +101,23 @@ export default function StudioPage() {
 
   useEffect(() => {
     setSupport(checkSupport());
+    setJobs(loadJobs());
+
+    const draft = loadDraft();
+    if (draft && draft.product?.name) {
+      setProduct(draft.product);
+      setPlatform(draft.platform);
+      setTargetSec(draft.targetSec);
+      setScript(draft.script);
+      setHookIndex(draft.hookIndex);
+      setVoiceName(draft.voiceName);
+      setStyleId(draft.styleId);
+      if (draft.templateId) {
+        const t = TEMPLATES.find((x) => x.id === draft.templateId);
+        if (t) setTemplate(t);
+      }
+      setRestored(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -105,6 +148,27 @@ export default function StudioPage() {
       clearVoice();
     }
   }, [voiceName, styleId, clearVoice]);
+
+  const draft = useMemo<JobDraft>(
+    () => ({
+      product,
+      templateId: template?.id ?? null,
+      platform,
+      targetSec,
+      script,
+      hookIndex,
+      voiceName,
+      styleId,
+    }),
+    [product, template?.id, platform, targetSec, script, hookIndex, voiceName, styleId],
+  );
+
+  // บันทึกงานที่ค้างอยู่แบบหน่วงเวลา กันเขียน localStorage ถี่เกินไปตอนพิมพ์
+  useEffect(() => {
+    if (!draft.product.name.trim()) return;
+    const id = setTimeout(() => saveDraft(draft), 800);
+    return () => clearTimeout(id);
+  }, [draft]);
 
   const audioless = template?.audio === 'music-only';
   const hasCta = Boolean(template && template.audio !== 'music-only');
@@ -148,11 +212,72 @@ export default function StudioPage() {
   // ── ขั้นที่ 2: เลือกสูตร
   const selectTemplate = useCallback((t: FormatTemplate) => {
     setTemplate(t);
-    setTargetSec(t.targetSec);
+    setTargetSec(clampDuration(t, platform, t.targetSec));
     setScript(null);
     setHookIndex(0);
     clearVoice();
+  }, [clearVoice, platform]);
+
+  const importPasted = useCallback(async (raw: string) => {
+    setError('');
+    setParseBusy(true);
+    try {
+      const p = await requestParse(raw);
+      setProduct((prev) => ({
+        ...prev,
+        ...p,
+        sellingPoints: p.sellingPoints.length ? p.sellingPoints : prev.sellingPoints,
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'แยกข้อมูลสินค้าไม่สำเร็จ');
+    } finally {
+      setParseBusy(false);
+    }
+  }, []);
+
+  const saveCurrent = useCallback(() => {
+    const res = saveJob(draft, currentJobId ?? undefined);
+    setJobs(res.jobs);
+    setCurrentJobId(res.id);
+    setSaveError(res.ok ? '' : 'บันทึกไม่สำเร็จ — พื้นที่เก็บข้อมูลของเบราว์เซอร์อาจเต็ม');
+  }, [draft, currentJobId]);
+
+  const loadJob = useCallback(
+    (job: SavedJob) => {
+      clearVoice();
+      setProduct(job.product);
+      setPlatform(job.platform);
+      setTargetSec(job.targetSec);
+      setScript(job.script);
+      setHookIndex(job.hookIndex);
+      setVoiceName(job.voiceName);
+      setStyleId(job.styleId);
+      setTemplate(job.templateId ? (TEMPLATES.find((t) => t.id === job.templateId) ?? null) : null);
+      setCurrentJobId(job.id);
+      setRestored(false);
+      setWarning('');
+    },
+    [clearVoice],
+  );
+
+  const startNew = useCallback(() => {
+    clearVoice();
+    setProduct(EMPTY_PRODUCT);
+    setTemplate(null);
+    setScript(null);
+    setHookIndex(0);
+    setCurrentJobId(null);
+    setRestored(false);
+    setWarning('');
+    clearDraft();
   }, [clearVoice]);
+
+  const exportShotList = useCallback(() => {
+    if (!script || !template) return;
+    const text = buildShotList({ productName: product.name, template, script, hookIndex, timeline });
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    downloadBlob(blob, safeFilename(product.name, 'script').replace(/\.mp4$/, '.txt'));
+  }, [script, template, product.name, hookIndex, timeline]);
 
   // ── ขั้นที่ 3: สร้างสคริปต์
   const generateScript = useCallback(async () => {
@@ -326,6 +451,7 @@ export default function StudioPage() {
         timeline: variantTimeline,
         voice: variantVoice,
         music: music?.buffer ?? null,
+        allowMusic: template.audio !== 'voice-only',
       });
 
       const { blob, warningTh } = await renderClip({
@@ -342,9 +468,11 @@ export default function StudioPage() {
       });
       if (warningTh) setWarning(warningTh);
 
+      const stamp = new Date().toLocaleTimeString('en-GB', { hour12: false }).replace(/:/g, '');
       return {
         id: `${Date.now()}-${index}`,
         hookIndex: index,
+        fileName: safeFilename(product.name, `hook${index + 1}-${stamp}`),
         labelTh: `${template.nameTh} · hook ${index + 1}`,
         hookText: script.hooks[index] ?? '',
         blob,
@@ -377,8 +505,10 @@ export default function StudioPage() {
       setRenderBusy(true);
       setRenderRatio(0);
 
-      // สูตรที่ต้องมีเสียงพูด แต่ยังไม่ได้สร้างเสียง — เตือนก่อนได้คลิปเงียบไปโดยไม่รู้ตัว
-      if (template.audio !== 'music-only' && bodyVoice.length === 0) {
+      // เตือนก่อนได้คลิปเงียบไปโดยไม่รู้ตัว
+      if (template.audio === 'music-only' && !music) {
+        setWarning('สูตรนี้ใช้เพลงเป็นเสียงทั้งหมด แต่ยังไม่ได้แนบไฟล์เพลง — คลิปที่ได้จะเงียบสนิท');
+      } else if (template.audio !== 'music-only' && bodyVoice.length === 0) {
         setWarning('ยังไม่ได้สร้างเสียงพากย์ในขั้นที่ 4 — คลิปที่ได้จะมีแต่ภาพและข้อความ ไม่มีเสียงพูด');
       }
 
@@ -405,7 +535,7 @@ export default function StudioPage() {
         abortRef.current = null;
       }
     },
-    [renderOne, script, template, bodyVoice.length],
+    [renderOne, script, template, bodyVoice.length, music],
   );
 
   const canScript = product.name.trim().length > 0 && Boolean(template);
@@ -436,12 +566,23 @@ export default function StudioPage() {
           <ErrorNote message="ยังไม่ได้ตั้งค่า GEMINI_API_KEY — คัดลอกไฟล์ .env.example เป็น .env.local แล้วใส่คีย์จาก aistudio.google.com/apikey ก่อนใช้งาน" />
         ) : null}
         {!support.ok ? <ErrorNote message={support.reasonTh!} /> : null}
+        {restored ? (
+          <div className="mt-3 flex items-start justify-between gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-panel)] px-3 py-2.5 text-xs text-[var(--color-ink-soft)]">
+            <span>กู้คืนงานที่ค้างไว้ให้แล้ว — เสียงพากย์และรูปต้องทำใหม่</span>
+            <button type="button" onClick={() => setRestored(false)} className="flex-none font-bold" aria-label="ปิด">
+              ✕
+            </button>
+          </div>
+        ) : null}
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="grid gap-5">
           <Section step={1} title="ข้อมูลสินค้า" hint="ยิ่งจุดขายชัด สคริปต์ยิ่งตรง" done={product.name.trim().length > 0}>
-            <ProductForm value={product} onChange={setProduct} />
+            <div className="grid gap-4">
+              <PasteImport busy={parseBusy} onImport={importPasted} />
+              <ProductForm value={product} onChange={setProduct} />
+            </div>
           </Section>
 
           <Section
@@ -479,7 +620,12 @@ export default function StudioPage() {
           <Section
             step={3}
             title="สคริปต์และ hook"
-            hint={template ? `สูตรนี้ยาว ${template.durationSec[0]}–${template.durationSec[1]} วินาที` : undefined}
+            hint={
+              template
+                ? `สูตรนี้ยาว ${durationRange(template, platform)[0]}–${durationRange(template, platform)[1]} วินาที` +
+                  (platform === 'shopee' ? ' (Shopee แนะนำ 10–30 วิ)' : '')
+                : undefined
+            }
             done={Boolean(script)}
             action={
               template ? (
@@ -491,10 +637,10 @@ export default function StudioPage() {
                     id="dur"
                     type="number"
                     className="field w-16 px-2 py-1 text-xs"
-                    min={template.durationSec[0]}
-                    max={template.durationSec[1]}
+                    min={durationRange(template, platform)[0]}
+                    max={durationRange(template, platform)[1]}
                     value={targetSec}
-                    onChange={(e) => setTargetSec(Number(e.target.value))}
+                    onChange={(e) => setTargetSec(clampDuration(template, platform, Number(e.target.value)))}
                   />
                   <span className="text-[11px] text-[var(--color-muted)]">วิ</span>
                 </div>
@@ -516,6 +662,7 @@ export default function StudioPage() {
                   onHookIndex={setHookIndex}
                   onChange={updateScript}
                   audioless={Boolean(audioless)}
+                  onExport={exportShotList}
                 />
               </div>
             ) : null}
@@ -552,6 +699,7 @@ export default function StudioPage() {
           <Section step={audioless ? 5 : 6} title="เรนเดอร์และดาวน์โหลด" done={results.length > 0}>
             <RenderPanel
               supportReason={support.ok ? null : support.reasonTh!}
+              musicAllowed={template?.audio !== 'voice-only'}
               busy={renderBusy || voiceBusy}
               progressLabel={voiceBusy && !renderBusy ? 'กำลังสร้างเสียงพากย์ รอสักครู่' : renderLabel}
               progressRatio={renderRatio}
@@ -565,14 +713,9 @@ export default function StudioPage() {
               onRenderOne={() => runRender([hookIndex])}
               onRenderAll={() => runRender((script?.hooks ?? []).map((_, i) => i))}
               onCancel={() => abortRef.current?.abort()}
-              onDownload={(c) => downloadBlob(c.blob, safeFilename(product.name, `hook${c.hookIndex + 1}`))}
+              onDownload={(c) => downloadBlob(c.blob, c.fileName)}
               onDownloadAll={() =>
-                results.forEach((c, i) =>
-                  setTimeout(
-                    () => downloadBlob(c.blob, safeFilename(product.name, `hook${c.hookIndex + 1}`)),
-                    i * 350,
-                  ),
-                )
+                results.forEach((c, i) => setTimeout(() => downloadBlob(c.blob, c.fileName), i * 350))
               }
             />
           </Section>
@@ -628,6 +771,23 @@ export default function StudioPage() {
                 </div>
               </dl>
             ) : null}
+          </div>
+
+          <div className="panel mt-4 p-4">
+            <h2 className="mb-3 text-sm font-bold">งานของฉัน</h2>
+            <JobLibrary
+              jobs={jobs}
+              currentId={currentJobId}
+              canSave={product.name.trim().length > 0}
+              onSave={saveCurrent}
+              onLoad={loadJob}
+              onDelete={(id) => {
+                setJobs(removeJob(id));
+                if (id === currentJobId) setCurrentJobId(null);
+              }}
+              onNew={startNew}
+              saveError={saveError}
+            />
           </div>
         </aside>
       </div>

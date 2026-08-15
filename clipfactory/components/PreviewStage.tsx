@@ -28,6 +28,8 @@ export function PreviewStage({
   // rAF ที่ self-schedule จะจับ closure ของเฟรมที่สร้างมัน — เก็บตัวล่าสุดไว้ใน ref กันพรีวิวค้าง
   const tickRef = useRef<() => void>(() => {});
   const startedAtRef = useRef(0);
+  // จุดที่ผู้ใช้เลื่อนค้างไว้ — กดเล่นแล้วต้องเล่นต่อ ไม่ใช่เริ่มใหม่
+  const offsetRef = useRef(0);
   const audiosRef = useRef<HTMLAudioElement[]>([]);
   const firedRef = useRef<Set<number>>(new Set());
 
@@ -71,7 +73,7 @@ export function PreviewStage({
   useEffect(() => () => stop(), [stop]);
 
   const tick = useCallback(() => {
-    const elapsed = (performance.now() - startedAtRef.current) / 1000;
+    const elapsed = offsetRef.current + (performance.now() - startedAtRef.current) / 1000;
     if (elapsed >= total) {
       paint(total);
       setT(total);
@@ -81,7 +83,7 @@ export function PreviewStage({
 
     for (let i = 0; i < cues.length; i++) {
       const cue = cues[i];
-      if (!firedRef.current.has(i) && elapsed >= cue.startSec) {
+      if (!firedRef.current.has(i) && elapsed >= cue.startSec && cue.startSec >= offsetRef.current - 0.05) {
         firedRef.current.add(i);
         const audio = new Audio(cue.url);
         audio.play().catch(() => {
@@ -100,10 +102,12 @@ export function PreviewStage({
 
   const play = useCallback(() => {
     stopAudio();
+    // เลื่อนไปจนสุดแล้วกดเล่น ให้เริ่มใหม่จากต้น
+    offsetRef.current = t >= total - 0.05 ? 0 : t;
     startedAtRef.current = performance.now();
     setPlaying(true);
     rafRef.current = requestAnimationFrame(() => tickRef.current());
-  }, [stopAudio]);
+  }, [stopAudio, t, total]);
 
   return (
     <div className="grid gap-3">

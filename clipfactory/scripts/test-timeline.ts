@@ -6,7 +6,7 @@
  * เน้นกรณีที่เคยพัง: บรรทัดที่มีข้อความบนจอซ้ำกัน ต้องยังจับคู่กับเสียงถูกบรรทัด
  */
 import { buildTimeline, voiceLines } from '../lib/render/timeline.ts';
-import { getTemplate } from '../lib/templates.ts';
+import { clampDuration, durationRange, getTemplate, suggestTemplates, TEMPLATES } from '../lib/templates.ts';
 import type { GeneratedScript, VoiceSegment } from '../lib/types.ts';
 
 let failed = 0;
@@ -26,6 +26,7 @@ function script(captions: string[]): GeneratedScript {
     hooks: ['hook หนึ่ง', 'hook สอง'],
     scenes: captions.map((caption) => ({ vo: `พูดว่า ${caption}`, caption, durationSec: 2 })),
     cta: 'กดตะกร้าเลย',
+    postCaption: 'แคปชั่นทดสอบ',
     hashtags: ['ของดีบอกต่อ'],
   };
 }
@@ -71,6 +72,42 @@ console.log('\nไทม์ไลน์: ความยาวมาจากไ
   check('ช็อตต่อเนื่องไม่มีช่องว่าง', tl.shots.every((sh, i) => i === 0 || Math.abs(sh.startSec - tl.shots[i - 1].endSec) < 0.01));
 }
 
+console.log('\nCTA ต้องมีทุกสูตร');
+{
+  for (const id of ['listicle', 'beat-sync', 'trust'] as const) {
+    const t = getTemplate(id);
+    const s = script(['หนึ่ง', 'สอง']);
+    const tl = buildTimeline({ script: s, hookIndex: 0, template: t, voice: [], imageCount: 2 });
+    check(`${id}: มีช็อต CTA`, tl.shots.some((sh) => sh.kind === 'cta'));
+  }
+}
+
+console.log('\nช่วงความยาวตามแพลตฟอร์ม');
+{
+  const shopeeTemplates = TEMPLATES.filter((t) => t.platforms.includes('shopee'));
+  check(
+    'ทุกสูตรที่เปิดให้ Shopee มีช่วงความยาวที่อยู่ใน 10–30 วิได้',
+    shopeeTemplates.every((t) => {
+      const [min, max] = durationRange(t, 'shopee');
+      return min >= 10 && max <= 30 && min <= max;
+    }),
+    shopeeTemplates.map((t) => `${t.id}:${durationRange(t, 'shopee').join('-')}`).join(' '),
+  );
+  check(
+    'คุมค่าที่ผู้ใช้กรอกเกินช่วงได้',
+    clampDuration(getTemplate('listicle'), 'shopee', 999) <= 30 &&
+      clampDuration(getTemplate('listicle'), 'shopee', 1) >= 10,
+  );
+}
+
+console.log('\nหมวดสินค้าที่งานวิจัยจัดกลุ่มเดียวกัน');
+{
+  const beauty = suggestTemplates('ความงาม').slice(0, 4).map((t) => t.id);
+  const skincare = suggestTemplates('สกินแคร์').slice(0, 4).map((t) => t.id);
+  check('สกินแคร์ ได้ listicle ติดอันดับต้น เหมือน ความงาม', skincare.includes('listicle'), skincare.join(','));
+  check('ทั้งสองคำให้ชุดสูตรกลุ่มเดียวกัน', beauty[0] === skincare[0], `${beauty[0]} vs ${skincare[0]}`);
+}
+
 console.log('\nสูตรที่ไม่มีเสียงพูด (beat-sync)');
 {
   const t = getTemplate('beat-sync');
@@ -78,8 +115,9 @@ console.log('\nสูตรที่ไม่มีเสียงพูด (bea
   check('ไม่มีบรรทัดเสียงให้สร้าง', voiceLines(s, 0, t).length === 0);
 
   const tl = buildTimeline({ script: s, hookIndex: 0, template: t, voice: [], imageCount: 4 });
-  check('ไม่มีบรรทัด cta', !tl.lines.some((l) => l.key === 'cta'));
-  check('มีบรรทัด = hook + ซีน', tl.lines.length === 1 + s.scenes.length, String(tl.lines.length));
+  check('ยังมี CTA ขึ้นบนจอ แม้ไม่มีเสียงอ่าน', tl.shots.some((sh) => sh.caption === s.cta));
+  check('CTA เป็นช็อตสุดท้าย', tl.shots[tl.shots.length - 1].kind === 'cta');
+  check('มีบรรทัด = hook + ซีน + cta', tl.lines.length === 2 + s.scenes.length, String(tl.lines.length));
   check('ซอยช็อตถี่ตามจังหวะของสูตร', tl.shots.length > tl.lines.length);
   check(
     'ทุกช็อตสั้นกว่าหรือเท่าจังหวะตัดที่กำหนด',

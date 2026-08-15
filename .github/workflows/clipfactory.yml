@@ -1,0 +1,54 @@
+name: ClipFactory
+
+on:
+  push:
+    branches: ['**']
+    paths: ['clipfactory/**', '.github/workflows/clipfactory.yml']
+  pull_request:
+    paths: ['clipfactory/**', '.github/workflows/clipfactory.yml']
+
+defaults:
+  run:
+    working-directory: clipfactory
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: clipfactory/pnpm-lock.yaml
+
+      - name: ติดตั้ง dependencies
+        run: pnpm install --frozen-lockfile --ignore-workspace
+
+      - name: ตรวจชนิดข้อมูล
+        run: pnpm typecheck
+
+      - name: ทดสอบตรรกะไทม์ไลน์
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      # Chromium ของ Playwright ไม่มีตัวเข้ารหัส H.264 จึงถอยไป VP9
+      # การทดสอบยังครอบคลุมทั้งไปป์ไลน์ ตั้งแต่วาด canvas จนถึงโครงสร้างไฟล์ mp4
+      - name: ติดตั้ง Chromium สำหรับทดสอบเรนเดอร์
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: ทดสอบเรนเดอร์ (มีเสียง)
+        run: pnpm verify:render
+
+      - name: ทดสอบเรนเดอร์ (ไม่มีเสียง)
+        run: SILENT=1 pnpm verify:render
+
+      - name: ทดสอบ UI ในเบราว์เซอร์
+        run: pnpm test:ui

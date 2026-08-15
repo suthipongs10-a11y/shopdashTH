@@ -23,16 +23,23 @@ export interface Evidence {
   outlier: string;
 }
 
+/** ค่านี้วัดจากคลิปจริงในงานวิจัย หรือเป็นการอนุมานของเราเอง */
+export type Provenance = 'measured' | 'inferred';
+
 /**
  * เทมเพลตคือ "ข้อมูล" ไม่ใช่โค้ด — เพิ่ม/แก้สูตรใหม่ได้โดยไม่ต้องแตะ engine
- * ทุกค่าถอดมาจาก research/tiktok-shopee-video/README.md
+ *
+ * ที่มาของค่า: หลักฐานคลิป (evidence) และค่าที่ทำเครื่องหมาย measured ใน derived
+ * ถอดมาจาก research/tiktok-shopee-video/README.md ส่วนค่าที่เป็น inferred
+ * เป็นการอนุมานของเราเองเพื่อให้ระบบทำงานได้ — งานวิจัยไม่ได้ระบุไว้
+ * ห้ามเปลี่ยน inferred เป็น measured โดยไม่มีหลักฐานรองรับ
  */
 export interface FormatTemplate {
   id: TemplateId;
   rank: number;
   nameTh: string;
   taglineTh: string;
-  /** ช่วงความยาวที่ชนะจริงในข้อมูล (วินาที) */
+  /** ช่วงความยาวเป็นวินาที — ดู derived.durationSec ว่าวัดจริงหรืออนุมาน */
   durationSec: [number, number];
   /** ความยาวเริ่มต้นที่ใช้ generate */
   targetSec: number;
@@ -45,6 +52,13 @@ export interface FormatTemplate {
   bestFor: string[];
   platforms: Platform[];
   evidence: Evidence[];
+  /** บอกตรงๆ ว่าค่าไหนมีหลักฐานรองรับ ค่าไหนเราอนุมานเอง */
+  derived: {
+    durationSec: Provenance;
+    audio: Provenance;
+    sceneCount: Provenance;
+    platforms: Provenance;
+  };
   /** ข้อจำกัดที่ต้องเตือนผู้ใช้ */
   warningTh?: string;
   /** บรีฟที่ป้อนให้โมเดลตอนเขียนสคริปต์ */
@@ -87,6 +101,8 @@ export interface GeneratedScript {
   hooks: string[];
   scenes: Scene[];
   cta: string;
+  /** แคปชั่นที่ใช้ตอนโพสต์คลิป (คนละอันกับข้อความบนจอ) */
+  postCaption: string;
   hashtags: string[];
 }
 

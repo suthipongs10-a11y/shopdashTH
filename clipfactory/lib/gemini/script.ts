@@ -29,13 +29,18 @@ const SCHEMA = {
       },
     },
     cta: { type: Type.STRING, description: 'ประโยคปิดที่ชี้ให้กดตะกร้า ไม่เกิน 10 คำ' },
+    postCaption: {
+      type: Type.STRING,
+      description:
+        'แคปชั่นสำหรับใช้ตอนโพสต์คลิป 1-3 บรรทัด ภาษาพูด ชวนคุย ไม่ต้องใส่แฮชแท็ก และไม่ต้องซ้ำกับ hook',
+    },
     hashtags: {
       type: Type.ARRAY,
       description: 'แฮชแท็กไทย 5-8 ตัว ไม่ต้องใส่เครื่องหมาย #',
       items: { type: Type.STRING },
     },
   },
-  required: ['headline', 'hooks', 'scenes', 'cta', 'hashtags'],
+  required: ['headline', 'hooks', 'scenes', 'cta', 'postCaption', 'hashtags'],
 } as const;
 
 /** กฎกลางที่ใช้กับทุกเทมเพลต — ถอดจากงานวิจัย */
@@ -48,10 +53,9 @@ const GLOBAL_RULES = [
   'โทนต้องเหมือนคนธรรมดารีวิวของที่ใช้จริง ไม่ใช่โฆษณาแบรนด์',
 ];
 
-/** เวลาที่เหลือให้เนื้อหา หลังหัก hook 3 วิ และ CTA 2 วิ (สูตรที่ไม่มีเสียงพูดไม่มีซีน CTA) */
-function bodyBudgetOf(targetSec: number, template: FormatTemplate): number {
-  const ctaSec = template.audio === 'music-only' ? 0 : 2;
-  return Math.max(4, targetSec - 3 - ctaSec);
+/** เวลาที่เหลือให้เนื้อหา หลังหัก hook 3 วิ และ CTA 2 วิ — ทุกสูตรมี CTA บนจอเสมอ */
+function bodyBudgetOf(targetSec: number): number {
+  return Math.max(4, targetSec - 3 - 2);
 }
 
 function buildPrompt(
@@ -60,7 +64,7 @@ function buildPrompt(
   platform: Platform,
   targetSec: number,
 ): string {
-  const bodySec = bodyBudgetOf(targetSec, template);
+  const bodySec = bodyBudgetOf(targetSec);
   const [minScenes, maxScenes] = template.sceneCount;
 
   const platformNote =
@@ -89,9 +93,7 @@ function buildPrompt(
     '',
     '## ข้อกำหนดความยาว',
     `คลิปรวมประมาณ ${targetSec} วินาที`,
-    template.audio === 'music-only'
-      ? `ข้อความแรกกินเวลา 3 วินาที เนื้อหาที่เหลือรวมกันประมาณ ${bodySec} วินาที`
-      : `hook กินเวลา 3 วินาทีแรก, CTA ปิดท้าย 2 วินาที, เนื้อหาหลักรวมกันประมาณ ${bodySec} วินาที`,
+    `hook กินเวลา 3 วินาทีแรก, CTA ปิดท้าย 2 วินาที, เนื้อหาหลักรวมกันประมาณ ${bodySec} วินาที`,
     `ต้องมีซีนเนื้อหา ${minScenes} ถึง ${maxScenes} ซีน และผลรวม durationSec ของทุกซีนต้องใกล้เคียง ${bodySec} วินาที`,
     '',
     '## กฎกลางที่ห้ามฝ่าฝืน',
@@ -119,7 +121,7 @@ function normalize(raw: unknown, targetSec: number, template: FormatTemplate): G
   }
 
   // ปรับสเกลเวลาให้ผลรวมตรงกับความยาวเป้าหมาย
-  const bodyBudget = bodyBudgetOf(targetSec, template);
+  const bodyBudget = bodyBudgetOf(targetSec);
   const sum = scenes.reduce((a, s) => a + s.durationSec, 0);
   const factor = sum > 0 ? bodyBudget / sum : 1;
   for (const s of scenes) s.durationSec = Math.round(s.durationSec * factor * 100) / 100;
@@ -131,6 +133,7 @@ function normalize(raw: unknown, targetSec: number, template: FormatTemplate): G
     hooks: hooks.length ? hooks.slice(0, 5) : [scenes[0].caption],
     scenes,
     cta: String(obj.cta ?? '').trim() || 'กดตะกร้าเหลืองข้างล่างได้เลย',
+    postCaption: String(obj.postCaption ?? '').trim(),
     hashtags: (obj.hashtags ?? []).map((h) => String(h).replace(/^#/, '').trim()).filter(Boolean),
   };
 }

@@ -57,9 +57,13 @@ export function TemplatePicker({
             <span className="mt-0.5 block text-xs leading-relaxed text-[var(--color-muted)]">{t.taglineTh}</span>
             <span className="mt-2 flex flex-wrap gap-1.5">
               <Pill tone="accent">
+                {t.derived.durationSec === 'inferred' ? '~ ' : ''}
                 {t.durationSec[0]}–{t.durationSec[1]} วิ
               </Pill>
-              <Pill>{AUDIO_LABEL[t.audio]}</Pill>
+              <Pill>
+                {t.derived.audio === 'inferred' ? '~ ' : ''}
+                {AUDIO_LABEL[t.audio]}
+              </Pill>
               {t.loop ? <Pill>วนลูป</Pill> : null}
               {t.warningTh ? <Pill tone="warn">มีข้อจำกัด</Pill> : null}
             </span>
@@ -97,6 +101,10 @@ export function TemplatePicker({
 
   return (
     <div className="grid gap-2.5">
+      <p className="text-[11px] leading-relaxed text-[var(--color-muted)]">
+        ค่าที่ขึ้นต้นด้วย <span className="mono">~</span> คือค่าที่เราอนุมานเอง งานวิจัยไม่ได้ระบุไว้ ·
+        ค่าที่ไม่มีเครื่องหมายวัดจากคลิปจริงในหลักฐานใต้แต่ละสูตร
+      </p>
       {available.map((t) => renderCard(t, false))}
       {unavailable.length ? (
         <>

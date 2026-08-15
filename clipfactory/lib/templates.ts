@@ -1,4 +1,4 @@
-import type { FormatTemplate, TemplateId } from './types';
+import type { FormatTemplate, Platform, TemplateId } from './types';
 
 /**
  * 9 สูตรคลิปปักตะกร้า ถอดจากคลิป outlier จริงในไทย ก.ค.–ส.ค. 2026
@@ -18,13 +18,19 @@ export const TEMPLATES: FormatTemplate[] = [
     captionStyle: 'static-line',
     sceneCount: [5, 6],
     loop: false,
-    bestFor: ['ความงาม', 'ของใช้ในบ้าน', 'แฟชั่น', 'ไอที'],
+    bestFor: ['ความงาม', 'สกินแคร์', 'ของใช้ในบ้าน', 'แฟชั่น', 'ไอที'],
     platforms: ['tiktok', 'shopee'],
     evidence: [
       { handle: '@im_papam', note: 'ไม่ต้องแพงแต่ดีคล้ายของแพง (16 วิ)', views: '1.2M', outlier: '320×' },
       { handle: '@gimzong_', note: 'คุ้มค่ากับการซื้อ ฉบับคนติดบ้าน (11 วิ)', views: '1.4M', outlier: '68×' },
       { handle: '@pawarisornem', note: 'ซื้อแล้วไม่เสียดายตัง (12 วิ)', views: '1.1M', outlier: '37×' },
     ],
+    derived: {
+      durationSec: 'measured',
+      audio: 'measured',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'ประกาศหัวข้อรวมใน 3 วิแรก แล้วไล่ข้อ 1 ถึง 5 ต่อเนื่องแบบไม่หยุดหายใจ แต่ละข้อคือประโยคสั้นประโยคเดียว จบด้วย CTA ชี้ตะกร้า',
@@ -57,6 +63,12 @@ export const TEMPLATES: FormatTemplate[] = [
       { handle: '@yoyax_korya', note: 'OxiClean “แช่ แช่ ขยี้ ขยี้” (44 วิ)', views: '300K', outlier: '106×' },
       { handle: '@sanqingpaint_th', note: 'ลูกกลิ้งเก็บรอย — “ผนังเลอะ ต้องจ้างช่าง?”', views: '170K', outlier: '24×' },
     ],
+    derived: {
+      durationSec: 'measured',
+      audio: 'measured',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'วิที่ 0–3 คือปัญหาที่คนดูบ่นเอง จากนั้นแนะนำตัวช่วย แล้วสาธิตทีละขั้นจนเห็นผลลัพธ์ชัดด้วยตา ปิดด้วยผลลัพธ์เทียบก่อน-หลังและ CTA',
@@ -89,6 +101,12 @@ export const TEMPLATES: FormatTemplate[] = [
       { handle: '@aummntww', note: '“ชิ้นที่สอง 1 บาท กลับมาแล้ว” (36 วิ)', views: '176K', outlier: '72×' },
       { handle: '@by.awy', note: '“วิธีใช้ลด 90%” (15 วิ)', views: '18.3K', outlier: '35×' },
     ],
+    derived: {
+      durationSec: 'measured',
+      audio: 'inferred',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'เปิดด้วยตัวเลขส่วนลดตัวใหญ่ทันที แล้วไล่ขั้นตอนการกดรับคูปองทีละสเต็ป ปิดด้วยเส้นตายของโปร',
@@ -118,6 +136,12 @@ export const TEMPLATES: FormatTemplate[] = [
       { handle: '@dcteea.blog', note: '“ของปลอมในร้าน Mall?” (60 วิ)', views: '318K', outlier: '104×' },
       { handle: '@somethingjinglebell', note: '“มหากาพย์ของปลอม” (120 วิ)', views: '260K', outlier: '45×' },
     ],
+    derived: {
+      durationSec: 'measured',
+      audio: 'inferred',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'เปิดด้วยคำเตือน แล้วไล่วิธีสังเกตของแท้ทีละข้อ ปิดด้วยการชี้ว่าควรซื้อจากร้านไหนถึงปลอดภัย',
@@ -141,11 +165,18 @@ export const TEMPLATES: FormatTemplate[] = [
     captionStyle: 'dynamic',
     sceneCount: [6, 10],
     loop: false,
-    bestFor: ['แฟชั่น', 'ของใช้ในบ้าน', 'ความงาม'],
-    platforms: ['tiktok', 'shopee'],
+    bestFor: ['แฟชั่น', 'ของใช้ในบ้าน', 'ความงาม', 'สกินแคร์'],
+    // ช่วงความยาวของสูตรนี้ยาวเกินที่ Shopee แนะนำ (10–30 วิ) ทั้งช่วง จึงไม่เปิดให้ใช้
+    platforms: ['tiktok'],
     evidence: [
-      { handle: '@setiesmareview', note: 'UNBOX 13 ชิ้น พร้อมแปะพิกัด ep2 (7K followers)', views: '848K', outlier: '841×' },
+      { handle: '@setiesmareview', note: 'UNBOX 13 ชิ้น พร้อมแปะพิกัด ep2 · 80 วิ (7K followers)', views: '848K', outlier: '841×' },
     ],
+    derived: {
+      durationSec: 'inferred',
+      audio: 'inferred',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'เปิดด้วยกองของทั้งหมดและจำนวนชิ้น แล้วไล่ทีละชิ้น ชิ้นละประโยคเดียว ปิดด้วยชวนดู EP ต่อไป',
@@ -169,12 +200,18 @@ export const TEMPLATES: FormatTemplate[] = [
     captionStyle: 'dynamic',
     sceneCount: [4, 7],
     loop: true,
-    bestFor: ['ความงาม', 'ทำความสะอาด', 'ของแต่งบ้าน'],
+    bestFor: ['ความงาม', 'สกินแคร์', 'ทำความสะอาด', 'ของแต่งบ้าน'],
     platforms: ['tiktok', 'shopee'],
     evidence: [
       { handle: '@theafternoon.official', note: '“ถึงคนที่บอกให้เราไปฉีดฟิลเลอร์”', views: '228K', outlier: '36×' },
       { handle: '@jarustory', note: 'จัดห้องน้ำใหม่ด้วยขวดรีฟิล (IG)', views: '102K', outlier: '34×' },
     ],
+    derived: {
+      durationSec: 'inferred',
+      audio: 'inferred',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'วิแรกคือสภาพ “ก่อน” ที่แย่ ตามด้วยการเผยสภาพ “หลัง” ทันที แล้วค่อยอธิบายว่าใช้อะไร ปิดด้วยเทียบซ้ำ',
@@ -198,12 +235,18 @@ export const TEMPLATES: FormatTemplate[] = [
     captionStyle: 'dynamic',
     sceneCount: [4, 6],
     loop: false,
-    bestFor: ['ความงาม', 'ของใช้ในบ้าน', 'อุปกรณ์'],
+    bestFor: ['ความงาม', 'สกินแคร์', 'ของใช้ในบ้าน', 'อุปกรณ์'],
     platforms: ['tiktok'],
     evidence: [
       { handle: '@rkjirakith', note: 'เช็ดผิวด้วยทิชชู่พิสูจน์ว่าไม่ได้พอก', views: '1.0M', outlier: '87×' },
       { handle: '@lady_iceburry', note: 'ตัดพัฟครึ่งโชว์เนื้อใน', views: '405K', outlier: '16×' },
     ],
+    derived: {
+      durationSec: 'inferred',
+      audio: 'inferred',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'วิแรกคือการลงมือทดสอบทันที ไม่มีคำอธิบายนำ แล้วค่อยเฉลยว่ากำลังพิสูจน์อะไร ปิดด้วยผลการทดสอบ',
@@ -231,6 +274,12 @@ export const TEMPLATES: FormatTemplate[] = [
     evidence: [
       { handle: '@spsaypan', note: '“฿1 โกยสิคะ!” ของหล่นใส่ตะกร้าตามบีต', views: '1.4M', outlier: '26×' },
     ],
+    derived: {
+      durationSec: 'inferred',
+      audio: 'measured',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'ไม่มีเสียงพูด มีแต่ข้อความบนจอ ซีนละ 1 สินค้า 1 ราคา ตัดถี่ตามจังหวะ',
@@ -260,6 +309,12 @@ export const TEMPLATES: FormatTemplate[] = [
       { handle: '@ford789789789', note: '“เปิดแล้วครับ” ชวนนายหน้าปักตะกร้า', views: '1.2M', outlier: '172×' },
       { handle: '@earryshop', note: '“ลูกค้าคืนของกลับมาแบบใจร้ายที่สุด”', views: '359K', outlier: '104×' },
     ],
+    derived: {
+      durationSec: 'inferred',
+      audio: 'inferred',
+      sceneCount: 'inferred',
+      platforms: 'inferred',
+    },
     brief: {
       structure:
         'เล่าจากมุมคนขาย เปิดด้วยเหตุการณ์จริงหลังร้าน แล้วโยงมาที่สินค้าหรือข้อเสนอสำหรับนายหน้า',
@@ -283,15 +338,59 @@ export function getTemplate(id: TemplateId): FormatTemplate {
   return t;
 }
 
+/** หมวดที่งานวิจัยจัดอยู่กลุ่มเดียวกัน — ผู้ใช้พิมพ์คำไหนก็ต้องได้สูตรชุดเดียวกัน */
+const CATEGORY_ALIASES: Record<string, string[]> = {
+  ความงาม: ['สกินแคร์', 'เครื่องสำอาง', 'บิวตี้'],
+  สกินแคร์: ['ความงาม', 'บิวตี้'],
+  อาหารเสริม: ['ความงาม', 'สกินแคร์'],
+  ทำความสะอาด: ['ของใช้ในบ้าน'],
+  ของใช้ในบ้าน: ['ทำความสะอาด', 'ของแต่งบ้าน'],
+  ของแต่งบ้าน: ['ของใช้ในบ้าน'],
+  ไอที: ['เครื่องใช้ไฟฟ้า'],
+  เครื่องใช้ไฟฟ้า: ['ไอที', 'อุปกรณ์'],
+};
+
+function categoryKeys(input: string): string[] {
+  const key = input.trim();
+  return key ? [key, ...(CATEGORY_ALIASES[key] ?? [])] : [];
+}
+
 /** แนะนำสูตรจากหมวดสินค้า — เรียงตาม rank ให้สูตรที่หลักฐานแน่นที่สุดขึ้นก่อน */
 export function suggestTemplates(category: string): FormatTemplate[] {
-  const key = category.trim();
-  if (!key) return [...TEMPLATES].sort((a, b) => a.rank - b.rank);
+  const keys = categoryKeys(category);
+  if (!keys.length) return [...TEMPLATES].sort((a, b) => a.rank - b.rank);
   const matched = TEMPLATES.filter(
-    (t) => t.bestFor.includes('ทุกหมวด') || t.bestFor.some((c) => key.includes(c) || c.includes(key)),
+    (t) =>
+      t.bestFor.includes('ทุกหมวด') ||
+      t.bestFor.some((c) => keys.some((k) => k.includes(c) || c.includes(k))),
   );
   const rest = TEMPLATES.filter((t) => !matched.includes(t));
   return [...matched.sort((a, b) => a.rank - b.rank), ...rest.sort((a, b) => a.rank - b.rank)];
+}
+
+/**
+ * ช่วงความยาวที่แต่ละแพลตฟอร์มแนะนำ (วินาที)
+ * Shopee: คนดูมาด้วยเจตนาซื้ออยู่แล้ว คลิปสั้นกว่าได้ผลดีกว่า — research §5
+ */
+const PLATFORM_DURATION: Record<Platform, [number, number]> = {
+  tiktok: [5, 180],
+  shopee: [10, 30],
+};
+
+/** ช่วงความยาวที่ใช้ได้จริง = ช่วงของสูตร ตัดกับช่วงที่แพลตฟอร์มแนะนำ */
+export function durationRange(template: FormatTemplate, platform: Platform): [number, number] {
+  const [tMin, tMax] = template.durationSec;
+  const [pMin, pMax] = PLATFORM_DURATION[platform];
+  const min = Math.max(tMin, pMin);
+  const max = Math.min(tMax, pMax);
+  // สูตรที่ไม่มีช่วงทับกันเลย ให้ยึดช่วงของสูตรไว้ก่อน (ไม่ควรเกิด เพราะกรองด้วย platforms แล้ว)
+  return min <= max ? [min, max] : template.durationSec;
+}
+
+export function clampDuration(template: FormatTemplate, platform: Platform, seconds: number): number {
+  const [min, max] = durationRange(template, platform);
+  const value = Number.isFinite(seconds) ? seconds : template.targetSec;
+  return Math.min(max, Math.max(min, Math.round(value)));
 }
 
 export const CATEGORIES = [

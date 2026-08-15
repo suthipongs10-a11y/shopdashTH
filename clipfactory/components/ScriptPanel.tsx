@@ -9,12 +9,14 @@ export function ScriptPanel({
   onHookIndex,
   onChange,
   audioless,
+  onExport,
 }: {
   script: GeneratedScript;
   hookIndex: number;
   onHookIndex: (i: number) => void;
   onChange: (next: GeneratedScript) => void;
   audioless: boolean;
+  onExport: () => void;
 }) {
   const setScene = (i: number, patch: Partial<GeneratedScript['scenes'][number]>) => {
     const scenes = script.scenes.map((s, idx) => (idx === i ? { ...s, ...patch } : s));
@@ -123,6 +125,41 @@ export function ScriptPanel({
           />
         </div>
       ) : null}
+
+      <div>
+        <label className="label" htmlFor="s-caption">
+          แคปชั่นตอนโพสต์ (คนละอันกับข้อความบนจอ)
+        </label>
+        <textarea
+          id="s-caption"
+          className="field resize-y"
+          rows={3}
+          value={script.postCaption}
+          onChange={(e) => onChange({ ...script, postCaption: e.target.value })}
+          placeholder="ข้อความที่จะพิมพ์ตอนอัปโหลดคลิป"
+        />
+        <button
+          type="button"
+          className="btn-ghost mt-2 px-3 py-1 text-xs"
+          onClick={() =>
+            navigator.clipboard?.writeText(
+              [script.postCaption, script.hashtags.map((h) => `#${h}`).join(' ')].filter(Boolean).join('\n\n'),
+            )
+          }
+        >
+          คัดลอกแคปชั่น + แฮชแท็ก
+        </button>
+      </div>
+
+      <div className="rounded-lg border border-[var(--color-line)] bg-[var(--color-panel-2)] p-3">
+        <p className="text-xs font-semibold">อยากถ่ายเอง?</p>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--color-muted)]">
+          โหลดสคริปต์ถ่ายทำเป็นไฟล์ข้อความ มีเวลาแต่ละช็อต ข้อความบนจอ และบทพูด ไว้เปิดดูตอนถ่าย
+        </p>
+        <button type="button" className="btn-ghost mt-2 px-3 py-1 text-xs" onClick={onExport}>
+          ดาวน์โหลดสคริปต์ถ่ายทำ (.txt)
+        </button>
+      </div>
 
       {script.hashtags.length ? (
         <div>

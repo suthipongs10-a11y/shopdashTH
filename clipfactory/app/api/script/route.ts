@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateScript } from '@/lib/gemini/script';
 import { toThaiError } from '@/lib/gemini/client';
-import { getTemplate } from '@/lib/templates';
+import { clampDuration, getTemplate } from '@/lib/templates';
 import type { Platform, ProductInput, TemplateId } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -53,9 +53,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'ไม่รู้จักสูตรคลิปที่เลือก' }, { status: 400 });
   }
 
-  const [minSec, maxSec] = template.durationSec;
-  const requested = Number(body.targetSec) || template.targetSec;
-  const targetSec = Math.min(maxSec, Math.max(minSec, requested));
+  const platform: Platform = body.platform === 'shopee' ? 'shopee' : 'tiktok';
+  const targetSec = clampDuration(template, platform, Number(body.targetSec) || template.targetSec);
 
   const rawPoints = body.product?.sellingPoints;
   const product: ProductInput = {
@@ -74,7 +73,7 @@ export async function POST(req: Request) {
     const script = await generateScript({
       product,
       template,
-      platform: body.platform === 'shopee' ? 'shopee' : 'tiktok',
+      platform,
       targetSec,
       signal: req.signal,
     });
