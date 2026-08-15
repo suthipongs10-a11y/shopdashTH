@@ -43,6 +43,7 @@ export function TemplatePicker({
           type="button"
           disabled={disabled}
           onClick={() => onSelect(t)}
+          data-testid={`template-${t.id}`}
           className="flex w-full items-start gap-3 p-3.5 text-left disabled:cursor-not-allowed"
         >
           <span
@@ -108,7 +109,7 @@ export function TemplatePicker({
       {available.map((t) => renderCard(t, false))}
       {unavailable.length ? (
         <>
-          <p className="mt-2 text-[11px] text-[var(--color-muted)]">
+          <p className="mt-2 text-[11px] text-[var(--color-muted)]" data-testid="unavailable-templates">
             สูตรที่ไม่เหมาะกับ {platform === 'shopee' ? 'Shopee Video' : 'TikTok'}
           </p>
           {unavailable.map((t) => renderCard(t, true))}

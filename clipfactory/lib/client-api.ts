@@ -1,6 +1,13 @@
 'use client';
 
-import type { GeneratedScript, Platform, ProductInput, TemplateId, VoiceSegment } from './types';
+import type {
+  GeneratedScript,
+  Platform,
+  ProductInput,
+  TemplateId,
+  TrendReport,
+  VoiceSegment,
+} from './types';
 
 async function readError(res: Response): Promise<string> {
   try {
@@ -33,6 +40,23 @@ export async function requestScript(args: {
   if (!res.ok) throw new Error(await readError(res));
   const data = (await res.json()) as { script: GeneratedScript };
   return data.script;
+}
+
+/** ค้นเทรนด์ที่กำลังมาแรง — Gemini ค้น Google สดแล้วสรุปเป็นการ์ด */
+export async function requestTrends(args: {
+  query: string;
+  platform: Platform;
+  signal?: AbortSignal;
+}): Promise<TrendReport> {
+  const res = await fetch('/api/trends', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: args.query, platform: args.platform }),
+    signal: args.signal,
+  });
+  if (!res.ok) throw new Error(await readError(res));
+  const data = (await res.json()) as { report: TrendReport };
+  return data.report;
 }
 
 /** วางข้อความที่ copy จากแอปช้อปปิ้ง แล้วให้ Gemini แยกฟิลด์ให้ */

@@ -7,6 +7,7 @@
  */
 import { buildTimeline, voiceLines } from '../lib/render/timeline.ts';
 import { clampDuration, durationRange, getTemplate, suggestTemplates, TEMPLATES } from '../lib/templates.ts';
+import { campaignLabel, upcomingCampaigns } from '../lib/campaigns.ts';
 import type { GeneratedScript, VoiceSegment } from '../lib/types.ts';
 
 let failed = 0;
@@ -143,6 +144,39 @@ console.log('\nไม่มีเสียงเลย ใช้ค่าปร�
   const tl = buildTimeline({ script: s, hookIndex: 0, template: t, voice: [], imageCount: 1 });
   check('ยังสร้างไทม์ไลน์ได้', tl.shots.length > 0 && tl.totalSec > 0);
   check('รูปเดียวถูกวนใช้ได้ ไม่พัง', tl.shots.every((sh) => sh.assetIndex === 0));
+}
+
+console.log('\nปฏิทินแคมเปญ');
+{
+  // 15 ส.ค. — 8.8 ผ่านไปแล้ว ตัวถัดไปควรเป็นเงินออก 25 ส.ค. แล้วตามด้วย 9.9
+  const now = new Date(2026, 7, 15);
+  const list = upcomingCampaigns(now, 45);
+
+  check('มีแคมเปญในช่วง 45 วันข้างหน้า', list.length > 0, String(list.length));
+  check('เรียงจากใกล้ที่สุดไปไกลที่สุด', list.every((c, i) => i === 0 || c.daysUntil >= list[i - 1].daysUntil));
+  check('ไม่มีแคมเปญที่เลยมาแล้ว (ยกเว้นเงินออกที่ยังลากอยู่)',
+    list.every((c) => c.daysUntil >= 0 || c.kind === 'payday'));
+
+  const names = list.map((c) => c.nameTh);
+  check('เจอ 9.9 ในช่วง 45 วัน', names.includes('9.9'), names.slice(0, 6).join(', '));
+  check('ไม่เจอ 8.8 เพราะผ่านไปแล้ว', !names.includes('8.8'));
+
+  const nine = list.find((c) => c.nameTh === '9.9')!;
+  check('9.9 อยู่อีก 25 วัน', nine.daysUntil === 25, String(nine.daysUntil));
+  check('9.9 ยังไม่ถึงเวลาลงมือ (lead 10 วัน)', !nine.isActionable);
+
+  // ขยับมาวันที่ 1 ก.ย. — เหลือ 8 วัน ควรเตือนให้เริ่มทำคลิปแล้ว
+  const soon = upcomingCampaigns(new Date(2026, 8, 1), 45).find((c) => c.nameTh === '9.9')!;
+  check('เหลือ 8 วันแล้วขึ้นสถานะถึงเวลาลงมือ', soon.isActionable, `daysUntil=${soon.daysUntil}`);
+  check('ป้ายบอกจำนวนวันถูกต้อง', campaignLabel(soon) === 'อีก 8 วัน', campaignLabel(soon));
+
+  // วันแม่ 12 ส.ค. ต้องโผล่ล่วงหน้าตั้งแต่ปลายเดือน ก.ค.
+  const july = upcomingCampaigns(new Date(2026, 6, 30), 45).map((c) => c.nameTh);
+  check('วันแม่โผล่ล่วงหน้าตั้งแต่ปลาย ก.ค.', july.includes('วันแม่'), july.slice(0, 5).join(', '));
+
+  // ข้ามปี — 31 ธ.ค. ต้องเห็นปีใหม่ของปีถัดไป
+  const dec = upcomingCampaigns(new Date(2026, 11, 20), 30).map((c) => c.nameTh);
+  check('ข้ามปีแล้วยังเจอปีใหม่', dec.includes('ปีใหม่'), dec.slice(0, 6).join(', '));
 }
 
 console.log(failed === 0 ? '\n✓ ผ่านทั้งหมด\n' : `\n✕ ไม่ผ่าน ${failed} ข้อ\n`);

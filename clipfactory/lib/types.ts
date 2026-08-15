@@ -187,6 +187,34 @@ export const DEFAULT_RENDER: Omit<RenderOptions, 'headline' | 'theme' | 'titleCa
   showSafeGuides: false,
 };
 
+/** เทรนด์ที่ค้นเจอ ณ เวลาที่ค้น — ไม่ใช่ข้อมูลนิ่งเหมือนเทมเพลต */
+export interface TrendCard {
+  /** หัวข้อ/มุมที่กำลังมาแรง */
+  title: string;
+  /** ทำไมถึงมาแรงตอนนี้ */
+  whyNowTh: string;
+  /** มุมเล่าที่แนะนำสำหรับคลิป */
+  angleTh: string;
+  /** สินค้าที่เกาะเทรนด์นี้ได้ */
+  productIdeas: string[];
+  /** ตัวอย่างประโยคเปิด 3 วินาทีแรก */
+  hookExamples: string[];
+  hashtags: string[];
+  /** สูตรคลิปที่เข้ากับเทรนด์นี้ */
+  templateId: TemplateId | null;
+  /** ความมั่นใจของโมเดลต่อเทรนด์นี้ */
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export interface TrendReport {
+  /** เวลาที่ค้น (ISO) — เทรนด์มีวันหมดอายุ ต้องโชว์ให้ผู้ใช้เห็น */
+  searchedAt: string;
+  queryTh: string;
+  trends: TrendCard[];
+  /** ลิงก์ที่ Gemini ใช้อ้างอิงจากการค้น Google */
+  sources: { title: string; url: string }[];
+}
+
 export interface GeminiVoice {
   name: string;
   descTh: string;

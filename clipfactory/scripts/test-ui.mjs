@@ -55,6 +55,16 @@ try {
 
   await page.goto(BASE, { waitUntil: 'networkidle' });
 
+  console.log('\nปฏิทินแคมเปญและช่องค้นเทรนด์');
+  check('มีแถบแคมเปญที่กำลังจะมา', await page.locator('text=แคมเปญที่กำลังจะมา').isVisible());
+  const campaignCards = await page.locator('button:has-text("อีก")').count();
+  check('มีการ์ดแคมเปญอย่างน้อย 1 ใบ', campaignCards > 0, String(campaignCards));
+  check('ปุ่มค้นเทรนด์ถูกปิดไว้ตอนยังไม่พิมพ์', await page.locator('button:has-text("ค้นเทรนด์ตอนนี้")').isDisabled());
+  await page.fill('#trend-q', 'สกินแคร์');
+  await page.waitForTimeout(200);
+  check('พิมพ์แล้วปุ่มค้นเทรนด์ใช้ได้', !(await page.locator('button:has-text("ค้นเทรนด์ตอนนี้")').isDisabled()));
+  await page.fill('#trend-q', '');
+
   console.log('\nแนะนำสูตรตามหมวดสินค้า');
   await page.fill('#p-name', 'ผงซักผ้าขาว ขจัดคราบฝังลึก');
   await page.fill('#p-cat', 'ทำความสะอาด');
@@ -68,21 +78,28 @@ try {
   check('หมวดสกินแคร์ ยังเห็นสูตร Listicle', cards > 0);
 
   console.log('\nกรองสูตรตามแพลตฟอร์ม');
-  await page.click('button:has-text("Shopee")');
+  await page.click('[data-testid="platform-shopee"]');
   await page.waitForTimeout(300);
-  const unavailableHeader = await page.locator('text=สูตรที่ไม่เหมาะกับ Shopee Video').isVisible();
-  check('มีหัวข้อแยกสูตรที่ไม่เหมาะกับ Shopee', unavailableHeader);
+  check('มีหัวข้อแยกสูตรที่ไม่เหมาะกับ Shopee', await page.locator('[data-testid="unavailable-templates"]').isVisible());
+  check('haul ถูกจัดอยู่กลุ่มที่ใช้กับ Shopee ไม่ได้',
+    await page.locator('[data-testid="template-haul"]').isDisabled());
 
   console.log('\nคุมความยาวคลิปของ Shopee');
-  await page.click('text=Listicle พูดหน้ากล้อง');
+  await page.click('[data-testid="template-listicle"]');
   await page.waitForTimeout(300);
   const durInput = page.locator('#dur');
-  const max = await durInput.getAttribute('max');
-  const value = await durInput.inputValue();
-  check('ช่องความยาวถูกจำกัดไม่เกิน 30 วิ', Number(max) <= 30, `max=${max}`);
-  check('ค่าเริ่มต้นอยู่ในช่วงที่ Shopee แนะนำ', Number(value) >= 10 && Number(value) <= 30, `value=${value}`);
-  const hint = await page.locator('text=/Shopee แนะนำ 10–30 วิ/').isVisible();
-  check('มีคำอธิบายช่วงความยาวของ Shopee', hint);
+  check('ช่องกรอกความยาวปรากฏหลังเลือกสูตร', (await durInput.count()) === 1);
+  const max = Number(await durInput.getAttribute('max'));
+  const min = Number(await durInput.getAttribute('min'));
+  const value = Number(await durInput.inputValue());
+  check('ช่วงความยาวถูกคุมไว้ที่ 10–30 วิ', min >= 10 && max <= 30 && max > 0, `min=${min} max=${max}`);
+  check('ค่าเริ่มต้นอยู่ในช่วงนั้นจริง', value >= min && value <= max, `value=${value}`);
+  check('มีคำอธิบายช่วงความยาวของ Shopee', await page.locator('text=/Shopee แนะนำ 10–30 วิ/').isVisible());
+
+  console.log('\nสลับกลับไป TikTok');
+  await page.click('[data-testid="platform-tiktok"]');
+  await page.waitForTimeout(300);
+  check('haul กลับมาใช้ได้บน TikTok', !(await page.locator('[data-testid="template-haul"]').isDisabled()));
 
   console.log('\nบันทึกและโหลดงาน');
   await page.click('button:has-text("บันทึกงานนี้")');

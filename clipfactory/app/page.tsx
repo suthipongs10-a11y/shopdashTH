@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ProductForm } from '@/components/ProductForm';
 import { PasteImport } from '@/components/PasteImport';
+import { TrendRadar } from '@/components/TrendRadar';
 import { JobLibrary } from '@/components/JobLibrary';
 import { buildShotList } from '@/components/ScriptExport';
 import { TemplatePicker } from '@/components/TemplatePicker';
@@ -16,6 +17,7 @@ import {
   downloadBlob,
   requestParse,
   requestScript,
+  requestTrends,
   revokeSegments,
   safeFilename,
   synthesizeLines,
@@ -39,9 +41,11 @@ import {
   DEFAULT_THEME,
   type FormatTemplate,
   type GeneratedScript,
+  type TrendCard,
   type Platform,
   type ProductInput,
   type RenderOptions,
+  type TrendReport,
   type VoiceSegment,
 } from '@/lib/types';
 
@@ -91,6 +95,9 @@ export default function StudioPage() {
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState('');
   const [parseBusy, setParseBusy] = useState(false);
+  const [trendReport, setTrendReport] = useState<TrendReport | null>(null);
+  const [trendBusy, setTrendBusy] = useState(false);
+  const [trendError, setTrendError] = useState('');
   const [restored, setRestored] = useState(false);
 
   const [error, setError] = useState('');
@@ -217,6 +224,50 @@ export default function StudioPage() {
     setHookIndex(0);
     clearVoice();
   }, [clearVoice, platform]);
+
+  const searchTrends = useCallback(
+    async (query: string) => {
+      if (!query) return;
+      setTrendError('');
+      setTrendBusy(true);
+      try {
+        setTrendReport(await requestTrends({ query, platform }));
+      } catch (e) {
+        setTrendError(e instanceof Error ? e.message : 'ค้นเทรนด์ไม่สำเร็จ');
+      } finally {
+        setTrendBusy(false);
+      }
+    },
+    [platform],
+  );
+
+  // เอาเทรนด์มาตั้งต้นงานใหม่ — เติมหมวด กลุ่มลูกค้า และเลือกสูตรที่แนะนำให้เลย
+  const useTrend = useCallback(
+    (trend: TrendCard) => {
+      clearVoice();
+      setScript(null);
+      setHookIndex(0);
+      setProduct((prev) => ({
+        ...prev,
+        category: prev.category || trendReport?.queryTh || '',
+        sellingPoints: prev.sellingPoints.some((p) => p.trim())
+          ? prev.sellingPoints
+          : [trend.angleTh, ...trend.productIdeas.slice(0, 2)].filter(Boolean),
+      }));
+      if (trend.templateId) {
+        const t = TEMPLATES.find((x) => x.id === trend.templateId);
+        if (t && t.platforms.includes(platform)) {
+          setTemplate(t);
+          setTargetSec(clampDuration(t, platform, t.targetSec));
+        }
+      }
+      setWarning(
+        `ตั้งต้นจากเทรนด์ “${trend.title}” แล้ว — กรอกชื่อสินค้าจริงที่จะขาย แล้วเขียนสคริปต์ต่อได้เลย`,
+      );
+      document.getElementById('p-name')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    },
+    [clearVoice, platform, trendReport?.queryTh],
+  );
 
   const importPasted = useCallback(async (raw: string) => {
     setError('');
@@ -509,7 +560,7 @@ export default function StudioPage() {
       if (template.audio === 'music-only' && !music) {
         setWarning('สูตรนี้ใช้เพลงเป็นเสียงทั้งหมด แต่ยังไม่ได้แนบไฟล์เพลง — คลิปที่ได้จะเงียบสนิท');
       } else if (template.audio !== 'music-only' && bodyVoice.length === 0) {
-        setWarning('ยังไม่ได้สร้างเสียงพากย์ในขั้นที่ 4 — คลิปที่ได้จะมีแต่ภาพและข้อความ ไม่มีเสียงพูด');
+        setWarning('ยังไม่ได้สร้างเสียงพากย์ในขั้นที่ 5 — คลิปที่ได้จะมีแต่ภาพและข้อความ ไม่มีเสียงพูด');
       }
 
       const controller = new AbortController();
@@ -550,10 +601,10 @@ export default function StudioPage() {
             <p className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-accent)]">
               ClipFactory
             </p>
-            <h1 className="mt-1.5 text-2xl font-bold sm:text-3xl">โรงงานคลิปปักตะกร้า</h1>
+            <h1 className="mt-1.5 text-2xl font-bold sm:text-3xl">หาเทรนด์ แล้วทำคลิปตามกระแส</h1>
             <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-[var(--color-ink-soft)]">
-              ป้อนข้อมูลสินค้า เลือกสูตรที่พิสูจน์แล้วว่าขายได้ ระบบเขียนสคริปต์ พากย์เสียงไทย
-              และเรนเดอร์ mp4 แนวตั้งพร้อมโพสต์ให้ในที่เดียว
+              ค้นว่าตอนนี้อะไรกำลังมาแรงในไทย เลือกสูตรที่พิสูจน์แล้วว่าขายได้ ระบบเขียนสคริปต์
+              พากย์เสียงไทย และเรนเดอร์ mp4 แนวตั้งให้พร้อมอัปโหลด
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -578,7 +629,23 @@ export default function StudioPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="grid gap-5">
-          <Section step={1} title="ข้อมูลสินค้า" hint="ยิ่งจุดขายชัด สคริปต์ยิ่งตรง" done={product.name.trim().length > 0}>
+          <Section
+            step={1}
+            title="หาเทรนด์ที่กำลังมาแรง"
+            hint="ดูว่าตอนนี้คนไทยกำลังสนใจอะไร แล้วค่อยเลือกสินค้าให้ตรงกระแส"
+            done={Boolean(trendReport)}
+          >
+            <TrendRadar
+              report={trendReport}
+              busy={trendBusy}
+              error={trendError}
+              onSearch={searchTrends}
+              onUseTrend={useTrend}
+              onDismissError={() => setTrendError('')}
+            />
+          </Section>
+
+          <Section step={2} title="ข้อมูลสินค้า" hint="ยิ่งจุดขายชัด สคริปต์ยิ่งตรง" done={product.name.trim().length > 0}>
             <div className="grid gap-4">
               <PasteImport busy={parseBusy} onImport={importPasted} />
               <ProductForm value={product} onChange={setProduct} />
@@ -586,7 +653,7 @@ export default function StudioPage() {
           </Section>
 
           <Section
-            step={2}
+            step={3}
             title="เลือกแพลตฟอร์มและสูตรคลิป"
             hint="ตัวเลขสีทองคือยอดวิวเทียบค่ากลางของบัญชีนั้น"
             done={Boolean(template)}
@@ -597,6 +664,7 @@ export default function StudioPage() {
                     key={p}
                     type="button"
                     onClick={() => setPlatform(p)}
+                    data-testid={`platform-${p}`}
                     className={`rounded px-3 py-1 text-xs font-semibold transition ${
                       platform === p
                         ? 'bg-[var(--color-accent)] text-[var(--color-accent-ink)]'
@@ -618,7 +686,7 @@ export default function StudioPage() {
           </Section>
 
           <Section
-            step={3}
+            step={4}
             title="สคริปต์และ hook"
             hint={
               template
@@ -669,7 +737,7 @@ export default function StudioPage() {
           </Section>
 
           {script && !audioless ? (
-            <Section step={4} title="เสียงพากย์ไทย" hint="สำหรับคนที่ไม่อยากพูดเอง" done={voice.length > 0}>
+            <Section step={5} title="เสียงพากย์ไทย" hint="สำหรับคนที่ไม่อยากพูดเอง" done={voice.length > 0}>
               <VoicePanel
                 voiceName={voiceName}
                 styleId={styleId}
@@ -684,7 +752,7 @@ export default function StudioPage() {
             </Section>
           ) : null}
 
-          <Section step={audioless ? 4 : 5} title="รูปสินค้า" done={assets.length > 0}>
+          <Section step={audioless ? 5 : 6} title="รูปสินค้า" done={assets.length > 0}>
             <AssetPanel
               assets={assets}
               onAdd={addAssets}
@@ -696,7 +764,7 @@ export default function StudioPage() {
             />
           </Section>
 
-          <Section step={audioless ? 5 : 6} title="เรนเดอร์และดาวน์โหลด" done={results.length > 0}>
+          <Section step={audioless ? 6 : 7} title="เรนเดอร์และดาวน์โหลด" done={results.length > 0}>
             <RenderPanel
               supportReason={support.ok ? null : support.reasonTh!}
               musicAllowed={template?.audio !== 'voice-only'}
