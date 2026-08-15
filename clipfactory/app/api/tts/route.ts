@@ -11,12 +11,16 @@ const VOICE_NAMES = new Set(VOICES.map((v) => v.name));
 export async function POST(req: Request) {
   let body: { text?: string; voiceName?: string; styleId?: string };
   try {
-    body = (await req.json()) as typeof body;
+    const parsed: unknown = await req.json();
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return NextResponse.json({ error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 });
+    }
+    body = parsed as typeof body;
   } catch {
     return NextResponse.json({ error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 });
   }
 
-  const text = body.text?.trim();
+  const text = typeof body.text === 'string' ? body.text.trim() : '';
   if (!text) return NextResponse.json({ error: 'ไม่มีข้อความให้อ่าน' }, { status: 400 });
   if (text.length > 4000) {
     return NextResponse.json({ error: 'ข้อความยาวเกินไป (สูงสุด 4000 ตัวอักษรต่อครั้ง)' }, { status: 400 });
@@ -30,6 +34,7 @@ export async function POST(req: Request) {
       text,
       voiceName,
       styleTh: style.promptTh,
+      signal: req.signal,
     });
     return new NextResponse(new Uint8Array(wav), {
       status: 200,

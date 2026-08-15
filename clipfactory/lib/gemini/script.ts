@@ -48,13 +48,19 @@ const GLOBAL_RULES = [
   'โทนต้องเหมือนคนธรรมดารีวิวของที่ใช้จริง ไม่ใช่โฆษณาแบรนด์',
 ];
 
+/** เวลาที่เหลือให้เนื้อหา หลังหัก hook 3 วิ และ CTA 2 วิ (สูตรที่ไม่มีเสียงพูดไม่มีซีน CTA) */
+function bodyBudgetOf(targetSec: number, template: FormatTemplate): number {
+  const ctaSec = template.audio === 'music-only' ? 0 : 2;
+  return Math.max(4, targetSec - 3 - ctaSec);
+}
+
 function buildPrompt(
   product: ProductInput,
   template: FormatTemplate,
   platform: Platform,
   targetSec: number,
 ): string {
-  const bodySec = Math.max(4, targetSec - 3 - 2); // หัก hook 3 วิ และ CTA 2 วิ
+  const bodySec = bodyBudgetOf(targetSec, template);
   const [minScenes, maxScenes] = template.sceneCount;
 
   const platformNote =
@@ -83,7 +89,9 @@ function buildPrompt(
     '',
     '## ข้อกำหนดความยาว',
     `คลิปรวมประมาณ ${targetSec} วินาที`,
-    `hook กินเวลา 3 วินาทีแรก, CTA ปิดท้าย 2 วินาที, เนื้อหาหลักรวมกันประมาณ ${bodySec} วินาที`,
+    template.audio === 'music-only'
+      ? `ข้อความแรกกินเวลา 3 วินาที เนื้อหาที่เหลือรวมกันประมาณ ${bodySec} วินาที`
+      : `hook กินเวลา 3 วินาทีแรก, CTA ปิดท้าย 2 วินาที, เนื้อหาหลักรวมกันประมาณ ${bodySec} วินาที`,
     `ต้องมีซีนเนื้อหา ${minScenes} ถึง ${maxScenes} ซีน และผลรวม durationSec ของทุกซีนต้องใกล้เคียง ${bodySec} วินาที`,
     '',
     '## กฎกลางที่ห้ามฝ่าฝืน',
@@ -110,8 +118,8 @@ function normalize(raw: unknown, targetSec: number, template: FormatTemplate): G
     throw new Error('โมเดลไม่ได้ส่งซีนกลับมา ลองกดสร้างใหม่อีกครั้ง');
   }
 
-  // ปรับสเกลเวลาให้ผลรวมตรงกับความยาวเป้าหมาย (หัก hook 3 วิ + CTA 2 วิ)
-  const bodyBudget = Math.max(4, targetSec - 5);
+  // ปรับสเกลเวลาให้ผลรวมตรงกับความยาวเป้าหมาย
+  const bodyBudget = bodyBudgetOf(targetSec, template);
   const sum = scenes.reduce((a, s) => a + s.durationSec, 0);
   const factor = sum > 0 ? bodyBudget / sum : 1;
   for (const s of scenes) s.durationSec = Math.round(s.durationSec * factor * 100) / 100;
@@ -132,8 +140,9 @@ export async function generateScript(args: {
   template: FormatTemplate;
   platform: Platform;
   targetSec: number;
+  signal?: AbortSignal;
 }): Promise<GeneratedScript> {
-  const { product, template, platform, targetSec } = args;
+  const { product, template, platform, targetSec, signal } = args;
   const ai = getGemini();
 
   const res = await ai.models.generateContent({
@@ -143,6 +152,7 @@ export async function generateScript(args: {
       responseMimeType: 'application/json',
       responseSchema: SCHEMA as never,
       temperature: 1.1,
+      ...(signal ? { abortSignal: signal } : {}),
     },
   });
 

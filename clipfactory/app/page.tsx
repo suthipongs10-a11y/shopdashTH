@@ -9,10 +9,10 @@ import { AssetPanel, type Asset } from '@/components/AssetPanel';
 import { PreviewStage, type VoiceCue } from '@/components/PreviewStage';
 import { RenderPanel, type RenderedClip } from '@/components/RenderPanel';
 import { ErrorNote, Pill, Section } from '@/components/ui';
-import { downloadBlob, requestScript, safeFilename, synthesizeLines } from '@/lib/client-api';
+import { downloadBlob, requestScript, revokeSegments, safeFilename, synthesizeLines } from '@/lib/client-api';
 import { buildMixedAudio, decodeAudio } from '@/lib/render/audio';
 import { checkSupport, renderClip } from '@/lib/render/encode';
-import { buildTimeline, lineStarts, orderedVoiceKeys, voiceLines } from '@/lib/render/timeline';
+import { buildTimeline, voiceLines } from '@/lib/render/timeline';
 import { TEMPLATES } from '@/lib/templates';
 import {
   DEFAULT_RENDER,
@@ -70,7 +70,12 @@ export default function StudioPage() {
   const [error, setError] = useState('');
   const [warning, setWarning] = useState('');
   const [hasKey, setHasKey] = useState<boolean | null>(null);
-  const support = useMemo(() => checkSupport(), []);
+  // ตรวจความสามารถของเบราว์เซอร์หลัง mount เท่านั้น ไม่งั้น HTML ที่ prerender ฝั่งเซิร์ฟเวอร์จะไม่ตรงกับฝั่ง client
+  const [support, setSupport] = useState<{ ok: boolean; reasonTh?: string }>({ ok: true });
+
+  useEffect(() => {
+    setSupport(checkSupport());
+  }, []);
 
   useEffect(() => {
     fetch('/api/health')
@@ -78,6 +83,28 @@ export default function StudioPage() {
       .then((d: { hasKey: boolean }) => setHasKey(d.hasKey))
       .catch(() => setHasKey(null));
   }, []);
+
+  // ล้างเสียงพากย์ทั้งหมดพร้อมคืนหน่วยความจำ — ใช้ทุกครั้งที่เสียงเดิมใช้ไม่ได้แล้ว
+  const clearVoice = useCallback(() => {
+    setBodyVoice((prev) => {
+      revokeSegments(prev);
+      return [];
+    });
+    setHookVoice((prev) => {
+      revokeSegments(Object.values(prev));
+      return {};
+    });
+  }, []);
+
+  // เปลี่ยนเสียงหรือโทนการพูด ไฟล์เสียงเดิมก็ใช้ไม่ได้แล้ว
+  const voiceSettingsRef = useRef(`${voiceName}/${styleId}`);
+  useEffect(() => {
+    const key = `${voiceName}/${styleId}`;
+    if (voiceSettingsRef.current !== key) {
+      voiceSettingsRef.current = key;
+      clearVoice();
+    }
+  }, [voiceName, styleId, clearVoice]);
 
   const audioless = template?.audio === 'music-only';
   const hasCta = Boolean(template && template.audio !== 'music-only');
@@ -89,7 +116,7 @@ export default function StudioPage() {
   }, [hookVoice, hookIndex, bodyVoice]);
 
   const timeline = useMemo(() => {
-    if (!script || !template) return { shots: [], totalSec: 0 };
+    if (!script || !template) return { shots: [], totalSec: 0, lines: [] };
     return buildTimeline({ script, hookIndex, template, voice, imageCount: assets.length });
   }, [script, template, hookIndex, voice, assets.length]);
 
@@ -98,23 +125,23 @@ export default function StudioPage() {
       ...DEFAULT_RENDER,
       headline: script?.headline ?? '',
       showSafeGuides: showGuides,
+      titleCard: template?.visual.titleCard ?? false,
+      kenBurns: template?.visual.kenBurns ?? 'alternate',
       theme: DEFAULT_THEME,
     }),
-    [script?.headline, showGuides],
+    [script?.headline, showGuides, template?.visual.titleCard, template?.visual.kenBurns],
   );
 
   const cues = useMemo<VoiceCue[]>(() => {
-    if (!script || !template || voice.length === 0) return [];
-    const keys = orderedVoiceKeys(script.scenes.length, hasCta);
-    const starts = lineStarts(timeline);
+    if (!voice.length) return [];
     const byKey = new Map(voice.map((v) => [v.key, v]));
-    const out: VoiceCue[] = [];
-    keys.forEach((k, i) => {
-      const seg = byKey.get(k);
-      if (seg && starts[i] !== undefined) out.push({ startSec: starts[i], url: seg.url });
-    });
-    return out;
-  }, [script, template, voice, timeline, hasCta]);
+    return timeline.lines
+      .map((line) => {
+        const seg = byKey.get(line.key);
+        return seg ? { startSec: line.startSec, url: seg.url } : null;
+      })
+      .filter((c): c is VoiceCue => c !== null);
+  }, [voice, timeline]);
 
   const bitmaps = useMemo(() => assets.map((a) => a.bitmap), [assets]);
 
@@ -124,9 +151,8 @@ export default function StudioPage() {
     setTargetSec(t.targetSec);
     setScript(null);
     setHookIndex(0);
-    setBodyVoice([]);
-    setHookVoice({});
-  }, []);
+    clearVoice();
+  }, [clearVoice]);
 
   // ── ขั้นที่ 3: สร้างสคริปต์
   const generateScript = useCallback(async () => {
@@ -137,26 +163,34 @@ export default function StudioPage() {
       const s = await requestScript({ product, templateId: template.id, platform, targetSec });
       setScript(s);
       setHookIndex(0);
-      setBodyVoice([]);
-      setHookVoice({});
+      clearVoice();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'สร้างสคริปต์ไม่สำเร็จ');
     } finally {
       setScriptBusy(false);
     }
-  }, [product, template, platform, targetSec]);
+  }, [product, template, platform, targetSec, clearVoice]);
 
   // แก้สคริปต์แล้วเสียงเดิมใช้ไม่ได้ ต้องล้างทิ้งเพื่อไม่ให้เสียงกับซับไม่ตรงกัน
   const updateScript = useCallback(
     (next: GeneratedScript) => {
       if (!script) return;
       const hookChanged = next.hooks.some((h, i) => h !== script.hooks[i]);
+      // caption เป็นต้นทางของเสียงพากย์เมื่อ vo ว่าง จึงต้องนับเป็นการเปลี่ยนแปลงด้วย
       const bodyChanged =
         next.cta !== script.cta ||
-        next.scenes.some((s, i) => s.vo !== script.scenes[i]?.vo) ||
-        next.scenes.length !== script.scenes.length;
-      if (hookChanged) setHookVoice({});
-      if (bodyChanged) setBodyVoice([]);
+        next.scenes.length !== script.scenes.length ||
+        next.scenes.some((s, i) => s.vo !== script.scenes[i]?.vo || s.caption !== script.scenes[i]?.caption);
+      if (hookChanged)
+        setHookVoice((prev) => {
+          revokeSegments(Object.values(prev));
+          return {};
+        });
+      if (bodyChanged)
+        setBodyVoice((prev) => {
+          revokeSegments(prev);
+          return [];
+        });
       setScript(next);
     },
     [script],
@@ -177,8 +211,16 @@ export default function StudioPage() {
         onProgress: (done, total, current) => setVoiceProgress({ done, total, current }),
       });
       const hook = segs.find((s) => s.key === 'hook');
-      setBodyVoice(segs.filter((s) => s.key !== 'hook'));
-      setHookVoice((prev) => (hook ? { ...prev, [hookIndex]: hook } : prev));
+      setBodyVoice((prev) => {
+        revokeSegments(prev);
+        return segs.filter((s) => s.key !== 'hook');
+      });
+      setHookVoice((prev) => {
+        if (!hook) return prev;
+        const old = prev[hookIndex];
+        if (old) revokeSegments([old]);
+        return { ...prev, [hookIndex]: hook };
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'สร้างเสียงพากย์ไม่สำเร็จ');
     } finally {
@@ -210,10 +252,26 @@ export default function StudioPage() {
   const removeAsset = useCallback((id: string) => {
     setAssets((prev) => {
       const target = prev.find((a) => a.id === id);
-      if (target) URL.revokeObjectURL(target.url);
+      if (target) {
+        URL.revokeObjectURL(target.url);
+        target.bitmap.close();
+      }
       return prev.filter((a) => a.id !== id);
     });
   }, []);
+
+  // คืนหน่วยความจำของรูปและไฟล์เสียงทั้งหมดเมื่อออกจากหน้า
+  const assetsRef = useRef(assets);
+  assetsRef.current = assets;
+  useEffect(
+    () => () => {
+      for (const a of assetsRef.current) {
+        URL.revokeObjectURL(a.url);
+        a.bitmap.close();
+      }
+    },
+    [],
+  );
 
   const moveAsset = useCallback((id: string, dir: -1 | 1) => {
     setAssets((prev) => {
@@ -245,7 +303,7 @@ export default function StudioPage() {
       if (!hookSeg && !audioless) {
         setRenderLabel(`${labelPrefix} · กำลังสร้างเสียง hook`);
         const [seg] = await synthesizeLines({
-          lines: [{ key: 'hook', text: script.hooks[index] ?? script.headline }],
+          lines: [{ key: 'hook', text: script.hooks[index]?.trim() || script.headline }],
           voiceName,
           styleId,
           signal: controller.signal,
@@ -268,8 +326,6 @@ export default function StudioPage() {
         timeline: variantTimeline,
         voice: variantVoice,
         music: music?.buffer ?? null,
-        sceneCount: script.scenes.length,
-        hasCta,
       });
 
       const { blob, warningTh } = await renderClip({
@@ -320,6 +376,12 @@ export default function StudioPage() {
       setError('');
       setRenderBusy(true);
       setRenderRatio(0);
+
+      // สูตรที่ต้องมีเสียงพูด แต่ยังไม่ได้สร้างเสียง — เตือนก่อนได้คลิปเงียบไปโดยไม่รู้ตัว
+      if (template.audio !== 'music-only' && bodyVoice.length === 0) {
+        setWarning('ยังไม่ได้สร้างเสียงพากย์ในขั้นที่ 4 — คลิปที่ได้จะมีแต่ภาพและข้อความ ไม่มีเสียงพูด');
+      }
+
       const controller = new AbortController();
       abortRef.current = controller;
 
@@ -343,7 +405,7 @@ export default function StudioPage() {
         abortRef.current = null;
       }
     },
-    [renderOne, script, template],
+    [renderOne, script, template, bodyVoice.length],
   );
 
   const canScript = product.name.trim().length > 0 && Boolean(template);
@@ -465,7 +527,7 @@ export default function StudioPage() {
                 voiceName={voiceName}
                 styleId={styleId}
                 segments={voice}
-                busy={voiceBusy}
+                busy={voiceBusy || renderBusy}
                 progress={voiceProgress}
                 onVoice={setVoiceName}
                 onStyle={setStyleId}
@@ -490,8 +552,8 @@ export default function StudioPage() {
           <Section step={audioless ? 5 : 6} title="เรนเดอร์และดาวน์โหลด" done={results.length > 0}>
             <RenderPanel
               supportReason={support.ok ? null : support.reasonTh!}
-              busy={renderBusy}
-              progressLabel={renderLabel}
+              busy={renderBusy || voiceBusy}
+              progressLabel={voiceBusy && !renderBusy ? 'กำลังสร้างเสียงพากย์ รอสักครู่' : renderLabel}
               progressRatio={renderRatio}
               hookCount={script?.hooks.length ?? 0}
               showGuides={showGuides}

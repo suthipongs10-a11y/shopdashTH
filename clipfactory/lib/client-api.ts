@@ -85,15 +85,9 @@ export async function synthesizeLines(args: {
   return out;
 }
 
-/** อ่านความยาวจริงของไฟล์เสียงจากเบราว์เซอร์ เผื่อ header ไม่มา */
-export async function probeDuration(url: string): Promise<number> {
-  return new Promise((resolve) => {
-    const a = new Audio();
-    a.preload = 'metadata';
-    a.onloadedmetadata = () => resolve(Number.isFinite(a.duration) ? a.duration : 0);
-    a.onerror = () => resolve(0);
-    a.src = url;
-  });
+/** คืนหน่วยความจำของไฟล์เสียงที่ไม่ใช้แล้ว */
+export function revokeSegments(segments: { url: string }[]) {
+  for (const s of segments) URL.revokeObjectURL(s.url);
 }
 
 export function downloadBlob(blob: Blob, filename: string) {

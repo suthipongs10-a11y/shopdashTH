@@ -109,9 +109,17 @@ export interface TimelineShot {
   kind: 'hook' | 'body' | 'cta';
 }
 
+/** จุดเริ่มของแต่ละบรรทัดเสียงพากย์ อ้างอิงด้วย key ตรงๆ ไม่ใช่ลำดับ */
+export interface TimelineLine {
+  key: string;
+  startSec: number;
+}
+
 export interface Timeline {
   shots: TimelineShot[];
   totalSec: number;
+  /** ผูกบรรทัดเสียงเข้ากับเวลาเริ่มจริง — เป็น source of truth เดียวของการวางเสียง */
+  lines: TimelineLine[];
 }
 
 export interface RenderOptions {
@@ -124,6 +132,10 @@ export interface RenderOptions {
   safeTop: number;
   headline: string;
   showSafeGuides: boolean;
+  /** แสดงป้ายหัวเรื่องค้างทั้งคลิปหรือไม่ — มาจาก template.visual.titleCard */
+  titleCard: boolean;
+  /** ลักษณะการซูม — มาจาก template.visual.kenBurns */
+  kenBurns: 'in' | 'out' | 'alternate' | 'none';
   theme: ClipTheme;
 }
 
@@ -149,7 +161,7 @@ export const DEFAULT_THEME: ClipTheme = {
 };
 
 /** ค่ามาตรฐาน 9:16 พร้อม safe zone จากงานวิจัย (ล่าง 25% / ขวา 15%) */
-export const DEFAULT_RENDER: Omit<RenderOptions, 'headline' | 'theme'> = {
+export const DEFAULT_RENDER: Omit<RenderOptions, 'headline' | 'theme' | 'titleCard' | 'kenBurns'> = {
   width: 1080,
   height: 1920,
   fps: 30,

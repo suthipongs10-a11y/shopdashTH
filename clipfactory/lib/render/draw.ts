@@ -226,16 +226,18 @@ export function drawFrame(
   const p = Math.min(1, Math.max(0, (t - shot.startSec) / span));
 
   if (img) {
-    const dir = idx % 2 === 0 ? 1 : -1;
-    const zoom = 1.02 + (dir > 0 ? p : 1 - p) * 0.07;
-    const drift = dir * (p - 0.5) * 0.22;
+    // ทิศทางการซูมตามที่สูตรกำหนด — alternate = สลับเข้า/ออกทีละช็อตให้ดูมีชีวิต
+    const dir = o.kenBurns === 'alternate' ? (idx % 2 === 0 ? 1 : -1) : o.kenBurns === 'out' ? -1 : 1;
+    const amount = o.kenBurns === 'none' ? 0 : 0.07;
+    const zoom = 1.02 + (dir > 0 ? p : 1 - p) * amount;
+    const drift = amount === 0 ? 0 : dir * (p - 0.5) * 0.22;
     drawCover(ctx, img, W, H, zoom, drift);
   } else {
     drawPlaceholder(ctx, W, H, o.theme.accent, productName || 'ยังไม่ได้อัปโหลดรูปสินค้า', o.theme.fontFamily);
   }
 
   drawScrim(ctx, W, H);
-  drawHeadline(ctx, o.headline, W, H, o);
+  if (o.titleCard) drawHeadline(ctx, o.headline, W, H, o);
   drawCaption(ctx, shot.caption, W, H, o, shot.kind !== 'body');
   drawProgress(ctx, timeline.totalSec > 0 ? t / timeline.totalSec : 0, W, H, o);
 

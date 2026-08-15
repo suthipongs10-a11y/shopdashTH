@@ -7,8 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
-    "verify:render": "node scripts/verify-render.mjs"
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.scripts.json",
+    "verify:render": "node scripts/verify-render.mjs",
+    "test": "node --experimental-strip-types scripts/test-timeline.ts"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",

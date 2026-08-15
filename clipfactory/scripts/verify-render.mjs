@@ -72,6 +72,10 @@ try {
   page.on('pageerror', (e) => console.log(`[pageerror] ${e.message}`));
 
   await page.goto(`${BASE}/selftest`, { waitUntil: 'domcontentloaded' });
+  if (process.env.SILENT === '1') {
+    await page.check('[data-testid="silent"]');
+    console.log('\n(โหมดทดสอบ: สูตรที่ไม่มีเสียงพูด)');
+  }
   await page.click('[data-testid="run"]');
 
   await page.waitForFunction(
@@ -104,7 +108,7 @@ try {
 
   if (bytes) {
     const buf = Buffer.from(bytes);
-    const outPath = '/tmp/clipfactory-selftest.mp4';
+    const outPath = process.env.SILENT === '1' ? '/tmp/clipfactory-silent.mp4' : '/tmp/clipfactory-selftest.mp4';
     await writeFile(outPath, buf);
     const boxes = parseBoxes(buf);
     const types = boxes.map((b) => b.type);
@@ -121,7 +125,10 @@ try {
     if (!types.includes('ftyp')) problems.push('ไม่พบกล่อง ftyp');
     if (!types.includes('moov')) problems.push('ไม่พบกล่อง moov (metadata)');
     if (!mdat || mdat.size < 1024) problems.push('กล่อง mdat ว่างหรือเล็กผิดปกติ');
-    if (trakCount < 2) problems.push(`คาดว่าจะมี 2 track (ภาพ+เสียง) แต่พบ ${trakCount}`);
+    const expectedTracks = process.env.SILENT === '1' ? 1 : 2;
+    if (trakCount !== expectedTracks) {
+      problems.push(`คาดว่าจะมี ${expectedTracks} track แต่พบ ${trakCount}`);
+    }
     if (types.indexOf('moov') > types.indexOf('mdat')) {
       problems.push('moov อยู่หลัง mdat — fastStart ไม่ทำงาน');
     }

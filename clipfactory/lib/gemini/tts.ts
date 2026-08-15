@@ -35,6 +35,7 @@ export interface SynthesizeArgs {
   voiceName: string;
   /** คำสั่งกำกับน้ำเสียง เช่น "พูดเร็ว กระตือรือร้น เหมือนกำลังเล่าให้เพื่อนฟัง" */
   styleTh?: string;
+  signal?: AbortSignal;
 }
 
 export interface SynthesizedAudio {
@@ -43,7 +44,7 @@ export interface SynthesizedAudio {
   durationSec: number;
 }
 
-export async function synthesize({ text, voiceName, styleTh }: SynthesizeArgs): Promise<SynthesizedAudio> {
+export async function synthesize({ text, voiceName, styleTh, signal }: SynthesizeArgs): Promise<SynthesizedAudio> {
   const clean = text.trim();
   if (!clean) throw new Error('ไม่มีข้อความให้อ่าน');
 
@@ -57,6 +58,7 @@ export async function synthesize({ text, voiceName, styleTh }: SynthesizeArgs): 
     config: {
       responseModalities: ['AUDIO'],
       speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
+      ...(signal ? { abortSignal: signal } : {}),
     },
   });
 
@@ -66,6 +68,7 @@ export async function synthesize({ text, voiceName, styleTh }: SynthesizeArgs): 
 
   const sampleRate = parseRate(part?.inlineData?.mimeType);
   const pcm = Buffer.from(b64, 'base64');
+  if (pcm.length < 2) throw new Error('ไฟล์เสียงที่ได้จาก Gemini ว่างเปล่า ลองเปลี่ยนเสียงหรือลองใหม่อีกครั้ง');
   const durationSec = pcm.length / (sampleRate * 2); // 16-bit mono
 
   return { wav: pcmToWav(pcm, sampleRate), sampleRate, durationSec };

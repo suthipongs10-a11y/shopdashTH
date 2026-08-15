@@ -1,4 +1,11 @@
-import type { FormatTemplate, GeneratedScript, Timeline, TimelineShot, VoiceSegment } from '../types';
+import type {
+  FormatTemplate,
+  GeneratedScript,
+  Timeline,
+  TimelineLine,
+  TimelineShot,
+  VoiceSegment,
+} from '../types';
 
 /** ช่องว่างหายใจท้ายแต่ละบรรทัดเสียงพากย์ */
 const PAD_SEC = 0.28;
@@ -48,27 +55,33 @@ export function buildTimeline(args: {
   const byKey = new Map((voice ?? []).map((v) => [v.key, v]));
   const lines = linesOf(script, hookIndex, template);
 
-  const base: { kind: TimelineShot['kind']; caption: string; dur: number }[] = lines.map((l) => {
+  const base = lines.map((l) => {
     const seg = byKey.get(l.key);
     const dur = seg && seg.durationSec > 0 ? seg.durationSec + PAD_SEC : l.fallbackSec;
-    return { kind: l.kind, caption: l.caption, dur: Math.max(0.6, dur) };
+    return { kind: l.kind, caption: l.caption, key: l.key, dur: Math.max(0.6, dur) };
   });
 
-  // กฎจากงานวิจัย: เปลี่ยนภาพทุก cutEverySec วินาที — ซอยซีนยาวเป็นช็อตย่อย
+  // กฎจากงานวิจัย: เปลี่ยนภาพทุก cutEverySec วินาที — ซอยบรรทัดยาวเป็นช็อตย่อย
+  // เก็บ key ติดไปกับช็อตแรกของแต่ละบรรทัด เพื่อรู้เวลาเริ่มของบรรทัดนั้นแบบตรงไปตรงมา
   const cut = Math.max(0.8, template.visual.cutEverySec);
-  const expanded: { kind: TimelineShot['kind']; caption: string; dur: number }[] = [];
+  const expanded: { kind: TimelineShot['kind']; caption: string; dur: number; lineKey?: string }[] = [];
   for (const b of base) {
     const pieces = Math.max(1, Math.ceil(b.dur / cut - 0.01));
     const each = b.dur / pieces;
-    for (let i = 0; i < pieces; i++) expanded.push({ kind: b.kind, caption: b.caption, dur: each });
+    for (let i = 0; i < pieces; i++) {
+      expanded.push({ kind: b.kind, caption: b.caption, dur: each, lineKey: i === 0 ? b.key : undefined });
+    }
   }
 
   const shots: TimelineShot[] = [];
+  const timelineLines: TimelineLine[] = [];
   let t = 0;
   const n = Math.max(1, imageCount);
   expanded.forEach((e, i) => {
+    const startSec = Math.round(t * 1000) / 1000;
+    if (e.lineKey) timelineLines.push({ key: e.lineKey, startSec });
     shots.push({
-      startSec: Math.round(t * 1000) / 1000,
+      startSec,
       endSec: Math.round((t + e.dur) * 1000) / 1000,
       caption: e.caption,
       assetIndex: i % n,
@@ -77,23 +90,7 @@ export function buildTimeline(args: {
     t += e.dur;
   });
 
-  return { shots, totalSec: Math.round(t * 1000) / 1000 };
-}
-
-/**
- * จุดเริ่มของแต่ละ "บรรทัด" ในไทม์ไลน์
- * ช็อตย่อยที่ถูกซอยจากบรรทัดเดียวกันใช้ caption เดียวกัน จึงนับเฉพาะตอนที่ caption เปลี่ยน
- */
-export function lineStarts(timeline: Timeline): number[] {
-  const starts: number[] = [];
-  let last: string | null = null;
-  for (const shot of timeline.shots) {
-    if (shot.caption !== last) {
-      starts.push(shot.startSec);
-      last = shot.caption;
-    }
-  }
-  return starts;
+  return { shots, totalSec: Math.round(t * 1000) / 1000, lines: timelineLines };
 }
 
 /** ลำดับคีย์เสียงพากย์ ต้องตรงกับลำดับบรรทัดที่ buildTimeline สร้าง */

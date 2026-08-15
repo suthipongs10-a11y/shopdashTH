@@ -1,5 +1,4 @@
 import type { Timeline, VoiceSegment } from '../types';
-import { lineStarts, orderedVoiceKeys } from './timeline';
 
 export const MIX_SAMPLE_RATE = 48000;
 export const MIX_CHANNELS = 2;
@@ -35,13 +34,10 @@ export async function fetchAudio(url: string): Promise<AudioBuffer> {
 export async function buildMixedAudio(args: {
   timeline: Timeline;
   voice: VoiceSegment[];
-  /** ลำดับบรรทัดเสียงต้องตรงกับที่ buildTimeline ใช้ */
   music?: AudioBuffer | null;
   musicGain?: number;
-  sceneCount: number;
-  hasCta: boolean;
 }): Promise<AudioBuffer | null> {
-  const { timeline, voice, music, sceneCount, hasCta } = args;
+  const { timeline, voice, music } = args;
   if (!voice.length && !music) return null;
 
   const totalSec = Math.max(0.5, timeline.totalSec);
@@ -55,26 +51,21 @@ export async function buildMixedAudio(args: {
     MIX_SAMPLE_RATE,
   );
 
-  // ── เสียงพากย์: วางแต่ละบรรทัดที่จุดเริ่มของช็อตแรกที่ใช้บรรทัดนั้น
+  // ── เสียงพากย์: วางตามเวลาเริ่มที่ไทม์ไลน์บอกไว้ตรงๆ อ้างอิงด้วย key ไม่ใช่ลำดับ
   const byKey = new Map(voice.map((v) => [v.key, v]));
-  const orderedKeys = orderedVoiceKeys(sceneCount, hasCta);
-  const starts = lineStarts(timeline);
-
   const voiceGain = offline.createGain();
   voiceGain.gain.value = 1;
   voiceGain.connect(offline.destination);
 
-  for (let i = 0; i < orderedKeys.length; i++) {
-    const seg = byKey.get(orderedKeys[i]);
-    if (!seg) continue;
-    const start = starts[i] ?? 0;
-    if (start >= totalSec) continue;
+  for (const line of timeline.lines) {
+    const seg = byKey.get(line.key);
+    if (!seg || line.startSec >= totalSec) continue;
     try {
       const buf = await fetchAudio(seg.url);
       const src = offline.createBufferSource();
       src.buffer = buf;
       src.connect(voiceGain);
-      src.start(start);
+      src.start(line.startSec);
     } catch {
       // ข้ามบรรทัดที่โหลดไม่ได้ ดีกว่าล้มทั้งคลิป
     }
@@ -89,10 +80,12 @@ export async function buildMixedAudio(args: {
     g.gain.linearRampToValueAtTime(0.0001, totalSec);
     g.connect(offline.destination);
 
-    // วนเพลงให้ยาวพอคลุมคลิป
+    // วนเพลงให้ยาวพอคลุมคลิปเสมอ — จำนวนรอบคำนวณจากความยาวจริง ไม่ใช่ค่าคงที่
+    const loopLen = Math.max(0.05, music.duration);
+    const maxLoops = Math.ceil(totalSec / loopLen) + 1;
     let at = 0;
     let guard = 0;
-    while (at < totalSec && guard++ < 64) {
+    while (at < totalSec && guard++ < maxLoops) {
       const src = offline.createBufferSource();
       src.buffer = music;
       src.connect(g);

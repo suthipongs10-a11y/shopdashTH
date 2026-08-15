@@ -7,6 +7,13 @@ import type { Platform, ProductInput, TemplateId } from '@/lib/types';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
+/** จำกัดความยาวของทุกช่อง กันข้อความยาวผิดปกติหลุดเข้าโมเดลและกินหน่วยความจำ */
+const LIMITS = { name: 200, price: 60, category: 60, url: 500, audience: 200, point: 200, points: 10 };
+
+function text(value: unknown, max: number): string {
+  return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
 interface Body {
   product?: Partial<ProductInput>;
   templateId?: TemplateId;
@@ -17,12 +24,21 @@ interface Body {
 export async function POST(req: Request) {
   let body: Body;
   try {
-    body = (await req.json()) as Body;
+    const parsed: unknown = await req.json();
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return NextResponse.json({ error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 });
+    }
+    body = parsed as Body;
   } catch {
     return NextResponse.json({ error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 });
   }
 
-  const name = body.product?.name?.trim();
+  const rawProduct = body.product;
+  if (rawProduct !== undefined && (typeof rawProduct !== 'object' || rawProduct === null || Array.isArray(rawProduct))) {
+    return NextResponse.json({ error: 'รูปแบบข้อมูลสินค้าไม่ถูกต้อง' }, { status: 400 });
+  }
+
+  const name = text(body.product?.name, LIMITS.name);
   if (!name) {
     return NextResponse.json({ error: 'กรุณากรอกชื่อสินค้าก่อน' }, { status: 400 });
   }
@@ -41,13 +57,17 @@ export async function POST(req: Request) {
   const requested = Number(body.targetSec) || template.targetSec;
   const targetSec = Math.min(maxSec, Math.max(minSec, requested));
 
+  const rawPoints = body.product?.sellingPoints;
   const product: ProductInput = {
     name,
-    price: body.product?.price?.trim() ?? '',
-    sellingPoints: (body.product?.sellingPoints ?? []).map((s) => String(s).trim()).filter(Boolean),
-    category: body.product?.category?.trim() ?? '',
-    url: body.product?.url?.trim() ?? '',
-    audience: body.product?.audience?.trim() ?? '',
+    price: text(body.product?.price, LIMITS.price),
+    sellingPoints: (Array.isArray(rawPoints) ? rawPoints : [])
+      .slice(0, LIMITS.points)
+      .map((s) => text(s, LIMITS.point))
+      .filter(Boolean),
+    category: text(body.product?.category, LIMITS.category),
+    url: text(body.product?.url, LIMITS.url),
+    audience: text(body.product?.audience, LIMITS.audience),
   };
 
   try {
@@ -56,6 +76,7 @@ export async function POST(req: Request) {
       template,
       platform: body.platform === 'shopee' ? 'shopee' : 'tiktok',
       targetSec,
+      signal: req.signal,
     });
     return NextResponse.json({ script, targetSec });
   } catch (err) {

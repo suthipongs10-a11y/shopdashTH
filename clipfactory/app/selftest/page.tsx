@@ -34,7 +34,11 @@ function demoTimeline(): Timeline {
     assetIndex: i,
     kind: (i === 0 ? 'hook' : i === captions.length - 1 ? 'cta' : 'body') as 'hook' | 'body' | 'cta',
   }));
-  return { shots, totalSec: shots.length * 0.8 };
+  return {
+    shots,
+    totalSec: shots.length * 0.8,
+    lines: shots.map((sh, i) => ({ key: `line-${i}`, startSec: sh.startSec })),
+  };
 }
 
 async function demoImage(seed: number): Promise<ImageBitmap> {
@@ -66,6 +70,7 @@ async function demoAudio(seconds: number): Promise<AudioBuffer> {
 }
 
 export default function SelfTestPage() {
+  const [silent, setSilent] = useState(false);
   const [checks, setChecks] = useState<Check[]>(INITIAL);
   const [busy, setBusy] = useState(false);
   const [ratio, setRatio] = useState(0);
@@ -103,14 +108,22 @@ export default function SelfTestPage() {
       const timeline = demoTimeline();
 
       mark('audio', 'running');
-      const audio = await demoAudio(timeline.totalSec);
-      mark('audio', 'pass', `${audio.numberOfChannels} ช่อง · ${audio.sampleRate} Hz · ${audio.duration.toFixed(1)} วิ`);
+      const audio = silent ? null : await demoAudio(timeline.totalSec);
+      mark(
+        'audio',
+        'pass',
+        audio
+          ? `${audio.numberOfChannels} ช่อง · ${audio.sampleRate} Hz · ${audio.duration.toFixed(1)} วิ`
+          : 'ข้าม — ทดสอบสูตรที่ไม่มีเสียงพูด',
+      );
 
       mark('render', 'running');
       const options: RenderOptions = {
         ...DEFAULT_RENDER,
         headline: 'ทดสอบระบบ ClipFactory',
         showSafeGuides: false,
+        titleCard: true,
+        kenBurns: 'alternate',
         theme: DEFAULT_THEME,
       };
       const started = performance.now();
@@ -149,7 +162,7 @@ export default function SelfTestPage() {
       setBusy(false);
       setRatio(0);
     }
-  }, [mark]);
+  }, [mark, silent]);
 
   // เปิดให้สคริปต์ทดสอบอัตโนมัติอ่านผลได้
   useEffect(() => {
@@ -167,9 +180,22 @@ export default function SelfTestPage() {
         ใช้ตรวจว่าเบราว์เซอร์ของคุณเรนเดอร์ mp4 ได้ก่อนลงมือทำคลิปจริง
       </p>
 
-      <button type="button" className="btn-primary mt-5" onClick={run} disabled={busy} data-testid="run">
-        {busy ? 'กำลังทดสอบ…' : 'เริ่มทดสอบ'}
-      </button>
+      <div className="mt-5 flex flex-wrap items-center gap-4">
+        <button type="button" className="btn-primary" onClick={run} disabled={busy} data-testid="run">
+          {busy ? 'กำลังทดสอบ…' : 'เริ่มทดสอบ'}
+        </button>
+        <label className="flex items-center gap-2 text-xs text-[var(--color-ink-soft)]">
+          <input
+            type="checkbox"
+            checked={silent}
+            onChange={(e) => setSilent(e.target.checked)}
+            disabled={busy}
+            className="accent-[var(--color-accent)]"
+            data-testid="silent"
+          />
+          ทดสอบสูตรที่ไม่มีเสียงพูด (beat-sync)
+        </label>
+      </div>
 
       {busy ? (
         <div className="mt-4">

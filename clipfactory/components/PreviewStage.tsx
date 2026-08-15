@@ -25,6 +25,8 @@ export function PreviewStage({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number | null>(null);
+  // rAF ที่ self-schedule จะจับ closure ของเฟรมที่สร้างมัน — เก็บตัวล่าสุดไว้ใน ref กันพรีวิวค้าง
+  const tickRef = useRef<() => void>(() => {});
   const startedAtRef = useRef(0);
   const audiosRef = useRef<HTMLAudioElement[]>([]);
   const firedRef = useRef<Set<number>>(new Set());
@@ -91,15 +93,17 @@ export function PreviewStage({
 
     paint(elapsed);
     setT(elapsed);
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(() => tickRef.current());
   }, [cues, paint, stop, total]);
+
+  tickRef.current = tick;
 
   const play = useCallback(() => {
     stopAudio();
     startedAtRef.current = performance.now();
     setPlaying(true);
-    rafRef.current = requestAnimationFrame(tick);
-  }, [stopAudio, tick]);
+    rafRef.current = requestAnimationFrame(() => tickRef.current());
+  }, [stopAudio]);
 
   return (
     <div className="grid gap-3">
