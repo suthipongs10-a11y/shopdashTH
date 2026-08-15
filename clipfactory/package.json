@@ -1,0 +1,30 @@
+{
+  "name": "clipfactory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "โรงงานผลิตคลิปปักตะกร้า สำหรับ affiliate รายเดี่ยว",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "verify:render": "node scripts/verify-render.mjs"
+  },
+  "dependencies": {
+    "@google/genai": "^2.17.1",
+    "mp4-muxer": "^5.2.2",
+    "next": "^15.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "playwright": "^1.62.1",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5"
+  }
+}
