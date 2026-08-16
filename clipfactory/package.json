@@ -11,7 +11,7 @@
     "verify:render": "node scripts/verify-render.mjs",
     "test": "node --experimental-strip-types scripts/test-timeline.ts",
     "test:ui": "node scripts/test-ui.mjs",
-    "setup": "node scripts/preflight.mjs"
+    "check": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",
@@ -29,5 +29,12 @@
     "playwright": "^1.62.1",
     "tailwindcss": "^4.1.0",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@google/genai",
+      "protobufjs",
+      "sharp"
+    ]
   }
 }

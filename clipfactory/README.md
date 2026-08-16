@@ -63,23 +63,36 @@
 git clone https://github.com/suthipongs10-a11y/shopdashTH.git
 cd shopdashTH
 git checkout claude/tiktok-shopee-video-research-kysf4d
-
-# 2. ติดตั้ง (ต้องมี --ignore-workspace เพราะโปรเจ็คแม่มี lockfile ของตัวเอง)
 cd clipfactory
-npm install -g pnpm          # ข้ามได้ถ้ามี pnpm แล้ว
-pnpm install --ignore-workspace
+
+# 2. ติดตั้ง (npm มากับ Node อยู่แล้ว ไม่ต้องลงอะไรเพิ่ม)
+npm install
 
 # 3. ตรวจความพร้อม — จะสร้าง .env.local ให้ และบอกว่าต้องทำอะไรต่อ
-pnpm setup
+npm run check
 
 # 4. ใส่คีย์ Gemini ลงใน .env.local (ขอฟรีที่ https://aistudio.google.com/apikey)
-#    แล้วรัน pnpm setup อีกครั้งเพื่อยืนยันว่าใส่ถูก
+#    แล้วรัน npm run check อีกครั้งให้ขึ้นว่า "พร้อมแล้ว"
 
 # 5. เปิดใช้งาน
-pnpm dev
+npm run dev
 ```
 
-`pnpm setup` จะบอกเป็นภาษาไทยว่าติดตรงไหน — Node เก่าไป ยังไม่ใส่คีย์ ยังไม่ได้ติดตั้ง หรือพอร์ตชนกัน
+`npm run check` จะบอกเป็นภาษาไทยว่าติดตรงไหน — Node เก่าไป ยังไม่ใส่คีย์ ยังไม่ได้ติดตั้ง หรือพอร์ตชนกัน
+
+<details>
+<summary>ถ้าอยากใช้ pnpm แทน</summary>
+
+```bash
+pnpm install --ignore-workspace   # ต้องมี --ignore-workspace เพราะโปรเจ็คแม่มี lockfile ของตัวเอง
+pnpm run check                    # ต้องมี run เพราะ pnpm มีคำสั่ง setup/check ในตัว
+npm run dev
+```
+
+`.npmrc` ตั้ง `strict-dep-builds=false` ไว้แล้ว เพราะ pnpm 11 ถือว่า build script ที่ถูกข้าม
+(`@google/genai`, `protobufjs`, `sharp`) เป็น error — โปรเจ็คนี้ไม่ต้องใช้ build script ของตัวไหนเลย
+
+</details>
 
 ### ตรวจเครื่องก่อนลงมือ
 
@@ -176,7 +189,7 @@ scripts/preflight.mjs       ตรวจความพร้อมของเ�
 ## ทดสอบ
 
 ```bash
-pnpm setup            # ตรวจความพร้อมของเครื่อง (Node, คีย์, dependencies, พอร์ต)
+npm run check         # ตรวจความพร้อมของเครื่อง (Node, คีย์, dependencies, พอร์ต)
 pnpm typecheck        # ตรวจชนิดข้อมูลทั้งแอปและสคริปต์ทดสอบ
 pnpm test             # ทดสอบตรรกะไทม์ไลน์ (ไม่ต้องใช้เบราว์เซอร์)
 pnpm test:ui          # ทดสอบ UI ในเบราว์เซอร์จริง (บันทึกงาน กู้คืน กรองสูตร)

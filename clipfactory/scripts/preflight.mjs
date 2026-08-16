@@ -1,7 +1,7 @@
 /**
  * ตรวจความพร้อมก่อนใช้งานจริง — บอกเป็นภาษาไทยว่าติดตรงไหนและต้องทำอะไรต่อ
  *
- *   pnpm setup
+ *   npm run check
  */
 import { existsSync, readFileSync, copyFileSync } from 'node:fs';
 import { createServer } from 'node:net';
@@ -76,16 +76,16 @@ const free = await new Promise((resolve) => {
   s.listen(port, '127.0.0.1');
 });
 if (free) ok(`พอร์ต ${port} ว่าง`);
-else warn(`พอร์ต ${port} ถูกใช้อยู่`, `เปิดด้วยพอร์ตอื่นได้: pnpm dev -- -p 3005`);
+else warn(`พอร์ต ${port} ถูกใช้อยู่`, `เปิดด้วยพอร์ตอื่นได้: pnpm dev -p 3005`);
 
 console.log('');
 if (blocking > 0) {
-  console.log(`ยังไม่พร้อม — แก้ ${blocking} ข้อข้างบนก่อน แล้วรัน pnpm setup ใหม่\n`);
+  console.log(`ยังไม่พร้อม — แก้ ${blocking} ข้อข้างบนก่อน แล้วรัน npm run check ใหม่\n`);
   process.exit(1);
 }
 
 console.log('พร้อมแล้ว ทำตามนี้ต่อ\n');
-console.log('  1. pnpm dev');
+console.log('  1. npm run dev');
 console.log(`  2. เปิด http://localhost:${port}/selftest ด้วย Chrome หรือ Edge แล้วกด "เริ่มทดสอบ"`);
 console.log('     ต้องผ่านครบ 5 ข้อ และขึ้น H.264 + AAC (ถ้าขึ้น VP9 แปลว่าเบราว์เซอร์ไม่มี codec)');
 console.log(`  3. เปิด http://localhost:${port} แล้วเริ่มใช้งานจริง\n`);

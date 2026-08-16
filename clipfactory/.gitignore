@@ -4,3 +4,6 @@ out
 .env
 .env.local
 *.tsbuildinfo
+
+# ผู้ใช้ทั่วไปติดตั้งด้วย npm ได้ แต่ lockfile ที่เป็นทางการของโปรเจ็คคือ pnpm-lock.yaml (CI ใช้ตัวนี้)
+package-lock.json
