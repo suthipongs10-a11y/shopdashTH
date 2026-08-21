@@ -20,7 +20,10 @@ npm run dev        # http://localhost:4321
 | `npm run build` | build static → `dist/` |
 | `npm run preview` | เปิดดูผลลัพธ์ที่ build แล้ว |
 | `npm run check` | ตรวจ type ของ `.astro` / `.ts` |
+| `npm run check:seo` | ตรวจโครงสร้าง SEO ของ `dist/` (title, description, h1, canonical, og, JSON-LD, ลิงก์ตาย) |
 | `npm run check:launch` | ด่านกัน launch ถ้าเบอร์โทร/LINE ยังเป็น placeholder |
+| `npm run verify` | check + build + check:seo — รันก่อน commit |
+| `npm run og` | สร้าง OG image / favicon ใหม่ |
 
 ## เอกสาร
 

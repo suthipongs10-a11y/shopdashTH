@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#1d4ed8"/>
-  <text x="32" y="44" font-family="Noto Sans Thai, sans-serif" font-size="34" font-weight="800"
-        fill="#ffffff" text-anchor="middle">ดี</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#12649f"/><g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M32 12v40M15 21.5l34 21M49 21.5l-34 21M32 22l6-6M32 22l-6-6M32 42l6 6M32 42l-6 6"/></g></svg>

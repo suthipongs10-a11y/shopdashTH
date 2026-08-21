@@ -1,0 +1,107 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import ReviewsSection from '@/components/ReviewsSection.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import Icons from '@/components/Icons.astro';
+import { contact, provinces, services } from '@/data/site';
+import { aggregateFor, reviewsFor } from '@/data/reviews';
+import {
+  breadcrumbNode,
+  clampDescription,
+  graph,
+  orgNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+const service = services[0]!;
+const province = provinces[0]!;
+const path = '/reviews/';
+
+const all = reviewsFor({});
+const aggregate = aggregateFor({});
+
+const title = `รีวิวจากลูกค้าจริง — ${service.nameTh}${province.nameTh}`;
+const description = clampDescription(
+  `รวมรีวิวจากลูกค้าที่ใช้บริการ${service.nameTh}กับหาช่างดีดีจริง ๆ ในจังหวัด${province.nameTh} เราแสดงเฉพาะรีวิวที่ได้รับอนุญาตให้เผยแพร่ ไม่มีรีวิวแต่งขึ้นเอง`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: 'รีวิวจากลูกค้า', path },
+];
+
+// หน้ายังไม่มีเนื้อหาจริง = อย่าให้ Google เก็บไปเป็น thin page
+const noindex = all.length === 0;
+
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+]);
+
+const steps = [
+  'ใช้บริการกับช่างของเราจนงานเสร็จ',
+  'ทัก LINE มาเล่าให้ฟังว่าเป็นยังไงบ้าง จะส่งรูปมาด้วยก็ได้',
+  'เราขออนุญาตก่อนนำขึ้นเว็บ และใช้แค่ชื่อย่อ เช่น “คุณสมชาย ก.”',
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema} noindex={noindex}>
+  <Hero
+    title="รีวิวจากลูกค้าจริง"
+    lead="เราแสดงเฉพาะรีวิวจากลูกค้าที่ใช้บริการจริงและอนุญาตให้เผยแพร่เท่านั้น ไม่มีรีวิวแต่งขึ้นเองแม้แต่รายการเดียว"
+    crumbs={crumbs}
+  />
+
+  <ReviewsSection
+    reviews={all}
+    aggregate={aggregate}
+    title="รีวิวทั้งหมด"
+    showWhenEmpty
+    tone="white"
+  />
+
+  <Section tone="tint" title="อยากรีวิวให้เรา ทำยังไง" id="how-to-review">
+    <ol class="grid gap-3 sm:grid-cols-3">
+      {
+        steps.map((step, i) => (
+          <li class="card p-5">
+            <span
+              aria-hidden="true"
+              class="grid h-8 w-8 place-items-center rounded-pill bg-brand-600 font-extrabold text-white"
+            >
+              {i + 1}
+            </span>
+            <p class="mt-3 text-ink-700">{step}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="card mt-6 p-5">
+      <p class="flex items-start gap-2 text-ink-700">
+        <Icons name="shield" class="mt-1 h-5 w-5 shrink-0 text-brand-600" />
+        <span>
+          <strong class="text-brand-900">นโยบายรีวิวของเรา:</strong>
+          เราไม่จ้างเขียนรีวิว ไม่ลบรีวิวที่ติชมตามจริง และไม่แสดงคะแนนเฉลี่ยจนกว่าจะมีรีวิวที่ยืนยันได้จริงมากพอ
+          ถ้าเจอปัญหาจากช่างของเรา บอกมาทาง LINE ได้โดยตรง เราตามให้
+        </span>
+      </p>
+      <a href={contact.lineUrl} rel="noopener" class="btn-line mt-4 px-5 py-3">
+        <Icons name="line" class="h-6 w-6" />
+        ส่งรีวิวหรือแจ้งปัญหาทาง LINE
+      </a>
+    </div>
+  </Section>
+
+  <CtaBanner
+    title="ยังไม่เคยใช้บริการ? ลองทักมาถามราคาก่อนได้"
+    lead="ถามราคาไม่มีค่าใช้จ่าย ไม่ต้องมัดจำ"
+    place="reviews-bottom"
+  />
+</BaseLayout>

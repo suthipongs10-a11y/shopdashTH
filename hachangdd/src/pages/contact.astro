@@ -1,0 +1,157 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import CtaButtons from '@/components/CtaButtons.astro';
+import Icons from '@/components/Icons.astro';
+import { contact, provinces, services, site } from '@/data/site';
+import {
+  breadcrumbNode,
+  clampDescription,
+  graph,
+  orgNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+const service = services[0]!;
+const province = provinces[0]!;
+const path = '/contact/';
+
+const title = `ติดต่อ${site.name} — จองคิวหรือสมัครเป็นช่างพาร์ทเนอร์`;
+const description = clampDescription(
+  `ติดต่อ${site.name} จองคิว${service.nameTh}ในจังหวัด${province.nameTh} โทร ${contact.phone} หรือทัก LINE ${contact.lineOaId} ${contact.hoursTh} — ช่างที่อยากรับงานสมัครเป็นพาร์ทเนอร์ได้ที่หน้านี้`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: 'ติดต่อเรา', path },
+];
+
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+]);
+
+const askFor = [
+  'ประเภทแอร์ (แอร์ผนัง / แขวน / ตู้ตั้ง / ฝังฝ้า) และขนาด BTU ถ้าทราบ',
+  'จำนวนเครื่องที่จะล้าง',
+  'อำเภอและตำบลที่อยู่',
+  'วันที่สะดวกให้ช่างเข้า',
+];
+
+const partnerQualify = [
+  'มีประสบการณ์งานล้าง/ซ่อมแอร์ และมีอุปกรณ์ของตัวเอง (ปั๊มน้ำ ผ้าคลุม เกจวัด)',
+  'รับงานในอำเภอที่ตัวเองอยู่หรือใกล้เคียง เดินทางถึงภายในวันเดียว',
+  'ยอมรับกติกาแจ้งราคาก่อนทำ และไม่บวกเพิ่มหน้างานโดยไม่ตกลงกับลูกค้า',
+  'รับงานซ่อมย้อนหลังได้ ถ้ามีปัญหาจากงานที่ทำภายใน 7 วัน',
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <Hero
+    title="ติดต่อเรา"
+    lead="จองคิวล้างแอร์ ถามราคา หรือสมัครเป็นช่างพาร์ทเนอร์ — ช่องทางเดียวกันหมด"
+    crumbs={crumbs}
+  />
+
+  <Section tone="white" title="จองคิว / ถามราคา">
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="card p-6">
+        <p class="text-ink-700">ช่องทางที่เร็วที่สุดคือโทรหรือทัก LINE ตอบทุกวันตามเวลาทำการ</p>
+        <CtaButtons place="contact-main" class="mt-5" />
+        <dl class="mt-6 grid gap-3 text-sm">
+          <div class="flex items-center gap-2">
+            <dt class="flex items-center gap-2 font-bold text-brand-900">
+              <Icons name="phone" class="h-4 w-4" />โทร
+            </dt>
+            <dd>
+              <a class="font-bold text-brand-700" href={`tel:${contact.phoneTel}`}>
+                {contact.phone}
+              </a>
+            </dd>
+          </div>
+          <div class="flex items-center gap-2">
+            <dt class="flex items-center gap-2 font-bold text-brand-900">
+              <Icons name="line" class="h-5 w-5" />LINE
+            </dt>
+            <dd>
+              <a class="font-bold text-brand-700" href={contact.lineUrl} rel="noopener">
+                {contact.lineOaId}
+              </a>
+            </dd>
+          </div>
+          <div class="flex items-center gap-2">
+            <dt class="flex items-center gap-2 font-bold text-brand-900">
+              <Icons name="clock" class="h-4 w-4" />เวลาทำการ
+            </dt>
+            <dd class="text-ink-700">{contact.hoursTh}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="card p-6">
+        <h3 class="text-lg font-bold text-brand-900">บอกข้อมูลพวกนี้มาด้วย จะแจ้งราคาได้เลย</h3>
+        <ul class="mt-4 grid gap-2.5">
+          {
+            askFor.map((item) => (
+              <li class="flex items-start gap-2 text-ink-700">
+                <Icons name="check" class="mt-1.5 h-4 w-4 shrink-0 text-brand-600" />
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-4 rounded-xl bg-brand-50 p-4 text-sm text-ink-700">
+          ถ่ายรูปแอร์กับรูปแผ่นสติกเกอร์รุ่นข้างเครื่องส่งมาทาง LINE ได้เลย
+          จะประเมินราคาได้แม่นกว่าและไม่ต้องอธิบายเยอะ
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section
+    tone="tint"
+    id="partner"
+    title="สมัครเป็นช่างพาร์ทเนอร์"
+    lead="เรากำลังหาช่างล้างแอร์ที่รับงานในจังหวัดอุบลราชธานีเพิ่ม โดยเฉพาะอำเภอรอบนอก"
+  >
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="card p-6">
+        <h3 class="text-lg font-bold text-brand-900">งานเป็นยังไง</h3>
+        <div class="prose-th mt-3">
+          <p>
+            เราส่งงานที่ลูกค้าติดต่อเข้ามาให้ช่างในโซนนั้น ๆ ช่างรับงาน ไปทำ
+            และเก็บเงินจากลูกค้าโดยตรงตามราคาที่ตกลงไว้
+            ไม่ต้องจ่ายค่าสมัคร ไม่ต้องวางเงินมัดจำกับเรา
+          </p>
+          <p>
+            รูปแบบค่าตอบแทนคุยกันได้ตามจำนวนงาน — คิดเป็นรายงาน (ค่า lead)
+            หรือแบบเหมารายเดือนสำหรับช่างที่อยากรับงานทั้งอำเภอแบบเจ้าเดียว
+          </p>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <h3 class="text-lg font-bold text-brand-900">คุณสมบัติที่เรามองหา</h3>
+        <ul class="mt-4 grid gap-2.5">
+          {
+            partnerQualify.map((item) => (
+              <li class="flex items-start gap-2 text-ink-700">
+                <Icons name="tools" class="mt-1.5 h-4 w-4 shrink-0 text-brand-600" />
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <a href={contact.lineUrl} rel="noopener" data-cta="line:partner" class="btn-line mt-5 px-5 py-3">
+          <Icons name="line" class="h-6 w-6" />
+          ทัก LINE สมัครเป็นช่างพาร์ทเนอร์
+        </a>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

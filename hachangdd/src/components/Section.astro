@@ -1,0 +1,45 @@
+---
+interface Props {
+  id?: string;
+  title?: string;
+  lead?: string;
+  /** พื้นหลังสลับเพื่อให้แต่ละ section แยกกันชัดบนมือถือ */
+  tone?: 'white' | 'tint' | 'brand';
+  class?: string;
+  /** ระดับหัวข้อ — หน้าเดียวมี h1 ได้ตัวเดียว ที่เหลือเป็น h2/h3 */
+  as?: 'h1' | 'h2' | 'h3';
+}
+const { id, title, lead, tone = 'white', class: className = '', as = 'h2' } = Astro.props as Props;
+const Heading = as;
+const bg: Record<NonNullable<Props['tone']>, string> = {
+  white: 'bg-white',
+  tint: 'bg-paper-50',
+  brand: 'bg-brand-900 text-brand-100',
+};
+const toneClass = bg[tone];
+---
+
+<section id={id} class:list={[toneClass, 'py-10 sm:py-14', className]}>
+  <div class="container-page">
+    {
+      title && (
+        <div class="mb-6 sm:mb-8">
+          <Heading
+            class:list={[
+              as === 'h1' ? 'text-3xl font-extrabold text-brand-900 sm:text-4xl' : 'h-section',
+              tone === 'brand' && 'text-white',
+            ]}
+          >
+            {title}
+          </Heading>
+          {lead && (
+            <p class:list={['mt-2 max-w-2xl', tone === 'brand' ? 'text-brand-200' : 'text-ink-700']}>
+              {lead}
+            </p>
+          )}
+        </div>
+      )
+    }
+    <slot />
+  </div>
+</section>

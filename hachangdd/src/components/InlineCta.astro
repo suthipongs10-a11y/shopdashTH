@@ -1,0 +1,30 @@
+---
+import { contact } from '@/data/site';
+import Icons from './Icons.astro';
+
+interface Props {
+  place: string;
+  title?: string;
+  lead?: string;
+}
+const {
+  place,
+  title = 'อยากให้ช่างเข้าไปดูให้เลยไหม',
+  lead = 'บอกจำนวนเครื่องกับอำเภอของคุณ เราแจ้งราคาให้ก่อนตัดสินใจ ไม่มีค่ามัดจำ',
+} = Astro.props;
+---
+
+<aside class="card not-prose my-8 border-brand-200 bg-brand-50 p-5">
+  <p class="text-lg font-extrabold text-brand-900">{title}</p>
+  <p class="mt-1 text-ink-700">{lead}</p>
+  <div class="mt-4 grid gap-3 sm:grid-cols-2">
+    <a href={`tel:${contact.phoneTel}`} data-cta={`call:${place}`} class="btn-call px-5 py-3">
+      <Icons name="phone" class="h-5 w-5" />
+      โทรเลย {contact.phone}
+    </a>
+    <a href={contact.lineUrl} data-cta={`line:${place}`} rel="noopener" class="btn-line px-5 py-3">
+      <Icons name="line" class="h-6 w-6" />
+      ทักไลน์
+    </a>
+  </div>
+</aside>

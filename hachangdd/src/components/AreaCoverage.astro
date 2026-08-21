@@ -1,0 +1,26 @@
+---
+import Icons from './Icons.astro';
+
+interface Props {
+  areas: string[];
+  districtNameTh: string;
+}
+const { areas, districtNameTh } = Astro.props;
+---
+
+<div class="card p-5 sm:p-6">
+  <p class="text-ink-700">
+    รับงานทั่วอำเภอ{districtNameTh} รวมถึงตำบลและย่านต่อไปนี้ —
+    ถ้าไม่เห็นชื่อพื้นที่ของคุณ โทรถามได้ ส่วนใหญ่ไปถึงอยู่แล้ว
+  </p>
+  <ul class="mt-4 flex flex-wrap gap-2">
+    {
+      areas.map((area) => (
+        <li class="flex items-center gap-1.5 rounded-pill border border-brand-100 bg-brand-50 px-3 py-1.5 text-sm font-semibold text-brand-800">
+          <Icons name="pin" class="h-3.5 w-3.5 text-brand-500" />
+          {area}
+        </li>
+      ))
+    }
+  </ul>
+</div>

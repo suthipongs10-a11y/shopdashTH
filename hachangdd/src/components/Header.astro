@@ -5,31 +5,40 @@ import Icons from './Icons.astro';
 const service = services[0]!;
 const nav = [
   { href: `/${service.slug}/`, label: service.nameTh },
+  { href: '/reviews/', label: 'รีวิว' },
   { href: '/blog/', label: 'บทความ' },
   { href: '/about/', label: 'เกี่ยวกับเรา' },
   { href: '/contact/', label: 'ติดต่อ' },
 ];
 const current = Astro.url.pathname;
+const isActive = (href: string) => current === href || current.startsWith(href);
 ---
 
-<header class="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur">
-  <div class="container-page flex h-16 items-center justify-between gap-4">
-    <a href="/" class="flex items-center gap-2 text-lg font-extrabold text-brand-900">
+<header class="sticky top-0 z-40 border-b border-brand-100 bg-white/95 backdrop-blur">
+  <div class="container-page flex h-16 items-center justify-between gap-3">
+    <a
+      href="/"
+      class="flex shrink-0 items-center gap-2 text-lg font-extrabold text-brand-900"
+      aria-label={`${site.name} หน้าแรก`}
+    >
       <span
-        class="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-base text-white"
-        aria-hidden="true">ดี</span
+        aria-hidden="true"
+        class="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white"
       >
+        <Icons name="snow" class="h-5 w-5" />
+      </span>
       <span>{site.name}</span>
     </a>
 
-    <nav aria-label="เมนูหลัก" class="hidden items-center gap-6 md:flex">
+    <nav aria-label="เมนูหลัก" class="hidden items-center gap-6 lg:flex">
       {
         nav.map((item) => (
           <a
             href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
             class:list={[
-              'text-sm font-semibold hover:text-brand-600',
-              current.startsWith(item.href) ? 'text-brand-600' : 'text-ink-700',
+              'text-sm font-bold transition hover:text-brand-600',
+              isActive(item.href) ? 'text-brand-600' : 'text-ink-700',
             ]}
           >
             {item.label}
@@ -38,26 +47,23 @@ const current = Astro.url.pathname;
       }
     </nav>
 
-    <a
-      href={`tel:${contact.phoneTel}`}
-      data-cta="call-header"
-      class="btn-base bg-call-600 px-4 py-2.5 text-sm text-white hover:bg-call-700"
-    >
+    <a href={`tel:${contact.phoneTel}`} data-cta="call:header" class="btn-call px-4 py-2.5 text-sm">
       <Icons name="phone" class="h-4 w-4" />
       <span class="hidden sm:inline">{contact.phone}</span>
-      <span class="sm:hidden">โทร</span>
+      <span class="sm:hidden">โทรเลย</span>
     </a>
   </div>
 
-  <!-- เมนูบนมือถือ: แถวเลื่อนแนวนอน แทน hamburger + JS -->
-  <nav aria-label="เมนูหลัก (มือถือ)" class="md:hidden">
-    <ul class="container-page flex gap-4 overflow-x-auto pb-2 text-sm font-semibold whitespace-nowrap">
+  <!-- เมนูมือถือ: แถวเลื่อนแนวนอน — ไม่ต้องใช้ JS และไม่ซ่อนลิงก์จาก crawler เหมือน hamburger -->
+  <nav aria-label="เมนูหลัก (มือถือ)" class="border-t border-brand-50 lg:hidden">
+    <ul class="container-page flex gap-5 overflow-x-auto py-2.5 text-sm font-bold whitespace-nowrap">
       {
         nav.map((item) => (
           <li>
             <a
               href={item.href}
-              class:list={[current.startsWith(item.href) ? 'text-brand-600' : 'text-ink-700']}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[isActive(item.href) ? 'text-brand-600' : 'text-ink-700']}
             >
               {item.label}
             </a>

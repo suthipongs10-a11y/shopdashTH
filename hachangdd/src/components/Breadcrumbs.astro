@@ -1,0 +1,36 @@
+---
+import type { Crumb } from '@/lib/seo';
+import Icons from './Icons.astro';
+
+interface Props {
+  crumbs: Crumb[];
+  /** true = อยู่บนพื้นเข้ม (hero) */
+  onDark?: boolean;
+}
+const { crumbs, onDark = false } = Astro.props;
+---
+
+<nav aria-label="เส้นทางหน้า" class:list={[onDark ? 'text-brand-200' : 'text-ink-500']}>
+  <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
+    {
+      crumbs.map((c, i) => (
+        <li class="flex items-center gap-1.5">
+          {i > 0 && <span aria-hidden="true" class="opacity-50">/</span>}
+          {i === crumbs.length - 1 ? (
+            <span aria-current="page" class:list={[onDark ? 'text-white' : 'text-ink-700']}>
+              {c.name}
+            </span>
+          ) : (
+            <a
+              href={c.path}
+              class:list={['hover:underline', onDark ? 'hover:text-white' : 'hover:text-brand-600']}
+            >
+              {i === 0 ? <Icons name="home" class="inline h-4 w-4 align-[-2px]" /> : null}
+              {c.name}
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

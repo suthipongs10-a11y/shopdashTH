@@ -1,62 +1,218 @@
 @import 'tailwindcss';
 
-/* ---------------------------------------------------------------- tokens */
+/* ============================================================== fonts ==
+   self-host: ไม่มี request ไป Google Fonts เลย → ลด render-blocking บนมือถือ
+   ตัวแปรน้ำหนัก 400–800 ไฟล์เดียวต่อ subset (thai 27KB / latin 31KB) */
+@font-face {
+  font-family: 'Noto Sans Thai';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/noto-sans-thai-thai.woff2') format('woff2');
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: 'Noto Sans Thai';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/noto-sans-thai-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ============================================================== tokens == */
 @theme {
-  --font-sans: 'Noto Sans Thai', 'Sarabun', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
 
-  /* แบรนด์: น้ำเงินเข้ม = น่าเชื่อถือ, ส้ม = ปุ่มโทร (ตัดกับพื้นชัดบนมือถือกลางแดด) */
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-500: #2563eb;
-  --color-brand-600: #1d4ed8;
-  --color-brand-700: #1e40af;
-  --color-brand-900: #16265c;
+  /* น้ำเงินลึก = ความน่าเชื่อถือ / ความเย็น (ธุรกิจแอร์) */
+  --color-brand-50: #eff7fd;
+  --color-brand-100: #d9edfa;
+  --color-brand-200: #b3daf5;
+  --color-brand-300: #7cc0ec;
+  --color-brand-400: #3d9ee0;
+  --color-brand-500: #1a7fc4;
+  --color-brand-600: #12649f;
+  --color-brand-700: #0e4f7f;
+  --color-brand-800: #0b3f66;
+  --color-brand-900: #082e4b;
 
-  --color-call-500: #f97316;
-  --color-call-600: #ea580c;
-  --color-call-700: #c2410c;
+  /* ส้ม = ปุ่มลงมือ (โทร) อ่านชัดกลางแดดบนมือถือ */
+  --color-action-400: #ff8c3d;
+  --color-action-500: #f97316;
+  --color-action-600: #e05600;
+  --color-action-700: #b84400;
 
   --color-line-500: #06c755;
   --color-line-600: #05a948;
 
-  --color-ink-900: #111827;
-  --color-ink-700: #374151;
-  --color-ink-500: #6b7280;
+  --color-ink-900: #0d1826;
+  --color-ink-800: #1c2a3a;
+  --color-ink-700: #3a4a5e;
+  --color-ink-500: #64748b;
+  --color-ink-300: #aab6c4;
+
+  --color-paper-0: #ffffff;
+  --color-paper-50: #f7fafd;
+  --color-paper-100: #eef4fa;
+
+  --color-star-500: #f5a524;
+  --color-ok-600: #0f8a4d;
+
+  --radius-card: 1rem;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 1px 2px rgb(8 46 75 / 0.06), 0 8px 24px -12px rgb(8 46 75 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(8 46 75 / 0.08), 0 16px 40px -16px rgb(8 46 75 / 0.28);
+
+  --container-page: 68rem;
 }
 
-/* ---------------------------------------------------------------- base */
+/* ================================================================ base == */
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem; /* กัน header sticky บังหัวข้อเวลา jump ด้วย #anchor */
   }
 
   body {
-    @apply bg-white font-sans text-ink-900 antialiased;
-    /* ภาษาไทยอ่านง่ายขึ้นเมื่อ line-height สูงกว่าปกติ */
-    line-height: 1.75;
+    @apply bg-paper-0 font-sans text-ink-800 antialiased;
+    /* ภาษาไทยมีวรรณยุกต์บน–ล่าง ต้องการ line-height สูงกว่าอังกฤษ */
+    line-height: 1.8;
+    font-size: 17px;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      font-size: 18px;
+    }
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
+    @apply font-extrabold text-brand-900;
     line-height: 1.4;
+    letter-spacing: -0.005em;
     text-wrap: balance;
   }
 
-  /* กัน sticky CTA bar บังเนื้อหาท้ายหน้าบนมือถือ */
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
+  p {
+    text-wrap: pretty;
+  }
+
+  a,
+  button,
+  summary {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
+  }
+
+  /* เคารพผู้ใช้ที่ปิดแอนิเมชัน */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-/* -------------------------------------------------------------- helpers */
+/* ========================================================== utilities == */
 @utility container-page {
-  @apply mx-auto w-full max-w-5xl px-4 sm:px-6;
+  @apply mx-auto w-full max-w-page px-4 sm:px-6;
 }
 
-@utility btn-base {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-base font-bold
-         transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2;
+/** ปุ่มฐาน — เป้ากดใหญ่ ≥48px ตามเกณฑ์ mobile a11y */
+@utility btn {
+  @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3
+         text-center leading-tight font-bold whitespace-nowrap transition
+         active:translate-y-px;
+}
+
+@utility btn-call {
+  @apply btn bg-action-600 text-white shadow-soft hover:bg-action-700;
+}
+
+@utility btn-line {
+  @apply btn bg-line-500 text-white shadow-soft hover:bg-line-600;
+}
+
+@utility btn-ghost {
+  @apply btn border-2 border-brand-200 bg-white text-brand-700 hover:border-brand-400 hover:bg-brand-50;
+}
+
+@utility card {
+  @apply rounded-card border border-brand-100 bg-white shadow-soft;
+}
+
+/** หัวข้อ section — ใช้ทุกหน้าให้จังหวะเท่ากัน */
+@utility h-section {
+  @apply text-2xl font-extrabold text-brand-900 sm:text-3xl;
+}
+
+@utility prose-th {
+  @apply text-ink-700 [&>p+p]:mt-4 [&>p]:leading-[1.85];
+}
+
+/* ===================================================== article (blog) ==
+   สไตล์เนื้อหาบทความจาก markdown — เขียนเองแทน typography plugin
+   เพื่อคุมระยะบรรทัดภาษาไทยและไม่เพิ่ม dependency */
+.article-body {
+  @apply text-ink-700;
+}
+.article-body > * + * {
+  margin-top: 1.15rem;
+}
+.article-body h2 {
+  @apply mt-10 text-2xl font-extrabold text-brand-900 sm:text-[1.6rem];
+  scroll-margin-top: 5rem;
+}
+.article-body h3 {
+  @apply mt-8 text-xl font-bold text-brand-900;
+  scroll-margin-top: 5rem;
+}
+.article-body p {
+  line-height: 1.9;
+}
+.article-body ul,
+.article-body ol {
+  @apply grid gap-2 pl-5;
+}
+.article-body ul {
+  list-style: disc;
+}
+.article-body ol {
+  list-style: decimal;
+}
+.article-body li::marker {
+  @apply text-brand-400;
+}
+.article-body a {
+  @apply font-bold text-brand-700 underline underline-offset-2 hover:text-brand-500;
+}
+.article-body strong {
+  @apply font-bold text-brand-900;
+}
+.article-body blockquote {
+  @apply rounded-r-xl border-l-4 border-brand-300 bg-brand-50 px-5 py-4 text-ink-700;
+}
+.article-body table {
+  @apply w-full border-collapse text-left text-sm;
+}
+.article-body th,
+.article-body td {
+  @apply border border-brand-100 px-3 py-2;
+}
+.article-body th {
+  @apply bg-brand-50 font-bold text-brand-900;
+}
+.article-body .not-prose a {
+  @apply no-underline;
 }

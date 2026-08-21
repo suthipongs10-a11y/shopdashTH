@@ -1,0 +1,217 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import TrustBar from '@/components/TrustBar.astro';
+import PriceTable from '@/components/PriceTable.astro';
+import AreaCoverage from '@/components/AreaCoverage.astro';
+import StepsTimeline from '@/components/StepsTimeline.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import ReviewsSection from '@/components/ReviewsSection.astro';
+import LinkGrid from '@/components/LinkGrid.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import Icons from '@/components/Icons.astro';
+import {
+  districtPath,
+  districtShort,
+  provincePath,
+  provinces,
+  servicePath,
+  services,
+  type District,
+  type Province,
+  type Service,
+} from '@/data/site';
+import { aggregateFor, reviewsFor } from '@/data/reviews';
+import { getFeaturedPosts, postPath } from '@/lib/blog';
+import {
+  breadcrumbNode,
+  clampDescription,
+  faqNode,
+  graph,
+  orgNode,
+  serviceNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+export function getStaticPaths() {
+  return services.flatMap((service) =>
+    provinces.flatMap((province) =>
+      province.districts.map((district) => ({
+        params: { service: service.slug, province: province.slug, district: district.slug },
+        props: { service, province, district },
+      })),
+    ),
+  );
+}
+
+type Props = { service: Service; province: Province; district: District };
+const { service, province, district } = Astro.props;
+
+const path = districtPath(service.slug, province.slug, district.slug);
+const short = districtShort(district);
+
+/* ------------------------------------------------------------------ SEO */
+// ชื่อ title สั้นไว้ ไม่ให้ Google ตัดกลางประโยค (เกณฑ์ ~70 ตัวอักษรรวมชื่อแบรนด์ — ตรวจด้วย npm run check:seo)
+const title = `${service.nameTh}${district.nameTh} ราคาเริ่ม ${service.priceFrom} บาท ช่างถึงบ้าน`;
+const description = clampDescription(
+  `${service.nameTh}ถึงบ้านในอำเภอ${district.nameTh} จังหวัด${province.nameTh} ราคาเริ่ม ${service.priceFrom} บาท แจ้งราคาก่อนทำ ช่างอยู่ในพื้นที่ ${district.areas.slice(0, 3).join(' ')} และตำบลใกล้เคียง โทรหรือทัก LINE นัดคิวได้เลย`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: service.nameTh, path: servicePath(service.slug) },
+  { name: province.nameTh, path: provincePath(service.slug, province.slug) },
+  { name: district.nameTh, path },
+];
+
+const faqs = [...service.faqs, ...district.localFaqs];
+const scope = {
+  serviceSlug: service.slug,
+  provinceSlug: province.slug,
+  districtSlug: district.slug,
+};
+const districtReviews = reviewsFor({ ...scope, limit: 6 });
+const aggregate = aggregateFor(scope);
+
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+  serviceNode({ path, service, province, district }),
+  faqNode(path, faqs),
+]);
+
+/* ------------------------------------------------------- internal links */
+const neighbors = district.neighbors
+  .map((slug) => province.districts.find((d) => d.slug === slug))
+  .filter((d): d is District => Boolean(d));
+
+const posts = await getFeaturedPosts(3);
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <Hero
+    title={`${service.nameTh}${district.nameTh} — ช่างถึงบ้าน ราคาชัดเจน`}
+    lead={`บริการ${service.nameTh}ถึงบ้านทั่วอำเภอ${district.nameTh} แจ้งราคาก่อนลงมือทุกครั้ง นัดคิวไว จ่ายเงินหลังงานเสร็จ`}
+    crumbs={crumbs}
+    eyebrow={`อำเภอ${district.nameTh} จังหวัด${province.nameTh}`}
+    chips={[
+      `เริ่ม ${service.priceFrom} บาท`,
+      'แจ้งราคาก่อนทำ',
+      `ช่างในพื้นที่${short}`,
+      'จ่ายหลังงานเสร็จ',
+    ]}
+  />
+
+  <!-- 3. Trust bullets -->
+  <Section tone="white">
+    <TrustBar items={service.trustBullets} />
+  </Section>
+
+  <!-- เนื้อหาเฉพาะพื้นที่ (unique ต่ออำเภอ) -->
+  <Section
+    tone="tint"
+    title={`${service.nameTh}ใน${district.nameTh} ต่างจากที่อื่นตรงไหน`}
+    id="local"
+  >
+    <div class="prose-th max-w-3xl">
+      {district.localIntro.map((para) => <p>{para}</p>)}
+    </div>
+
+    <ul class="mt-6 grid gap-3 sm:grid-cols-3">
+      {
+        district.localHighlights.map((item) => (
+          <li class="card flex items-start gap-2 p-4 text-sm text-ink-700">
+            <Icons name="check" class="mt-1 h-4 w-4 shrink-0 text-brand-600" />
+            <span>{item}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <!-- 4. ตารางราคา -->
+  <Section
+    tone="white"
+    id="price"
+    title={`ราคา${service.nameTh}${district.nameTh}`}
+    lead="ราคาเดียวกันทุกตำบลในอำเภอ ไม่มีค่าเดินทางแอบแฝง"
+  >
+    <PriceTable service={service} areaLabel={district.nameTh} />
+  </Section>
+
+  <!-- 5. พื้นที่ให้บริการ -->
+  <Section
+    tone="tint"
+    id="areas"
+    title={`พื้นที่ให้บริการในอำเภอ${district.nameTh}`}
+    lead={`ระยะทางจากตัวเมืองอุบลฯ ประมาณ ${district.distanceFromCityKm} กิโลเมตร`}
+  >
+    <AreaCoverage areas={district.areas} districtNameTh={district.nameTh} />
+  </Section>
+
+  <!-- 6. ขั้นตอนบริการ -->
+  <Section tone="white" id="steps" title="ขั้นตอนบริการ 4 ขั้น" lead="ตั้งแต่ทักมาจนงานเสร็จ">
+    <StepsTimeline steps={service.steps} />
+  </Section>
+
+  <!-- รีวิว (ขึ้นเฉพาะเมื่อมีรีวิวจริงของพื้นที่นี้) -->
+  <ReviewsSection
+    reviews={districtReviews}
+    aggregate={aggregate}
+    title={`รีวิวจากลูกค้าใน${district.nameTh}`}
+  />
+
+  <!-- 7. FAQ -->
+  <Section
+    tone="tint"
+    id="faq"
+    title="คำถามที่ลูกค้าถามบ่อย"
+    lead={`รวมคำถามทั่วไปเรื่อง${service.nameTh} และคำถามเฉพาะพื้นที่${short}`}
+  >
+    <FaqAccordion faqs={faqs} />
+  </Section>
+
+  <CtaBanner
+    title={`อยากล้างแอร์ที่${district.nameTh} ทักมาได้เลย`}
+    lead="บอกจำนวนเครื่องกับประเภทแอร์ เราแจ้งราคาให้ก่อน แล้วค่อยตัดสินใจ"
+    place="district-mid"
+  />
+
+  <!-- 8. บทความแนะนำ -->
+  <Section tone="white" id="articles" title="อ่านก่อนเรียกช่าง">
+    <LinkGrid
+      icon="quote"
+      items={posts.map((p) => ({ href: postPath(p), title: p.data.title, sub: p.data.excerpt }))}
+    />
+  </Section>
+
+  <!-- 9. อำเภอข้างเคียง -->
+  <Section
+    tone="tint"
+    id="nearby"
+    title="พื้นที่ใกล้เคียง"
+    lead={`เราให้บริการทั่วจังหวัด${province.nameTh} — ถ้าบ้านคุณอยู่อำเภออื่น เลือกจากรายการนี้ได้`}
+  >
+    <LinkGrid
+      items={neighbors.map((n) => ({
+        href: districtPath(service.slug, province.slug, n.slug),
+        title: `${service.nameTh}${n.nameTh}`,
+        sub: n.areas.slice(0, 3).join(' · '),
+      }))}
+    />
+    <p class="mt-4">
+      <a
+        href={provincePath(service.slug, province.slug)}
+        class="inline-flex items-center gap-1.5 font-bold text-brand-700 hover:underline"
+      >
+        ดูทุกอำเภอในจังหวัด{province.nameTh}
+        <Icons name="arrow" class="h-4 w-4" />
+      </a>
+    </p>
+  </Section>
+</BaseLayout>

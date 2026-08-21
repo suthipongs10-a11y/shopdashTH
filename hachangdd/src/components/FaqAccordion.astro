@@ -1,0 +1,29 @@
+---
+import type { Faq } from '@/data/site';
+import Icons from './Icons.astro';
+
+interface Props {
+  faqs: Faq[];
+  /** เปิดข้อแรกไว้ ช่วยให้ผู้ใช้รู้ว่ากดขยายได้ */
+  openFirst?: boolean;
+}
+const { faqs, openFirst = true } = Astro.props;
+---
+
+<!-- ใช้ <details> ล้วน — ไม่มี JS, ทำงานได้แม้ JS ปิด, และ crawler อ่านคำตอบเจอครบ -->
+<div class="grid gap-3">
+  {
+    faqs.map((faq, i) => (
+      <details class="card group px-5 py-1 open:bg-paper-50" open={openFirst && i === 0}>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-bold text-brand-900 [&::-webkit-details-marker]:hidden">
+          <span>{faq.q}</span>
+          <Icons
+            name="chevron"
+            class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <p class="pb-5 text-ink-700">{faq.a}</p>
+      </details>
+    ))
+  }
+</div>

@@ -1,0 +1,25 @@
+---
+import type { Step } from '@/data/site';
+
+interface Props {
+  steps: Step[];
+}
+const { steps } = Astro.props;
+---
+
+<ol class="relative grid gap-4 sm:grid-cols-2">
+  {
+    steps.map((step, i) => (
+      <li class="card relative p-5 pl-16">
+        <span
+          aria-hidden="true"
+          class="absolute top-5 left-5 grid h-8 w-8 place-items-center rounded-pill bg-brand-600 font-extrabold text-white"
+        >
+          {i + 1}
+        </span>
+        <h3 class="text-lg font-bold text-brand-900">{step.title}</h3>
+        <p class="mt-1 text-ink-700">{step.detail}</p>
+      </li>
+    ))
+  }
+</ol>

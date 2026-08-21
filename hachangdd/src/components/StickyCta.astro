@@ -3,27 +3,18 @@ import { contact } from '@/data/site';
 import Icons from './Icons.astro';
 ---
 
-<!-- แถบ CTA ล่างจอ เฉพาะมือถือ — ผู้ใช้ต่างจังหวัด 90%+ มาจากมือถือ -->
+<!-- แถบ CTA ล่างจอเฉพาะมือถือ — ผู้ใช้ต่างจังหวัดกว่า 90% เข้าจากมือถือ -->
 <div
-  class="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur md:hidden"
+  class="fixed inset-x-0 bottom-0 z-50 border-t border-brand-100 bg-white/95 px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-6px_24px_-12px_rgba(8,46,75,0.35)] backdrop-blur lg:hidden"
 >
-  <div class="flex gap-2">
-    <a
-      href={`tel:${contact.phoneTel}`}
-      data-cta="call-sticky"
-      class="btn-base flex-1 bg-call-600 py-3 text-white"
-    >
+  <div class="grid grid-cols-2 gap-2">
+    <a href={`tel:${contact.phoneTel}`} data-cta="call:sticky" class="btn-call py-3">
       <Icons name="phone" class="h-5 w-5" />โทรเลย
     </a>
-    <a
-      href={contact.lineUrl}
-      data-cta="line-sticky"
-      rel="noopener"
-      class="btn-base flex-1 bg-line-500 py-3 text-white"
-    >
+    <a href={contact.lineUrl} data-cta="line:sticky" rel="noopener" class="btn-line py-3">
       <Icons name="line" class="h-6 w-6" />ทักไลน์
     </a>
   </div>
 </div>
-<!-- เว้นที่ให้แถบ CTA ไม่บังเนื้อหาท้ายหน้า -->
-<div class="h-20 md:hidden" aria-hidden="true"></div>
+<!-- ที่ว่างกันแถบ CTA บังเนื้อหาท้ายหน้า -->
+<div class="h-20 lg:hidden" aria-hidden="true"></div>

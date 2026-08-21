@@ -1,0 +1,124 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import TrustBar from '@/components/TrustBar.astro';
+import PriceTable from '@/components/PriceTable.astro';
+import LinkGrid from '@/components/LinkGrid.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import ReviewsSection from '@/components/ReviewsSection.astro';
+import {
+  districtPath,
+  provincePath,
+  provinces,
+  servicePath,
+  services,
+  type Province,
+  type Service,
+} from '@/data/site';
+import { aggregateFor, reviewsFor } from '@/data/reviews';
+import {
+  breadcrumbNode,
+  clampDescription,
+  faqNode,
+  graph,
+  orgNode,
+  serviceNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+export function getStaticPaths() {
+  return services.flatMap((service) =>
+    provinces.map((province) => ({
+      params: { service: service.slug, province: province.slug },
+      props: { service, province },
+    })),
+  );
+}
+
+type Props = { service: Service; province: Province };
+const { service, province } = Astro.props;
+
+const path = provincePath(service.slug, province.slug);
+
+const title = `${service.nameTh}${province.nameTh} ทุกอำเภอ ราคาเริ่ม ${service.priceFrom} บาท`;
+const description = clampDescription(
+  `${service.nameTh}จังหวัด${province.nameTh} ให้บริการ ${province.districts.length} อำเภอ ${province.districts
+    .slice(0, 4)
+    .map((d) => d.nameTh)
+    .join(' ')} ราคาเริ่ม ${service.priceFrom} บาท แจ้งราคาก่อนทำ ช่างอยู่ในพื้นที่`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: service.nameTh, path: servicePath(service.slug) },
+  { name: province.nameTh, path },
+];
+
+const scope = { serviceSlug: service.slug, provinceSlug: province.slug };
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+  serviceNode({ path, service, province }),
+  faqNode(path, service.faqs.slice(0, 5)),
+]);
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <Hero
+    title={`${service.nameTh}${province.nameTh} — ช่างในพื้นที่ ทุกอำเภอ`}
+    lead={province.intro}
+    crumbs={crumbs}
+    eyebrow={`จังหวัด${province.nameTh}`}
+    chips={[`${province.districts.length} อำเภอ`, `เริ่ม ${service.priceFrom} บาท`, 'นัดคิวไว']}
+  />
+
+  <Section
+    tone="white"
+    id="districts"
+    title={`เลือกอำเภอของคุณ`}
+    lead="แต่ละหน้ามีรายละเอียดพื้นที่ ตำบลที่ไปถึง และคำถามเฉพาะอำเภอนั้น"
+  >
+    <LinkGrid
+      items={province.districts.map((d) => ({
+        href: districtPath(service.slug, province.slug, d.slug),
+        title: `${service.nameTh}${d.nameTh}`,
+        sub: `${d.areas.slice(0, 3).join(' · ')} — ห่างตัวเมือง ${d.distanceFromCityKm} กม.`,
+      }))}
+    />
+  </Section>
+
+  <Section tone="tint">
+    <TrustBar items={service.trustBullets} />
+  </Section>
+
+  <Section
+    tone="white"
+    id="price"
+    title={`ราคา${service.nameTh}ในจังหวัด${province.nameTh}`}
+    lead="ราคาเดียวกันทุกอำเภอ"
+  >
+    <PriceTable service={service} areaLabel={province.nameTh} />
+  </Section>
+
+  <ReviewsSection
+    reviews={reviewsFor({ ...scope, limit: 6 })}
+    aggregate={aggregateFor(scope)}
+    title={`รีวิวจากลูกค้าในจังหวัด${province.nameTh}`}
+  />
+
+  <Section tone="white" id="faq" title="คำถามที่พบบ่อย">
+    <FaqAccordion faqs={service.faqs.slice(0, 5)} />
+  </Section>
+
+  <CtaBanner
+    title={`จอง${service.nameTh}ในจังหวัด${province.nameTh}`}
+    lead="โทรหรือทัก LINE บอกอำเภอกับจำนวนเครื่อง เราแจ้งราคาให้ทันที"
+    place="province-bottom"
+  />
+</BaseLayout>

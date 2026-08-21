@@ -1,0 +1,129 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import Icons from '@/components/Icons.astro';
+import { contact, provinces, services, site } from '@/data/site';
+import {
+  breadcrumbNode,
+  clampDescription,
+  graph,
+  orgNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+const service = services[0]!;
+const province = provinces[0]!;
+const path = '/about/';
+
+const title = `เกี่ยวกับ${site.name} — เราทำงานยังไง`;
+const description = clampDescription(
+  `${site.name}เป็นตัวกลางที่ช่วยหาช่าง${service.nameTh}ในพื้นที่จังหวัด${province.nameTh} ให้คุณ คัดช่างที่รับงานจริง แจ้งราคาก่อนทำ และตามงานให้จนจบ`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: 'เกี่ยวกับเรา', path },
+];
+
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+]);
+
+const principles = [
+  {
+    title: 'แจ้งราคาก่อนลงมือเสมอ',
+    detail:
+      'เรื่องที่คนกลัวที่สุดเวลาเรียกช่างคือโดนบวกราคาหน้างาน ช่างของเราต้องแจ้งราคาให้ครบก่อนเริ่มงานทุกครั้ง ถ้าหน้างานมีอะไรเพิ่ม ต้องบอกและรอลูกค้าตกลงก่อน',
+  },
+  {
+    title: 'ช่างอยู่ในพื้นที่จริง',
+    detail:
+      'เราไม่ส่งช่างข้ามจังหวัดมาทำแล้วบวกค่าเดินทาง ช่างที่รับงานแต่ละอำเภอคือช่างที่อยู่ในโซนนั้นหรือใกล้เคียง จึงนัดคิวได้เร็วและตามงานซ่อมย้อนหลังได้',
+  },
+  {
+    title: 'จ่ายหลังงานเสร็จ',
+    detail:
+      'ไม่มีค่ามัดจำล่วงหน้า ลูกค้าตรวจงานก่อนจ่ายเงินได้เสมอ ถ้างานไม่เรียบร้อย บอกช่างตรงนั้นได้เลย หรือแจ้งกลับมาที่เรา',
+  },
+  {
+    title: 'ไม่แต่งรีวิว ไม่ปั้นคะแนน',
+    detail:
+      'หน้ารีวิวของเราแสดงเฉพาะรีวิวจากลูกค้าที่ใช้บริการจริงและอนุญาตให้เผยแพร่ ถ้ายังไม่มีรีวิว เราก็บอกตรง ๆ ว่ายังไม่มี',
+  },
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <Hero
+    title={`${site.name} คือใคร`}
+    lead={`เราเป็นตัวกลางที่ช่วยคนใน${province.nameTh}หาช่าง${service.nameTh}ที่ไว้ใจได้ โดยไม่ต้องไล่ถามในกลุ่มเฟซบุ๊กทีละคน`}
+    crumbs={crumbs}
+  />
+
+  <Section tone="white" title="ทำไมถึงทำเว็บนี้ขึ้นมา">
+    <div class="prose-th max-w-3xl">
+      <p>
+        เวลาแอร์ที่บ้านไม่เย็น สิ่งที่คนส่วนใหญ่ทำคือโพสต์ถามในกลุ่มเฟซบุ๊กประจำอำเภอ
+        แล้วรอคนมาแนะนำช่าง ปัญหาคือไม่รู้ว่าใครคือช่างจริง ราคาเท่าไหร่ ต้องรอกี่วัน
+        และถ้างานมีปัญหาย้อนหลังจะตามใครได้
+      </p>
+      <p>
+        {site.name}ทำหน้าที่ตรงนี้แทน เรารวบรวมช่างที่รับงานในแต่ละอำเภอไว้
+        เวลาลูกค้าโทรหรือทัก LINE เข้ามา เราจะถามข้อมูลที่จำเป็น เช่น
+        ประเภทแอร์ จำนวนเครื่อง และพื้นที่ แล้วแจ้งราคากับวันที่ช่างเข้าได้กลับไป
+        ลูกค้าตัดสินใจแล้วค่อยนัด
+      </p>
+      <p>
+        เราไม่ใช่บริษัทใหญ่ และไม่ได้พยายามทำให้ดูใหญ่กว่าที่เป็น
+        สิ่งที่เรารับปากได้คือราคาที่บอกไว้คือราคาที่จ่ายจริง
+        และถ้ามีปัญหาหลังงานเสร็จ ทักกลับมาได้ เราตามให้
+      </p>
+    </div>
+  </Section>
+
+  <Section tone="tint" title="สิ่งที่เรายึดถือ">
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {
+        principles.map((p) => (
+          <li class="card p-5">
+            <h3 class="flex items-start gap-2 text-lg font-bold text-brand-900">
+              <Icons name="check" class="mt-1.5 h-5 w-5 shrink-0 text-brand-600" />
+              {p.title}
+            </h3>
+            <p class="mt-2 text-ink-700">{p.detail}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section tone="white" title="พื้นที่ที่เราให้บริการตอนนี้">
+    <p class="prose-th max-w-3xl">
+      <span>
+        ตอนนี้เราเปิดให้บริการ{service.nameTh}ใน {province.districts.length} อำเภอของจังหวัด
+        {province.nameTh} ได้แก่ {province.districts.map((d) => d.nameTh).join(' ')}
+        และกำลังทยอยขยายไปอำเภออื่นตามจำนวนช่างพาร์ทเนอร์ที่เข้าร่วม
+        ถ้าบ้านคุณอยู่นอกพื้นที่นี้ ทักมาถามได้ ถ้ามีช่างแถวนั้นเราจะประสานให้
+      </span>
+    </p>
+    <p class="mt-4 text-ink-700">
+      เป็นช่างและอยากรับงานกับเรา? ดูรายละเอียดที่หน้า
+      <a class="font-bold text-brand-700 hover:underline" href="/contact/#partner">
+        สมัครเป็นช่างพาร์ทเนอร์
+      </a>
+    </p>
+  </Section>
+
+  <CtaBanner
+    title="มีคำถาม ถามได้เลย"
+    lead={`โทร ${contact.phone} หรือทัก LINE ${contact.lineOaId}`}
+    place="about-bottom"
+  />
+</BaseLayout>

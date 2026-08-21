@@ -1,0 +1,35 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import LinkGrid from '@/components/LinkGrid.astro';
+import CtaButtons from '@/components/CtaButtons.astro';
+import { districtPath, provinces, services } from '@/data/site';
+
+const service = services[0]!;
+const province = provinces[0]!;
+---
+
+<BaseLayout
+  title="ไม่พบหน้านี้"
+  description="ไม่พบหน้าที่คุณกำลังหา ลองเลือกพื้นที่ที่ต้องการจากรายการด้านล่าง หรือโทรหาเราได้เลย"
+  path="/404/"
+  noindex
+>
+  <Section tone="white" title="ไม่พบหน้านี้" as="h1">
+    <p class="prose-th max-w-2xl">
+      ลิงก์ที่คุณเปิดอาจถูกย้ายหรือพิมพ์ผิด ลองเลือกพื้นที่ที่ต้องการจากรายการด้านล่าง
+      หรือโทรมาถามเราตรง ๆ ก็ได้
+    </p>
+    <CtaButtons place="404" class="mt-6 max-w-xl" />
+  </Section>
+
+  <Section tone="tint" title={`${service.nameTh}ในจังหวัด${province.nameTh}`}>
+    <LinkGrid
+      items={province.districts.map((d) => ({
+        href: districtPath(service.slug, province.slug, d.slug),
+        title: `${service.nameTh}${d.nameTh}`,
+        sub: d.areas.slice(0, 3).join(' · '),
+      }))}
+    />
+  </Section>
+</BaseLayout>

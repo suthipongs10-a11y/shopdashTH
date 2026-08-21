@@ -1,0 +1,121 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import LinkGrid from '@/components/LinkGrid.astro';
+import Icons from '@/components/Icons.astro';
+import { getPosts, postPath, formatDateTh, type Post } from '@/lib/blog';
+import { districtPath, provinces, services } from '@/data/site';
+import {
+  articleNode,
+  breadcrumbNode,
+  clampDescription,
+  graph,
+  orgNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post, others: posts.filter((p) => p.id !== post.id).slice(0, 2) },
+  }));
+}
+
+type Props = { post: Post; others: Post[] };
+const { post, others } = Astro.props;
+const { Content } = await render(post);
+
+const service = services[0]!;
+const province = provinces[0]!;
+const path = postPath(post);
+
+const title = post.data.title;
+const description = clampDescription(post.data.description);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: 'บทความ', path: '/blog/' },
+  { name: post.data.heading ?? post.data.title, path },
+];
+
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+  articleNode({
+    path,
+    headline: post.data.heading ?? post.data.title,
+    description: post.data.description,
+    datePublished: post.data.publishDate.toISOString(),
+    dateModified: (post.data.updatedDate ?? post.data.publishDate).toISOString(),
+  }),
+]);
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <div class="border-b border-brand-100 bg-paper-50">
+    <div class="container-page py-6">
+      <Breadcrumbs crumbs={crumbs} />
+      <h1 class="mt-4 text-[1.7rem] leading-[1.35] font-extrabold text-brand-900 sm:text-4xl">
+        {post.data.heading ?? post.data.title}
+      </h1>
+      <p class="mt-3 max-w-2xl text-ink-700">{post.data.excerpt}</p>
+      <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-500">
+        <span class="flex items-center gap-1.5">
+          <Icons name="clock" class="h-4 w-4" />
+          เผยแพร่ {formatDateTh(post.data.publishDate)}
+        </span>
+        {
+          post.data.updatedDate && (
+            <span>· อัปเดตล่าสุด {formatDateTh(post.data.updatedDate)}</span>
+          )
+        }
+      </p>
+    </div>
+  </div>
+
+  <div class="container-page py-8 sm:py-12">
+    <article class="article-body mx-auto max-w-2xl">
+      <Content />
+    </article>
+  </div>
+
+  <Section tone="tint" title={`${service.nameTh}ในพื้นที่ของคุณ`} as="h2">
+    <LinkGrid
+      items={province.districts.map((d) => ({
+        href: districtPath(service.slug, province.slug, d.slug),
+        title: `${service.nameTh}${d.nameTh}`,
+        sub: d.areas.slice(0, 3).join(' · '),
+      }))}
+    />
+  </Section>
+
+  {
+    others.length > 0 && (
+      <Section tone="white" title="อ่านต่อ" as="h2">
+        <LinkGrid
+          columns={2}
+          icon="quote"
+          items={others.map((p) => ({
+            href: postPath(p),
+            title: p.data.title,
+            sub: p.data.excerpt,
+          }))}
+        />
+      </Section>
+    )
+  }
+
+  <CtaBanner
+    title="ให้ช่างเข้าไปดูให้เลยไหม"
+    lead="บอกอาการกับพื้นที่ของคุณ เราแจ้งราคาให้ก่อนตัดสินใจ"
+    place="blog-post-bottom"
+  />
+</BaseLayout>

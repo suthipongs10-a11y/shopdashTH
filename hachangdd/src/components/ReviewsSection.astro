@@ -1,0 +1,60 @@
+---
+import type { Aggregate, Review } from '@/data/reviews';
+import { contact } from '@/data/site';
+import ReviewCard from './ReviewCard.astro';
+import StarRating from './StarRating.astro';
+import Icons from './Icons.astro';
+
+interface Props {
+  reviews: Review[];
+  aggregate: Aggregate | null;
+  title: string;
+  /** true = แสดงกล่องเชิญชวนรีวิวแม้ยังไม่มีรีวิว (ใช้เฉพาะหน้า /reviews/) */
+  showWhenEmpty?: boolean;
+  tone?: 'white' | 'tint';
+}
+const { reviews, aggregate, title, showWhenEmpty = false, tone = 'tint' } = Astro.props;
+const hasReviews = reviews.length > 0;
+---
+
+{
+  (hasReviews || showWhenEmpty) && (
+    <section
+      id="reviews"
+      class:list={[tone === 'tint' ? 'bg-paper-50' : 'bg-white', 'py-10 sm:py-14']}
+    >
+      <div class="container-page">
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <h2 class="h-section">{title}</h2>
+          {aggregate && (
+            <p class="flex items-center gap-2 text-ink-700">
+              <StarRating value={aggregate.ratingValue} showValue />
+              <span class="text-sm">จาก {aggregate.reviewCount} รีวิวที่ยืนยันแล้ว</span>
+            </p>
+          )}
+        </div>
+
+        {hasReviews ? (
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {reviews.map((review) => (
+              <ReviewCard review={review} />
+            ))}
+          </div>
+        ) : (
+          <div class="card p-6">
+            <p class="font-bold text-brand-900">ยังไม่มีรีวิวแสดงบนหน้านี้</p>
+            <p class="mt-2 text-ink-700">
+              เราแสดงเฉพาะรีวิวจากลูกค้าที่ใช้บริการจริงและอนุญาตให้เผยแพร่เท่านั้น
+              ไม่มีรีวิวแต่งขึ้นเองแม้แต่รายการเดียว ถ้าคุณเคยใช้บริการกับเรา
+              ส่งรีวิวมาทาง LINE ได้เลย เราจะนำขึ้นหน้านี้พร้อมชื่อย่อของคุณ
+            </p>
+            <a href={contact.lineUrl} rel="noopener" class="btn-line mt-4 px-5 py-3">
+              <Icons name="line" class="h-6 w-6" />
+              ส่งรีวิวทาง LINE
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}

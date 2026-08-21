@@ -1,0 +1,129 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import TrustBar from '@/components/TrustBar.astro';
+import PriceTable from '@/components/PriceTable.astro';
+import StepsTimeline from '@/components/StepsTimeline.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import LinkGrid from '@/components/LinkGrid.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import ReviewsSection from '@/components/ReviewsSection.astro';
+import { districtPath, provincePath, provinces, servicePath, services, type Service } from '@/data/site';
+import { aggregateFor, reviewsFor } from '@/data/reviews';
+import { getFeaturedPosts, postPath } from '@/lib/blog';
+import {
+  breadcrumbNode,
+  clampDescription,
+  faqNode,
+  graph,
+  orgNode,
+  serviceNode,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+} from '@/lib/seo';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { service: service.slug }, props: { service } }));
+}
+
+type Props = { service: Service };
+const { service } = Astro.props;
+
+const path = servicePath(service.slug);
+const allDistricts = provinces.flatMap((p) => p.districts.map((d) => ({ province: p, district: d })));
+
+const title = `${service.nameTh}ถึงบ้าน ราคาเริ่ม ${service.priceFrom} บาท — จองช่างในพื้นที่`;
+const description = clampDescription(
+  `บริการ${service.nameTh}ถึงบ้าน ราคาเริ่ม ${service.priceFrom} บาท แจ้งราคาก่อนทำ ช่างอยู่ในพื้นที่ ให้บริการ ${allDistricts.length} อำเภอในจังหวัด${provinces[0]!.nameTh} โทรหรือทัก LINE นัดคิวได้ทันที`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: service.nameTh, path },
+];
+
+const scope = { serviceSlug: service.slug };
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+  serviceNode({ path, service }),
+  faqNode(path, service.faqs),
+]);
+
+const posts = await getFeaturedPosts(3);
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <Hero
+    title={`${service.nameTh}ถึงบ้าน — ${service.tagline}`}
+    lead={service.intro}
+    crumbs={crumbs}
+    chips={[`เริ่ม ${service.priceFrom} บาท`, 'แจ้งราคาก่อนทำ', 'จ่ายหลังงานเสร็จ']}
+  />
+
+  <Section tone="white">
+    <TrustBar items={service.trustBullets} />
+  </Section>
+
+  <Section
+    tone="tint"
+    id="areas"
+    title="เลือกพื้นที่ของคุณ"
+    lead={`หน้าของแต่ละอำเภอมีราคา พื้นที่ให้บริการ และคำถามเฉพาะพื้นที่นั้น ๆ`}
+  >
+    {
+      provinces.map((province) => (
+        <div class="mb-8 last:mb-0">
+          <h3 class="mb-3 text-lg font-extrabold text-brand-900">
+            <a class="hover:underline" href={provincePath(service.slug, province.slug)}>
+              จังหวัด{province.nameTh}
+            </a>
+          </h3>
+          <LinkGrid
+            items={province.districts.map((d) => ({
+              href: districtPath(service.slug, province.slug, d.slug),
+              title: `${service.nameTh}${d.nameTh}`,
+              sub: d.areas.slice(0, 3).join(' · '),
+            }))}
+          />
+        </div>
+      ))
+    }
+  </Section>
+
+  <Section tone="white" id="price" title={`ราคา${service.nameTh}`} lead={service.priceNote}>
+    <PriceTable service={service} />
+  </Section>
+
+  <Section tone="tint" id="steps" title="ขั้นตอนบริการ">
+    <StepsTimeline steps={service.steps} />
+  </Section>
+
+  <ReviewsSection
+    reviews={reviewsFor({ ...scope, limit: 6 })}
+    aggregate={aggregateFor(scope)}
+    title="รีวิวจากลูกค้า"
+    tone="white"
+  />
+
+  <Section tone="tint" id="faq" title="คำถามที่พบบ่อย">
+    <FaqAccordion faqs={service.faqs} />
+  </Section>
+
+  <CtaBanner
+    title="พร้อมจองคิวแล้วใช่ไหม"
+    lead="บอกจำนวนเครื่องกับพื้นที่ของคุณ เราแจ้งราคาให้ก่อนตัดสินใจ"
+    place="service-bottom"
+  />
+
+  <Section tone="white" id="articles" title="บทความแนะนำ">
+    <LinkGrid
+      icon="quote"
+      items={posts.map((p) => ({ href: postPath(p), title: p.data.title, sub: p.data.excerpt }))}
+    />
+  </Section>
+</BaseLayout>

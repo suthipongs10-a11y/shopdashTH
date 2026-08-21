@@ -1,0 +1,23 @@
+---
+import Icons from './Icons.astro';
+import type { IconName } from '@/lib/icons';
+
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+const icons: IconName[] = ['money', 'pin', 'clock', 'shield'];
+---
+
+<ul class="grid gap-3 sm:grid-cols-2">
+  {
+    items.map((item, i) => (
+      <li class="card flex items-start gap-3 p-4">
+        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+          <Icons name={icons[i % icons.length]!} class="h-5 w-5" />
+        </span>
+        <span class="text-ink-700">{item}</span>
+      </li>
+    ))
+  }
+</ul>

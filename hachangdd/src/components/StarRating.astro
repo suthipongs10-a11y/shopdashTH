@@ -1,0 +1,21 @@
+---
+import Icons from './Icons.astro';
+
+interface Props {
+  value: number;
+  class?: string;
+  showValue?: boolean;
+}
+const { value, class: className = '', showValue = false } = Astro.props;
+const rounded = Math.round(value);
+---
+
+<span class:list={['inline-flex items-center gap-0.5', className]}>
+  <span class="sr-only">{value} จาก 5 ดาว</span>
+  {
+    Array.from({ length: 5 }, (_, i) => (
+      <Icons name="star" class={`h-4 w-4 ${i < rounded ? 'text-star-500' : 'text-ink-300'}`} />
+    ))
+  }
+  {showValue && <span class="ml-1 font-bold text-ink-800">{value.toFixed(1)}</span>}
+</span>

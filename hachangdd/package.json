@@ -9,9 +9,13 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "check:launch": "node scripts/check-launch.mjs"
+    "check:seo": "node scripts/check-seo.mjs",
+    "check:launch": "node scripts/check-launch.mjs",
+    "verify": "npm run check && npm run build && npm run check:seo",
+    "og": "node scripts/make-og.mjs"
   },
   "dependencies": {
+    "@astrojs/mdx": "^7.0.7",
     "@astrojs/sitemap": "^3.7.3",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.4",
@@ -19,6 +23,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "sharp": "^0.35.3",
     "typescript": "^6.0.3"
   }
 }

@@ -1,0 +1,87 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import CtaBanner from '@/components/CtaBanner.astro';
+import Icons from '@/components/Icons.astro';
+import { getPosts, postPath, formatDateTh } from '@/lib/blog';
+import { services } from '@/data/site';
+import {
+  breadcrumbNode,
+  clampDescription,
+  graph,
+  orgNode,
+  webPageNode,
+  websiteNode,
+  abs,
+  type Crumb,
+} from '@/lib/seo';
+
+const service = services[0]!;
+const path = '/blog/';
+const posts = await getPosts();
+
+const title = 'บทความและคำแนะนำเรื่องแอร์';
+const description = clampDescription(
+  `รวมบทความเรื่อง${service.nameTh} แอร์ไม่เย็น แอร์น้ำหยด ราคาล้างแอร์ และวิธีเลือกช่างแอร์ เขียนจากงานจริงที่ช่างของเราเจอในพื้นที่`,
+);
+
+const crumbs: Crumb[] = [
+  { name: 'หน้าแรก', path: '/' },
+  { name: 'บทความ', path },
+];
+
+const schema = graph([
+  orgNode(),
+  websiteNode(),
+  webPageNode({ title, description, path }, { hasBreadcrumb: true }),
+  breadcrumbNode(path, crumbs),
+  {
+    '@type': 'ItemList',
+    '@id': `${abs(path)}#list`,
+    itemListElement: posts.map((post, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: abs(postPath(post)),
+      name: post.data.title,
+    })),
+  },
+]);
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <Hero
+    title="บทความและคำแนะนำเรื่องแอร์"
+    lead="เรื่องที่ลูกค้าถามช่างของเราบ่อยที่สุด รวบรวมมาเขียนให้อ่านก่อนตัดสินใจเรียกช่าง"
+    crumbs={crumbs}
+  />
+
+  <Section tone="white">
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {
+        posts.map((post) => (
+          <li>
+            <a
+              href={postPath(post)}
+              class="card flex h-full flex-col p-6 transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift"
+            >
+              <p class="text-sm text-ink-500">{formatDateTh(post.data.publishDate)}</p>
+              <h2 class="mt-1 text-xl font-extrabold text-brand-900">{post.data.title}</h2>
+              <p class="mt-2 grow text-ink-700">{post.data.excerpt}</p>
+              <span class="mt-4 inline-flex items-center gap-1.5 font-bold text-brand-700">
+                อ่านต่อ
+                <Icons name="arrow" class="h-4 w-4" />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <CtaBanner
+    title="อ่านแล้วอยากให้ช่างมาดูให้"
+    lead="โทรหรือทัก LINE บอกอาการกับพื้นที่ของคุณ เราแจ้งราคาให้ก่อน"
+    place="blog-index-bottom"
+  />
+</BaseLayout>

@@ -1,0 +1,50 @@
+---
+import type { Review } from '@/data/reviews';
+import StarRating from './StarRating.astro';
+import Icons from './Icons.astro';
+
+interface Props {
+  review: Review;
+}
+const { review } = Astro.props;
+
+const sourceLabel: Record<Review['source'], string> = {
+  line: 'รีวิวผ่าน LINE',
+  facebook: 'รีวิวผ่าน Facebook',
+  google: 'รีวิวใน Google',
+  phone: 'รีวิวทางโทรศัพท์',
+  onsite: 'รีวิวหน้างาน',
+};
+
+const dateTh = new Intl.DateTimeFormat('th-TH', {
+  year: 'numeric',
+  month: 'long',
+  timeZone: 'Asia/Bangkok',
+}).format(new Date(review.date));
+---
+
+<article class="card flex h-full flex-col p-5">
+  <Icons name="quote" class="h-6 w-6 text-brand-200" />
+  <p class="mt-2 grow text-ink-700">{review.body}</p>
+
+  <footer class="mt-4 border-t border-brand-100 pt-3">
+    <StarRating value={review.rating} />
+    <p class="mt-1 font-bold text-brand-900">{review.author}</p>
+    <p class="text-sm text-ink-500">
+      {review.areaTh ? `${review.areaTh} · ` : ''}{dateTh}
+      {review.jobSummary ? ` · ${review.jobSummary}` : ''}
+    </p>
+    <p class="mt-1 flex items-center gap-1 text-xs text-ink-500">
+      {
+        review.verified && (
+          <>
+            <Icons name="shield" class="h-3.5 w-3.5 text-ok-600" />
+            <span class="text-ok-600">ยืนยันว่ามีงานจริง</span>
+            <span aria-hidden="true">·</span>
+          </>
+        )
+      }
+      <span>{sourceLabel[review.source]}</span>
+    </p>
+  </footer>
+</article>

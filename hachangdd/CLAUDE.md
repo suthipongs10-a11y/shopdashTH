@@ -19,7 +19,10 @@
 | `npm run build` | build static → `dist/` |
 | `npm run preview` | เปิดดูผลลัพธ์ที่ build แล้ว |
 | `npm run check` | ตรวจ type ของไฟล์ `.astro`/`.ts` |
+| `npm run check:seo` | ตรวจโครงสร้าง SEO ของ `dist/` (ต้อง build ก่อน) — ดู §9 |
 | `npm run check:launch` | ด่านกัน launch — fail ถ้าเบอร์โทร/LINE ยังเป็น placeholder (M4) |
+| `npm run verify` | รวบ check + build + check:seo — **รันก่อน commit ทุกครั้ง** |
+| `npm run og` | สร้าง `og-default.png` / `apple-touch-icon.png` / `favicon.svg` ใหม่ (รันเมื่อแก้แบรนด์) |
 
 ---
 
@@ -45,8 +48,9 @@
 
 | ส่วน | เลือกใช้ | เหตุผล |
 |---|---|---|
-| Framework | Astro (latest) | Static output, ใช้สูตรเดิมจาก taxi-ubon ได้ |
-| Styling | Tailwind CSS | เร็ว, ไม่ต้องดูแล CSS แยก |
+| Framework | Astro 7 + MDX | Static output; MDX ใช้เพื่อวาง CTA กลางบทความโดยไม่ hardcode เบอร์โทร |
+| Styling | Tailwind CSS v4 (ผ่าน `@tailwindcss/vite`) | design token อยู่ใน `@theme` ของ `src/styles/global.css` |
+| ฟอนต์ | Noto Sans Thai (self-host, variable 400–800) | ไม่มี request ไป Google Fonts → ไม่ render-blocking |
 | Hosting | Cloudflare Pages | ฟรี, CDN ในตัว, ต่อโดเมนง่าย |
 | Data | ไฟล์ JSON/TS ใน `src/data/` | ไม่ใช้ DB — ไม่มี runtime cost |
 | Forms | ไม่มีฟอร์มในเฟส 1 | ใช้ปุ่มโทร + LINE OA เท่านั้น (conversion สูงกว่าในตลาดต่างจังหวัด) |
@@ -164,6 +168,100 @@ export const contact = {
 
 ---
 
+## 6.5 Design system (UX/UI)
+
+**Token ทั้งหมดอยู่ที่ `@theme` ใน `src/styles/global.css` ที่เดียว** — ห้าม hardcode สีหรือฟอนต์ในคอมโพเนนต์
+
+| กลุ่ม | ค่า | ใช้ตอนไหน |
+|---|---|---|
+| `brand-*` | น้ำเงินลึก #082e4b → #eff7fd | โครงหลัก ความน่าเชื่อถือ ความเย็น |
+| `action-*` | ส้ม #e05600 | **ปุ่มโทรเท่านั้น** — สีนี้ = ลงมือ อ่านชัดกลางแดด |
+| `line-*` | เขียว LINE #06c755 | ปุ่ม LINE เท่านั้น (สีแบรนด์ LINE ห้ามเปลี่ยน) |
+| `ink-*` / `paper-*` | เทา-ขาว | ตัวอักษรและพื้นหลัง |
+| `star-500` | เหลือง #f5a524 | ดาวรีวิว |
+
+กติกา UI:
+- **เป้ากดขั้นต่ำ 48px** (`btn` utility คุมให้แล้วด้วย `min-h-12`) — ผู้ใช้ส่วนใหญ่กดด้วยนิ้วโป้งบนมือถือ
+- **ไม่มี JavaScript ฝั่ง client เลยทั้งเว็บ** — FAQ ใช้ `<details>`, เมนูมือถือใช้แถวเลื่อนแนวนอนแทน hamburger
+  (hamburger ต้องใช้ JS และซ่อนลิงก์จาก crawler โดยไม่จำเป็น)
+- `body` ขนาด 17px มือถือ / 18px เดสก์ท็อป, `line-height: 1.8` — ภาษาไทยมีวรรณยุกต์บน-ล่าง ต้องการที่หายใจมากกว่าอังกฤษ
+- Section สลับพื้น `white` / `tint` เพื่อให้แยกบล็อกออกจากกันได้บนจอเล็ก
+- ทุกหน้ามี sticky CTA ล่างจอบนมือถือ + ปุ่มโทรบน header ตลอดเวลา
+
+คอมโพเนนต์กลางอยู่ที่ `src/components/` — เพิ่มหน้าใหม่ให้ประกอบจากของเดิม อย่าเขียน markup ซ้ำ:
+`Hero` `Section` `TrustBar` `PriceTable` `AreaCoverage` `StepsTimeline` `FaqAccordion`
+`ReviewsSection` `ReviewCard` `StarRating` `LinkGrid` `CtaBanner` `CtaButtons` `InlineCta`
+`Breadcrumbs` `Header` `Footer` `StickyCta` `Icons`
+
+---
+
+## 6.6 โครงสร้าง SEO (สำคัญที่สุดของโปรเจกต์นี้)
+
+**ทุกอย่างที่เกี่ยวกับ meta และ schema ออกจาก `src/lib/seo.ts` ที่เดียว** ห้ามเขียน JSON-LD ใส่หน้าตรง ๆ
+
+### JSON-LD แบบ @graph ก้อนเดียวต่อหน้า
+แต่ละหน้าปล่อย `<script type="application/ld+json">` แค่ก้อนเดียว ข้างในเป็น `@graph` ที่ผูก entity ด้วย `@id`:
+
+| Node | มีในหน้าไหน | หมายเหตุ |
+|---|---|---|
+| `Organization` (`#organization`) | ทุกหน้า | entity หลัก ทุก node อื่นอ้างถึงตัวนี้ |
+| `WebSite` (`#website`) | ทุกหน้า | |
+| `WebPage` (`{url}#webpage`) | ทุกหน้า | |
+| `BreadcrumbList` | ทุกหน้า | ตรงกับ breadcrumb ที่มองเห็นบนหน้าจริง |
+| `Service` (`{url}#service`) | หน้าแรก / บริการ / จังหวัด / อำเภอ | `areaServed` = อำเภอ + ทุกตำบลใน `areas[]` |
+| `FAQPage` | หน้าที่มี FAQ จริงบนหน้า | ต้องมีคำถาม-คำตอบแสดงจริง ห้ามใส่ schema ลอย ๆ |
+| `Article` | หน้าบทความ | |
+| `Review` / `AggregateRating` | เมื่อมีรีวิวจริงถึงเกณฑ์เท่านั้น | ดู §6.7 |
+
+**ทำไมไม่ใช้ `LocalBusiness` รายอำเภอ:** `LocalBusiness` หมายถึงสถานประกอบการที่มีที่ตั้งจริง
+การประกาศ 6 สาขาที่ไม่มีอยู่จริงเพื่อให้ดูเป็นธุรกิจท้องถิ่นทุกอำเภอ = spam ตามนโยบาย Google
+เราใช้ `Service` + `areaServed` + `provider` ชี้กลับ `Organization` เดียวแทน ซึ่งสื่อความหมายตรงกว่าและปลอดภัยกว่า
+ถ้าวันหนึ่งมีที่อยู่จริง ให้เติม `business.address` / `business.geo` ใน `src/data/site.ts` — ตัวสร้าง schema จะใส่ให้เอง
+
+### กติกาที่บังคับด้วยสคริปต์
+`npm run check:seo` (สแกน `dist/`) จะ fail ถ้าเจอ:
+1. `<title>` หาย หรือยาวเกิน 70 ตัวอักษร (รวมชื่อแบรนด์)
+2. meta description หาย หรือไม่อยู่ระหว่าง 70–170 ตัวอักษร
+3. `<h1>` ไม่ใช่ 1 ตัวพอดี
+4. canonical หาย / ไม่ absolute / ไม่ปิดท้ายด้วย `/`
+5. JSON-LD parse ไม่ผ่าน หรือไม่มี `@graph`
+6. og:title / og:description / og:image / og:url ขาด
+7. **ลิงก์ภายในตาย** (ชี้ไปหน้าที่ไม่มีใน `dist/`)
+
+### Internal linking (ทำแล้ว อย่ารื้อ)
+- หน้าแรก → จังหวัด → อำเภอ (hub → spoke) และย้อนกลับทุกชั้น
+- อำเภอ → อำเภอข้างเคียง ผ่าน `district.neighbors` ใน data
+- อำเภอ → บทความ 3 เรื่อง / บทความ → ทุกอำเภอ + บทความอื่น + ลิงก์ในเนื้อความ
+- footer ลิสต์ทุกอำเภอทุกหน้า
+
+### sitemap / robots
+- `sitemap` ตั้ง priority อัตโนมัติใน `astro.config.mjs`: หน้าแรก 1.0 → **หน้าอำเภอ 0.9 (money page)** → hub 0.8 → บทความ 0.7 → about/contact 0.5
+- หน้าที่ยังไม่มีเนื้อหาจริง (เช่น `/reviews/` ตอนที่ยังไม่มีรีวิว) ถูกกันออกจาก sitemap และใส่ `noindex` อัตโนมัติ
+- `robots.txt` สร้างตอน build จาก `src/pages/robots.txt.ts`
+
+---
+
+## 6.7 ระบบรีวิว (`src/data/reviews.ts`)
+
+**นโยบายเด็ดขาด: แสดงเฉพาะรีวิวจากลูกค้าจริงที่อนุญาตให้เผยแพร่ ห้ามแต่งรีวิวแม้แต่รายการเดียว**
+รวมถึงห้ามใส่ "รีวิวตัวอย่าง" ไว้ก่อนแล้วค่อยเปลี่ยนทีหลัง
+
+กลไกที่วางไว้:
+- `reviews: Review[]` ตอนนี้เป็น **array ว่าง** — ถูกต้องแล้ว ไม่ต้องเติมอะไรจนกว่าจะมีรีวิวจริง
+- ส่วนรีวิวบนหน้าอำเภอ/จังหวัด/บริการ **ไม่ render เลย** เมื่อไม่มีรีวิวของ scope นั้น
+- `/reviews/` เป็นหน้าเดียวที่แสดงตอนว่าง โดยบอกตรง ๆ ว่ายังไม่มีรีวิว + วิธีส่งรีวิวทาง LINE และหน้านั้นถูกใส่ `noindex` + ตัดออกจาก sitemap อัตโนมัติจนกว่าจะมีรีวิว
+- คะแนนเฉลี่ย + `AggregateRating` จะโผล่ก็ต่อเมื่อมีรีวิว `verified: true` ครบ `MIN_REVIEWS_FOR_RATING` (ตอนนี้ 3)
+
+**ข้อเท็จจริงเรื่อง SEO ที่ต้องรู้:** รีวิวที่เจ้าของเว็บลงเองเกี่ยวกับธุรกิจตัวเอง (self-serving review)
+Google **ไม่แสดงดาวใน search result** ตั้งแต่ปี 2019 ประโยชน์จริงของส่วนนี้คือ conversion + E-E-A-T
+ถ้าอยากได้ดาวใน Google ต้องเป็นรีวิวใน **Google Business Profile ของช่างพาร์ทเนอร์จริง** เท่านั้น
+(และตามกติกาข้อ 8 — ห้ามสร้าง GBP ปลอมหรือรีวิวปลอมเด็ดขาด)
+
+วิธีเพิ่มรีวิวจริง: เพิ่ม object ใน `reviews` ให้ครบทุกฟิลด์ โดยเฉพาะ `districtSlug` (เพื่อให้ขึ้นหน้าอำเภอที่ถูก)
+`source` (ช่องทางที่ได้รีวิวมา) และ `verified` (ใส่ `true` เฉพาะที่ตรวจย้อนกลับได้ว่ามีงานจริง)
+
+---
+
 ## 7. Milestones (gated — commit + รอ approve ก่อนไปต่อ)
 
 ### M1: Scaffold + Data
@@ -175,23 +273,23 @@ export const contact = {
 
 ### M2: Money pages
 
-- [ ] Template หน้าอำเภอครบ 9 section ตามข้อ 5
-- [ ] หน้าบริการ + หน้าจังหวัด (hub pages ลิงก์ลงอำเภอ)
-- [ ] Schema JSON-LD ทั้ง 3 ตัว, ตรวจด้วย Rich Results Test
-- [ ] เนื้อหา unique ต่ออำเภอครบ 6 หน้า
+- [x] Template หน้าอำเภอครบ 9 section ตามข้อ 5
+- [x] หน้าบริการ + หน้าจังหวัด (hub pages ลิงก์ลงอำเภอ)
+- [x] Schema JSON-LD (`@graph`: Organization / WebSite / WebPage / BreadcrumbList / Service / FAQPage) — ยังต้องยืนยันด้วย Rich Results Test หลัง deploy
+- [x] เนื้อหา unique ต่ออำเภอครบ 6 หน้า (`localIntro` + `localHighlights` + `localFaqs` ใน data)
 - **Checkpoint:** `git commit -m "M2: money pages"` → เปิดทุก URL ได้, schema valid
 
 ### M3: Blog + หน้าประกอบ
 
-- [ ] บทความ 5 เรื่องตามข้อ 6 (Claude เขียน draft → user ตรวจภาษา/ข้อเท็จจริง)
-- [ ] หน้าแรก, /about/, /contact/ (มี section "สมัครเป็นช่างพาร์ทเนอร์")
-- [ ] Internal linking ครบ: blog↔money pages, อำเภอข้างเคียง
+- [x] บทความ 5 เรื่องตามข้อ 6 (**draft จาก Claude — user ต้องตรวจภาษา/ข้อเท็จจริง/ราคา ก่อน launch**)
+- [x] หน้าแรก, /about/, /contact/ (มี section "สมัครเป็นช่างพาร์ทเนอร์"), /reviews/, 404
+- [x] Internal linking ครบ: blog↔money pages, อำเภอข้างเคียง, ลิงก์ในเนื้อความบทความ
 - **Checkpoint:** `git commit -m "M3: content complete"`
 
 ### M4: Technical SEO + Launch
 
-- [ ] sitemap.xml, robots.txt, canonical, OG tags (แชร์ LINE/FB สวย)
-- [ ] Lighthouse mobile: Performance ≥ 95, SEO = 100
+- [x] sitemap.xml (+priority), robots.txt, canonical, OG tags + og-default.png
+- [ ] Lighthouse mobile: Performance ≥ 95, SEO = 100 (ยังไม่ได้วัดจริง — ต้องวัดหลัง deploy)
 - [ ] `npm run check:launch` ผ่าน (ไม่มี placeholder เบอร์โทร/LINE หลงเหลือ)
 - [ ] Deploy Cloudflare Pages + ต่อโดเมน hachangdd.com
 - [ ] Submit Google Search Console + ยิง sitemap
@@ -212,4 +310,6 @@ export const contact = {
 - เนื้อหาภาษาไทยทั้งหมดให้เขียนแบบภาษาพูดที่คนต่างจังหวัดอ่านสบาย ไม่ใช่ภาษาทางการ
 - ราคาในตารางเป็น "ช่วงราคาแนะนำ" — user จะปรับตามดีลช่างจริงทีหลัง อย่า hardcode กระจายหลายที่ (อยู่ใน data เท่านั้น)
 - เบอร์โทร/LINE ยังเป็น placeholder — ใส่ TODO ชัด ๆ ห้าม launch ทั้งที่ยังเป็น placeholder (M4 ต้องเช็คข้อนี้)
-- ห้ามสร้าง GBP ปลอมหรือ review ปลอม — GBP จะทำผ่านช่างพาร์ทเนอร์จริงเท่านั้น
+- ห้ามสร้าง GBP ปลอมหรือ review ปลอม — GBP จะทำผ่านช่างพาร์ทเนอร์จริงเท่านั้น (ดู §6.7)
+- ห้ามใส่ที่อยู่/พิกัดที่ไม่มีจริงลง schema เพื่อให้ `LocalBusiness` "ครบ" (ดู §6.6)
+- ก่อน commit ทุกครั้ง: `npm run verify` ต้องผ่าน

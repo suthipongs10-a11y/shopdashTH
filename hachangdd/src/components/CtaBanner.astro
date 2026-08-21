@@ -1,0 +1,24 @@
+---
+import CtaButtons from './CtaButtons.astro';
+import { contact } from '@/data/site';
+
+interface Props {
+  title: string;
+  lead?: string;
+  place: string;
+}
+const { title, lead, place } = Astro.props;
+---
+
+<section class="bg-brand-800 py-10 text-white sm:py-12">
+  <div class="container-page">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div class="max-w-xl">
+        <h2 class="text-2xl font-extrabold text-white sm:text-3xl">{title}</h2>
+        {lead && <p class="mt-2 text-brand-100">{lead}</p>}
+        <p class="mt-2 text-sm text-brand-200">{contact.hoursTh}</p>
+      </div>
+      <CtaButtons place={place} class="w-full lg:max-w-md" />
+    </div>
+  </div>
+</section>
