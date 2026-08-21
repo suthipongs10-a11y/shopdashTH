@@ -1,0 +1,24 @@
+{
+  "name": "hachangdd",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "hachangdd.com — local service lead-gen site (Astro static)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:launch": "node scripts/check-launch.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.4",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}

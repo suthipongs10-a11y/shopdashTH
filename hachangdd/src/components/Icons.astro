@@ -1,0 +1,44 @@
+---
+/** ไอคอน inline SVG — ไม่โหลด icon font/JS เพิ่ม */
+interface Props {
+  name: 'phone' | 'line' | 'check' | 'menu' | 'pin';
+  class?: string;
+}
+const { name, class: className = 'h-5 w-5' } = Astro.props;
+---
+
+{
+  name === 'phone' && (
+    <svg class={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2Z" />
+    </svg>
+  )
+}
+{
+  name === 'line' && (
+    <svg class={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 3C6.9 3 2.8 6.4 2.8 10.5c0 3.7 3.3 6.8 7.7 7.4.3.1.7.2.8.5.1.3.1.6 0 .9l-.1.8c0 .2-.2.9.8.5s5.4-3.2 7.4-5.5c1.3-1.4 1.9-2.9 1.9-4.6C21.3 6.4 17.1 3 12 3ZM8.1 13H6.5a.4.4 0 0 1-.4-.4V9.1c0-.2.2-.4.4-.4h.4c.2 0 .4.2.4.4v3.1h.8c.2 0 .4.2.4.4v.1c0 .2-.2.4-.4.4Zm2-.4c0 .2-.2.4-.4.4h-.4a.4.4 0 0 1-.4-.4V9.1c0-.2.2-.4.4-.4h.4c.2 0 .4.2.4.4v3.5Zm4-.0c0 .2-.2.4-.4.4h-.4a.4.4 0 0 1-.3-.2l-1.4-2v1.8c0 .2-.2.4-.4.4h-.4a.4.4 0 0 1-.4-.4V9.1c0-.2.2-.4.4-.4h.5c.1 0 .2 0 .3.2l1.4 1.9V9.1c0-.2.2-.4.4-.4h.3c.2 0 .4.2.4.4v3.5Zm3.4-2.6c0 .2-.2.4-.4.4h-.9v.5h.9c.2 0 .4.2.4.4v.2c0 .2-.2.4-.4.4h-.9v.5h.9c.2 0 .4.2.4.4v.2c0 .2-.2.4-.4.4h-1.7a.4.4 0 0 1-.4-.4V9.1c0-.2.2-.4.4-.4h1.7c.2 0 .4.2.4.4v.2Z" />
+    </svg>
+  )
+}
+{
+  name === 'check' && (
+    <svg class={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m4 12.5 5 5L20 6.5" />
+    </svg>
+  )
+}
+{
+  name === 'menu' && (
+    <svg class={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  )
+}
+{
+  name === 'pin' && (
+    <svg class={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+    </svg>
+  )
+}

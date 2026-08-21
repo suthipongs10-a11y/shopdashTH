@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------- tokens */
+@theme {
+  --font-sans: 'Noto Sans Thai', 'Sarabun', ui-sans-serif, system-ui, sans-serif;
+
+  /* แบรนด์: น้ำเงินเข้ม = น่าเชื่อถือ, ส้ม = ปุ่มโทร (ตัดกับพื้นชัดบนมือถือกลางแดด) */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+  --color-brand-900: #16265c;
+
+  --color-call-500: #f97316;
+  --color-call-600: #ea580c;
+  --color-call-700: #c2410c;
+
+  --color-line-500: #06c755;
+  --color-line-600: #05a948;
+
+  --color-ink-900: #111827;
+  --color-ink-700: #374151;
+  --color-ink-500: #6b7280;
+}
+
+/* ---------------------------------------------------------------- base */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white font-sans text-ink-900 antialiased;
+    /* ภาษาไทยอ่านง่ายขึ้นเมื่อ line-height สูงกว่าปกติ */
+    line-height: 1.75;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+
+  /* กัน sticky CTA bar บังเนื้อหาท้ายหน้าบนมือถือ */
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* -------------------------------------------------------------- helpers */
+@utility container-page {
+  @apply mx-auto w-full max-w-5xl px-4 sm:px-6;
+}
+
+@utility btn-base {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-base font-bold
+         transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2;
+}

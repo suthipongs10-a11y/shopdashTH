@@ -26,3 +26,7 @@ npm run dev
 ```
 
 เปิด `http://demo.localhost:3000` (ร้านเดโม่) — ดูรายละเอียดตัวแปร environment ทั้งหมดใน `.env.example`
+
+## โปรเจ็คอื่นในเรพอนี้
+
+- [`hachangdd/`](./hachangdd/) — **หาช่างดีดี (hachangdd.com)** เว็บ lead-gen บริการช่างท้องถิ่น (Astro + Cloudflare Pages) แยกขาดจาก ShopDash ไม่แชร์ dependency หรือ config ใด ๆ ดูรายละเอียดใน [`hachangdd/CLAUDE.md`](./hachangdd/CLAUDE.md)

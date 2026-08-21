@@ -1,0 +1,69 @@
+---
+import { contact, services, site } from '@/data/site';
+import Icons from './Icons.astro';
+
+const service = services[0]!;
+const nav = [
+  { href: `/${service.slug}/`, label: service.nameTh },
+  { href: '/blog/', label: 'บทความ' },
+  { href: '/about/', label: 'เกี่ยวกับเรา' },
+  { href: '/contact/', label: 'ติดต่อ' },
+];
+const current = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur">
+  <div class="container-page flex h-16 items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-2 text-lg font-extrabold text-brand-900">
+      <span
+        class="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-base text-white"
+        aria-hidden="true">ดี</span
+      >
+      <span>{site.name}</span>
+    </a>
+
+    <nav aria-label="เมนูหลัก" class="hidden items-center gap-6 md:flex">
+      {
+        nav.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'text-sm font-semibold hover:text-brand-600',
+              current.startsWith(item.href) ? 'text-brand-600' : 'text-ink-700',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <a
+      href={`tel:${contact.phoneTel}`}
+      data-cta="call-header"
+      class="btn-base bg-call-600 px-4 py-2.5 text-sm text-white hover:bg-call-700"
+    >
+      <Icons name="phone" class="h-4 w-4" />
+      <span class="hidden sm:inline">{contact.phone}</span>
+      <span class="sm:hidden">โทร</span>
+    </a>
+  </div>
+
+  <!-- เมนูบนมือถือ: แถวเลื่อนแนวนอน แทน hamburger + JS -->
+  <nav aria-label="เมนูหลัก (มือถือ)" class="md:hidden">
+    <ul class="container-page flex gap-4 overflow-x-auto pb-2 text-sm font-semibold whitespace-nowrap">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={[current.startsWith(item.href) ? 'text-brand-600' : 'text-ink-700']}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
