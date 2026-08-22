@@ -6,3 +6,6 @@ dist/
 *.log
 .env
 .env.production
+
+# ไฟล์ทำงานส่วนตัว (มีข้อมูลติดต่อบุคคล — PDPA) ห้าม commit
+.local/
