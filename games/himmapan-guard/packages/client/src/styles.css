@@ -62,6 +62,13 @@ button.ghost { background: rgba(255,255,255,.06); }
 .section-title { font-size: 15px; color: var(--gold); margin: 22px 0 10px; display: flex; align-items: center; gap: 8px; }
 .section-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 
+.howto {
+  margin: 0; padding-left: 22px; display: grid; gap: 7px;
+  font-size: 13.5px; line-height: 1.6; color: var(--muted);
+}
+.howto b { color: var(--text); font-weight: 600; }
+.howto::marker, .howto li::marker { color: var(--gold); font-weight: 700; }
+
 .stage-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .stage-card {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);

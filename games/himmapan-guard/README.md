@@ -6,7 +6,16 @@
 > โปรเจ็คนี้อยู่ในโฟลเดอร์แยกของ repo ShopDash และไม่เกี่ยวข้องกับแอปหลักเลย
 > เอกสารหลักอยู่ที่ [`CLAUDE.md`](./CLAUDE.md) · สถานะงานอยู่ที่ [`STATUS.md`](./STATUS.md)
 
-## เริ่มเล่น
+## เอาไปเล่นบนมือถือ
+
+```bash
+node scripts/build-artifact.mjs      # → packages/client/dist/himmapan-guard.html
+```
+
+ได้ HTML ไฟล์เดียวจบ ~640 KB (three.js + โค้ดเกม + CSS อยู่ในไฟล์เดียว ไม่มี asset แนบ)
+เอาไปวางบนโฮสต์ไหนก็ได้ หรือส่งไฟล์ให้เปิดตรงๆ ก็เล่นได้ทันที
+
+## เริ่มเล่น (โหมดพัฒนา)
 
 ```bash
 cd games/himmapan-guard
