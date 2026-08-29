@@ -1,4 +1,4 @@
-import { cards, dropTableById, enemies, enemyById, heroes, skillById, stages } from './index.js';
+import { cards, dropTableById, enemies, enemyById, heroes, MELEE_MAX_RANGE, MELEE_MIN_RANGE, skillById, stages } from './index.js';
 import type { Stage } from './schema/stage.js';
 
 export interface ContentIssue {
@@ -47,7 +47,15 @@ export function validateContent(): ContentIssue[] {
     if (ults.length > 1) err(`hero:${h.id}`, `มี ultimate ${ults.length} ท่า — อนุญาตตัวละ 1 ท่า`);
     if (h.pos === 'ranged' && h.blockCount > 0) err(`hero:${h.id}`, 'ฮีโร่ ranged ต้อง blockCount = 0');
     if (h.pos === 'melee' && h.blockCount === 0) warn(`hero:${h.id}`, 'ฮีโร่ melee ที่บล็อคไม่ได้ — ตั้งใจหรือไม่?');
-    if (h.pos === 'melee' && h.range > 1.6) warn(`hero:${h.id}`, `melee ระยะ ${h.range} ยาวผิดปกติ`);
+    if (h.pos === 'melee' && h.range < MELEE_MIN_RANGE) {
+      err(
+        `hero:${h.id}`,
+        `ฮีโร่ประชิดระยะ ${h.range} สั้นเกินไป — ต้อง ≥ ${MELEE_MIN_RANGE} ไม่งั้นตีศัตรูในช่องที่ติดกันไม่ได้ (วางข้างทางแล้วยืนเฉย)`,
+      );
+    }
+    if (h.pos === 'melee' && h.range > MELEE_MAX_RANGE) {
+      warn(`hero:${h.id}`, `melee ระยะ ${h.range} ยาวเกิน ${MELEE_MAX_RANGE} — จะตีข้ามช่องทแยงได้ด้วย ตั้งใจหรือไม่?`);
+    }
   }
 
   for (const e of enemies) {

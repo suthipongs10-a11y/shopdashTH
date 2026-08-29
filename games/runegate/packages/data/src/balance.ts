@@ -36,6 +36,15 @@ export const MIN_DAMAGE_RATIO = 0.05;
 export const ARMORED_PHYSICAL_MULT = 0.7;
 export const MAGIC_RESIST_TRAIT_MULT = 0.6;
 
+/**
+ * ระยะขั้นต่ำของฮีโร่ประชิด — ระยะจากกึ่งกลางช่องไปกึ่งกลางช่องที่ติดกัน = 1.0 พอดี
+ * ถ้าตั้งต่ำกว่านี้ ฮีโร่จะตีได้เฉพาะศัตรูที่ยืนทับช่องตัวเอง (คือตอนบล็อคเท่านั้น)
+ * วางข้างทางแล้วจะยืนเฉยทั้งด่าน — validator บังคับค่านี้ไว้กันพลาดซ้ำ
+ */
+export const MELEE_MIN_RANGE = 1.05;
+/** ระยะทแยงมุมของช่องที่ติดกัน — ระยะประชิดไม่ควรเกินค่านี้ */
+export const MELEE_MAX_RANGE = 1.4;
+
 /** อัตราส่วนเวลาจำลอง — sim เดินด้วย fixed timestep เสมอ (§13.2 ข้อ 2) */
 export const TICKS_PER_SEC = 30;
 export const TICK_DT = 1 / TICKS_PER_SEC;

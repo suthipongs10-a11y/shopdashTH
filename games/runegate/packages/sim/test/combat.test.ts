@@ -111,13 +111,46 @@ describe('การบล็อค (§5.4)', () => {
   });
 
   it('ถอนฮีโร่แล้วศัตรูที่ถูกบล็อคเดินต่อทันที', () => {
-    const b = new Battle({ stage: makeStage([wave('restless_shade', 1, 0.1)]), squad: squad(['warden_kael']), seed: 6 });
+    // ใช้มินิบอสเลือดหนาคู่กับผู้บล็อคเลเวล 1 เพื่อให้ศัตรูยังไม่ตายตอนตรวจ
+    const b = new Battle({ stage: makeStage([wave('ogre_bruiser', 1, 0.1)]), squad: squad(['warden_kael'], 1), seed: 6 });
     b.deploy('warden_kael', 3, 2);
     advance(b, 6);
     const before = b.aliveEnemies[0]!.dist;
     b.retreat(b.deployedHeroes[0]!.uid);
     advance(b, 2);
     expect(b.aliveEnemies[0]!.dist).toBeGreaterThan(before);
+  });
+});
+
+describe('ระยะของฮีโร่ประชิด (regression)', () => {
+  // บั๊กที่เคยเกิด: ระยะ 0.9–1.0 ทำให้ฮีโร่ประชิดที่วาง "ข้างทาง" ตีอะไรไม่ได้เลย
+  // เพราะระยะจากกึ่งกลางช่องไปกึ่งกลางช่องที่ติดกัน = 1.0 พอดี
+  it('ฮีโร่ประชิดทุกตัวมีระยะพอจะตีช่องที่ติดกันได้', async () => {
+    const { heroes, MELEE_MIN_RANGE } = await import('@runegate/data');
+    for (const hero of heroes.filter((x) => x.pos === 'melee')) {
+      expect(hero.range, `${hero.id} ระยะสั้นเกินไป`).toBeGreaterThanOrEqual(MELEE_MIN_RANGE);
+    }
+  });
+
+  it('วางฮีโร่ประชิดข้างทางเดินแล้วต้องตีศัตรูที่เดินผ่านได้', () => {
+    const stage = makeStage([wave('gel_slime', 4, 1, 1.2)], { baseHp: 20 });
+    const b = new Battle({ stage, squad: squad(['militia_swordsman']), seed: 5 });
+    // (3,1) เป็นช่อง G ที่อยู่ติดกับทางเดินแถว y=2 พอดี — ไม่ได้อยู่บนทาง จึงไม่บล็อค
+    expect(b.deploy('militia_swordsman', 3, 1).ok).toBe(true);
+    advance(b, 20);
+    const hero = b.result().heroes[0]!;
+    expect(hero.damageDealt).toBeGreaterThan(0);
+  });
+
+  it('วางบนทางเดินยังได้เปรียบกว่าเสมอ (บล็อค = ตีได้ต่อเนื่อง)', () => {
+    const stage = makeStage([wave('gel_slime', 4, 1, 1.2)], { baseHp: 20 });
+    const run = (tx: number, ty: number): number => {
+      const b = new Battle({ stage, squad: squad(['militia_swordsman']), seed: 5 });
+      b.deploy('militia_swordsman', tx, ty);
+      advance(b, 20);
+      return b.result().heroes[0]!.damageDealt;
+    };
+    expect(run(3, 2)).toBeGreaterThan(run(3, 1));
   });
 });
 

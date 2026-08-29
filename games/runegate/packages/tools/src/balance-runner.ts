@@ -31,6 +31,12 @@ const REFERENCE_LEVEL: Record<string, number> = {
 const MIN_WIN_RATE = 0.8;
 /** win-rate สูงสุดที่เลเวลต่ำกว่าอ้างอิงมาก — ถ้าสูงกว่านี้แปลว่าด่านง่ายเกินไป */
 const MAX_EASY_WIN_RATE = 0.35;
+/**
+ * จำนวนรอบขั้นต่ำต่อ (ด่าน × เลเวล) ที่จะเชื่อผลได้
+ * ต่ำกว่านี้ผลจะแกว่งจนตัดสินไม่ได้ — เคยเจอกรณี 9 รอบให้ 78% แต่ 240 รอบให้ 90%
+ * ผู้ใช้สั่ง --runs น้อยได้ แต่ runner จะดันขึ้นมาที่ค่านี้เองเพื่อไม่ให้สรุปผิด
+ */
+const MIN_RUNS_PER_COMBO = 20;
 
 interface Args {
   runs: number;
@@ -97,7 +103,14 @@ function main(): void {
   };
 
   const combos = targetStages.flatMap((s) => levelsFor(s).map((level) => ({ stage: s, level })));
-  const runsPer = Math.max(1, Math.floor(args.runs / combos.length));
+  const requested = Math.max(1, Math.floor(args.runs / combos.length));
+  const runsPer = Math.max(MIN_RUNS_PER_COMBO, requested);
+  if (runsPer > requested && !args.quiet) {
+    console.log(
+      `\nℹ️  ขอมา ${args.runs} รอบ (= ${requested} รอบต่อช่อง) ซึ่งน้อยเกินกว่าจะเชื่อผลได้ ` +
+        `— รันจริง ${runsPer * combos.length} รอบ (${runsPer} รอบต่อช่อง)`,
+    );
+  }
 
   const started = Date.now();
   const rows: Row[] = [];

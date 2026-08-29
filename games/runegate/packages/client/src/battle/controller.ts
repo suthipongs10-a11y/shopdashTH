@@ -1,6 +1,6 @@
 import { getHero, getSkill, TICK_DT, type Stage } from '@runegate/data';
-import { Battle, canDeployOn, isHero, type HeroUnit } from '@runegate/sim';
-import { StageScene } from '../render/scene.js';
+import { Battle, canDeployOn, effRange, isHero, type HeroUnit } from '@runegate/sim';
+import { StageScene, type DeployTile } from '../render/scene.js';
 import { BattleView } from '../render/battleView.js';
 import { portraitDataUrl } from '../render/sprites.js';
 import { h, progress, starHtml, toast } from '../ui/common.js';
@@ -34,6 +34,7 @@ export class BattleController {
 
   private bar: HeroBarEntry[] = [];
   private dirpad: HTMLElement | null = null;
+  private hint: HTMLElement | null = null;
   private unitPanel: HTMLElement | null = null;
   private elWave!: HTMLElement;
   private elHp!: HTMLElement;
@@ -151,6 +152,7 @@ export class BattleController {
         return;
       }
       this.pendingTile = { x: tx, y: ty };
+      this.scene.showRangeRing(tx, ty, getHero(this.selectedHeroId).range);
       this.showDirPad(clientX, clientY);
       return;
     }
@@ -172,25 +174,48 @@ export class BattleController {
     }
     this.selectedHeroId = heroId;
     const hero = getHero(heroId);
-    const tiles: { x: number; y: number }[] = [];
+    const tiles: DeployTile[] = [];
     for (let y = 0; y < this.stage.grid.h; y++) {
       for (let x = 0; x < this.stage.grid.w; x++) {
         const ch = this.stage.tiles[y]?.[x] ?? '.';
         if (!canDeployOn(ch, hero.pos)) continue;
         if (this.battle.deployedHeroes.some((u) => u.tileX === x && u.tileY === y)) continue;
-        tiles.push({ x, y });
+        tiles.push({ x, y, kind: ch === 'R' ? 'block' : ch === 'H' ? 'high' : 'ground' });
       }
     }
-    this.scene.showDeployTiles(tiles, hero.pos === 'melee' ? 0x66e2ff : 0xffc866);
+    this.scene.showDeployTiles(tiles);
+    this.showPlacementHint(hero.pos);
     for (const e of this.bar) e.btn.classList.toggle('active', e.heroId === heroId);
+  }
+
+  /** อธิบายความต่างของช่องแต่ละสี — กันผู้เล่นวางฮีโร่ประชิดข้างทางแล้วงงว่าทำไมไม่ตี */
+  private showPlacementHint(pos: 'melee' | 'ranged'): void {
+    this.hint?.remove();
+    this.hint =
+      pos === 'melee'
+        ? h(
+            'div',
+            { class: 'place-hint' },
+            h('span', {}, h('i', { class: 'sw block' }), 'บนทางเดิน = ', h('b', {}, 'ขวางศัตรูไว้'), ' (คุ้มที่สุด)'),
+            h('span', {}, h('i', { class: 'sw ground' }), 'ข้างทาง = ตีศัตรูที่เดินผ่านได้ แต่ ', h('b', {}, 'ไม่ขวาง')),
+          )
+        : h(
+            'div',
+            { class: 'place-hint' },
+            h('span', {}, h('i', { class: 'sw high' }), 'ที่สูงเท่านั้น — ยิงข้ามหัวได้ และตีศัตรูบินได้'),
+          );
+    this.ui.appendChild(this.hint);
   }
 
   private cancelPlacement(): void {
     this.selectedHeroId = null;
     this.pendingTile = null;
     this.scene.clearHighlights();
+    this.scene.clearRangeRing();
     this.dirpad?.remove();
     this.dirpad = null;
+    this.hint?.remove();
+    this.hint = null;
     for (const e of this.bar) e.btn.classList.remove('active');
   }
 
@@ -224,6 +249,8 @@ export class BattleController {
 
   private openUnitPanel(uid: number): void {
     this.selectedUid = uid;
+    const u = this.battle.unit(uid);
+    if (u && isHero(u)) this.scene.showRangeRing(u.tileX, u.tileY, effRange(u));
     this.renderUnitPanel();
   }
 
@@ -231,6 +258,7 @@ export class BattleController {
     this.selectedUid = null;
     this.unitPanel?.remove();
     this.unitPanel = null;
+    this.scene.clearRangeRing();
   }
 
   private renderUnitPanel(): void {

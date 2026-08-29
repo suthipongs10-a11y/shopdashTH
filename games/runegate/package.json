@@ -19,7 +19,7 @@
     "balance": "tsx packages/tools/src/balance-runner.ts",
     "economy": "tsx packages/tools/src/economy-model.ts",
     "validate": "tsx packages/tools/src/validate-content.ts",
-    "verify": "npm run validate && npm run typecheck && npm run test && npm run balance -- --runs 100"
+    "verify": "npm run validate && npm run typecheck && npm run test && npm run balance -- --runs 400"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

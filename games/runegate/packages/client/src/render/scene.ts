@@ -8,6 +8,21 @@ export interface TileMeshData {
   type: string;
 }
 
+/** ชนิดช่องที่วางได้ — สีต่างกันเพื่อให้เห็นทันทีว่าช่องไหน "บล็อค" ได้ */
+export type DeployTileKind = 'block' | 'ground' | 'high';
+
+export interface DeployTile {
+  x: number;
+  y: number;
+  kind: DeployTileKind;
+}
+
+const DEPLOY_COLOR: Record<DeployTileKind, number> = {
+  block: 0x7fd4e8, // บนทางเดิน — ขวางศัตรูได้
+  ground: 0x4f9e86, // ข้างทาง — ตีได้แต่ไม่บล็อค
+  high: 0xf0a860, // ที่สูง — เฉพาะฮีโร่ระยะไกล
+};
+
 /** พื้นผิวของโลก RUNEGATE: หินสกัด มอส และรอยแยกมิติ */
 const TILE_STYLE: Record<string, { color: number; height: number; top?: number }> = {
   R: { color: 0x7d7668, height: 0.09 }, // ทางหินปูเก่า
@@ -27,6 +42,7 @@ export class StageScene {
   readonly tileMeshes: THREE.Mesh[] = [];
   readonly highlights = new THREE.Group();
 
+  private rangeRing: THREE.Group | null = null;
   private target = new THREE.Vector3();
   private azimuth = -Math.PI / 4;
   private polar = 1.02;
@@ -175,18 +191,55 @@ export class StageScene {
 
   /* ---------------- ไฮไลต์ช่องวาง ---------------- */
 
-  showDeployTiles(tiles: { x: number; y: number }[], color = 0x66e2ff): void {
+  showDeployTiles(tiles: DeployTile[]): void {
     this.clearHighlights();
     const geo = new THREE.PlaneGeometry(0.92, 0.92);
     for (const t of tiles) {
       const ch = this.stage.tiles[t.y]?.[t.x] ?? '.';
       const height = TILE_STYLE[ch]?.height ?? 0.1;
-      const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.42, depthWrite: false });
+      const mat = new THREE.MeshBasicMaterial({
+        color: DEPLOY_COLOR[t.kind],
+        transparent: true,
+        opacity: t.kind === 'ground' ? 0.3 : 0.44,
+        depthWrite: false,
+      });
       const m = new THREE.Mesh(geo, mat);
       m.rotation.x = -Math.PI / 2;
       m.position.set(t.x + 0.5, height + 0.04, t.y + 0.5);
       this.highlights.add(m);
     }
+  }
+
+  /** วงแสดงระยะโจมตี — ช่วยให้เห็นว่าฮีโร่เอื้อมถึงทางเดินไหม */
+  showRangeRing(tileX: number, tileY: number, radius: number): void {
+    this.clearRangeRing();
+    const y = this.tileHeight(tileX, tileY) + 0.06;
+    const group = new THREE.Group();
+    const fill = new THREE.Mesh(
+      new THREE.CircleGeometry(radius, 40),
+      new THREE.MeshBasicMaterial({ color: 0x7fd4e8, transparent: true, opacity: 0.1, depthWrite: false }),
+    );
+    const edge = new THREE.Mesh(
+      new THREE.RingGeometry(radius - 0.055, radius, 44),
+      new THREE.MeshBasicMaterial({ color: 0x9ee7f5, transparent: true, opacity: 0.62, depthWrite: false }),
+    );
+    fill.rotation.x = -Math.PI / 2;
+    edge.rotation.x = -Math.PI / 2;
+    group.add(fill, edge);
+    group.position.set(tileX + 0.5, y, tileY + 0.5);
+    this.rangeRing = group;
+    this.root.add(group);
+  }
+
+  clearRangeRing(): void {
+    if (!this.rangeRing) return;
+    this.root.remove(this.rangeRing);
+    for (const child of this.rangeRing.children) {
+      const m = child as THREE.Mesh;
+      m.geometry.dispose();
+      (m.material as THREE.Material).dispose();
+    }
+    this.rangeRing = null;
   }
 
   clearHighlights(): void {
@@ -321,6 +374,7 @@ export class StageScene {
   dispose(): void {
     for (const d of this.disposers) d();
     this.clearHighlights();
+    this.clearRangeRing();
     this.scene.traverse((o) => {
       const m = o as THREE.Mesh;
       if (m.geometry) m.geometry.dispose();

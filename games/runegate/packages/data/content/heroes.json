@@ -10,7 +10,7 @@
     "pos": "melee",
     "cost": 26,
     "blockCount": 3,
-    "range": 0.95,
+    "range": 1.3,
     "damageType": "physical",
     "targetPriority": "first",
     "base": {
@@ -56,7 +56,7 @@
     "pos": "melee",
     "cost": 12,
     "blockCount": 2,
-    "range": 0.9,
+    "range": 1.25,
     "damageType": "physical",
     "targetPriority": "first",
     "base": {
@@ -101,7 +101,7 @@
     "pos": "melee",
     "cost": 22,
     "blockCount": 1,
-    "range": 1,
+    "range": 1.2,
     "damageType": "physical",
     "targetPriority": "lowest_hp",
     "base": {
@@ -147,7 +147,7 @@
     "pos": "melee",
     "cost": 18,
     "blockCount": 1,
-    "range": 1,
+    "range": 1.2,
     "damageType": "physical",
     "targetPriority": "elite_first",
     "base": {
@@ -193,7 +193,7 @@
     "pos": "melee",
     "cost": 10,
     "blockCount": 1,
-    "range": 0.95,
+    "range": 1.2,
     "damageType": "physical",
     "targetPriority": "first",
     "base": {
@@ -552,7 +552,7 @@
     "pos": "melee",
     "cost": 18,
     "blockCount": 2,
-    "range": 1,
+    "range": 1.3,
     "damageType": "physical",
     "targetPriority": "first",
     "base": {
