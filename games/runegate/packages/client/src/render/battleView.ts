@@ -78,7 +78,7 @@ export class BattleView {
     const hit = this.views.get(u.uid);
     if (hit) return hit;
 
-    const atlas = getAtlas(this.recipeOf(u));
+    const atlas = getAtlas(this.recipeOf(u), isEnemy(u) ? u.enemyId : u.heroId);
     const tex = atlas.texture.clone();
     tex.needsUpdate = true;
     const material = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, alphaTest: 0.04 });

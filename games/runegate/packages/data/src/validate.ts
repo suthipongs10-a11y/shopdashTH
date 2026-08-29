@@ -1,4 +1,4 @@
-import { cards, dropTableById, enemies, enemyById, heroes, MELEE_MAX_RANGE, MELEE_MIN_RANGE, skillById, stages } from './index.js';
+import { cards, dropTableById, dropTables, enemies, enemyById, heroById, heroes, MELEE_MAX_RANGE, MELEE_MIN_RANGE, progression, skillById, stages } from './index.js';
 import type { Stage } from './schema/stage.js';
 
 export interface ContentIssue {
@@ -55,6 +55,28 @@ export function validateContent(): ContentIssue[] {
     }
     if (h.pos === 'melee' && h.range > MELEE_MAX_RANGE) {
       warn(`hero:${h.id}`, `melee ระยะ ${h.range} ยาวเกิน ${MELEE_MAX_RANGE} — จะตีข้ามช่องทแยงได้ด้วย ตั้งใจหรือไม่?`);
+    }
+  }
+
+  // ของแจกตอนเริ่มเกม ต้องอ้างฮีโร่ที่มีอยู่จริง ไม่งั้นเปิดเกมใหม่แล้วพังทันที
+  for (const id of progression.starter.heroes) {
+    if (!heroById.has(id)) err('progression:starter', `แจกฮีโร่ "${id}" ที่ไม่มีอยู่`);
+  }
+  if (new Set(progression.starter.heroes).size !== progression.starter.heroes.length) {
+    err('progression:starter', 'มีฮีโร่ซ้ำในรายการแจกตอนเริ่มเกม');
+  }
+
+  // ไอเทมในตารางดรอปต้องเป็นชนิดที่ระบบนอกด่านรู้จัก (สะกดผิด = ของหายเงียบๆ)
+  const KNOWN_ITEM_PREFIX = ['essence_', 'shard_', 'rune_'];
+  const KNOWN_ITEMS = new Set([
+    'gold', 'hero_exp_potion', 'skill_scroll', 'summon_scroll', 'refine_ore',
+    'card_shard', 'hero_shard_random', 'essence_random',
+  ]);
+  for (const t of dropTables) {
+    for (const e of t.entries) {
+      const known = KNOWN_ITEMS.has(e.item) || KNOWN_ITEM_PREFIX.some((p) => e.item.startsWith(p));
+      if (!known) err(`dropTable:${t.id}`, `ไอเทม "${e.item}" ไม่อยู่ในรายการที่ระบบรู้จัก`);
+      if (e.max < e.min) err(`dropTable:${t.id}`, `ไอเทม "${e.item}" max < min`);
     }
   }
 

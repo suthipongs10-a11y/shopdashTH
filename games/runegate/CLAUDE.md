@@ -52,6 +52,8 @@ npm run typecheck      # tsc ทั้ง workspace
 npm run test           # vitest (data + sim)
 npm run balance        # รันจำลองสมดุล (--runs 1000 --stage ch1_03 --levels 10,15,20)
 npm run economy        # โมเดลเศรษฐกิจ 90 วัน → packages/tools/out/economy-90d.csv
+npm run art-status     # ดูว่าตัวละครไหนมี atlas จริงแล้ว ตัวไหนยังใช้ placeholder
+npm run pack-sprites   # แพ็ค PNG รายเฟรม → atlas + manifest (ดู ART_GUIDE.md)
 npm run verify         # ทั้งหมดข้างบน — ต้องผ่านก่อน commit
 ```
 

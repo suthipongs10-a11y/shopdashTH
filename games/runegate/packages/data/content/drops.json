@@ -3,14 +3,20 @@
     { "item": "gold", "weight": 50, "min": 120, "max": 260 },
     { "item": "refine_ore", "weight": 22, "min": 1, "max": 2 },
     { "item": "summon_scroll", "weight": 6, "min": 1, "max": 1 },
-    { "item": "essence_dark", "weight": 12, "min": 1, "max": 2 },
-    { "item": "hero_exp_potion", "weight": 10, "min": 1, "max": 3 }
+    { "item": "essence_random", "weight": 12, "min": 1, "max": 2 },
+    { "item": "hero_exp_potion", "weight": 10, "min": 1, "max": 3 },
+    { "item": "hero_shard_random", "weight": 8, "min": 1, "max": 1 },
+    { "item": "skill_scroll", "weight": 9, "min": 1, "max": 1 }
   ]},
   { "id": "drop_ch1_boss", "rolls": 3, "entries": [
     { "item": "gold", "weight": 40, "min": 400, "max": 800 },
     { "item": "refine_ore", "weight": 25, "min": 2, "max": 4 },
     { "item": "summon_scroll", "weight": 15, "min": 1, "max": 2 },
     { "item": "rune_random_g3", "weight": 15, "min": 1, "max": 1 },
-    { "item": "card_shard", "weight": 5, "min": 1, "max": 3 }
+    { "item": "card_shard", "weight": 5, "min": 1, "max": 3 },
+    { "item": "hero_shard_random", "weight": 18, "min": 1, "max": 2 },
+    { "item": "essence_random", "weight": 14, "min": 1, "max": 2 },
+    { "item": "skill_scroll", "weight": 12, "min": 1, "max": 2 },
+    { "item": "hero_exp_potion", "weight": 14, "min": 2, "max": 5 }
   ]}
 ]

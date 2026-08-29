@@ -9,7 +9,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { economy, getStage, runeConfig } from '@runegate/data';
+import { economy, getStage, progression, runeConfig } from '@runegate/data';
 import { AutoPlayer, Battle, Rng, runHeadless } from '@runegate/sim';
 
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../out/economy-90d.csv');
@@ -62,7 +62,7 @@ export function runeUpgradeCost(grade: number, toLevel: number): number {
 
 /** ค่าอัพเลเวลฮีโร่ 1 ตัวจาก 1 ถึง maxLevel */
 export function heroLevelCost(maxLevel: number): number {
-  const { base, exp } = economy.heroLevelUpGold;
+  const { goldBase: base, goldExponent: exp } = progression.level;
   let sum = 0;
   for (let lv = 1; lv < maxLevel; lv++) sum += base * lv ** exp;
   return Math.round(sum);

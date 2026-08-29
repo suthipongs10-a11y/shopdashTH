@@ -9,12 +9,13 @@ import economyJson from '../content/economy.json';
 import dropsJson from '../content/drops.json';
 import weaponsJson from '../content/weapons.json';
 import turretsJson from '../content/turrets.json';
+import progressionJson from '../content/progression.json';
 import stage101 from '../content/stages/ch1_01.json';
 import stage102 from '../content/stages/ch1_02.json';
 import stage103 from '../content/stages/ch1_03.json';
 import stage104 from '../content/stages/ch1_04.json';
 
-import { Hero, heroStatsAtLevel, MAX_LEVEL_BY_STAR } from './schema/hero.js';
+import { Hero, HeroStats } from './schema/hero.js';
 import { Enemy } from './schema/enemy.js';
 import { Skill } from './schema/skill.js';
 import { Card } from './schema/card.js';
@@ -23,7 +24,9 @@ import { EconomyConfig } from './schema/economy.js';
 import { DropTable } from './schema/drop.js';
 import { Weapon } from './schema/weapon.js';
 import { Turret } from './schema/turret.js';
+import { ProgressionConfig } from './schema/progression.js';
 import { Stage } from './schema/stage.js';
+import { heroStatsFor, skillAtLevel, type HeroProgress } from './progress.js';
 
 export * from './schema/common.js';
 export * from './schema/skill.js';
@@ -36,10 +39,11 @@ export * from './schema/economy.js';
 export * from './schema/drop.js';
 export * from './schema/weapon.js';
 export * from './schema/turret.js';
+export * from './schema/progression.js';
+export * from './progress.js';
 export * from './balance.js';
 export { validateContent, tilesAlongPath, tileAt } from './validate.js';
 export type { ContentIssue } from './validate.js';
-export { heroStatsAtLevel, MAX_LEVEL_BY_STAR };
 
 function parseAll<S extends z.ZodTypeAny>(schema: S, rows: unknown[], label: string): z.infer<S>[] {
   return rows.map((row, i) => {
@@ -72,6 +76,7 @@ export const turrets: Turret[] = parseAll(Turret, turretsJson as unknown[], 'tur
 export const stages: Stage[] = parseAll(Stage, [stage101, stage102, stage103, stage104] as unknown[], 'stage');
 export const runeConfig: RuneConfig = parseOne(RuneConfig, runesJson, 'runeConfig');
 export const economy: EconomyConfig = parseOne(EconomyConfig, economyJson, 'economy');
+export const progression: ProgressionConfig = parseOne(ProgressionConfig, progressionJson, 'progression');
 
 function index<T extends { id: string }>(rows: T[]): ReadonlyMap<string, T> {
   const m = new Map<string, T>();
@@ -120,4 +125,16 @@ export function getStage(id: string): Stage {
   const s = stageById.get(id);
   if (!s) throw new Error(`[data] ไม่พบด่าน id "${id}"`);
   return s;
+}
+
+/* ---------- เวอร์ชันที่ผูกคอนฟิกไว้แล้ว (ใช้ในเกมทั่วไป) ---------- */
+
+/** สถิติฮีโร่ตามเลเวล/ดาว/ปลุกพลัง */
+export function heroStats(hero: Hero, p: HeroProgress): HeroStats {
+  return heroStatsFor(progression, hero, p);
+}
+
+/** สกิลที่ปรับตามระดับสกิล + ส่วนลดคูลดาวน์จากการปลุกพลัง */
+export function skillFor(skill: Skill, level = 1, awakened = false): Skill {
+  return skillAtLevel(progression, skill, level, awakened);
 }

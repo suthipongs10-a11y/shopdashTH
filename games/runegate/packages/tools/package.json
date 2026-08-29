@@ -3,5 +3,11 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "dependencies": { "@runegate/data": "*", "@runegate/sim": "*" }
+  "dependencies": {
+    "@runegate/data": "*",
+    "@runegate/sim": "*"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
 }

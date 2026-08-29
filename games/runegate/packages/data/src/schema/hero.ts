@@ -60,14 +60,3 @@ export const MAX_LEVEL_BY_STAR: Readonly<Record<number, number>> = {
   5: 35,
   6: 40,
 };
-
-/** สถิติจริงของฮีโร่ที่เลเวล L (ยังไม่รวมรูน/อุปกรณ์ — Phase 6) */
-export function heroStatsAtLevel(hero: Hero, level: number): HeroStats {
-  const l = Math.max(1, Math.floor(level)) - 1;
-  return {
-    ...hero.base,
-    hp: Math.round(hero.base.hp + hero.growth.hp * l),
-    atk: Math.round(hero.base.atk + hero.growth.atk * l),
-    def: Math.round(hero.base.def + hero.growth.def * l),
-  };
-}

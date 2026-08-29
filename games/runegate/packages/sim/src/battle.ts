@@ -6,7 +6,8 @@ import {
   getWeapon,
   turretById,
   turrets,
-  heroStatsAtLevel,
+  heroStats,
+  skillFor,
   TICK_DT,
   TICKS_PER_SEC,
   type Effect,
@@ -42,6 +43,11 @@ import {
 export interface SquadEntry {
   heroId: string;
   level: number;
+  /** ดาวปัจจุบัน — ไม่ระบุ = ดาวธรรมชาติของฮีโร่ (โบนัส 0) */
+  star?: number;
+  awakened?: boolean;
+  /** ระดับสกิลรายตัว (key = skillId) — ไม่ระบุ = ระดับ 1 */
+  skillLevels?: Readonly<Record<string, number>>;
   /** โบนัสจากการ์ด/รูนที่ติดตั้งไว้นอกด่าน (Phase 6) — sim รับเป็น input เท่านั้น */
   raceBonus?: Partial<Record<Race, number>>;
   elementBonus?: Partial<Record<Element, number>>;
@@ -209,7 +215,13 @@ export class Battle {
     if (!check.ok) return check;
     const entry = this.squad.find((s) => s.heroId === heroId)!;
     const hero = getHero(heroId);
-    const stats = heroStatsAtLevel(hero, entry.level);
+    const prog = {
+      level: entry.level,
+      star: entry.star,
+      awakened: entry.awakened,
+      skillLevels: entry.skillLevels,
+    };
+    const stats = heroStats(hero, prog);
 
     const u: HeroUnit = {
       uid: this.nextUid++,
@@ -246,7 +258,10 @@ export class Battle {
       damageType: hero.damageType,
       statuses: [],
       mods: [],
-      skills: hero.skills.map((id) => ({ def: getSkill(id), cd: 0 })),
+      skills: hero.skills.map((id) => ({
+        def: skillFor(getSkill(id), entry.skillLevels?.[id] ?? 1, entry.awakened ?? false),
+        cd: 0,
+      })),
       attackCd: 0,
       alive: true,
       blockCount: hero.blockCount,

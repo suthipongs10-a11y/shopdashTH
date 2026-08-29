@@ -1,13 +1,29 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client"
+    ],
     "baseUrl": "../..",
     "paths": {
-      "@runegate/data": ["packages/data/src/index.ts"],
-      "@runegate/sim": ["packages/sim/src/index.ts"]
+      "@runegate/data": [
+        "packages/data/src/index.ts"
+      ],
+      "@runegate/sim": [
+        "packages/sim/src/index.ts"
+      ],
+      "@runegate/meta": [
+        "packages/meta/src/index.ts"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "vite.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "vite.config.ts"
+  ]
 }

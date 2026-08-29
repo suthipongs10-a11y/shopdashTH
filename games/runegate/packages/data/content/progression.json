@@ -1,0 +1,45 @@
+{
+  "level": {
+    "expBase": 42,
+    "expExponent": 1.45,
+    "goldBase": 90,
+    "goldExponent": 1.65,
+    "expPerPotion": 120
+  },
+  "star": {
+    "shardsPerStar": 20,
+    "goldBase": 12000,
+    "statBonusPerStar": 0.14,
+    "maxStar": 6
+  },
+  "awaken": {
+    "essence": 16,
+    "gold": 45000,
+    "minStar": 4,
+    "statBonus": 0.12,
+    "ultCooldownCut": 0.15
+  },
+  "skill": {
+    "maxLevel": 5,
+    "scrollsPerLevel": 3,
+    "goldBase": 6000,
+    "powerPerLevel": 0.08,
+    "cooldownCutPerLevel": 0.05
+  },
+  "starter": {
+    "gold": 30000,
+    "gems": 300,
+    "heroes": [
+      "militia_swordsman",
+      "ranger_bryn",
+      "cleric_seraphine",
+      "wolfkin_striker",
+      "quartermaster_pell"
+    ],
+    "materials": {
+      "hero_exp_potion": 24,
+      "skill_scroll": 6,
+      "summon_scroll": 2
+    }
+  }
+}

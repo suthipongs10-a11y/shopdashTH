@@ -1,32 +1,108 @@
 {
-  "energy": { "regenSecPerPoint": 300, "baseCap": 80, "capPerPlayerLevel": 1 },
+  "energy": {
+    "regenSecPerPoint": 300,
+    "baseCap": 80,
+    "capPerPlayerLevel": 1
+  },
   "gacha": {
-    "rates": { "r5": 0.025, "r4": 0.125, "r3": 0.85 },
+    "rates": {
+      "r5": 0.025,
+      "r4": 0.125,
+      "r3": 0.85
+    },
     "hardPity": 60,
     "softPityStart": 45,
     "softPityStep": 0.025,
     "rateUpChance": 0.5,
-    "costPerPull": { "gems": 150, "scroll": 1 }
+    "costPerPull": {
+      "gems": 150,
+      "scroll": 1
+    }
   },
   "refine": [
-    { "from": 0, "successRate": 1,    "onFail": "keep",      "oreCost": 1, "goldCost": 500 },
-    { "from": 1, "successRate": 1,    "onFail": "keep",      "oreCost": 1, "goldCost": 800 },
-    { "from": 2, "successRate": 1,    "onFail": "keep",      "oreCost": 2, "goldCost": 1200 },
-    { "from": 3, "successRate": 1,    "onFail": "keep",      "oreCost": 2, "goldCost": 1800 },
-    { "from": 4, "successRate": 0.6,  "onFail": "downgrade", "oreCost": 3, "goldCost": 2600 },
-    { "from": 5, "successRate": 0.5,  "onFail": "downgrade", "oreCost": 3, "goldCost": 3600 },
-    { "from": 6, "successRate": 0.4,  "onFail": "downgrade", "oreCost": 4, "goldCost": 5000 },
-    { "from": 7, "successRate": 0.3,  "onFail": "break",     "oreCost": 5, "goldCost": 7000 },
-    { "from": 8, "successRate": 0.22, "onFail": "break",     "oreCost": 6, "goldCost": 9500 },
-    { "from": 9, "successRate": 0.15, "onFail": "break",     "oreCost": 8, "goldCost": 13000 }
+    {
+      "from": 0,
+      "successRate": 1,
+      "onFail": "keep",
+      "oreCost": 1,
+      "goldCost": 500
+    },
+    {
+      "from": 1,
+      "successRate": 1,
+      "onFail": "keep",
+      "oreCost": 1,
+      "goldCost": 800
+    },
+    {
+      "from": 2,
+      "successRate": 1,
+      "onFail": "keep",
+      "oreCost": 2,
+      "goldCost": 1200
+    },
+    {
+      "from": 3,
+      "successRate": 1,
+      "onFail": "keep",
+      "oreCost": 2,
+      "goldCost": 1800
+    },
+    {
+      "from": 4,
+      "successRate": 0.6,
+      "onFail": "downgrade",
+      "oreCost": 3,
+      "goldCost": 2600
+    },
+    {
+      "from": 5,
+      "successRate": 0.5,
+      "onFail": "downgrade",
+      "oreCost": 3,
+      "goldCost": 3600
+    },
+    {
+      "from": 6,
+      "successRate": 0.4,
+      "onFail": "downgrade",
+      "oreCost": 4,
+      "goldCost": 5000
+    },
+    {
+      "from": 7,
+      "successRate": 0.3,
+      "onFail": "break",
+      "oreCost": 5,
+      "goldCost": 7000
+    },
+    {
+      "from": 8,
+      "successRate": 0.22,
+      "onFail": "break",
+      "oreCost": 6,
+      "goldCost": 9500
+    },
+    {
+      "from": 9,
+      "successRate": 0.15,
+      "onFail": "break",
+      "oreCost": 8,
+      "goldCost": 13000
+    }
   ],
-  "dailyFaucets": { "questGold": 18000, "questGems": 60, "questEnergy": 60, "questScrolls": 1.5, "loginGems": 30 },
+  "dailyFaucets": {
+    "questGold": 18000,
+    "questGems": 60,
+    "questEnergy": 60,
+    "questScrolls": 1.5,
+    "loginGems": 30
+  },
   "iap": {
     "monthlyCardTHB": 119,
     "monthlyCardGemsPerDay": 90,
     "monthlyCardInstantGems": 300,
     "battlePassTHB": 299,
     "battlePassGems": 1200
-  },
-  "heroLevelUpGold": { "base": 90, "exp": 1.65 }
+  }
 }

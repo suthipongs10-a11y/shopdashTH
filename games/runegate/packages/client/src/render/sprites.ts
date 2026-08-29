@@ -467,13 +467,22 @@ function drawEmplacement(
 }
 
 const atlasCache = new Map<string, SpriteAtlas>();
+/** atlas จริงจากโรงงาน sprite (Phase 3) — ถ้ามี id นี้จะถูกใช้แทน placeholder ทันที */
+const atlasRegistry = new Map<string, SpriteAtlas>();
 
 function recipeKey(r: SpriteRecipe): string {
   return `${r.body}|${r.weapon}|${r.palette.main}|${r.palette.accent}|${r.palette.skin}|${r.scale}`;
 }
 
-/** สร้าง texture atlas ของยูนิตหนึ่งตัว (แคชตามสูตร) */
-export function getAtlas(recipe: SpriteRecipe): SpriteAtlas {
+/**
+ * atlas ของยูนิตหนึ่งตัว — ใช้ atlas จริงถ้ามี ไม่งั้นวาด placeholder จากสูตร
+ * `id` คือ id ในไฟล์คอนเทนต์ (ตรงกับชื่อไฟล์ที่ pack-sprites ปล่อยออกมา)
+ */
+export function getAtlas(recipe: SpriteRecipe, id?: string): SpriteAtlas {
+  if (id) {
+    const real = atlasRegistry.get(id);
+    if (real) return real;
+  }
   const key = recipeKey(recipe);
   const hit = atlasCache.get(key);
   if (hit) return hit;
@@ -539,4 +548,36 @@ export function portraitDataUrl(recipe: SpriteRecipe, size = 96): string {
   drawUnit(ctx, recipe, 0, 'idle', 0, frameW, frameH);
   ctx.restore();
   return c.toDataURL();
+}
+
+
+/**
+ * โหลด atlas จริงที่โรงงาน sprite ปล่อยไว้ใน public/art/ (Phase 3)
+ * ตัวไหนยังไม่มีไฟล์ก็ข้ามไปเงียบๆ แล้วใช้ placeholder ต่อ — เกมไม่ต้องรอ
+ */
+export async function preloadArt(ids: string[], baseUrl = './art'): Promise<number> {
+  let loaded = 0;
+  await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const res = await fetch(`${baseUrl}/${id}.json`, { cache: 'force-cache' });
+        if (!res.ok) return;
+        const manifest = (await res.json()) as AtlasManifest;
+        const texture = await new THREE.TextureLoader().loadAsync(`${baseUrl}/${id}.png`);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        atlasRegistry.set(id, { ...manifest, texture });
+        loaded++;
+      } catch {
+        /* ไม่มีไฟล์อาร์ตของตัวนี้ — ใช้ placeholder ต่อไป */
+      }
+    }),
+  );
+  return loaded;
+}
+
+/** ใช้ในเทสต์/เครื่องมือ: ยัด atlas เข้าไปตรงๆ */
+export function registerAtlas(id: string, atlas: SpriteAtlas): void {
+  atlasRegistry.set(id, atlas);
 }

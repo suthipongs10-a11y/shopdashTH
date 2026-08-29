@@ -67,7 +67,6 @@ export const EconomyConfig = z
         battlePassGems: z.number().int(),
       })
       .strict(),
-    heroLevelUpGold: z.object({ base: z.number(), exp: z.number() }).strict(),
   })
   .strict();
 export type EconomyConfig = z.infer<typeof EconomyConfig>;

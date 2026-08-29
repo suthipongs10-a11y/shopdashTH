@@ -3,6 +3,10 @@ import { z } from 'zod';
 /** ธาตุ 5 ชนิด (§5.3) — น้ำ > ไฟ > ลม > น้ำ | แสง ↔ มืด */
 export const Element = z.enum(['water', 'fire', 'wind', 'light', 'dark']);
 export type Element = z.infer<typeof Element>;
+/** รายชื่อธาตุทั้งหมดตามลำดับคงที่ (ใช้สุ่ม/วนแสดงผล) */
+export function elementsOf(): readonly Element[] {
+  return Element.options;
+}
 
 /** เผ่า 5 แบบ (§5.3) — ไม่มีแพ้ทางในตัว แต่การ์ดให้โบนัสเจาะเผ่า */
 export const Race = z.enum(['human', 'beast', 'demon', 'undead', 'insect']);

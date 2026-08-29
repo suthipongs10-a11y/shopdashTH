@@ -15,10 +15,24 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@runegate/data": ["packages/data/src/index.ts"],
-      "@runegate/data/*": ["packages/data/src/*"],
-      "@runegate/sim": ["packages/sim/src/index.ts"],
-      "@runegate/sim/*": ["packages/sim/src/*"]
+      "@runegate/data": [
+        "packages/data/src/index.ts"
+      ],
+      "@runegate/data/*": [
+        "packages/data/src/*"
+      ],
+      "@runegate/sim": [
+        "packages/sim/src/index.ts"
+      ],
+      "@runegate/sim/*": [
+        "packages/sim/src/*"
+      ],
+      "@runegate/meta": [
+        "packages/meta/src/index.ts"
+      ],
+      "@runegate/meta/*": [
+        "packages/meta/src/*"
+      ]
     }
   }
 }
