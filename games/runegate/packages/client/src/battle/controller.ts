@@ -1,5 +1,5 @@
-import { getHero, getSkill, TICK_DT, type Stage } from '@runegate/data';
-import { Battle, canDeployOn, effRange, isHero, type HeroUnit } from '@runegate/sim';
+import { getHero, getSkill, getTurret, getWeapon, TICK_DT, type Stage, type Turret } from '@runegate/data';
+import { Battle, canDeployOn, effRange, isHero, isTurret, type HeroUnit } from '@runegate/sim';
 import { StageScene, type DeployTile } from '../render/scene.js';
 import { BattleView } from '../render/battleView.js';
 import { portraitDataUrl } from '../render/sprites.js';
@@ -35,6 +35,7 @@ export class BattleController {
   private bar: HeroBarEntry[] = [];
   private dirpad: HTMLElement | null = null;
   private hint: HTMLElement | null = null;
+  private selectedPad: { x: number; y: number } | null = null;
   private unitPanel: HTMLElement | null = null;
   private elWave!: HTMLElement;
   private elHp!: HTMLElement;
@@ -156,9 +157,16 @@ export class BattleController {
       this.showDirPad(clientX, clientY);
       return;
     }
-    const hero = this.battle.deployedHeroes.find((u) => u.tileX === tx && u.tileY === ty);
-    if (hero) this.openUnitPanel(hero.uid);
-    else this.closeUnitPanel();
+    const unit = this.battle.deployedHeroes.find((u) => u.tileX === tx && u.tileY === ty);
+    if (unit) {
+      this.openUnitPanel(unit.uid);
+      return;
+    }
+    if (this.stage.tiles[ty]?.[tx] === 'T') {
+      this.openBuildMenu(tx, ty);
+      return;
+    }
+    this.closeUnitPanel();
   }
 
   private selectHeroForDeploy(heroId: string): void {
@@ -254,7 +262,91 @@ export class BattleController {
     this.renderUnitPanel();
   }
 
+  /** แตะแท่นว่าง → เลือกเครื่องยิงที่จะสร้าง */
+  private openBuildMenu(tileX: number, tileY: number): void {
+    this.closeUnitPanel();
+    this.cancelPlacement();
+    this.selectedPad = { x: tileX, y: tileY };
+    const options = this.battle.buildableTurrets.map((t) => this.turretOption(t, () => {
+      const res = this.battle.build(t.id, tileX, tileY);
+      if (!res.ok) toast(this.ui, res.reason_th ?? 'สร้างไม่สำเร็จ');
+      this.closeUnitPanel();
+      const built = this.battle.turretAt(tileX, tileY);
+      if (built) this.openUnitPanel(built.uid);
+    }));
+    this.scene.showRangeRing(tileX, tileY, this.battle.buildableTurrets[0]?.range ?? 3);
+    this.unitPanel?.remove();
+    this.unitPanel = h(
+      'div',
+      { class: 'unitpanel buildmenu' },
+      h('h4', {}, 'แท่นเครื่องยิง'),
+      h('div', { class: 'sub' }, 'เครื่องยิงอัพเกรดต่อได้ระหว่างรบ และไม่กินโควตาช่องวางฮีโร่'),
+      ...options,
+      h('div', { class: 'btns' }, h('button', { onclick: () => this.closeUnitPanel() }, 'ปิด')),
+    );
+    this.ui.appendChild(this.unitPanel);
+  }
+
+  private turretOption(t: Turret, onclick: () => void): HTMLElement {
+    const w = getWeapon(t.weapon);
+    const affordable = this.battle.cost >= t.cost;
+    return h(
+      'button',
+      { class: `turret-opt${affordable ? '' : ' poor'}`, onclick },
+      h('span', { class: 'row' }, h('b', {}, t.name_th), h('span', { class: 'price' }, `${t.cost} แต้ม`)),
+      h('span', { class: 'wname' }, `${w.name_th} · ระยะ ${t.range} · ${t.aspd.toFixed(2)} ครั้ง/วิ`),
+      h('span', { class: 'wdesc' }, t.desc_th),
+    );
+  }
+
+  private renderTurretPanel(u: HeroUnit): void {
+    const def = u.def as Turret;
+    const w = getWeapon(def.weapon);
+    const report = this.battle.result().heroes.find((r) => r.uid === u.uid);
+    const upgrades = def.upgradesTo.map((id) => getTurret(id));
+    const panel = h(
+      'div',
+      { class: 'unitpanel' },
+      h('h4', {}, `${def.name_th} · ขั้น ${def.tier}`),
+      h('div', { class: 'sub' }, `${w.name_th} — ${w.desc_th}`),
+      h('div', { class: 'stat' }, 'พลังโจมตี', h('b', {}, String(Math.round(u.base.atk)))),
+      h('div', { class: 'stat' }, 'ระยะ / ความเร็ว', h('b', {}, `${def.range} · ${def.aspd.toFixed(2)}/วิ`)),
+      h('div', { class: 'stat' }, 'ดาเมจสะสม', h('b', {}, (report?.damageDealt ?? 0).toLocaleString('th-TH'))),
+      upgrades.length > 0 ? h('div', { class: 'up-title' }, 'อัพเกรดเป็น') : null,
+      ...upgrades.map((t) =>
+        this.turretOption(t, () => {
+          const res = this.battle.upgrade(u.uid, t.id);
+          if (!res.ok) {
+            toast(this.ui, res.reason_th ?? 'อัพเกรดไม่สำเร็จ');
+            return;
+          }
+          const next = this.battle.turretAt(u.tileX, u.tileY);
+          this.closeUnitPanel();
+          if (next) this.openUnitPanel(next.uid);
+        }),
+      ),
+      h(
+        'div',
+        { class: 'btns' },
+        h(
+          'button',
+          {
+            onclick: () => {
+              this.battle.sell(u.uid);
+              this.closeUnitPanel();
+            },
+          },
+          `🔨 รื้อ (คืน ${Math.floor(u.investedCost * this.stage.deploy.retreatRefund)})`,
+        ),
+      ),
+    );
+    this.unitPanel?.remove();
+    this.unitPanel = panel;
+    this.ui.appendChild(panel);
+  }
+
   private closeUnitPanel(): void {
+    this.selectedPad = null;
     this.selectedUid = null;
     this.unitPanel?.remove();
     this.unitPanel = null;
@@ -269,6 +361,10 @@ export class BattleController {
       return;
     }
     const hero = u as HeroUnit;
+    if (isTurret(hero)) {
+      this.renderTurretPanel(hero);
+      return;
+    }
     const ultSkill = hero.skills.find((s) => s.def.type === 'ultimate');
     const ultReady = hero.hasUlt && hero.ultCd <= 0;
 
@@ -276,7 +372,7 @@ export class BattleController {
       'div',
       { class: 'unitpanel' },
       h('h4', {}, `${hero.name} · Lv.${hero.level}`),
-      h('div', { class: 'sub' }, `${hero.def.awakenName_th} — ${hero.def.lore_th}`),
+      h('div', { class: 'sub' }, heroSubtitle(hero)),
       h('div', { class: 'bar' }, h('i', { style: `width:${(hero.hp / hero.maxHp) * 100}%` })),
       h('div', { class: 'stat' }, 'พลังชีวิต', h('b', {}, `${Math.ceil(hero.hp)} / ${hero.maxHp}`)),
       h('div', { class: 'stat' }, 'พลังโจมตี', h('b', {}, String(Math.round(hero.base.atk)))),
@@ -438,4 +534,11 @@ export class BattleController {
     this.scene.dispose();
     this.ui.replaceChildren();
   }
+}
+
+
+function heroSubtitle(u: HeroUnit): string {
+  const def = u.def as { awakenName_th?: string; lore_th?: string; desc_th?: string };
+  if (def.awakenName_th) return `${def.awakenName_th} — ${def.lore_th ?? ''}`;
+  return def.desc_th ?? '';
 }

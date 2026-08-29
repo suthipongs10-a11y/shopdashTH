@@ -8,10 +8,11 @@ import { Id } from './common.js';
  *   H = ที่สูง (วาง ranged ได้เท่านั้น)
  *   X = สิ่งกีดขวาง (วางไม่ได้)
  *   S = จุดเกิดศัตรู
+ *   T = แท่นเครื่องยิง (สร้างเครื่องยิงได้เท่านั้น ฮีโร่ลงไม่ได้)
  *   E = ประตูฐาน (ศัตรูถึงตรงนี้ = เสียเลือดฐาน)
  *   . = ช่องว่าง/เหว
  */
-export const TileChar = z.enum(['R', 'G', 'H', 'X', 'S', 'E', '.']);
+export const TileChar = z.enum(['R', 'G', 'H', 'T', 'X', 'S', 'E', '.']);
 export type TileChar = z.infer<typeof TileChar>;
 
 export const Waypoint = z.tuple([z.number(), z.number()]);

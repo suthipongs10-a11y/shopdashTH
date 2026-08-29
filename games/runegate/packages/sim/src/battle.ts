@@ -2,6 +2,10 @@ import {
   getEnemy,
   getHero,
   getSkill,
+  getTurret,
+  getWeapon,
+  turretById,
+  turrets,
   heroStatsAtLevel,
   TICK_DT,
   TICKS_PER_SEC,
@@ -10,17 +14,20 @@ import {
   type Race,
   type Skill,
   type Stage,
+  type Turret,
+  type Weapon,
   type StarCondition,
   type StatusKind,
 } from '@runegate/data';
 
-import { computeDamage } from './damage.js';
+import { computeDamage, computeDamageFrom, snapshotAttacker } from './damage.js';
 import { buildPaths, canDeployOn, dist2, tileOf, type PathTrack } from './path.js';
 import { Rng } from './rng.js';
 import { effAspd, effAtk, effMoveSpeed, effRange, isRooted, isStunned } from './stats.js';
 import {
   isEnemy,
   isHero,
+  isTurret,
   type BattleEvent,
   type BattleResult,
   type BattleStatus,
@@ -28,6 +35,7 @@ import {
   type EnemyUnit,
   type HeroReport,
   type HeroUnit,
+  type Projectile,
   type Unit,
 } from './types.js';
 
@@ -77,6 +85,8 @@ export class Battle {
   readonly recordEvents: boolean;
 
   units: Unit[] = [];
+  /** กระสุนที่กำลังลอยอยู่ — client อ่านตรงนี้ไปวาดได้เลย */
+  projectiles: Projectile[] = [];
   tick = 0;
   baseHp: number;
   readonly baseHpMax: number;
@@ -93,6 +103,7 @@ export class Battle {
   currentWaveLabel = '';
 
   private nextUid = 1;
+  private nextProjectileId = 1;
   private summonedTotal = 0;
   private spawnQueue: SpawnEntry[];
   private spawnIndex = 0;
@@ -124,6 +135,11 @@ export class Battle {
 
   get deployedHeroes(): HeroUnit[] {
     return this.units.filter((u): u is HeroUnit => isHero(u) && u.alive);
+  }
+
+  /** เฉพาะฮีโร่จริง (ไม่รวมเครื่องยิง) — ใช้กับเพดานช่องวางและเงื่อนไขดาว */
+  get deployedRealHeroes(): HeroUnit[] {
+    return this.deployedHeroes.filter((u) => u.kind === 'hero');
   }
 
   get aliveEnemies(): EnemyUnit[] {
@@ -169,7 +185,7 @@ export class Battle {
     const wait = this.redeployRemainingSec(heroId);
     if (wait > 0) return { ok: false, reason_th: `รอคูลดาวน์อีก ${Math.ceil(wait)} วินาที` };
     if (this.cost < hero.cost) return { ok: false, reason_th: 'แต้มวางไม่พอ' };
-    if (this.deployedHeroes.length >= this.stage.deploy.deployLimit) {
+    if (this.deployedHeroes.filter((u) => u.kind === 'hero').length >= this.stage.deploy.deployLimit) {
       return { ok: false, reason_th: `วางได้สูงสุด ${this.stage.deploy.deployLimit} ตัวพร้อมกัน` };
     }
     if (tileX < 0 || tileY < 0 || tileX >= this.stage.grid.w || tileY >= this.stage.grid.h) {
@@ -198,8 +214,15 @@ export class Battle {
     const u: HeroUnit = {
       uid: this.nextUid++,
       faction: 'hero',
+      kind: 'hero',
       heroId,
       def: hero,
+      targetPriority: hero.targetPriority,
+      sprite: hero.sprite,
+      weapon: null,
+      tier: 1,
+      investedCost: hero.cost,
+      burst: null,
       level: entry.level,
       name: hero.name_th,
       element: hero.element,
@@ -349,6 +372,381 @@ export class Battle {
         return this.retreat(cmd.uid);
       case 'ultimate':
         return this.useUltimate(cmd.uid);
+      case 'build':
+        return this.build(cmd.turretId, cmd.tileX, cmd.tileY);
+      case 'upgrade':
+        return this.upgrade(cmd.uid, cmd.turretId);
+      case 'sell':
+        return this.sell(cmd.uid);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* เครื่องยิง: สร้าง / อัพเกรด / รื้อ                                  */
+  /* ---------------------------------------------------------------- */
+
+  /** เครื่องยิงที่สร้างได้เป็นตัวแรก (tier 1) */
+  get buildableTurrets(): Turret[] {
+    return turrets.filter((t) => t.tier === 1);
+  }
+
+  turretCostOf(turretId: string): number {
+    return turretById.get(turretId)?.cost ?? Infinity;
+  }
+
+  turretAt(tileX: number, tileY: number): HeroUnit | undefined {
+    return this.deployedHeroes.find((u) => isTurret(u) && u.tileX === tileX && u.tileY === tileY);
+  }
+
+  canBuild(turretId: string, tileX: number, tileY: number): DeployCheck {
+    const def = turretById.get(turretId);
+    if (!def) return { ok: false, reason_th: 'ไม่พบเครื่องยิงชนิดนี้' };
+    if (def.tier !== 1) return { ok: false, reason_th: 'สร้างได้เฉพาะเครื่องยิงขั้นแรก' };
+    if (tileX < 0 || tileY < 0 || tileX >= this.stage.grid.w || tileY >= this.stage.grid.h) {
+      return { ok: false, reason_th: 'ตำแหน่งอยู่นอกสนาม' };
+    }
+    if (tileOf(this.stage, tileX, tileY) !== 'T') return { ok: false, reason_th: 'สร้างได้เฉพาะบนแท่นเครื่องยิง' };
+    if (this.turretAt(tileX, tileY)) return { ok: false, reason_th: 'แท่นนี้มีเครื่องยิงอยู่แล้ว' };
+    if (this.cost < def.cost) return { ok: false, reason_th: 'แต้มวางไม่พอ' };
+    return { ok: true };
+  }
+
+  build(turretId: string, tileX: number, tileY: number): DeployCheck {
+    const check = this.canBuild(turretId, tileX, tileY);
+    if (!check.ok) return check;
+    const def = getTurret(turretId);
+    this.cost -= def.cost;
+    this.spawnTurret(def, tileX, tileY, def.cost);
+    return { ok: true };
+  }
+
+  canUpgrade(uid: number, turretId: string): DeployCheck {
+    const u = this.unit(uid);
+    if (!u || !isHero(u) || !isTurret(u) || !u.alive) return { ok: false, reason_th: 'ไม่พบเครื่องยิงตัวนี้' };
+    const current = u.def as Turret;
+    if (!current.upgradesTo.includes(turretId)) return { ok: false, reason_th: 'อัพเกรดเป็นแบบนี้ไม่ได้' };
+    const next = turretById.get(turretId);
+    if (!next) return { ok: false, reason_th: 'ไม่พบเครื่องยิงชนิดนี้' };
+    if (this.cost < next.cost) return { ok: false, reason_th: `แต้มวางไม่พอ (ต้องใช้ ${next.cost})` };
+    return { ok: true };
+  }
+
+  upgrade(uid: number, turretId: string): DeployCheck {
+    const check = this.canUpgrade(uid, turretId);
+    if (!check.ok) return check;
+    const u = this.unit(uid) as HeroUnit;
+    const next = getTurret(turretId);
+    const invested = u.investedCost + next.cost;
+    const { tileX, tileY } = u;
+    this.cost -= next.cost;
+    // รื้อของเดิมออกเงียบๆ แล้ววางตัวใหม่ทับแท่นเดิม (เลือดเต็มตามระดับใหม่)
+    u.alive = false;
+    const rep = this.heroReports.get(u.uid);
+    if (rep) rep.alive = false;
+    this.spawnTurret(next, tileX, tileY, invested);
+    return { ok: true };
+  }
+
+  sell(uid: number): DeployCheck {
+    const u = this.unit(uid);
+    if (!u || !isHero(u) || !isTurret(u) || !u.alive) return { ok: false, reason_th: 'ไม่พบเครื่องยิงตัวนี้' };
+    this.cost = Math.min(MAX_COST, this.cost + Math.floor(u.investedCost * this.stage.deploy.retreatRefund));
+    u.alive = false;
+    const rep = this.heroReports.get(u.uid);
+    if (rep) rep.alive = false;
+    this.emit({ t: 'retreat', uid: u.uid });
+    return { ok: true };
+  }
+
+  private spawnTurret(def: Turret, tileX: number, tileY: number, investedCost: number): HeroUnit {
+    const weapon = getWeapon(def.weapon);
+    const hp = 1;
+    const u: HeroUnit = {
+      uid: this.nextUid++,
+      faction: 'hero',
+      kind: 'turret',
+      heroId: def.id,
+      def,
+      targetPriority: def.targetPriority,
+      sprite: def.sprite,
+      weapon,
+      tier: def.tier,
+      investedCost,
+      burst: null,
+      level: def.tier,
+      name: def.name_th,
+      element: def.element,
+      pos: 'ranged',
+      tileX,
+      tileY,
+      x: tileX + 0.5,
+      y: tileY + 0.5,
+      facing: 0,
+      hp,
+      maxHp: hp,
+      base: {
+        atk: def.atk,
+        def: 0,
+        mres: 0,
+        aspd: def.aspd,
+        range: def.range,
+        critRate: def.critRate,
+        critDmg: def.critDmg,
+      },
+      damageType: def.damageType,
+      statuses: [],
+      mods: [],
+      skills: [],
+      attackCd: 0,
+      alive: true,
+      blockCount: 0,
+      blocking: [],
+      cost: def.cost,
+      windup: 0.3,
+      ultCd: 0,
+      ultMaxCd: 0,
+      hasUlt: false,
+      antiAir: def.antiAir,
+      revealAura: def.revealAura,
+      lifesteal: 0,
+      splash: null,
+      costRate: 0,
+      raceBonus: {},
+      elementBonus: {},
+      targetUid: null,
+      damageDealt: 0,
+      damageTaken: 0,
+      kills: 0,
+      deployedAtTick: this.tick,
+    };
+    this.units.push(u);
+    this.heroReports.set(u.uid, {
+      uid: u.uid,
+      heroId: def.id,
+      name: def.name_th,
+      damageDealt: 0,
+      damageTaken: 0,
+      kills: 0,
+      healed: 0,
+      alive: true,
+    });
+    this.emit({ t: 'build', uid: u.uid, turretId: def.id, tileX, tileY, tier: def.tier });
+    return u;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* กระสุน                                                            */
+  /* ---------------------------------------------------------------- */
+
+  private fireWeapon(u: HeroUnit, w: Weapon, target: Unit): void {
+    const angle = Math.atan2(target.y - u.y, target.x - u.x);
+    if (w.burstIntervalSec > 0 && w.shots > 1) {
+      // ยิงรัวเป็นชุด: นัดแรกออกทันที ที่เหลือทยอยออกตามจังหวะ
+      this.spawnShot(u, w, angle, target);
+      u.burst = { left: w.shots - 1, timer: w.burstIntervalSec, angle, targetUid: target.uid };
+      return;
+    }
+    const spread = (w.spreadDeg * Math.PI) / 180;
+    for (let i = 0; i < w.shots; i++) {
+      const offset = w.shots === 1 ? 0 : (i / (w.shots - 1) - 0.5) * spread;
+      this.spawnShot(u, w, angle + offset, target);
+    }
+  }
+
+  private updateBurst(u: HeroUnit, dt: number): void {
+    if (!u.burst || !u.weapon) return;
+    u.burst.timer -= dt;
+    while (u.burst && u.burst.timer <= 0 && u.burst.left > 0) {
+      const prev = u.burst.targetUid !== null ? this.unit(u.burst.targetUid) : undefined;
+      const target = prev && prev.alive ? prev : this.nearestEnemyTo(u.x, u.y, effRange(u));
+      const angle = target ? Math.atan2(target.y - u.y, target.x - u.x) : u.burst.angle;
+      this.spawnShot(u, u.weapon, angle, target ?? null);
+      u.burst.left--;
+      u.burst.timer += u.weapon.burstIntervalSec;
+      if (u.burst.left <= 0) u.burst = null;
+    }
+  }
+
+  private spawnShot(u: HeroUnit, w: Weapon, angle: number, target: Unit | null): void {
+    const range = effRange(u);
+    const tx = target ? target.x : u.x + Math.cos(angle) * range;
+    const ty = target ? target.y : u.y + Math.sin(angle) * range;
+    this.projectiles.push({
+      id: this.nextProjectileId++,
+      owner: snapshotAttacker(u),
+      x: u.x,
+      y: u.y,
+      vx: Math.cos(angle) * w.speed,
+      vy: Math.sin(angle) * w.speed,
+      ratio: w.ratio,
+      damageType: w.damageType,
+      element: w.element,
+      pierceLeft: w.pierce,
+      aoeRadius: w.aoeRadius,
+      homingTurnRate: w.homingTurnRate,
+      targetUid: target?.uid ?? null,
+      lob: w.lob,
+      targetX: tx,
+      targetY: ty,
+      hit: [],
+      splitOnHit: w.splitOnHit,
+      onHit: w.onHit,
+      vfx: w.vfx,
+      ttl: (range + 3) / w.speed + 0.5,
+    });
+  }
+
+  private nearestEnemyTo(x: number, y: number, maxDist: number): EnemyUnit | null {
+    let best: EnemyUnit | null = null;
+    let bestD = maxDist * maxDist;
+    for (const e of this.units) {
+      if (!isEnemy(e) || !e.alive) continue;
+      if (e.traits.includes('stealth') && !this.isRevealed(e)) continue;
+      const d = dist2(x, y, e.x, e.y);
+      if (d < bestD) {
+        bestD = d;
+        best = e;
+      }
+    }
+    return best;
+  }
+
+  private updateProjectiles(dt: number): void {
+    const HIT_RADIUS = 0.4;
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const p = this.projectiles[i]!;
+      p.ttl -= dt;
+      let dead = p.ttl <= 0;
+
+      if (!dead && p.lob) {
+        // วิถีโค้ง: บินไปตกที่จุดเป้าหมาย ไม่สนตัวที่ขวางระหว่างทาง
+        const dx = p.targetX - p.x;
+        const dy = p.targetY - p.y;
+        const d = Math.hypot(dx, dy);
+        const step = Math.hypot(p.vx, p.vy) * dt;
+        if (d <= step || d < 0.04) {
+          this.explode(p, p.targetX, p.targetY);
+          dead = true;
+        } else {
+          p.x += (dx / d) * step;
+          p.y += (dy / d) * step;
+        }
+      } else if (!dead) {
+        if (p.homingTurnRate > 0) this.steerHoming(p, dt);
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        for (const e of this.units) {
+          if (!isEnemy(e) || !e.alive) continue;
+          if (p.hit.includes(e.uid)) continue;
+          if (e.traits.includes('stealth') && !this.isRevealed(e)) continue;
+          if (dist2(p.x, p.y, e.x, e.y) > HIT_RADIUS * HIT_RADIUS) continue;
+          p.hit.push(e.uid);
+          if (p.aoeRadius > 0) {
+            this.explode(p, p.x, p.y);
+            dead = true;
+          } else {
+            this.hitEnemy(p, e);
+            if (p.pierceLeft <= 0) dead = true;
+            else p.pierceLeft--;
+          }
+          break;
+        }
+
+        if (!dead && (p.x < -2 || p.y < -2 || p.x > this.stage.grid.w + 2 || p.y > this.stage.grid.h + 2)) {
+          dead = true;
+        }
+      }
+
+      if (dead) this.projectiles.splice(i, 1);
+    }
+  }
+
+  private steerHoming(p: Projectile, dt: number): void {
+    let target = p.targetUid !== null ? this.unit(p.targetUid) : undefined;
+    if (!target || !target.alive) {
+      target = this.nearestEnemyTo(p.x, p.y, 6) ?? undefined;
+      p.targetUid = target?.uid ?? null;
+    }
+    if (!target) return;
+    const speed = Math.hypot(p.vx, p.vy);
+    const current = Math.atan2(p.vy, p.vx);
+    const wanted = Math.atan2(target.y - p.y, target.x - p.x);
+    let diff = wanted - current;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    const maxTurn = p.homingTurnRate * dt;
+    const next = current + Math.max(-maxTurn, Math.min(maxTurn, diff));
+    p.vx = Math.cos(next) * speed;
+    p.vy = Math.sin(next) * speed;
+  }
+
+  private hitEnemy(p: Projectile, e: Unit): void {
+    const out = computeDamageFrom(
+      p.owner,
+      e,
+      { ratio: p.ratio, damageType: p.damageType, element: p.element },
+      this.rng,
+    );
+    this.applyDamage(e, out.amount, p.owner.uid, true);
+    this.emit({
+      t: 'hit',
+      from: p.owner.uid,
+      to: e.uid,
+      amount: out.amount,
+      crit: out.crit,
+      kind: p.damageType,
+      matchup: out.matchup,
+    });
+    if (p.onHit && this.rng.chance(p.onHit.chance)) {
+      this.addStatus(
+        e,
+        p.onHit.status,
+        p.onHit.durationSec,
+        this.statusValueFromSnapshot(p, e),
+        p.owner.uid,
+      );
+    }
+  }
+
+  private statusValueFromSnapshot(p: Projectile, target: Unit): number {
+    const potency = p.onHit?.potency ?? 0;
+    if (p.onHit?.status === 'shield') return target.maxHp * potency;
+    if (p.onHit?.status === 'poison') return p.owner.atk * potency;
+    return potency;
+  }
+
+  private explode(p: Projectile, x: number, y: number): void {
+    const r2 = p.aoeRadius * p.aoeRadius;
+    this.emit({ t: 'boom', x, y, radius: Math.max(p.aoeRadius, 0.4), vfx: p.vfx });
+    for (const e of this.units) {
+      if (!isEnemy(e) || !e.alive) continue;
+      if (e.traits.includes('stealth') && !this.isRevealed(e)) continue;
+      if (dist2(x, y, e.x, e.y) > r2) continue;
+      this.hitEnemy(p, e);
+    }
+    if (!p.splitOnHit) return;
+    // ครกคลัสเตอร์: แตกเป็นลูกย่อยกระจายรอบจุดตก
+    const split = p.splitOnHit;
+    for (let i = 0; i < split.shots; i++) {
+      const a = (i / split.shots) * Math.PI * 2;
+      const dist = 1.1;
+      this.projectiles.push({
+        ...p,
+        id: this.nextProjectileId++,
+        x,
+        y,
+        vx: Math.cos(a) * 6,
+        vy: Math.sin(a) * 6,
+        ratio: split.ratio,
+        aoeRadius: split.aoeRadius,
+        targetX: x + Math.cos(a) * dist,
+        targetY: y + Math.sin(a) * dist,
+        lob: true,
+        hit: [],
+        splitOnHit: undefined,
+        ttl: 0.6,
+      });
     }
   }
 
@@ -374,6 +772,7 @@ export class Battle {
       if (isEnemy(u)) this.updateEnemy(u, dt);
     }
 
+    this.updateProjectiles(dt);
     this.cleanup();
     this.checkEnd();
   }
@@ -392,7 +791,7 @@ export class Battle {
       for (let i = u.statuses.length - 1; i >= 0; i--) {
         const s = u.statuses[i]!;
         if (s.kind === 'poison') {
-          this.applyDamage(u, s.value * dt, this.unit(s.sourceUid) ?? null, false);
+          this.applyDamage(u, s.value * dt, s.sourceUid, false);
         }
         s.remaining -= dt;
         if (s.remaining <= 0 || (s.kind === 'shield' && s.value <= 0)) u.statuses.splice(i, 1);
@@ -486,7 +885,8 @@ export class Battle {
   /* ฮีโร่                                                             */
   /* ---------------------------------------------------------------- */
 
-  private updateHero(u: HeroUnit, _dt: number): void {
+  private updateHero(u: HeroUnit, dt: number): void {
+    if (u.weapon) this.updateBurst(u, dt);
     if (isStunned(u)) return;
     if (u.windup > 0) return;
 
@@ -502,7 +902,8 @@ export class Battle {
     if (!target) return;
     if (u.attackCd > 0) return;
     u.attackCd = 1 / effAspd(u);
-    this.performAttack(u, target);
+    if (u.weapon) this.fireWeapon(u, u.weapon, target);
+    else this.performAttack(u, target);
   }
 
   private isTargetable(hero: HeroUnit, e: EnemyUnit): boolean {
@@ -546,7 +947,7 @@ export class Battle {
     if (pool.length === 0) return null;
 
     const score = (e: EnemyUnit): number => {
-      switch (u.def.targetPriority) {
+      switch (u.targetPriority) {
         case 'first':
           return e.dist;
         case 'last':
@@ -664,7 +1065,7 @@ export class Battle {
 
   private performAttack(attacker: Unit, target: Unit): void {
     const out = computeDamage(attacker, target, { ratio: 1 }, this.rng);
-    this.applyDamage(target, out.amount, attacker, true);
+    this.applyDamage(target, out.amount, attacker.uid, true);
     this.emit({
       t: 'hit',
       from: attacker.uid,
@@ -684,7 +1085,7 @@ export class Battle {
           if (dist2(target.x, target.y, e.x, e.y) > r2) continue;
           if (!this.isTargetable(attacker, e)) continue;
           const s = computeDamage(attacker, e, { ratio: attacker.splash.ratio, canCrit: false }, this.rng);
-          this.applyDamage(e, s.amount, attacker, true);
+          this.applyDamage(e, s.amount, attacker.uid, true);
         }
       }
     }
@@ -696,7 +1097,8 @@ export class Battle {
     }
   }
 
-  applyDamage(target: Unit, amount: number, source: Unit | null, countStats: boolean): void {
+  applyDamage(target: Unit, amount: number, sourceUid: number | null, countStats: boolean): void {
+    const source = sourceUid !== null ? (this.unit(sourceUid) ?? null) : null;
     if (!target.alive || amount <= 0) return;
     let remaining = amount;
     for (const s of target.statuses) {
@@ -710,15 +1112,15 @@ export class Battle {
 
     target.hp -= remaining;
     target.damageTaken += remaining;
-    if (source && countStats) {
-      source.damageDealt += remaining;
-      const rep = this.heroReports.get(source.uid);
+    if (sourceUid !== null && countStats) {
+      if (source) source.damageDealt += remaining;
+      const rep = this.heroReports.get(sourceUid);
       if (rep) rep.damageDealt += remaining;
     }
     const trep = this.heroReports.get(target.uid);
     if (trep) trep.damageTaken += remaining;
 
-    if (target.hp <= 0) this.killUnit(target, source, false);
+    if (target.hp <= 0) this.killUnit(target, sourceUid, false);
   }
 
   private heal(target: Unit, amount: number, source: Unit | null): void {
@@ -734,7 +1136,8 @@ export class Battle {
     this.emit({ t: 'heal', from: source?.uid ?? 0, to: target.uid, amount: Math.round(healed) });
   }
 
-  private killUnit(u: Unit, killer: Unit | null, leaked: boolean): void {
+  private killUnit(u: Unit, killerUid: number | null, leaked: boolean): void {
+    const killer = killerUid !== null ? (this.unit(killerUid) ?? null) : null;
     if (!u.alive) return;
     u.alive = false;
     if (isEnemy(u)) {
@@ -747,9 +1150,9 @@ export class Battle {
         this.enemiesKilled++;
         this.goldEarned += u.bountyGold;
         this.expEarned += u.bountyExp;
-        if (killer) {
-          killer.kills++;
-          const rep = this.heroReports.get(killer.uid);
+        if (killer) killer.kills++;
+        if (killerUid !== null) {
+          const rep = this.heroReports.get(killerUid);
           if (rep) rep.kills++;
         }
         this.emit({ t: 'death', uid: u.uid, faction: 'enemy' });
@@ -768,7 +1171,10 @@ export class Battle {
     u.blocking = [];
     const rep = this.heroReports.get(u.uid);
     if (rep) rep.alive = false;
-    this.redeployReadyTick.set(u.heroId, this.tick + Math.round(u.def.redeployCooldownSec * TICKS_PER_SEC));
+    if (u.kind === 'hero') {
+      const def = u.def as { redeployCooldownSec: number };
+      this.redeployReadyTick.set(u.heroId, this.tick + Math.round(def.redeployCooldownSec * TICKS_PER_SEC));
+    }
     if (cause === 'death') this.emit({ t: 'death', uid: u.uid, faction: 'hero' });
     else this.emit({ t: 'retreat', uid: u.uid });
   }
@@ -887,7 +1293,7 @@ export class Battle {
               { ratio: effect.ratio, damageType: effect.damageType, element: effect.element },
               this.rng,
             );
-            this.applyDamage(t, out.amount, caster, true);
+            this.applyDamage(t, out.amount, caster.uid, true);
             this.emit({
               t: 'hit',
               from: caster.uid,

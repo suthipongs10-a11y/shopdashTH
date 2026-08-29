@@ -7,6 +7,8 @@ import cardsJson from '../content/cards.json';
 import runesJson from '../content/runes.json';
 import economyJson from '../content/economy.json';
 import dropsJson from '../content/drops.json';
+import weaponsJson from '../content/weapons.json';
+import turretsJson from '../content/turrets.json';
 import stage101 from '../content/stages/ch1_01.json';
 import stage102 from '../content/stages/ch1_02.json';
 import stage103 from '../content/stages/ch1_03.json';
@@ -19,6 +21,8 @@ import { Card } from './schema/card.js';
 import { RuneConfig } from './schema/rune.js';
 import { EconomyConfig } from './schema/economy.js';
 import { DropTable } from './schema/drop.js';
+import { Weapon } from './schema/weapon.js';
+import { Turret } from './schema/turret.js';
 import { Stage } from './schema/stage.js';
 
 export * from './schema/common.js';
@@ -30,6 +34,8 @@ export * from './schema/rune.js';
 export * from './schema/card.js';
 export * from './schema/economy.js';
 export * from './schema/drop.js';
+export * from './schema/weapon.js';
+export * from './schema/turret.js';
 export * from './balance.js';
 export { validateContent, tilesAlongPath, tileAt } from './validate.js';
 export type { ContentIssue } from './validate.js';
@@ -61,6 +67,8 @@ export const enemies: Enemy[] = parseAll(Enemy, enemiesJson as unknown[], 'enemy
 export const skills: Skill[] = parseAll(Skill, skillsJson as unknown[], 'skill');
 export const cards: Card[] = parseAll(Card, cardsJson as unknown[], 'card');
 export const dropTables: DropTable[] = parseAll(DropTable, dropsJson as unknown[], 'dropTable');
+export const weapons: Weapon[] = parseAll(Weapon, weaponsJson as unknown[], 'weapon');
+export const turrets: Turret[] = parseAll(Turret, turretsJson as unknown[], 'turret');
 export const stages: Stage[] = parseAll(Stage, [stage101, stage102, stage103, stage104] as unknown[], 'stage');
 export const runeConfig: RuneConfig = parseOne(RuneConfig, runesJson, 'runeConfig');
 export const economy: EconomyConfig = parseOne(EconomyConfig, economyJson, 'economy');
@@ -80,6 +88,8 @@ export const skillById = index(skills);
 export const cardById = index(cards);
 export const stageById = index(stages);
 export const dropTableById = index(dropTables);
+export const weaponById = index(weapons);
+export const turretById = index(turrets);
 
 export function getHero(id: string): Hero {
   const h = heroById.get(id);
@@ -95,6 +105,16 @@ export function getSkill(id: string): Skill {
   const s = skillById.get(id);
   if (!s) throw new Error(`[data] ไม่พบสกิล id "${id}"`);
   return s;
+}
+export function getTurret(id: string): Turret {
+  const t = turretById.get(id);
+  if (!t) throw new Error(`[data] ไม่พบเครื่องยิง id "${id}"`);
+  return t;
+}
+export function getWeapon(id: string): Weapon {
+  const w = weaponById.get(id);
+  if (!w) throw new Error(`[data] ไม่พบอาวุธ id "${id}"`);
+  return w;
 }
 export function getStage(id: string): Stage {
   const s = stageById.get(id);

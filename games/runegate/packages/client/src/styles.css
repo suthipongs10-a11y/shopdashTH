@@ -122,6 +122,16 @@ button.ghost { background: rgba(255,255,255,.06); }
 }
 .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 6px; }
 .chip { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(127,212,232,.12); color: var(--rune); }
+.turret-card.tier-t1 { border-left-color: rgba(143,163,184,.5); }
+.turret-card.tier-t2 { border-left-color: var(--rune-dim); }
+.turret-card.tier-t3 { border-left-color: var(--rune); background: var(--panel-2); }
+.tier-badge.tier-t1 { background: rgba(143,163,184,.16); color: var(--muted); }
+.tier-badge.tier-t2 { background: rgba(127,212,232,.14); color: var(--rune-dim); }
+.tier-badge.tier-t3 { background: rgba(127,212,232,.2); color: var(--rune); }
+.turret-card .upnext { margin-top: 6px; font-size: 10.5px; color: var(--brass); }
+.turret-card .upnext.final { color: rgba(143,163,184,.6); }
+.turret-card .mon-stats { flex-wrap: wrap; gap: 5px 8px; }
+
 .mon-card .where { margin-top: 7px; font-size: 10.5px; color: rgba(143,163,184,.75); }
 
 .hero-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); }
@@ -226,6 +236,21 @@ button.ghost { background: rgba(255,255,255,.06); }
 .unitpanel .stat b { color: var(--text); font-weight: 600; }
 .unitpanel .btns { display: flex; gap: 6px; margin-top: 10px; }
 .unitpanel .btns button { flex: 1; padding: 8px 6px; font-size: 12.5px; }
+.unitpanel.buildmenu { width: 262px; }
+.unitpanel .up-title { font-size: 11.5px; color: var(--brass); margin: 10px 0 5px; letter-spacing: .3px; }
+.turret-opt {
+  display: block; width: 100%; text-align: left; padding: 7px 9px; margin-bottom: 6px;
+  background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 7px; font-size: 12px;
+}
+.turret-opt:hover:not(.poor) { border-color: var(--rune); }
+.turret-opt.poor { opacity: .5; }
+.turret-opt .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.turret-opt b { font-size: 12.5px; color: var(--text); }
+.turret-opt .price { color: var(--rune); font-weight: 700; font-size: 11.5px; white-space: nowrap; }
+.turret-opt .wname { display: block; color: var(--brass); font-size: 10.5px; margin-top: 2px; }
+.turret-opt .wdesc { display: block; color: var(--muted); font-size: 10.5px; line-height: 1.45; margin-top: 2px; }
+@media (max-width: 560px) { .unitpanel.buildmenu { width: 220px; } }
+
 .bar { height: 7px; border-radius: 4px; background: rgba(255,255,255,.13); overflow: hidden; margin: 6px 0; }
 .bar > i { display: block; height: 100%; background: linear-gradient(90deg, #4fc98a, #9ae6a8); }
 

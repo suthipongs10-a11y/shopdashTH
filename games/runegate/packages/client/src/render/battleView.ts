@@ -31,6 +31,17 @@ interface UnitView {
   flash: number;
 }
 
+/** สีและขนาดของกระสุนแต่ละแบบ */
+const SHOT_STYLE: Record<string, { color: number; size: number }> = {
+  rock: { color: 0xa89478, size: 0.19 },
+  bullet: { color: 0xbdf0ff, size: 0.11 },
+  shell: { color: 0xffb066, size: 0.15 },
+  beam: { color: 0xe8fbff, size: 0.13 },
+  flame: { color: 0xff8a3c, size: 0.18 },
+  bomb: { color: 0x6b5f7d, size: 0.2 },
+  shard: { color: 0xffd98a, size: 0.13 },
+};
+
 const VFX_COLOR: Record<string, number> = {
   none: 0xffffff,
   slash: 0xfff0c0,
@@ -45,6 +56,10 @@ const VFX_COLOR: Record<string, number> = {
 export class BattleView {
   private views = new Map<number, UnitView>();
   private vfx: { mesh: THREE.Mesh; t: number; life: number; radius: number }[] = [];
+  /** กระสุนที่กำลังลอย — sync จาก battle.projectiles ทุกเฟรม */
+  private shots = new Map<number, THREE.Mesh>();
+  private shotGeo = new THREE.SphereGeometry(1, 8, 6);
+  private shotMats = new Map<string, THREE.MeshBasicMaterial>();
   private floaters: { el: HTMLDivElement; t: number; x: number; y: number; z: number }[] = [];
   private tmp = new THREE.Vector3();
   private clock = 0;
@@ -137,6 +152,9 @@ export class BattleView {
         }
         case 'skill':
           this.spawnVfx(e.x, e.y, Math.max(e.radius, 0.8), VFX_COLOR[e.vfx] ?? 0xffffff);
+          break;
+        case 'boom':
+          this.spawnVfx(e.x, e.y, e.radius, SHOT_STYLE[e.vfx]?.color ?? 0xffb066);
           break;
         case 'leak':
           document.body.classList.add('flash-danger');
@@ -266,8 +284,49 @@ export class BattleView {
       }
     }
 
+    this.updateShots();
     this.updateVfx(dt);
     this.updateFloaters(dt);
+  }
+
+  /** ซิงก์กระสุนจาก sim → mesh (สร้าง/ย้าย/เก็บทิ้ง) */
+  private updateShots(): void {
+    const live = new Set<number>();
+    for (const p of this.battle.projectiles) {
+      live.add(p.id);
+      let mesh = this.shots.get(p.id);
+      const style = SHOT_STYLE[p.vfx] ?? SHOT_STYLE.bullet!;
+      if (!mesh) {
+        let mat = this.shotMats.get(p.vfx);
+        if (!mat) {
+          mat = new THREE.MeshBasicMaterial({ color: style.color });
+          this.shotMats.set(p.vfx, mat);
+        }
+        mesh = new THREE.Mesh(this.shotGeo, mat);
+        this.scene.root.add(mesh);
+        this.shots.set(p.id, mesh);
+      }
+      const ground = this.scene.tileHeight(Math.floor(p.x), Math.floor(p.y));
+      // วิถีโค้งยกสูงกลางทาง ให้เห็นว่าเป็นการเหวี่ยงข้ามหัว
+      let arc = 0;
+      if (p.lob) {
+        const total = Math.hypot(p.targetX - p.x, p.targetY - p.y) + 0.001;
+        arc = Math.min(1.4, total * 0.45);
+      }
+      mesh.position.set(p.x, ground + 0.75 + arc, p.y);
+      const scale = p.vfx === 'beam' ? style.size : style.size;
+      mesh.scale.set(scale, scale, scale);
+      if (p.vfx === 'beam') {
+        const len = 0.5;
+        mesh.scale.set(len, style.size * 0.8, style.size * 0.8);
+        mesh.rotation.set(0, -Math.atan2(p.vy, p.vx), 0);
+      }
+    }
+    for (const [id, mesh] of [...this.shots]) {
+      if (live.has(id)) continue;
+      this.scene.root.remove(mesh);
+      this.shots.delete(id);
+    }
   }
 
   private advanceFrame(v: UnitView, dt: number): void {
@@ -335,5 +394,10 @@ export class BattleView {
     this.floaters = [];
     for (const fx of this.vfx) this.scene.root.remove(fx.mesh);
     this.vfx = [];
+    for (const mesh of this.shots.values()) this.scene.root.remove(mesh);
+    this.shots.clear();
+    this.shotGeo.dispose();
+    for (const m of this.shotMats.values()) m.dispose();
+    this.shotMats.clear();
   }
 }

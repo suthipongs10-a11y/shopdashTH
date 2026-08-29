@@ -7,19 +7,22 @@
   "brief_th": "ศัตรูมาสองทางพร้อมกัน และมีนักล่าเงาล่องหนปนมาด้วย — ต้องมีตัวเปิดล่องหน",
   "energyCost": 7,
   "grid": {
-    "w": 16,
-    "h": 9
+    "w": 20,
+    "h": 12
   },
   "tiles": [
-    "................",
-    "SRRRRRRRR.......",
-    "..GGHH..R.G.....",
-    ".....HH.R.......",
-    "........RRRRRRRE",
-    ".....HH.R..HH...",
-    "..GGHH..R.G.....",
-    "SRRRRRRRR.......",
-    "................"
+    "GGGGGGGH............",
+    "SRRRRRRGH...........",
+    "GGGGGGRGT...........",
+    "HHTHHGRGTHHTH.......",
+    "....HGRGGGGGGT......",
+    "....HGRRRRRRRGH.....",
+    "....TGRGGGGGRGH.....",
+    "....HGRGTHHGRGTHHTHH",
+    "THHTHGRGH.TGRGGGGGGG",
+    "GGGGGGRGH.HGRRRRRRRE",
+    "SRRRRRRGT..HGGGGGGGG",
+    "GGGGGGGH....THHTHHTH"
   ],
   "paths": {
     "north": [
@@ -28,42 +31,58 @@
         1
       ],
       [
-        8,
+        6,
         1
       ],
       [
-        8,
-        4
+        6,
+        5
       ],
       [
-        15,
-        4
+        12,
+        5
+      ],
+      [
+        12,
+        9
+      ],
+      [
+        19,
+        9
       ]
     ],
     "south": [
       [
         0,
-        7
+        10
       ],
       [
-        8,
-        7
+        6,
+        10
       ],
       [
-        8,
-        4
+        6,
+        5
       ],
       [
-        15,
-        4
+        12,
+        5
+      ],
+      [
+        12,
+        9
+      ],
+      [
+        19,
+        9
       ]
     ]
   },
   "baseHp": 10,
   "deploy": {
-    "initialCost": 18,
-    "costPerSec": 1.05,
-    "deployLimit": 7,
+    "initialCost": 30,
+    "costPerSec": 1.35,
+    "deployLimit": 9,
     "retreatRefund": 0.5
   },
   "waves": [
@@ -81,7 +100,7 @@
         },
         {
           "enemy": "ghoul",
-          "count": 5,
+          "count": 4,
           "intervalSec": 1.2,
           "delaySec": 0,
           "path": "south"
@@ -95,14 +114,14 @@
       "groups": [
         {
           "enemy": "venom_wasp",
-          "count": 8,
+          "count": 7,
           "intervalSec": 0.6,
           "delaySec": 0,
           "path": "north"
         },
         {
           "enemy": "goblin_raider",
-          "count": 6,
+          "count": 5,
           "intervalSec": 0.8,
           "delaySec": 2,
           "path": "south"
@@ -186,7 +205,7 @@
         },
         {
           "enemy": "ghoul",
-          "count": 8,
+          "count": 7,
           "intervalSec": 0.6,
           "delaySec": 6,
           "path": "north"

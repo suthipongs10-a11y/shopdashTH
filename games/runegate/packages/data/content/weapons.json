@@ -1,0 +1,47 @@
+[
+  {
+    "id": "w_rock", "name_th": "ก้อนหิน", "desc_th": "เหวี่ยงก้อนหินเป็นวิถีโค้ง ตกแล้วกระแทกเป็นวงเล็ก",
+    "shots": 1, "speed": 7, "ratio": 1.0, "lob": true, "aoeRadius": 0.75, "vfx": "rock"
+  },
+  {
+    "id": "w_repeater", "name_th": "กระสุนรัว", "desc_th": "ยิงรัว 3 นัดติดต่อกัน",
+    "shots": 3, "burstIntervalSec": 0.09, "speed": 14, "ratio": 0.46, "vfx": "bullet"
+  },
+  {
+    "id": "w_autocannon", "name_th": "ปืนกลรูน", "desc_th": "ยิงรัว 5 นัดถี่ยิบ",
+    "shots": 5, "burstIntervalSec": 0.06, "speed": 17, "ratio": 0.44, "vfx": "bullet"
+  },
+  {
+    "id": "w_lance", "name_th": "ลำแสงเจาะ", "desc_th": "ลำแสงความเร็วสูง ทะลุศัตรูได้ถึง 5 ตัวในแนวเดียว",
+    "shots": 1, "speed": 26, "ratio": 1.9, "pierce": 5, "damageType": "magic", "element": "light", "vfx": "beam"
+  },
+  {
+    "id": "w_scatter3", "name_th": "กระจายสามทาง", "desc_th": "ยิงพร้อมกัน 3 นัดเป็นรูปพัด",
+    "shots": 3, "spreadDeg": 34, "speed": 12, "ratio": 0.62, "vfx": "shard"
+  },
+  {
+    "id": "w_scatter5", "name_th": "กระจายห้าทาง", "desc_th": "ยิงพร้อมกัน 5 นัดคลุมทั้งแนว",
+    "shots": 5, "spreadDeg": 58, "speed": 13, "ratio": 0.64, "vfx": "shard"
+  },
+  {
+    "id": "w_flamewheel", "name_th": "ลูกไฟวน", "desc_th": "ปล่อยลูกไฟ 2 ลูกที่วิ่งวนตามศัตรู และทำให้ไหม้",
+    "shots": 2, "spreadDeg": 24, "speed": 8, "ratio": 0.9, "homingTurnRate": 3.4,
+    "damageType": "magic", "element": "fire", "aoeRadius": 0.5,
+    "onHit": { "status": "poison", "durationSec": 3, "potency": 0.12 }, "vfx": "flame"
+  },
+  {
+    "id": "w_mortar", "name_th": "ลูกระเบิด", "desc_th": "ยิงระเบิดวิถีโค้ง ระเบิดเป็นวงกว้าง",
+    "shots": 1, "speed": 6, "ratio": 1.5, "lob": true, "aoeRadius": 1.5, "vfx": "bomb"
+  },
+  {
+    "id": "w_hellfire", "name_th": "ระเบิดเพลิงนรก", "desc_th": "ระเบิดเพลิงวงกว้างมาก และเผาศัตรูต่อเนื่อง",
+    "shots": 1, "speed": 6, "ratio": 2.1, "lob": true, "aoeRadius": 1.95,
+    "damageType": "magic", "element": "fire",
+    "onHit": { "status": "poison", "durationSec": 4, "potency": 0.14 }, "vfx": "bomb"
+  },
+  {
+    "id": "w_cluster", "name_th": "ระเบิดคลัสเตอร์", "desc_th": "ระเบิดแล้วแตกเป็นลูกย่อยอีก 4 ลูกกระจายรอบจุดตก",
+    "shots": 1, "speed": 6, "ratio": 1.2, "lob": true, "aoeRadius": 1.2,
+    "splitOnHit": { "shots": 4, "ratio": 0.55, "aoeRadius": 0.9 }, "vfx": "bomb"
+  }
+]

@@ -7,54 +7,65 @@
   "brief_th": "ลิชราชันย์ปลุกกองทัพซากศพขึ้นมาไม่หยุด — ต้องฆ่ามันให้ได้ก่อนที่ลูกสมุนจะท่วมด่าน",
   "energyCost": 12,
   "grid": {
-    "w": 16,
-    "h": 10
+    "w": 22,
+    "h": 13
   },
   "tiles": [
-    "................",
-    "..GGHH..GG..HH..",
-    "....RRRRRRRR....",
-    "..HHR..GG..R.HH.",
-    "..GGR..HH..R.GG.",
-    "SRRRR..HH..R....",
-    ".....GG.HH.R.HH.",
-    "....HH...GGR.GG.",
-    "........GGGRRRRE",
-    "........HHH.HH.."
+    "HHTHHT.....HHTHHT.....",
+    "GGGGGGH...HGGGGGGT....",
+    "SRRRRRGH.HGRRRRRRGT...",
+    "GGGGGRGH.HGRGGGGRGT...",
+    "HHTHGRGH.TGRGHHGRGT...",
+    "...HGRGH.TGRGHHGRGT...",
+    "...HGRGH.TGRGHHGRGT...",
+    "...HGRGHTHGRGHTGRGH...",
+    "...HGRGGGGGRGTHGRGH...",
+    "...TGRRRRRRRGHHGRGTHHT",
+    "....HGGGGGGGH.TGRGGGGG",
+    ".....HHTHHTH..HGRRRRRE",
+    "...............TGGGGGG"
   ],
   "paths": {
     "main": [
       [
         0,
-        5
-      ],
-      [
-        4,
-        5
-      ],
-      [
-        4,
         2
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        5,
+        9
+      ],
+      [
+        11,
+        9
       ],
       [
         11,
         2
       ],
       [
-        11,
-        8
+        16,
+        2
       ],
       [
-        15,
-        8
+        16,
+        11
+      ],
+      [
+        21,
+        11
       ]
     ]
   },
   "baseHp": 12,
   "deploy": {
-    "initialCost": 24,
-    "costPerSec": 1.15,
-    "deployLimit": 8,
+    "initialCost": 34,
+    "costPerSec": 1.45,
+    "deployLimit": 10,
     "retreatRefund": 0.5
   },
   "waves": [

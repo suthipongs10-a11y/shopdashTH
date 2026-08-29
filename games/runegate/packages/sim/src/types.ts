@@ -7,7 +7,11 @@ import type {
   Hero,
   Race,
   Skill,
+  SpriteRecipe,
   StatusKind,
+  TargetPriority,
+  Turret,
+  Weapon,
 } from '@runegate/data';
 
 export type Faction = 'hero' | 'enemy';
@@ -67,10 +71,24 @@ interface UnitCommon {
   kills: number;
 }
 
+/** ฝ่ายเรามี 2 ชนิด: ฮีโร่ที่วาง/ถอนได้ กับเครื่องยิงที่สร้างแล้วอัพเกรดต่อในด่าน */
+export type AllyKind = 'hero' | 'turret';
+
 export interface HeroUnit extends UnitCommon {
   faction: 'hero';
+  kind: AllyKind;
   heroId: string;
-  def: Hero;
+  def: Hero | Turret;
+  /** คัดลอกมาตอนวาง เพื่อไม่ต้องแยกชนิดตอนเล็งเป้า */
+  targetPriority: TargetPriority;
+  sprite: SpriteRecipe;
+  /** อาวุธกระสุน (เครื่องยิงเท่านั้น) — ฮีโร่เป็น null = โจมตีถึงตัวทันที */
+  weapon: Weapon | null;
+  tier: number;
+  /** แต้มวางที่ทุ่มลงไปทั้งหมด ใช้คิดเงินคืนตอนรื้อ */
+  investedCost: number;
+  /** คิวกระสุนที่ยังยิงไม่ครบชุด (แพตเทิร์นยิงรัว) */
+  burst: { left: number; timer: number; angle: number; targetUid: number | null } | null;
   level: number;
   pos: DeployPos;
   tileX: number;
@@ -117,6 +135,50 @@ export interface EnemyUnit extends UnitCommon {
 
 export type Unit = HeroUnit | EnemyUnit;
 
+/** เป็น predicate ธรรมดา (ไม่ narrow ชนิด) เพราะเครื่องยิงใช้โครงเดียวกับฮีโร่ */
+export function isTurret(u: Unit): boolean {
+  return u.faction === 'hero' && u.kind === 'turret';
+}
+
+/** สถิติผู้ยิงที่ถูก snapshot ไว้ในกระสุน — กระสุนต้องคำนวณดาเมจได้แม้ผู้ยิงถูกรื้อไปแล้ว */
+export interface AttackerSnapshot {
+  uid: number;
+  atk: number;
+  critRate: number;
+  critDmg: number;
+  element: Element;
+  damageType: DamageType;
+  antiAir: number;
+  raceBonus: Partial<Record<Race, number>>;
+  elementBonus: Partial<Record<Element, number>>;
+}
+
+export interface Projectile {
+  id: number;
+  owner: AttackerSnapshot;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  ratio: number;
+  damageType: DamageType;
+  element: Element | undefined;
+  /** ทะลุได้อีกกี่ตัว (0 = โดนตัวถัดไปแล้วหาย) */
+  pierceLeft: number;
+  aoeRadius: number;
+  homingTurnRate: number;
+  targetUid: number | null;
+  /** วิถีโค้ง: บินไปตกที่จุด (targetX,targetY) ไม่ชนใครระหว่างทาง */
+  lob: boolean;
+  targetX: number;
+  targetY: number;
+  hit: number[];
+  splitOnHit: { shots: number; ratio: number; aoeRadius: number } | undefined;
+  onHit: { status: StatusKind; durationSec: number; potency: number; chance: number } | undefined;
+  vfx: string;
+  ttl: number;
+}
+
 export function isHero(u: Unit): u is HeroUnit {
   return u.faction === 'hero';
 }
@@ -131,7 +193,10 @@ export function isEnemy(u: Unit): u is EnemyUnit {
 export type Command =
   | { type: 'deploy'; tick: number; heroId: string; tileX: number; tileY: number; facing: number }
   | { type: 'retreat'; tick: number; uid: number }
-  | { type: 'ultimate'; tick: number; uid: number };
+  | { type: 'ultimate'; tick: number; uid: number }
+  | { type: 'build'; tick: number; turretId: string; tileX: number; tileY: number }
+  | { type: 'upgrade'; tick: number; uid: number; turretId: string }
+  | { type: 'sell'; tick: number; uid: number };
 
 export type BattleEvent =
   | { t: 'spawn'; uid: number; enemyId: string }
@@ -142,6 +207,8 @@ export type BattleEvent =
   | { t: 'death'; uid: number; faction: Faction }
   | { t: 'leak'; uid: number; damage: number }
   | { t: 'skill'; uid: number; skillId: string; vfx: string; x: number; y: number; radius: number }
+  | { t: 'build'; uid: number; turretId: string; tileX: number; tileY: number; tier: number }
+  | { t: 'boom'; x: number; y: number; radius: number; vfx: string }
   | { t: 'status'; uid: number; kind: StatusKind; durationSec: number }
   | { t: 'wave'; waveId: string; label: string }
   | { t: 'end'; win: boolean };

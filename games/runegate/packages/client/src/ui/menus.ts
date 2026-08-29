@@ -1,4 +1,4 @@
-import { enemies, heroes, stages, type Enemy, type Hero, type Stage } from '@runegate/data';
+import { enemies, getWeapon, heroes, stages, turrets, type Enemy, type Hero, type Stage, type Turret } from '@runegate/data';
 import { portraitDataUrl } from '../render/sprites.js';
 import { CLASS_TH, ELEMENT_COLOR, ELEMENT_TH, RACE_TH, TIER_TH, TRAIT_TH, h, progress, starHtml, toast, type EnemyTier } from './common.js';
 
@@ -10,7 +10,7 @@ export function recommendedLevel(stage: Stage): number {
   return table[stage.id] ?? 1 + (stage.index - 1) * 7;
 }
 
-export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: () => void): HTMLElement {
+export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: () => void, onArsenal: () => void): HTMLElement {
   const cards = stages.map((s) => {
     const best = progress.bestStars(s.id);
     return h(
@@ -63,6 +63,7 @@ export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: ()
         'div',
         { class: 'codex-cta' },
         h('button', { class: 'ghost', onclick: onBestiary }, `📖 สมุดมอนสเตอร์ (${enemies.length} ชนิด)`),
+        h('button', { class: 'ghost', onclick: onArsenal }, `🔧 คลังเครื่องยิง (${turrets.length} แบบ)`),
         h('span', {}, `ธรรมดา ${count('normal')} · มินิบอส ${count('elite')} · บอส MVP ${count('mvp')}`),
       ),
       h(
@@ -248,6 +249,70 @@ export function bestiaryScreen(onBack: () => void): HTMLElement {
       ...section('mvp', 'บอส MVP', 'บอสประจำบท เลือดหนามาก มีสกิลเรียกลูกสมุนและบัฟตัวเอง ต้องจัดทีมมาเฉพาะ'),
       ...section('elite', 'มินิบอส', 'โผล่กลางด่าน หนากว่ามอนธรรมดาหลายเท่าและมีสกิลของตัวเอง'),
       ...section('normal', 'มอนสเตอร์ธรรมดา', 'กำลังพลหลักของทัพอสูร มาเป็นเวฟ บางชนิดบิน ล่องหน หุ้มเกราะ หรือฮีลพวกเดียวกัน'),
+      h('div', { class: 'sticky-actions' }, h('button', { class: 'ghost', onclick: onBack }, '← กลับ')),
+    ),
+  );
+}
+
+
+function turretCard(t: Turret): HTMLElement {
+  const w = getWeapon(t.weapon);
+  const nextNames = t.upgradesTo.map((id) => turrets.find((x) => x.id === id)?.name_th ?? id);
+  const tags: string[] = [];
+  if (w.shots > 1 && w.burstIntervalSec > 0) tags.push(`ยิงรัว ${w.shots} นัด`);
+  if (w.shots > 1 && w.spreadDeg > 0) tags.push(`กระจาย ${w.shots} ทาง`);
+  if (w.pierce > 0) tags.push(`ทะลุ ${w.pierce} ตัว`);
+  if (w.aoeRadius > 0) tags.push(`ระเบิดวง ${w.aoeRadius}`);
+  if (w.homingTurnRate > 0) tags.push('ตามเป้า');
+  if (w.splitOnHit) tags.push(`แตก ${w.splitOnHit.shots} ลูก`);
+  if (t.antiAir > 0) tags.push(`ตีตัวบิน +${Math.round(t.antiAir * 100)}%`);
+
+  return h(
+    'div',
+    { class: `mon-card turret-card tier-t${t.tier}` },
+    h('span', { class: `tier-badge tier-t${t.tier}` }, `ขั้น ${t.tier}`),
+    h('img', { class: 'pic', src: portraitDataUrl(t.sprite), alt: t.name_th }),
+    h('div', { class: 'nm' }, t.name_th),
+    h('div', { class: 'sub' }, h('span', { class: 'el-dot', style: `background:${ELEMENT_COLOR[t.element]}` }), h('span', {}, w.name_th)),
+    h(
+      'div',
+      { class: 'mon-stats' },
+      h('span', {}, `${t.cost} แต้ม`),
+      h('span', {}, `ATK ${t.atk}`),
+      h('span', {}, `ระยะ ${t.range}`),
+      h('span', {}, `${t.aspd.toFixed(2)}/วิ`),
+    ),
+    tags.length > 0 ? h('div', { class: 'chips' }, ...tags.map((x) => h('span', { class: 'chip' }, x))) : null,
+    h('div', { class: 'where' }, t.desc_th),
+    nextNames.length > 0 ? h('div', { class: 'upnext' }, `↑ ${nextNames.join(' / ')}`) : h('div', { class: 'upnext final' }, 'ขั้นสูงสุด'),
+  );
+}
+
+export function arsenalScreen(onBack: () => void): HTMLElement {
+  const tierSection = (tier: 1 | 2 | 3, title: string, note: string): HTMLElement[] => {
+    const list = turrets.filter((t) => t.tier === tier);
+    return [
+      h('div', { class: 'section-title' }, `${title} (${list.length})`),
+      h('p', { class: 'tier-note' }, note),
+      h('div', { class: 'mon-grid' }, ...list.map(turretCard)),
+    ];
+  };
+  return h(
+    'div',
+    { class: 'screen' },
+    h(
+      'div',
+      { class: 'screen-inner' },
+      h('div', { class: 'brand' }, h('h1', { class: 'wordmark' }, 'ARSENAL'), h('p', { class: 'sub-th' }, 'คลังเครื่องยิง — สร้างบนแท่นในด่าน แล้วอัพเกรดต่อระหว่างรบ')),
+      h(
+        'p',
+        { class: 'tier-note' },
+        'เครื่องยิงไม่ผูกกับเลเวลฮีโร่ พลังมาจากการทุ่มแต้มวางอัพเกรดล้วนๆ และไม่กินโควตาช่องวางฮีโร่ ' +
+          'ทุกสายเริ่มจากเครื่องยิงหินเหมือนกันหมด แล้วแยกเป็น 3 ทางตามสถานการณ์',
+      ),
+      ...tierSection(1, 'ขั้นที่ 1 — จุดเริ่มต้น', 'ปาก้อนหินวิถีโค้ง ยิงช้าแต่ลงเป็นวง ราคาถูกที่สุด สร้างคลุมพื้นที่ไว้ก่อนแล้วค่อยเลือกสาย'),
+      ...tierSection(2, 'ขั้นที่ 2 — เลือกสาย', 'สายรัว = DPS ต่อเนื่อง · สายกระจาย = กวาดฝูง · สายครก = ระเบิดวงกว้างระยะไกล'),
+      ...tierSection(3, 'ขั้นที่ 3 — ขั้นสูงสุด', 'แต่ละสายแยกได้อีก 2 ทาง รวม 6 ปลายทาง เลือกตามศัตรูที่จะเจอ'),
       h('div', { class: 'sticky-actions' }, h('button', { class: 'ghost', onclick: onBack }, '← กลับ')),
     ),
   );

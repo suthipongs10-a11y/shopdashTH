@@ -7,44 +7,63 @@
   "brief_th": "เงาไร้สุขเริ่มคืบออกจากป่าดำมาป้วนเปี้ยนหน้าหมู่บ้าน ตั้งด่านสกัดไว้ที่ทางเข้า",
   "energyCost": 6,
   "grid": {
-    "w": 14,
-    "h": 8
+    "w": 20,
+    "h": 11
   },
   "tiles": [
-    "..............",
-    "..HH...HH.....",
-    "..GG...GG.....",
-    "SRRRRR........",
-    ".....R..HH....",
-    ".....RRRRRRRRE",
-    "....GG..GG....",
-    "....HH..HH...."
+    "....HHTHHT..........",
+    "...HGGGGGGH.........",
+    "..TGRRRRRRGH..HTHHTH",
+    "HTHGRGGGGRGH.TGGGGGG",
+    "GGGGRGHHGRGTHGRRRRRE",
+    "SRRRRGHTGRGHHGRGGGGG",
+    "GGGGGT.HGRGHTGRGHHTH",
+    "HTHHT..HGRGGGGRGH...",
+    ".......TGRRRRRRGH...",
+    "........HGGGGGGT....",
+    ".........HHTHHT....."
   ],
   "paths": {
     "main": [
       [
         0,
-        3
-      ],
-      [
-        5,
-        3
-      ],
-      [
-        5,
         5
       ],
       [
-        13,
+        4,
         5
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        9,
+        2
+      ],
+      [
+        9,
+        8
+      ],
+      [
+        14,
+        8
+      ],
+      [
+        14,
+        4
+      ],
+      [
+        19,
+        4
       ]
     ]
   },
   "baseHp": 12,
   "deploy": {
-    "initialCost": 15,
-    "costPerSec": 1,
-    "deployLimit": 6,
+    "initialCost": 20,
+    "costPerSec": 1.15,
+    "deployLimit": 8,
     "retreatRefund": 0.5
   },
   "waves": [
@@ -55,7 +74,7 @@
       "groups": [
         {
           "enemy": "gel_slime",
-          "count": 5,
+          "count": 6,
           "intervalSec": 1.5,
           "delaySec": 0.0,
           "path": "main"
@@ -69,7 +88,7 @@
       "groups": [
         {
           "enemy": "larva_grub",
-          "count": 8,
+          "count": 10,
           "intervalSec": 0.7,
           "delaySec": 0.0,
           "path": "main"
@@ -83,14 +102,14 @@
       "groups": [
         {
           "enemy": "restless_shade",
-          "count": 4,
+          "count": 5,
           "intervalSec": 1.4,
           "delaySec": 0.0,
           "path": "main"
         },
         {
           "enemy": "cave_bat",
-          "count": 4,
+          "count": 5,
           "intervalSec": 1.2,
           "delaySec": 3,
           "path": "main"
@@ -104,14 +123,14 @@
       "groups": [
         {
           "enemy": "goblin_raider",
-          "count": 6,
+          "count": 7,
           "intervalSec": 1.0,
           "delaySec": 0.0,
           "path": "main"
         },
         {
           "enemy": "ghoul",
-          "count": 6,
+          "count": 7,
           "intervalSec": 0.7,
           "delaySec": 5,
           "path": "main"
@@ -132,7 +151,7 @@
         },
         {
           "enemy": "ember_wolf",
-          "count": 4,
+          "count": 5,
           "intervalSec": 1.5,
           "delaySec": 2,
           "path": "main"

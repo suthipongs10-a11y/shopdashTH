@@ -1,7 +1,7 @@
 import './styles.css';
 import type { Stage } from '@runegate/data';
 import { BattleController } from './battle/controller.js';
-import { bestiaryScreen, squadScreen, stageSelectScreen } from './ui/menus.js';
+import { arsenalScreen, bestiaryScreen, squadScreen, stageSelectScreen } from './ui/menus.js';
 
 const canvas = document.getElementById('scene') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
@@ -17,12 +17,17 @@ function clear(): void {
 
 function showStageSelect(): void {
   clear();
-  ui.appendChild(stageSelectScreen((stage) => showSquad(stage), showBestiary));
+  ui.appendChild(stageSelectScreen((stage) => showSquad(stage), showBestiary, showArsenal));
 }
 
 function showBestiary(): void {
   clear();
   ui.appendChild(bestiaryScreen(showStageSelect));
+}
+
+function showArsenal(): void {
+  clear();
+  ui.appendChild(arsenalScreen(showStageSelect));
 }
 
 function showSquad(stage: Stage): void {

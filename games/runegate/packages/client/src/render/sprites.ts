@@ -246,6 +246,12 @@ function drawUnit(
   const body = recipe.body;
   const handX = cx + (dir === 4 ? -1 : 1) * 15 * s;
 
+  if (body === 'catapult' || body === 'cannon' || body === 'arcane') {
+    drawEmplacement(ctx, recipe, dir, anim, frame, cx, groundY, s);
+    ctx.restore();
+    return;
+  }
+
   if (body === 'beast' || body === 'insect') {
     const bodyY = groundY - 20 * s;
     // ขา
@@ -366,10 +372,98 @@ const BODY_HEIGHT_PX: Record<SpriteRecipe['body'], number> = {
   insect: 46,
   floating: 60,
   spirit: 60,
+  catapult: 64,
+  cannon: 38,
+  arcane: 55,
 };
 
 export function spriteHeadFraction(recipe: SpriteRecipe): number {
   return (BODY_HEIGHT_PX[recipe.body] * recipe.scale) / ATLAS_MANIFEST.frameH;
+}
+
+/** เครื่องยิงเป็นสิ่งปลูกสร้าง ไม่มีขา — แอนิเมชั่นคือการสะบัดแขน/ถอยหลังตอนยิง */
+function drawEmplacement(
+  ctx: CanvasRenderingContext2D,
+  recipe: SpriteRecipe,
+  dir: number,
+  anim: AnimName,
+  frame: number,
+  cx: number,
+  groundY: number,
+  s: number,
+): void {
+  const { main, accent, skin } = recipe.palette;
+  const face = dir === 4 ? -1 : 1;
+  const recoil = anim === 'attack' ? [0, -4, -1][frame] ?? 0 : 0;
+  const bob = anim === 'idle' && frame === 1 ? -1 : 0;
+
+  // ฐานหิน
+  roundRect(ctx, cx - 17 * s, groundY - 11 * s, 34 * s, 11 * s, 3);
+  fillStroke(ctx, shade(main, -40));
+  roundRect(ctx, cx - 20 * s, groundY - 4 * s, 40 * s, 6 * s, 2);
+  fillStroke(ctx, shade(main, -60));
+
+  ctx.save();
+  ctx.translate(recoil * s * face, bob);
+
+  if (recipe.body === 'catapult') {
+    // โครงไม้สองขา + แขนเหวี่ยง
+    for (const sx of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(cx + sx * 13 * s, groundY - 11 * s);
+      ctx.lineTo(cx + sx * 4 * s, groundY - 34 * s);
+      ctx.strokeStyle = main;
+      ctx.lineWidth = 6 * s;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    }
+    const armAngle = anim === 'attack' ? [-0.9, 0.5, 0.1][frame] ?? -0.6 : -0.6;
+    ctx.save();
+    ctx.translate(cx, groundY - 32 * s);
+    ctx.rotate(armAngle * face);
+    roundRect(ctx, -3 * s, -30 * s, 6 * s, 32 * s, 2);
+    fillStroke(ctx, shade(main, 20));
+    ellipse(ctx, 0, -32 * s, 7 * s, 6 * s, accent);
+    ctx.restore();
+  } else if (recipe.body === 'cannon') {
+    // แท่นหมุน + ลำกล้อง
+    ellipse(ctx, cx, groundY - 16 * s, 13 * s, 9 * s, main);
+    ctx.save();
+    ctx.translate(cx, groundY - 20 * s);
+    ctx.rotate(-0.32 * face);
+    roundRect(ctx, face > 0 ? 0 : -34 * s, -6 * s, 34 * s, 12 * s, 5);
+    fillStroke(ctx, shade(main, 26));
+    roundRect(ctx, face > 0 ? 26 * s : -36 * s, -8 * s, 10 * s, 16 * s, 3);
+    fillStroke(ctx, accent);
+    ctx.restore();
+    ellipse(ctx, cx, groundY - 30 * s, 6 * s, 6 * s, skin);
+  } else {
+    // แท่นเวท: คริสตัลลอยเหนือเสา + วงแหวนรูน
+    roundRect(ctx, cx - 6 * s, groundY - 30 * s, 12 * s, 22 * s, 3);
+    fillStroke(ctx, main);
+    const float = anim === 'idle' && frame === 1 ? -2 : 0;
+    ctx.save();
+    ctx.translate(cx, groundY - 40 * s + float);
+    ctx.beginPath();
+    ctx.moveTo(0, -13 * s);
+    ctx.lineTo(9 * s, 0);
+    ctx.lineTo(0, 13 * s);
+    ctx.lineTo(-9 * s, 0);
+    ctx.closePath();
+    fillStroke(ctx, accent);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 17 * s, 7 * s, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = skin;
+    ctx.lineWidth = 2.5;
+    ctx.globalAlpha *= 0.8;
+    ctx.stroke();
+    ctx.globalAlpha /= 0.8;
+    ctx.restore();
+  }
+  ctx.restore();
 }
 
 const atlasCache = new Map<string, SpriteAtlas>();

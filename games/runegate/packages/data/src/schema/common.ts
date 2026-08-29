@@ -71,7 +71,7 @@ export const Id = z.string().regex(/^[a-z][a-z0-9_]{1,39}$/, 'id ต้องเ
 
 /** สูตรสีของ sprite placeholder (Phase 2) — Phase 3 จะแทนด้วย atlas จริง */
 export const SpriteRecipe = z.object({
-  body: z.enum(['humanoid', 'beast', 'floating', 'hulk', 'insect', 'spirit']),
+  body: z.enum(['humanoid', 'beast', 'floating', 'hulk', 'insect', 'spirit', 'catapult', 'cannon', 'arcane']),
   weapon: z.enum(['none', 'sword', 'bow', 'staff', 'dagger', 'hammer', 'claw', 'spear']).default('none'),
   palette: z.object({
     main: z.string().regex(/^#[0-9a-fA-F]{6}$/),

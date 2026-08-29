@@ -11,7 +11,22 @@ import {
 } from '@runegate/data';
 import type { Rng } from './rng.js';
 import { effAtk, effCritDmg, effCritRate, effDef, effMres } from './stats.js';
-import { isEnemy, isHero, type Unit } from './types.js';
+import { isEnemy, isHero, type AttackerSnapshot, type Unit } from './types.js';
+
+/** เก็บสถิติผู้โจมตีไว้ใช้ทีหลัง (กระสุนที่ยังลอยอยู่ต้องคิดดาเมจได้แม้ผู้ยิงหายไปแล้ว) */
+export function snapshotAttacker(u: Unit): AttackerSnapshot {
+  return {
+    uid: u.uid,
+    atk: effAtk(u),
+    critRate: effCritRate(u),
+    critDmg: effCritDmg(u),
+    element: u.element,
+    damageType: u.damageType,
+    antiAir: isHero(u) ? u.antiAir : 0,
+    raceBonus: isHero(u) ? u.raceBonus : {},
+    elementBonus: isHero(u) ? u.elementBonus : {},
+  };
+}
 
 export interface DamageOutput {
   amount: number;
@@ -36,9 +51,19 @@ export interface DamageOptions {
  * แล้วคูณ ธาตุ → trait ของศัตรู → โบนัสพิเศษ
  */
 export function computeDamage(attacker: Unit, defender: Unit, opts: DamageOptions, rng: Rng): DamageOutput {
+  return computeDamageFrom(snapshotAttacker(attacker), defender, opts, rng);
+}
+
+/** สูตรเดียวกัน แต่รับสถิติผู้ยิงแบบ snapshot — ใช้กับกระสุนที่ลอยอยู่ */
+export function computeDamageFrom(
+  attacker: AttackerSnapshot,
+  defender: Unit,
+  opts: DamageOptions,
+  rng: Rng,
+): DamageOutput {
   const canCrit = opts.canCrit ?? true;
-  const crit = canCrit && rng.chance(effCritRate(attacker));
-  const raw = effAtk(attacker) * opts.ratio * (crit ? effCritDmg(attacker) : 1);
+  const crit = canCrit && rng.chance(attacker.critRate);
+  const raw = attacker.atk * opts.ratio * (crit ? attacker.critDmg : 1);
   const type: DamageType = opts.damageType ?? attacker.damageType;
 
   let dmg: number;
@@ -60,7 +85,7 @@ export function computeDamage(attacker: Unit, defender: Unit, opts: DamageOption
     if (type === 'magic' && defender.traits.includes('magic_resist')) dmg *= MAGIC_RESIST_TRAIT_MULT;
   }
 
-  if (isHero(attacker) && isEnemy(defender)) {
+  if (isEnemy(defender)) {
     if (defender.traits.includes('flying')) dmg *= 1 + attacker.antiAir;
     dmg *= 1 + (attacker.raceBonus[defender.race] ?? 0);
     dmg *= 1 + (attacker.elementBonus[atkElement] ?? 0);

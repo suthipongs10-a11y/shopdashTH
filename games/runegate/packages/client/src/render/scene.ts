@@ -28,6 +28,7 @@ const TILE_STYLE: Record<string, { color: number; height: number; top?: number }
   R: { color: 0x7d7668, height: 0.09 }, // ทางหินปูเก่า
   G: { color: 0x3c6a48, height: 0.18 }, // พื้นดินมีมอส
   H: { color: 0x4e6b57, height: 0.64, top: 0x6f9573 }, // แท่นหินยกระดับ
+  T: { color: 0x5a5f70, height: 0.5, top: 0xb08a4a }, // แท่นเครื่องยิง — ขอบทองเหลืองให้เห็นชัด
   X: { color: 0x3a3f52, height: 0.95 },
   S: { color: 0xb0405e, height: 0.09 }, // รอยแยกมิติ
   E: { color: 0x9aa3b5, height: 0.11 }, // ลานหน้าประตู
