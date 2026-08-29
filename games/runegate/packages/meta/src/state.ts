@@ -1,5 +1,5 @@
 /** สร้าง/อ่าน/เขียนสถานะผู้เล่น — โครงเดียวกับที่ Phase 5 จะเก็บฝั่ง server */
-import { getHero, progression } from '@runegate/data';
+import { getHero, maxLevelForStar, progression } from '@runegate/data';
 
 import { newHeroState, TEAM_SIZE } from './hero-progress.js';
 import type { HeroState, PlayerState } from './types.js';
@@ -48,7 +48,8 @@ export function migrateState(raw: unknown): PlayerState {
     roster[id] = {
       id,
       star,
-      level: clampInt(hs?.level ?? 1, 1, 99),
+      // เพดานเลเวลผูกกับดาวเสมอ — เซฟที่อ้างเลเวลเกินดาวถูกตัดลงมา (กันเซฟปลอม)
+      level: clampInt(hs?.level ?? 1, 1, maxLevelForStar(star)),
       exp: Math.max(0, Math.floor(hs?.exp ?? 0)),
       awakened: Boolean(hs?.awakened) && star >= progression.awaken.minStar,
       skillLevels,

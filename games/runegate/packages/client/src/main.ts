@@ -2,8 +2,9 @@ import './styles.css';
 import { enemies, heroes, turrets } from '@runegate/data';
 import { preloadArt } from './render/sprites.js';
 import type { Stage } from '@runegate/data';
-import { BattleController } from './battle/controller.js';
+import { BattleController, type BattleSquadInput } from './battle/controller.js';
 import { arsenalScreen, bestiaryScreen, squadScreen, stageSelectScreen } from './ui/menus.js';
+import { heroesScreen } from './ui/heroes.js';
 
 const canvas = document.getElementById('scene') as HTMLCanvasElement;
 const ui = document.getElementById('ui') as HTMLElement;
@@ -19,7 +20,7 @@ function clear(): void {
 
 function showStageSelect(): void {
   clear();
-  ui.appendChild(stageSelectScreen((stage) => showSquad(stage), showBestiary, showArsenal));
+  ui.appendChild(stageSelectScreen((stage) => showSquad(stage), showBestiary, showArsenal, () => showHeroes(showStageSelect)));
 }
 
 function showBestiary(): void {
@@ -32,17 +33,29 @@ function showArsenal(): void {
   ui.appendChild(arsenalScreen(showStageSelect));
 }
 
-function showSquad(stage: Stage): void {
+function showHeroes(onBack: () => void): void {
   clear();
-  ui.appendChild(squadScreen(stage, (squad, level) => startBattle(stage, squad, level), showStageSelect));
+  ui.appendChild(heroesScreen(onBack));
 }
 
-function startBattle(stage: Stage, squad: string[], level: number): void {
+function showSquad(stage: Stage): void {
+  clear();
+  ui.appendChild(
+    squadScreen(
+      stage,
+      (squad) => startBattle(stage, squad),
+      showStageSelect,
+      () => showHeroes(() => showSquad(stage)),
+    ),
+  );
+}
+
+function startBattle(stage: Stage, squad: BattleSquadInput): void {
   clear();
   canvas.style.visibility = 'visible';
-  controller = new BattleController(canvas, ui, stage, squad, level, {
+  controller = new BattleController(canvas, ui, stage, squad, {
     onExit: () => showStageSelect(),
-    onRetry: () => startBattle(stage, squad, level),
+    onRetry: () => startBattle(stage, squad),
   });
 }
 

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@runegate/data": "*",
+    "@runegate/meta": "*",
     "@runegate/sim": "*",
     "three": "^0.171.0"
   },

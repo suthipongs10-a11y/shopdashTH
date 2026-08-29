@@ -3,13 +3,26 @@ import { Battle, canDeployOn, effRange, isHero, isTurret, type HeroUnit } from '
 import { StageScene, type DeployTile } from '../render/scene.js';
 import { BattleView } from '../render/battleView.js';
 import { portraitDataUrl } from '../render/sprites.js';
-import { h, progress, starHtml, toast } from '../ui/common.js';
+import { applyBattleRewards, type RewardSummary } from '@runegate/meta';
+import { Rng } from '@runegate/sim';
+import { h, starHtml, toast } from '../ui/common.js';
+import { itemLabel } from '../ui/heroes.js';
+import { save } from '../ui/save.js';
 
 interface HeroBarEntry {
   heroId: string;
   btn: HTMLButtonElement;
   veil: HTMLDivElement;
 }
+
+/** ทีมที่ส่งเข้าด่าน (โครงเดียวกับ `SquadEntry` ของ sim) */
+export type BattleSquadInput = {
+  heroId: string;
+  level: number;
+  star?: number;
+  awakened?: boolean;
+  skillLevels?: Record<string, number>;
+}[];
 
 export interface BattleHandlers {
   onExit(): void;
@@ -41,25 +54,22 @@ export class BattleController {
   private elHp!: HTMLElement;
   private elCost!: HTMLElement;
   private elTime!: HTMLElement;
+  private readonly seed: number;
 
   constructor(
     canvas: HTMLCanvasElement,
     uiRoot: HTMLElement,
     private readonly stage: Stage,
-    squad: string[],
-    level: number,
+    squad: BattleSquadInput,
     private readonly handlers: BattleHandlers,
   ) {
     this.ui = uiRoot;
     this.scene = new StageScene(canvas, stage);
-    this.battle = new Battle({
-      stage,
-      squad: squad.map((heroId) => ({ heroId, level })),
-      seed: (Date.now() & 0x7fffffff) >>> 0,
-    });
+    this.seed = (Date.now() & 0x7fffffff) >>> 0;
+    this.battle = new Battle({ stage, squad, seed: this.seed });
     this.view = new BattleView(this.scene, this.battle, this.ui);
 
-    this.buildHud(squad);
+    this.buildHud(squad.map((e) => e.heroId));
     this.attachInput(canvas);
     window.addEventListener('resize', this.onResize);
     this.lastTime = performance.now();
@@ -477,7 +487,9 @@ export class BattleController {
     this.cancelPlacement();
     this.closeUnitPanel();
     const r = this.battle.result();
-    progress.recordStars(this.stage.id, r.stars);
+    // รางวัลคิดจากผลจริงของด่าน ผ่าน meta (pure) แล้วบันทึกลงเซฟจุดเดียว
+    const { state, summary } = applyBattleRewards(save.state, this.stage, r, new Rng(this.seed ^ 0x9e3779b9));
+    save.set(state);
 
     const rows: [string, string][] = [
       ['ศัตรูที่กำจัด', `${r.enemiesKilled} / ${r.enemiesTotal}`],
@@ -485,7 +497,6 @@ export class BattleController {
       ['เลือดฐานที่เหลือ', `${r.baseHp} / ${r.baseHpMax}`],
       ['เวลาที่ใช้', `${Math.floor(r.elapsedSec / 60)}:${String(Math.floor(r.elapsedSec % 60)).padStart(2, '0')}`],
       ['ฮีโร่ที่ใช้', `${r.heroesUsed} ตัว`],
-      ['ทองที่ได้', String(r.goldEarned)],
     ];
     const top = [...r.heroes].sort((a, b) => b.damageDealt - a.damageDealt)[0];
     if (top) rows.push(['ดาเมจสูงสุด', `${top.name} (${top.damageDealt.toLocaleString('th-TH')})`]);
@@ -498,6 +509,7 @@ export class BattleController {
         { class: 'modal' },
         h('h2', {}, r.win ? 'ป้องกันสำเร็จ!' : 'ฐานแตก...'),
         h('div', { class: 'bigstars', html: starHtml(r.stars) }),
+        rewardBlock(summary),
         h(
           'table',
           {},
@@ -541,4 +553,17 @@ function heroSubtitle(u: HeroUnit): string {
   const def = u.def as { awakenName_th?: string; lore_th?: string; desc_th?: string };
   if (def.awakenName_th) return `${def.awakenName_th} — ${def.lore_th ?? ''}`;
   return def.desc_th ?? '';
+}
+
+/** กล่องสรุปของรางวัลหลังจบด่าน */
+function rewardBlock(summary: RewardSummary): HTMLElement {
+  const chips: HTMLElement[] = [
+    h('span', { class: 'chip gain' }, `🪙 +${summary.gold.toLocaleString('th-TH')}`),
+  ];
+  if (summary.gems > 0) chips.push(h('span', { class: 'chip gain' }, `💎 +${summary.gems} (เคลียร์ครั้งแรก)`));
+  if (summary.exp > 0) chips.push(h('span', { class: 'chip gain' }, `EXP +${summary.exp.toLocaleString('th-TH')}`));
+  for (const [item, n] of Object.entries(summary.items)) {
+    chips.push(h('span', { class: 'chip gain' }, `${itemLabel(item)} ×${n}`));
+  }
+  return h('div', { class: 'reward-block' }, h('b', {}, 'ของที่ได้รับ'), h('div', { class: 'chips' }, ...chips));
 }

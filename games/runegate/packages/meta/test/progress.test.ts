@@ -350,3 +350,61 @@ describe('ชื่อไอเทมภาษาไทย', () => {
     expect(itemName_th(essenceItem('fire'))).toContain('ไฟ');
   });
 });
+
+describe('เชื่อมกับ sim จริง', () => {
+  it('เล่นด่านจริงด้วย AutoPlayer แล้วรางวัลไหลเข้าสถานะผู้เล่นครบ', async () => {
+    const { AutoPlayer, Battle, runHeadless } = await import('@runegate/sim');
+    const stage = getStage('ch1_01');
+
+    // ทีมจากสถานะจริง: อัพทุกตัวให้พอผ่านด่านแรก
+    let s = rich(createInitialState());
+    for (const id of Object.keys(s.roster)) {
+      s = grantExp(s, id, 500_000);
+      const up = levelUpHero(s, id, 99);
+      if (up.ok) s = up.state;
+    }
+    const squad = battleSquad(s);
+    expect(squad.length).toBeGreaterThan(0);
+
+    const battle = new Battle({ stage, squad, seed: 1234, recordEvents: false });
+    runHeadless(battle, new AutoPlayer(battle));
+    const result = battle.result();
+    expect(result.win).toBe(true);
+
+    const goldBefore = s.gold;
+    const { state: after, summary } = applyBattleRewards(s, stage, result, new Rng(77));
+    expect(after.gold).toBe(goldBefore + summary.gold);
+    expect(after.stars[stage.id]).toBe(result.stars);
+    expect(summary.firstClear).toBe(true);
+    expect(after.gems).toBe(s.gems + stage.rewards.firstClearGems);
+    // ฮีโร่ที่ลงสนามต้องได้ EXP จริง
+    const gainers = Object.entries(summary.heroExp).filter(([, v]) => v > 0);
+    expect(gainers.length).toBeGreaterThan(0);
+    for (const [id, exp] of gainers) expect(after.roster[id]!.exp).toBeGreaterThanOrEqual(exp);
+    // ด่านนี้มีตารางดรอป → ต้องได้ของอย่างน้อย 1 ชนิด และต้องไม่เหลือไอเทมเสมือน
+    if (stage.rewards.dropTable) {
+      expect(Object.keys(summary.items).length + summary.gold).toBeGreaterThan(0);
+      for (const item of Object.keys(summary.items)) {
+        expect(item.startsWith('hero_shard_random') || item === 'essence_random').toBe(false);
+      }
+    }
+  });
+});
+
+describe('เซฟปลอม', () => {
+  it('เลเวลที่เกินเพดานของดาวถูกตัดลงมาเท่าเพดาน', () => {
+    const s = migrateState({
+      roster: { [HERO]: { level: 99, star: 3, exp: 0, awakened: false, skillLevels: {} } },
+      team: [HERO],
+    });
+    expect(s.roster[HERO]!.level).toBe(maxLevelForStar(3));
+  });
+
+  it('ปลุกพลังโดยดาวไม่ถึงถูกล้างทิ้ง', () => {
+    const s = migrateState({
+      roster: { [HERO]: { level: 5, star: 3, exp: 0, awakened: true, skillLevels: {} } },
+      team: [HERO],
+    });
+    expect(s.roster[HERO]!.awakened).toBe(false);
+  });
+});

@@ -31,10 +31,13 @@
     "gems": 300,
     "heroes": [
       "militia_swordsman",
+      "ironvow_gunnar",
+      "wolfkin_striker",
       "ranger_bryn",
       "cleric_seraphine",
-      "wolfkin_striker",
-      "quartermaster_pell"
+      "quartermaster_pell",
+      "hexer_morrin",
+      "plaguebinder_sorrel"
     ],
     "materials": {
       "hero_exp_potion": 24,

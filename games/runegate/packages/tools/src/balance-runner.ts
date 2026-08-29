@@ -6,7 +6,7 @@
  *   npm run balance -- --runs 1000
  *   npm run balance -- --stage ch1_03 --levels 10,15,20 --runs 300
  */
-import { stages, type Stage } from '@runegate/data';
+import { progression, stages, type Stage } from '@runegate/data';
 import { AutoPlayer, Battle, runHeadless } from '@runegate/sim';
 
 const DEFAULT_SQUAD = [
@@ -50,6 +50,8 @@ interface Args {
   stageIds: string[];
   levels: number[];
   quiet: boolean;
+  /** พิมพ์ตารางเสริมของ "ทีมเริ่มต้น" ด้วย (ค่าเริ่มต้น: พิมพ์) */
+  starterTeam: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -65,6 +67,7 @@ function parseArgs(argv: string[]): Args {
       .filter(Boolean)
       .map(Number),
     quiet: argv.includes('--quiet'),
+    starterTeam: !argv.includes('--no-starter-team'),
   };
 }
 
@@ -79,8 +82,8 @@ interface Row {
   seconds: number;
 }
 
-function simulate(stage: Stage, level: number, runs: number, seedBase: number): Row {
-  const squad = DEFAULT_SQUAD.map((heroId) => ({ heroId, level }));
+function simulate(stage: Stage, level: number, runs: number, seedBase: number, team = DEFAULT_SQUAD): Row {
+  const squad = team.map((heroId) => ({ heroId, level }));
   const row: Row = { stage, level, runs, wins: 0, stars: 0, baseHp: 0, leaks: 0, seconds: 0 };
   for (let i = 0; i < runs; i++) {
     const battle = new Battle({ stage, squad, seed: seedBase + i, recordEvents: false });
@@ -144,6 +147,26 @@ function main(): void {
     }
     console.log('─'.repeat(78));
     console.log(`รวม ${totalRuns} ด่าน ใน ${(elapsedMs / 1000).toFixed(1)} วินาที (${(elapsedMs / totalRuns).toFixed(1)} ms/ด่าน)\n`);
+  }
+
+  // ตารางเสริม (ไม่ใช่เกณฑ์ผ่าน/ไม่ผ่าน): ทีมที่ผู้เล่นใหม่มีจริง ก่อนเปิดระบบอัญเชิญใน Phase 5
+  // มีไว้ให้เห็นช่องว่างระหว่าง "ทีมมาตรฐานที่ใช้ตั้งเกณฑ์" กับ "ทีมที่เล่นได้จริงตอนนี้"
+  if (!args.quiet && args.starterTeam) {
+    const starter = progression.starter.heroes;
+    console.log(`ℹ️  ทีมเริ่มต้นที่ผู้เล่นใหม่มีจริง ${starter.length} ตัว (ข้อมูลประกอบ ไม่ใช่เกณฑ์ตัดสิน)\n`);
+    console.log('ด่าน        เลเวล  รอบ   ชนะ     ดาวเฉลี่ย  เลือดฐาน');
+    console.log('─'.repeat(56));
+    let s2 = 90210;
+    for (const c of combos) {
+      const r = simulate(c.stage, c.level, Math.min(runsPer, 20), s2, starter);
+      s2 += r.runs;
+      console.log(
+        `${r.stage.id.padEnd(11)} ${String(r.level).padStart(4)}  ${String(r.runs).padStart(4)}  ` +
+          `${((r.wins / r.runs) * 100).toFixed(0).padStart(4)}%  ${(r.stars / r.runs).toFixed(2).padStart(8)}  ` +
+          `${(r.baseHp / r.runs).toFixed(1).padStart(7)}/${r.stage.baseHp}`,
+      );
+    }
+    console.log('─'.repeat(56) + '\n');
   }
 
   // ตรวจเกณฑ์สมดุล

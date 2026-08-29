@@ -585,5 +585,324 @@
       },
       "scale": 1.08
     }
+  },
+  {
+    "id": "dawnguard_arien",
+    "name_th": "อารีน อัศวินรุ่งอรุณ",
+    "awakenName_th": "ตราประจำแสงอุษา",
+    "lore_th": "ยืนเฝ้าแนวหน้ามาสามสงคราม โล่บิ่นแต่ไม่เคยถอย",
+    "class": "swordsman",
+    "element": "light",
+    "rarity": 4,
+    "pos": "melee",
+    "cost": 21,
+    "blockCount": 3,
+    "range": 1.3,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 1180,
+      "atk": 78,
+      "def": 48,
+      "mres": 0.15,
+      "aspd": 0.75,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 46,
+      "atk": 2.4,
+      "def": 2.0
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 24,
+    "skills": [
+      "dawn_bulwark",
+      "radiant_mend",
+      "aegis_of_dawn"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "sword",
+      "palette": {
+        "main": "#d8c07a",
+        "accent": "#fff3d0",
+        "skin": "#e0b285"
+      },
+      "scale": 1.05
+    }
+  },
+  {
+    "id": "ironvow_gunnar",
+    "name_th": "กุนนาร์ คำสาบานเหล็ก",
+    "awakenName_th": "ทั่งเหล็กไม่แตก",
+    "lore_th": "สาบานกับหลุมศพพี่ชายว่าจะไม่ปล่อยให้ใครผ่านแนวนี้อีก",
+    "class": "swordsman",
+    "element": "fire",
+    "rarity": 3,
+    "pos": "melee",
+    "cost": 14,
+    "blockCount": 2,
+    "range": 1.25,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 840,
+      "atk": 62,
+      "def": 34,
+      "mres": 0.05,
+      "aspd": 0.85,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 32,
+      "atk": 2.1,
+      "def": 1.3
+    },
+    "deployWindupSec": 0.4,
+    "redeployCooldownSec": 20,
+    "skills": [
+      "iron_vow",
+      "ember_riposte"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "hammer",
+      "palette": {
+        "main": "#8f3a2a",
+        "accent": "#e0a45c",
+        "skin": "#c98f5e"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "stormcaller_vela",
+    "name_th": "เวลา ผู้เรียกพายุ",
+    "awakenName_th": "เสียงฟ้าเหนือหุบเขา",
+    "lore_th": "เดินทางตามพายุมาตั้งแต่เด็ก จนพายุเดินตามเธอกลับ",
+    "class": "mage",
+    "element": "wind",
+    "rarity": 5,
+    "pos": "ranged",
+    "cost": 26,
+    "blockCount": 0,
+    "range": 3.4,
+    "damageType": "magic",
+    "targetPriority": "first",
+    "base": {
+      "hp": 560,
+      "atk": 146,
+      "def": 14,
+      "mres": 0.1,
+      "aspd": 0.62,
+      "critRate": 0.07,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 20,
+      "atk": 6.4,
+      "def": 0.6
+    },
+    "deployWindupSec": 0.6,
+    "redeployCooldownSec": 28,
+    "skills": [
+      "chain_gale",
+      "static_charge",
+      "thunder_verdict"
+    ],
+    "sprite": {
+      "body": "arcane",
+      "weapon": "staff",
+      "palette": {
+        "main": "#3f7f74",
+        "accent": "#bff2e4",
+        "skin": "#e6c9a8"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "plaguebinder_sorrel",
+    "name_th": "ซอเรล ผู้ผูกโรค",
+    "awakenName_th": "ผู้เก็บลมหายใจสุดท้าย",
+    "lore_th": "เคยเป็นหมอประจำหมู่บ้าน ก่อนจะค้นพบว่าโรคก็เชื่อฟังคำสั่งได้",
+    "class": "mage",
+    "element": "dark",
+    "rarity": 3,
+    "pos": "ranged",
+    "cost": 12,
+    "blockCount": 0,
+    "range": 3.0,
+    "damageType": "magic",
+    "targetPriority": "first",
+    "base": {
+      "hp": 420,
+      "atk": 86,
+      "def": 10,
+      "mres": 0.1,
+      "aspd": 0.7,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 15,
+      "atk": 3.6,
+      "def": 0.4
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 20,
+    "skills": [
+      "withering_touch",
+      "grave_bloom"
+    ],
+    "sprite": {
+      "body": "spirit",
+      "weapon": "staff",
+      "palette": {
+        "main": "#4b3f6b",
+        "accent": "#9ee6a0",
+        "skin": "#cbb9d6"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "sunwarden_lyra",
+    "name_th": "ไลรา ผู้เฝ้าตะวัน",
+    "awakenName_th": "ธนูเที่ยงวัน",
+    "lore_th": "ยิงธนูเพื่อให้แสงส่องถึงที่ที่เงาซ่อนตัวอยู่",
+    "class": "archer",
+    "element": "light",
+    "rarity": 4,
+    "pos": "ranged",
+    "cost": 18,
+    "blockCount": 0,
+    "range": 3.5,
+    "damageType": "physical",
+    "targetPriority": "flying_first",
+    "base": {
+      "hp": 520,
+      "atk": 104,
+      "def": 16,
+      "mres": 0.05,
+      "aspd": 0.95,
+      "critRate": 0.08,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 19,
+      "atk": 4.2,
+      "def": 0.7
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 22,
+    "skills": [
+      "sunlit_arrow",
+      "sun_volley"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "bow",
+      "palette": {
+        "main": "#e2c15c",
+        "accent": "#fff6d8",
+        "skin": "#d9a066"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "tideheart_maren",
+    "name_th": "มาเรน หัวใจวารี",
+    "awakenName_th": "บทเพลงน้ำขึ้น",
+    "lore_th": "ผู้รักษาที่เชื่อว่าไม่มีบาดแผลไหนลึกกว่ามหาสมุทร",
+    "class": "acolyte",
+    "element": "water",
+    "rarity": 5,
+    "pos": "ranged",
+    "cost": 22,
+    "blockCount": 0,
+    "range": 3.4,
+    "damageType": "magic",
+    "targetPriority": "nearest",
+    "base": {
+      "hp": 660,
+      "atk": 112,
+      "def": 20,
+      "mres": 0.2,
+      "aspd": 0.72,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 24,
+      "atk": 4.6,
+      "def": 0.9
+    },
+    "deployWindupSec": 0.6,
+    "redeployCooldownSec": 26,
+    "skills": [
+      "tide_blessing",
+      "deep_current",
+      "high_tide"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "staff",
+      "palette": {
+        "main": "#2f6f8f",
+        "accent": "#cfeff7",
+        "skin": "#e6c9a8"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "windrunner_tam",
+    "name_th": "ตัม พ่อค้าลมกรด",
+    "awakenName_th": "เจ้าของเส้นทางสายลม",
+    "lore_th": "ขายของได้แม้ในดินแดนที่ไม่มีใครกล้าเข้าไป เพราะวิ่งเร็วกว่าอสูร",
+    "class": "merchant",
+    "element": "wind",
+    "rarity": 4,
+    "pos": "ranged",
+    "cost": 13,
+    "blockCount": 0,
+    "range": 2.8,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 480,
+      "atk": 64,
+      "def": 16,
+      "mres": 0.05,
+      "aspd": 0.9,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 18,
+      "atk": 2.4,
+      "def": 0.7
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 20,
+    "skills": [
+      "caravan_rhythm",
+      "caltrop_toss",
+      "windfall"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "dagger",
+      "palette": {
+        "main": "#6f8f4f",
+        "accent": "#e7f0c8",
+        "skin": "#d9a066"
+      },
+      "scale": 0.95
+    }
   }
 ]

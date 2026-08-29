@@ -885,5 +885,392 @@
     "vfx": "shadow",
     "cooldownSec": 15,
     "initialCooldownSec": 12
+  },
+  {
+    "id": "dawn_bulwark",
+    "name_th": "ปราการรุ่งอรุณ",
+    "desc_th": "DEF +20% และต้านเวท +0.1 ตลอดเวลาที่อยู่ในสนาม",
+    "type": "passive",
+    "trigger": "passive",
+    "effects": [
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "def",
+        "mult": 1.2
+      },
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "mres",
+        "add": 0.1
+      }
+    ],
+    "vfx": "buff"
+  },
+  {
+    "id": "radiant_mend",
+    "name_th": "แสงสมาน",
+    "desc_th": "ทุก 7 วิ ฟื้นฟูตัวเอง 90% ATK",
+    "type": "auto",
+    "trigger": "interval",
+    "cooldownSec": 7,
+    "initialCooldownSec": 3,
+    "effects": [
+      {
+        "kind": "heal",
+        "target": "self",
+        "ratio": 0.9
+      }
+    ],
+    "vfx": "heal"
+  },
+  {
+    "id": "aegis_of_dawn",
+    "name_th": "โล่แห่งอรุณ",
+    "desc_th": "มอบโล่ 30% ให้พันธมิตรรอบตัวนาน 10 วิ และผลักดันศัตรูที่บล็อคอยู่ 200% ATK",
+    "type": "ultimate",
+    "trigger": "manual",
+    "cooldownSec": 38,
+    "initialCooldownSec": 12,
+    "effects": [
+      {
+        "kind": "status",
+        "target": "allies_in_radius",
+        "radius": 3,
+        "status": "shield",
+        "durationSec": 10,
+        "potency": 0.3
+      },
+      {
+        "kind": "damage",
+        "target": "blocked_enemies",
+        "ratio": 2.0,
+        "damageType": "physical",
+        "element": "light"
+      }
+    ],
+    "vfx": "buff"
+  },
+  {
+    "id": "iron_vow",
+    "name_th": "คำสาบานเหล็ก",
+    "desc_th": "HP +15% และ DEF +15% ตลอดเวลาที่อยู่ในสนาม",
+    "type": "passive",
+    "trigger": "passive",
+    "effects": [
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "hp",
+        "mult": 1.15
+      },
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "def",
+        "mult": 1.15
+      }
+    ],
+    "vfx": "buff"
+  },
+  {
+    "id": "ember_riposte",
+    "name_th": "สวนกลับเพลิง",
+    "desc_th": "โจมตีมีโอกาส 35% แผดเผาศัตรูรอบเป้า 110% ATK",
+    "type": "passive",
+    "trigger": "on_attack",
+    "chance": 0.35,
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 1.3,
+        "ratio": 1.1,
+        "damageType": "physical",
+        "element": "fire"
+      }
+    ],
+    "vfx": "slash"
+  },
+  {
+    "id": "chain_gale",
+    "name_th": "ลมโซ่ตรวน",
+    "desc_th": "ทุก 8 วิ ปล่อยพายุรอบเป้าหมาย 150% ATK และทำให้ช้าลง 30% นาน 3 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "cooldownSec": 8,
+    "initialCooldownSec": 3,
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 2.4,
+        "ratio": 1.5,
+        "damageType": "magic",
+        "element": "wind"
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 2.4,
+        "status": "slow",
+        "durationSec": 3,
+        "potency": 0.3
+      }
+    ],
+    "vfx": "nova"
+  },
+  {
+    "id": "static_charge",
+    "name_th": "ประจุสถิต",
+    "desc_th": "ATK +20% ตลอดเวลาที่อยู่ในสนาม",
+    "type": "passive",
+    "trigger": "passive",
+    "effects": [
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "atk",
+        "mult": 1.2
+      }
+    ],
+    "vfx": "buff"
+  },
+  {
+    "id": "thunder_verdict",
+    "name_th": "คำตัดสินอัสนี",
+    "desc_th": "ฟาดสายฟ้าใส่ศัตรูทุกตัวในระยะ 400% ATK และมึนงง 2 วิ",
+    "type": "ultimate",
+    "trigger": "manual",
+    "cooldownSec": 44,
+    "initialCooldownSec": 14,
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_range",
+        "ratio": 4.0,
+        "damageType": "magic",
+        "element": "wind"
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_range",
+        "status": "stun",
+        "durationSec": 2,
+        "chance": 0.7
+      }
+    ],
+    "vfx": "nova"
+  },
+  {
+    "id": "withering_touch",
+    "name_th": "สัมผัสเหี่ยวเฉา",
+    "desc_th": "โจมตีทำให้ศัตรูติดพิษ 30% ATK ต่อวินาที นาน 4 วิ",
+    "type": "passive",
+    "trigger": "on_attack",
+    "chance": 0.5,
+    "effects": [
+      {
+        "kind": "status",
+        "target": "current_target",
+        "status": "poison",
+        "durationSec": 4,
+        "potency": 0.3
+      }
+    ],
+    "vfx": "shadow"
+  },
+  {
+    "id": "grave_bloom",
+    "name_th": "ดอกไม้หลุมศพ",
+    "desc_th": "ทุก 11 วิ แผ่ไอพิษรอบเป้าหมาย 120% ATK",
+    "type": "auto",
+    "trigger": "interval",
+    "cooldownSec": 11,
+    "initialCooldownSec": 5,
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 1.9,
+        "ratio": 1.2,
+        "damageType": "magic",
+        "element": "dark"
+      }
+    ],
+    "vfx": "shadow"
+  },
+  {
+    "id": "sunlit_arrow",
+    "name_th": "ศรต้องแสง",
+    "desc_th": "ความเสียหายต่อศัตรูบิน +50% และเปิดเผยศัตรูล่องหนในระยะ 3 ช่อง",
+    "type": "passive",
+    "trigger": "passive",
+    "effects": [
+      {
+        "kind": "trait",
+        "trait": "anti_air",
+        "value": 0.5
+      },
+      {
+        "kind": "reveal",
+        "radius": 3
+      }
+    ],
+    "vfx": "arrow"
+  },
+  {
+    "id": "sun_volley",
+    "name_th": "ห่าศรตะวัน",
+    "desc_th": "ทุก 10 วิ ระดมยิงศัตรูรอบเป้าหมาย 3 ครั้ง ครั้งละ 80% ATK",
+    "type": "auto",
+    "trigger": "interval",
+    "cooldownSec": 10,
+    "initialCooldownSec": 4,
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 2.0,
+        "ratio": 0.8,
+        "hits": 3,
+        "damageType": "physical",
+        "element": "light"
+      }
+    ],
+    "vfx": "arrow"
+  },
+  {
+    "id": "tide_blessing",
+    "name_th": "พรแห่งวารี",
+    "desc_th": "ทุก 5 วิ ฟื้นฟูพันธมิตรที่เลือดน้อยที่สุด 190% ATK",
+    "type": "auto",
+    "trigger": "interval",
+    "cooldownSec": 5,
+    "initialCooldownSec": 2,
+    "effects": [
+      {
+        "kind": "heal",
+        "target": "lowest_hp_ally",
+        "ratio": 1.9
+      }
+    ],
+    "vfx": "heal"
+  },
+  {
+    "id": "deep_current",
+    "name_th": "กระแสลึก",
+    "desc_th": "เพิ่ม DEF ให้พันธมิตรรอบตัว 20% ตลอดเวลาที่อยู่ในสนาม",
+    "type": "passive",
+    "trigger": "passive",
+    "effects": [
+      {
+        "kind": "stat_mod",
+        "target": "allies_in_radius",
+        "stat": "def",
+        "mult": 1.2
+      }
+    ],
+    "vfx": "buff"
+  },
+  {
+    "id": "high_tide",
+    "name_th": "น้ำขึ้นสูงสุด",
+    "desc_th": "ฟื้นฟูพันธมิตรรอบตัว 300% ATK มอบโล่ 30% นาน 12 วิ และผลักศัตรูรอบตัวให้ช้าลง 45% นาน 5 วิ",
+    "type": "ultimate",
+    "trigger": "manual",
+    "cooldownSec": 42,
+    "initialCooldownSec": 12,
+    "effects": [
+      {
+        "kind": "heal",
+        "target": "allies_in_radius",
+        "radius": 3.5,
+        "ratio": 3.0
+      },
+      {
+        "kind": "status",
+        "target": "allies_in_radius",
+        "radius": 3.5,
+        "status": "shield",
+        "durationSec": 12,
+        "potency": 0.3
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 2.5,
+        "status": "slow",
+        "durationSec": 5,
+        "potency": 0.45
+      }
+    ],
+    "vfx": "heal"
+  },
+  {
+    "id": "caravan_rhythm",
+    "name_th": "จังหวะกองคาราวาน",
+    "desc_th": "เพิ่มอัตรางอกแต้มวาง +0.45 ต่อวินาที",
+    "type": "passive",
+    "trigger": "passive",
+    "effects": [
+      {
+        "kind": "cost_rate",
+        "perSec": 0.45
+      }
+    ],
+    "vfx": "coin"
+  },
+  {
+    "id": "caltrop_toss",
+    "name_th": "โปรยเหล็กแหลม",
+    "desc_th": "ทุก 9 วิ โปรยเหล็กแหลมรอบเป้าหมาย 90% ATK และทำให้ช้าลง 40% นาน 4 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "cooldownSec": 9,
+    "initialCooldownSec": 3,
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 1.8,
+        "ratio": 0.9,
+        "damageType": "physical"
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 1.8,
+        "status": "slow",
+        "durationSec": 4,
+        "potency": 0.4
+      }
+    ],
+    "vfx": "coin"
+  },
+  {
+    "id": "windfall",
+    "name_th": "ลาภลอย",
+    "desc_th": "ได้แต้มวางทันที 14 แต้ม และเพิ่มความเร็วโจมตีพันธมิตรรอบตัว 25% นาน 10 วิ",
+    "type": "ultimate",
+    "trigger": "manual",
+    "cooldownSec": 32,
+    "initialCooldownSec": 8,
+    "effects": [
+      {
+        "kind": "cost_gain",
+        "amount": 14
+      },
+      {
+        "kind": "stat_mod",
+        "target": "allies_in_radius",
+        "radius": 3,
+        "stat": "aspd",
+        "mult": 1.25,
+        "durationSec": 10
+      }
+    ],
+    "vfx": "coin"
   }
 ]

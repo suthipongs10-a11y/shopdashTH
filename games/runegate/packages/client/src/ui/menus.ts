@@ -1,8 +1,12 @@
 import { enemies, getWeapon, heroes, stages, turrets, type Enemy, type Hero, type Stage, type Turret } from '@runegate/data';
+import { battleSquad, TEAM_SIZE, toggleTeamMember, type PlayerState } from '@runegate/meta';
 import { portraitDataUrl } from '../render/sprites.js';
-import { CLASS_TH, ELEMENT_COLOR, ELEMENT_TH, RACE_TH, TIER_TH, TRAIT_TH, h, progress, starHtml, toast, type EnemyTier } from './common.js';
+import { CLASS_TH, ELEMENT_COLOR, ELEMENT_TH, RACE_TH, TIER_TH, TRAIT_TH, h, starHtml, toast, type EnemyTier } from './common.js';
+import { walletBar } from './heroes.js';
+import { save } from './save.js';
 
-const SQUAD_SIZE = 8;
+/** ทีมที่ส่งเข้าด่าน — โครงตรงกับ `SquadEntry` ของ sim */
+export type BattleSquad = ReturnType<typeof battleSquad>;
 
 /** เลเวลที่แนะนำต่อด่าน (ตรงกับเกณฑ์ใน balance runner) */
 export function recommendedLevel(stage: Stage): number {
@@ -10,9 +14,14 @@ export function recommendedLevel(stage: Stage): number {
   return table[stage.id] ?? 1 + (stage.index - 1) * 7;
 }
 
-export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: () => void, onArsenal: () => void): HTMLElement {
+export function stageSelectScreen(
+  onPick: (stage: Stage) => void,
+  onBestiary: () => void,
+  onArsenal: () => void,
+  onHeroes: () => void,
+): HTMLElement {
   const cards = stages.map((s) => {
-    const best = progress.bestStars(s.id);
+    const best = save.bestStars(s.id);
     return h(
       'button',
       { class: 'stage-card', onclick: () => onPick(s) },
@@ -45,8 +54,9 @@ export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: ()
         { class: 'brand' },
         h('h1', { class: 'wordmark' }, 'RUNEGATE'),
         h('p', { class: 'sub-th' }, 'ปิดประตูมิติก่อนกองทัพอสูรจะทะลักเข้ามา'),
-        h('p', {}, `ดาวสะสม ★ ${progress.totalStars()} / ${stages.length * 3}`),
+        h('p', {}, `ดาวสะสม ★ ${save.totalStars()} / ${stages.length * 3}`),
       ),
+      walletBar(),
       h('div', { class: 'section-title' }, 'วิธีเล่น'),
       h(
         'ol',
@@ -64,25 +74,22 @@ export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: ()
         { class: 'codex-cta' },
         h('button', { class: 'ghost', onclick: onBestiary }, `📖 สมุดมอนสเตอร์ (${enemies.length} ชนิด)`),
         h('button', { class: 'ghost', onclick: onArsenal }, `🔧 คลังเครื่องยิง (${turrets.length} แบบ)`),
+        h('button', { class: 'ghost', onclick: onHeroes }, `🛡️ คลังฮีโร่ (${heroes.length} นาย)`),
         h('span', {}, `ธรรมดา ${count('normal')} · มินิบอส ${count('elite')} · บอส MVP ${count('mvp')}`),
       ),
-      h(
-        'div',
-        { class: 'section-title' },
-        `กองกำลังรูนเกต (${heroes.length} นาย)`,
-      ),
-      h('div', { class: 'hero-grid' }, ...heroes.map((hero) => heroCard(hero, false))),
+      h('div', { class: 'section-title' }, 'กองกำลังของคุณ'),
+      teamStrip(save.state, onHeroes),
     ),
   );
 }
 
-function heroCard(hero: Hero, selected: boolean, onclick?: () => void): HTMLElement {
+function heroCard(hero: Hero, selected: boolean, onclick?: () => void, badge?: string): HTMLElement {
   const img = h('img', { class: 'pic', src: portraitDataUrl(hero.sprite), alt: hero.name_th });
   return h(
     'div',
     { class: `hero-card${selected ? ' selected' : ''}`, 'data-hero': hero.id, ...(onclick ? { onclick } : {}) },
     h('span', { class: 'rar' }, '★'.repeat(hero.rarity)),
-    h('span', { class: 'cost' }, String(hero.cost)),
+    h('span', { class: 'cost' }, badge ?? String(hero.cost)),
     img,
     h('div', { class: 'nm' }, hero.name_th),
     h(
@@ -94,99 +101,96 @@ function heroCard(hero: Hero, selected: boolean, onclick?: () => void): HTMLElem
   );
 }
 
+/** แถบทีมย่อบนหน้าเลือกด่าน */
+function teamStrip(state: PlayerState, onHeroes: () => void): HTMLElement {
+  if (state.team.length === 0) {
+    return h(
+      'div',
+      { class: 'team-strip empty' },
+      h('span', {}, 'ยังไม่ได้จัดทีม'),
+      h('button', { class: 'ghost', onclick: onHeroes }, 'จัดทีม'),
+    );
+  }
+  return h(
+    'div',
+    { class: 'team-strip', onclick: onHeroes },
+    ...state.team.map((id) => {
+      const hero = heroes.find((x) => x.id === id);
+      const hs = state.roster[id];
+      if (!hero || !hs) return h('span', {});
+      return h(
+        'div',
+        { class: 'team-chip' },
+        h('img', { src: portraitDataUrl(hero.sprite), alt: hero.name_th }),
+        h('span', {}, `${hero.name_th.split(' ')[0]} Lv.${hs.level}`),
+      );
+    }),
+  );
+}
+
+/** หน้าจัดทีมก่อนลงด่าน — เลือกได้เฉพาะฮีโร่ที่มีในคลัง เลเวลมาจากที่อัพไว้จริง */
 export function squadScreen(
   stage: Stage,
-  onStart: (squad: string[], level: number) => void,
+  onStart: (squad: BattleSquad) => void,
   onBack: () => void,
+  onHeroes: () => void,
 ): HTMLElement {
-  const saved = progress.squad().filter((id) => heroes.some((x) => x.id === id));
-  const picked = new Set<string>(saved.length > 0 ? saved.slice(0, SQUAD_SIZE) : defaultSquad());
-  let level = progress.level() || recommendedLevel(stage);
-
   const grid = h('div', { class: 'hero-grid' });
   const counter = h('div', { class: 'grow' });
   const startBtn = h('button', { class: 'primary' }, 'เริ่มด่าน');
+  const wallet = h('div', { class: 'wallet-slot' });
   const root = h('div', { class: 'screen' });
 
   const refresh = (): void => {
+    const s = save.state;
+    const owned = heroes.filter((x) => s.roster[x.id]);
     grid.replaceChildren(
-      ...heroes.map((hero) =>
-        heroCard(hero, picked.has(hero.id), () => {
-          if (picked.has(hero.id)) picked.delete(hero.id);
-          else if (picked.size >= SQUAD_SIZE) {
-            toast(root, `เลือกได้สูงสุด ${SQUAD_SIZE} ตัว`);
-            return;
-          } else picked.add(hero.id);
-          refresh();
-        }),
-      ),
+      ...owned.map((hero) => {
+        const hs = s.roster[hero.id]!;
+        return heroCard(
+          hero,
+          s.team.includes(hero.id),
+          () => {
+            const res = save.apply(toggleTeamMember(save.state, hero.id));
+            if (!res.ok) toast(root, res.reason_th);
+            refresh();
+          },
+          `Lv.${hs.level}`,
+        );
+      }),
     );
-    counter.textContent = `เลือกแล้ว ${picked.size}/${SQUAD_SIZE} ตัว`;
-    startBtn.toggleAttribute('disabled', picked.size === 0);
+    counter.textContent = `เลือกแล้ว ${s.team.length}/${TEAM_SIZE} ตัว`;
+    startBtn.toggleAttribute('disabled', s.team.length === 0);
+    wallet.replaceChildren(walletBar());
   };
 
-  const levelLabel = h('b', {}, `Lv.${level}`);
-  const slider = h('input', {
-    type: 'range',
-    min: '1',
-    max: '40',
-    value: String(level),
-    oninput: (e: Event) => {
-      level = Number((e.target as HTMLInputElement).value);
-      levelLabel.textContent = `Lv.${level}`;
-    },
-  });
-
-  startBtn.addEventListener('click', () => {
-    progress.setSquad([...picked]);
-    progress.setLevel(level);
-    onStart([...picked], level);
-  });
+  startBtn.addEventListener('click', () => onStart(battleSquad(save.state)));
 
   refresh();
   root.append(
     h(
       'div',
       { class: 'screen-inner' },
-      h(
-        'div',
-        { class: 'brand' },
-        h('h1', {}, stage.name_th),
-        h('p', {}, stage.brief_th),
-      ),
+      h('div', { class: 'brand' }, h('h1', {}, stage.name_th), h('p', {}, stage.brief_th)),
+      wallet,
       h('div', { class: 'section-title' }, 'จัดกองกำลัง'),
-      grid,
       h(
-        'div',
-        { class: 'level-row' },
-        h('span', {}, 'เลเวลฮีโร่ (ชั่วคราวสำหรับทดสอบ — ระบบเลเวลจริงอยู่ Phase 4)'),
-        levelLabel,
+        'p',
+        { class: 'tier-note' },
+        `แนะนำเลเวล ${recommendedLevel(stage)} ขึ้นไป · แตะการ์ดเพื่อเข้า/ออกทีม · อัพฮีโร่ได้ที่ปุ่ม "คลังฮีโร่"`,
       ),
-      slider,
+      grid,
       h(
         'div',
         { class: 'sticky-actions' },
         h('button', { class: 'ghost', onclick: onBack }, '← กลับ'),
+        h('button', { class: 'ghost', onclick: onHeroes }, '🛡️ คลังฮีโร่'),
         counter,
         startBtn,
       ),
     ),
   );
   return root;
-}
-
-function defaultSquad(): string[] {
-  const order = [
-    'warden_kael',
-    'forgemaster_durn',
-    'militia_swordsman',
-    'sylvane_archer',
-    'archmage_ignis',
-    'cleric_seraphine',
-    'hexer_morrin',
-    'quartermaster_pell',
-  ];
-  return order.filter((id) => heroes.some((h2) => h2.id === id)).slice(0, SQUAD_SIZE);
 }
 
 

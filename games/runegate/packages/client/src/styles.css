@@ -155,8 +155,72 @@ button.ghost { background: rgba(255,255,255,.06); }
   display: flex; gap: 10px; align-items: center;
 }
 .sticky-actions .grow { flex: 1; font-size: 13px; color: var(--muted); }
-.level-row { display: flex; align-items: center; gap: 10px; margin: 14px 0 4px; font-size: 13px; color: var(--muted); }
-.level-row input { flex: 1; accent-color: var(--brass); }
+
+/* ---------------- คลังฮีโร่ / อัพเกรด ---------------- */
+.wallet, .wallet-slot > .wallet {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px;
+}
+.wallet span { font-size: 13px; font-weight: 600; color: var(--brass); }
+
+.hero-card.owned .cost { color: var(--brass); }
+.hero-card.in-team { border-color: var(--rune-dim); padding-bottom: 22px; }
+.hero-card.locked { opacity: .45; filter: grayscale(.6); }
+.hero-card .team-flag {
+  position: absolute; bottom: 0; left: 0; right: 0; font-size: 10px; padding: 2px 0;
+  background: rgba(127,212,232,.18); color: var(--rune);
+}
+
+.team-strip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; cursor: pointer; }
+.team-strip.empty { justify-content: space-between; align-items: center; color: var(--muted); font-size: 13px; }
+.team-chip { flex: 0 0 auto; width: 74px; text-align: center; }
+.team-chip img { width: 100%; aspect-ratio: 1; border-radius: 8px; image-rendering: pixelated;
+  background: radial-gradient(60% 60% at 50% 40%, rgba(255,255,255,.10), transparent 70%); }
+.team-chip span { display: block; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+.hero-detail .hd-head { display: flex; gap: 14px; align-items: flex-start; margin-top: 14px; }
+.hd-pic { width: 116px; height: 116px; border-radius: 12px; image-rendering: pixelated; flex: 0 0 auto;
+  background: radial-gradient(60% 60% at 50% 40%, rgba(255,255,255,.10), transparent 70%); }
+.hd-title h2 { margin: 0; font-size: 21px; }
+.hd-star { font-size: 15px; letter-spacing: 2px; color: var(--brass-dim); }
+.hd-star .on { color: var(--brass); }
+.hd-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.hd-tags .awk { color: var(--rune); }
+.hd-title .lore { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+.hd-level { margin-top: 14px; }
+.hd-level .row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+.hd-level .bar { height: 8px; background: rgba(255,255,255,.08); border-radius: 5px; overflow: hidden; }
+.hd-level .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--rune-dim), var(--rune)); }
+
+.stat-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); margin-top: 14px; }
+.stat-box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.stat-box .k { display: block; font-size: 11px; color: var(--muted); }
+.stat-box .v { display: block; font-size: 15px; font-weight: 700; }
+
+.up-list { display: flex; flex-direction: column; gap: 8px; }
+.up-row {
+  display: flex; gap: 10px; align-items: center; justify-content: space-between;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px;
+}
+.up-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.up-text b { font-size: 13.5px; }
+.up-text span { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+.up-text .cost-note { color: var(--brass); }
+.up-btns { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+button.small { padding: 6px 10px; font-size: 12.5px; }
+
+.reward-block { margin: 6px 0 10px; }
+.reward-block b { font-size: 12px; color: var(--brass); }
+.chip.gain { background: rgba(110,231,168,.14); color: var(--good); font-size: 11px; padding: 2px 7px; }
+
+@media (max-width: 420px) {
+  .up-row { flex-direction: column; align-items: stretch; }
+  .up-btns { flex-direction: row; }
+  .up-btns button { flex: 1; }
+  .hero-detail .hd-head { flex-direction: column; align-items: center; text-align: center; }
+  .hd-tags { justify-content: center; }
+}
 
 /* ---------------- HUD ในด่าน ---------------- */
 .topbar {
@@ -302,7 +366,7 @@ button.ghost { background: rgba(255,255,255,.06); }
 .modal .btns button { flex: 1; }
 
 .toast {
-  position: absolute; left: 50%; top: 74px; transform: translateX(-50%);
+  position: fixed; left: 50%; top: 74px; z-index: 40; transform: translateX(-50%);
   background: rgba(8,13,19,.95); border: 1px solid var(--ember); color: #ffd9c4;
   padding: 8px 14px; border-radius: 10px; font-size: 13px; pointer-events: none;
   animation: toastIn .18s ease-out;
