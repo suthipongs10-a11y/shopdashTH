@@ -1,0 +1,233 @@
+[
+  {
+    "id": "card_restless_shade",
+    "name_th": "การ์ดเงาไร้สุข",
+    "sourceEnemy": "restless_shade",
+    "dropRate": 0.01,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "hp",
+        "pct": 8
+      }
+    ],
+    "desc_th": "HP +8%"
+  },
+  {
+    "id": "card_ghoul",
+    "name_th": "การ์ดกูล",
+    "sourceEnemy": "ghoul",
+    "dropRate": 0.01,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "undead",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าอันเดด +15%"
+  },
+  {
+    "id": "card_wraith",
+    "name_th": "การ์ดเรธ",
+    "sourceEnemy": "wraith",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "aspd",
+        "pct": 7
+      }
+    ],
+    "desc_th": "ความเร็วโจมตี +7%"
+  },
+  {
+    "id": "card_ember_wolf",
+    "name_th": "การ์ดหมาป่าเพลิง",
+    "sourceEnemy": "ember_wolf",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "beast",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าสัตว์ +15%"
+  },
+  {
+    "id": "card_bog_serpent",
+    "name_th": "การ์ดอสรพิษหนองน้ำ",
+    "sourceEnemy": "bog_serpent",
+    "dropRate": 0.006,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "def",
+        "pct": 12
+      }
+    ],
+    "desc_th": "DEF +12%"
+  },
+  {
+    "id": "card_scorpion",
+    "name_th": "การ์ดแมงป่องเกราะหิน",
+    "sourceEnemy": "carapace_scorpion",
+    "dropRate": 0.006,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "on_hit_status",
+        "status": "poison",
+        "chance": 0.15,
+        "durationSec": 4,
+        "potency": 0.12
+      }
+    ],
+    "desc_th": "โจมตีมีโอกาส 15% ทำให้ติดพิษ 4 วิ"
+  },
+  {
+    "id": "card_venom_wasp",
+    "name_th": "การ์ดต่อพิษ",
+    "sourceEnemy": "venom_wasp",
+    "dropRate": 0.01,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "insect",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าแมลง +15%"
+  },
+  {
+    "id": "card_cult_acolyte",
+    "name_th": "การ์ดสาวกลัทธิมืด",
+    "sourceEnemy": "cult_acolyte",
+    "dropRate": 0.005,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "human",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่ามนุษย์ +15%"
+  },
+  {
+    "id": "card_revenant",
+    "name_th": "การ์ดอัศวินคืนชีพ",
+    "sourceEnemy": "revenant_knight",
+    "dropRate": 0.005,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "crit_rate",
+        "pct": 6
+      }
+    ],
+    "desc_th": "อัตราคริติคอล +6%"
+  },
+  {
+    "id": "card_shadow_stalker",
+    "name_th": "การ์ดนักล่าเงา",
+    "sourceEnemy": "shadow_stalker",
+    "dropRate": 0.005,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "element_damage",
+        "element": "wind",
+        "pct": 12
+      }
+    ],
+    "desc_th": "ความเสียหายธาตุลม +12%"
+  },
+  {
+    "id": "card_ogre",
+    "name_th": "การ์ดออร์คยักษ์",
+    "sourceEnemy": "ogre_bruiser",
+    "dropRate": 0.003,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "demon",
+        "pct": 25
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าปีศาจ +25%"
+  },
+  {
+    "id": "card_night_terror",
+    "name_th": "การ์ดฝันร้ายราตรี",
+    "sourceEnemy": "night_terror",
+    "dropRate": 0.003,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "on_hit_status",
+        "status": "stun",
+        "chance": 0.05,
+        "durationSec": 1,
+        "potency": 0
+      }
+    ],
+    "desc_th": "โจมตีมีโอกาส 5% ทำให้มึนงง 1 วิ"
+  },
+  {
+    "id": "card_banshee",
+    "name_th": "การ์ดแบนชี",
+    "sourceEnemy": "banshee",
+    "dropRate": 0.002,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "gold_bonus",
+        "pct": 10
+      }
+    ],
+    "desc_th": "ฆ่าศัตรูได้ Gold +10%"
+  },
+  {
+    "id": "card_malakar",
+    "name_th": "การ์ดมาลาการ์",
+    "sourceEnemy": "malakar",
+    "dropRate": 0.0005,
+    "shardsToCraft": 50,
+    "slot": "any",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "atk",
+        "pct": 20
+      },
+      {
+        "kind": "cost_down",
+        "value": 1
+      }
+    ],
+    "desc_th": "ATK +20% และลดแต้มวางลง 1"
+  }
+]

@@ -1,0 +1,204 @@
+{
+  "id": "ch1_02",
+  "name_th": "สุสานหมอกจัด",
+  "chapter": 1,
+  "index": 2,
+  "difficulty": "normal",
+  "brief_th": "ศัตรูมาสองทางพร้อมกัน และมีนักล่าเงาล่องหนปนมาด้วย — ต้องมีตัวเปิดล่องหน",
+  "energyCost": 7,
+  "grid": {
+    "w": 16,
+    "h": 9
+  },
+  "tiles": [
+    "................",
+    "SRRRRRRRR.......",
+    "..GGHH..R.G.....",
+    ".....HH.R.......",
+    "........RRRRRRRE",
+    ".....HH.R..HH...",
+    "..GGHH..R.G.....",
+    "SRRRRRRRR.......",
+    "................"
+  ],
+  "paths": {
+    "north": [
+      [
+        0,
+        1
+      ],
+      [
+        8,
+        1
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        15,
+        4
+      ]
+    ],
+    "south": [
+      [
+        0,
+        7
+      ],
+      [
+        8,
+        7
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        15,
+        4
+      ]
+    ]
+  },
+  "baseHp": 10,
+  "deploy": {
+    "initialCost": 18,
+    "costPerSec": 1.05,
+    "deployLimit": 7,
+    "retreatRefund": 0.5
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "startSec": 5,
+      "label_th": "สองทางพร้อมกัน",
+      "groups": [
+        {
+          "enemy": "restless_shade",
+          "count": 4,
+          "intervalSec": 1.5,
+          "path": "north"
+        },
+        {
+          "enemy": "restless_shade",
+          "count": 4,
+          "intervalSec": 1.5,
+          "path": "south"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "startSec": 26,
+      "label_th": "ฝูงต่อพิษ",
+      "groups": [
+        {
+          "enemy": "venom_wasp",
+          "count": 8,
+          "intervalSec": 0.6,
+          "path": "north"
+        },
+        {
+          "enemy": "ghoul",
+          "count": 6,
+          "intervalSec": 0.8,
+          "delaySec": 2,
+          "path": "south"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "startSec": 48,
+      "label_th": "สาวกลัทธิกับอัศวินคืนชีพ",
+      "groups": [
+        {
+          "enemy": "cult_acolyte",
+          "count": 2,
+          "intervalSec": 3,
+          "delaySec": 4,
+          "path": "north"
+        },
+        {
+          "enemy": "revenant_knight",
+          "count": 4,
+          "intervalSec": 1.8,
+          "path": "north"
+        },
+        {
+          "enemy": "ember_wolf",
+          "count": 4,
+          "intervalSec": 1.6,
+          "path": "south"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "startSec": 74,
+      "label_th": "นักล่าเงาเข้าโจมตี",
+      "groups": [
+        {
+          "enemy": "shadow_stalker",
+          "count": 4,
+          "intervalSec": 2,
+          "path": "south"
+        },
+        {
+          "enemy": "wraith",
+          "count": 3,
+          "intervalSec": 2,
+          "path": "north"
+        },
+        {
+          "enemy": "bog_serpent",
+          "count": 2,
+          "intervalSec": 5,
+          "delaySec": 4,
+          "path": "south"
+        }
+      ]
+    },
+    {
+      "id": "w5",
+      "startSec": 104,
+      "label_th": "ฝันร้ายนำทัพ",
+      "groups": [
+        {
+          "enemy": "night_terror",
+          "count": 2,
+          "intervalSec": 6,
+          "path": "north"
+        },
+        {
+          "enemy": "carapace_scorpion",
+          "count": 3,
+          "intervalSec": 3,
+          "path": "south"
+        },
+        {
+          "enemy": "ghoul",
+          "count": 8,
+          "intervalSec": 0.6,
+          "delaySec": 6,
+          "path": "north"
+        }
+      ]
+    }
+  ],
+  "stars": {
+    "two": {
+      "type": "base_hp_pct",
+      "value": 80
+    },
+    "three": {
+      "type": "max_heroes",
+      "value": 6
+    }
+  },
+  "rewards": {
+    "gold": 1300,
+    "exp": 180,
+    "firstClearGems": 60,
+    "dropTable": "drop_ch1_common"
+  }
+}

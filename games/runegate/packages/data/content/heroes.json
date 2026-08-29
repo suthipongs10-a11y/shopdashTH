@@ -1,0 +1,589 @@
+[
+  {
+    "id": "warden_kael",
+    "name_th": "เคล ผู้เฝ้าประตู",
+    "awakenName_th": "เคล ตราประทับรูน",
+    "lore_th": "อัศวินร่างยักษ์ผู้สาบานว่าจะไม่ให้สิ่งใดผ่านประตูไปได้ แม้ต้องยืนตายคาที่",
+    "class": "swordsman",
+    "element": "dark",
+    "rarity": 5,
+    "pos": "melee",
+    "cost": 26,
+    "blockCount": 3,
+    "range": 0.95,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 900,
+      "atk": 90,
+      "def": 40,
+      "mres": 0.15,
+      "aspd": 0.85,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 45,
+      "atk": 3.2,
+      "def": 1.6
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 30,
+    "skills": [
+      "guard_stance",
+      "shield_wall",
+      "warden_judgment"
+    ],
+    "sprite": {
+      "body": "hulk",
+      "weapon": "hammer",
+      "palette": {
+        "main": "#3a4a63",
+        "accent": "#c8b06a",
+        "skin": "#8a93a8"
+      },
+      "scale": 1.25
+    }
+  },
+  {
+    "id": "militia_swordsman",
+    "name_th": "ทหารอาสาชายแดน",
+    "awakenName_th": "ขุนพลประจำกอง",
+    "lore_th": "ชาวบ้านที่หยิบดาบขึ้นมาเพราะกองทัพหลวงมาไม่ทัน",
+    "class": "swordsman",
+    "element": "water",
+    "rarity": 3,
+    "pos": "melee",
+    "cost": 12,
+    "blockCount": 2,
+    "range": 0.9,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 620,
+      "atk": 60,
+      "def": 26,
+      "mres": 0.05,
+      "aspd": 0.9,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 26,
+      "atk": 2,
+      "def": 1
+    },
+    "deployWindupSec": 0.4,
+    "redeployCooldownSec": 20,
+    "skills": [
+      "frontier_grit",
+      "sweeping_strike"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "sword",
+      "palette": {
+        "main": "#35618f",
+        "accent": "#cdd6e0",
+        "skin": "#d9a066"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "varr_beastkin",
+    "name_th": "วาร์ เผ่าอสูรกาย",
+    "awakenName_th": "วาร์ เขี้ยวพายุ",
+    "lore_th": "ครึ่งคนครึ่งสัตว์จากดินแดนเหนือ เร็วจนสายตาตามไม่ทัน",
+    "class": "thief",
+    "element": "wind",
+    "rarity": 5,
+    "pos": "melee",
+    "cost": 22,
+    "blockCount": 1,
+    "range": 1,
+    "damageType": "physical",
+    "targetPriority": "lowest_hp",
+    "base": {
+      "hp": 620,
+      "atk": 150,
+      "def": 18,
+      "mres": 0.1,
+      "aspd": 1.5,
+      "critRate": 0.12,
+      "critDmg": 1.6
+    },
+    "growth": {
+      "hp": 24,
+      "atk": 6.2,
+      "def": 0.6
+    },
+    "deployWindupSec": 0.3,
+    "redeployCooldownSec": 25,
+    "skills": [
+      "wind_fury",
+      "rending_claw",
+      "beast_leap"
+    ],
+    "sprite": {
+      "body": "beast",
+      "weapon": "claw",
+      "palette": {
+        "main": "#e8e3d6",
+        "accent": "#4aa6c9",
+        "skin": "#efe7d2"
+      },
+      "scale": 1.05
+    }
+  },
+  {
+    "id": "nyx_shadowblade",
+    "name_th": "นิกซ์ ใบมีดเงา",
+    "awakenName_th": "นิกซ์ มัจจุราชไร้เสียง",
+    "lore_th": "ไม่มีใครเคยเห็นหน้า มีแต่คนเห็นรอยมีดตอนที่สายเกินไปแล้ว",
+    "class": "thief",
+    "element": "dark",
+    "rarity": 4,
+    "pos": "melee",
+    "cost": 18,
+    "blockCount": 1,
+    "range": 1,
+    "damageType": "physical",
+    "targetPriority": "elite_first",
+    "base": {
+      "hp": 480,
+      "atk": 130,
+      "def": 12,
+      "mres": 0.05,
+      "aspd": 1.15,
+      "critRate": 0.15,
+      "critDmg": 1.7
+    },
+    "growth": {
+      "hp": 18,
+      "atk": 5.2,
+      "def": 0.5
+    },
+    "deployWindupSec": 0.3,
+    "redeployCooldownSec": 22,
+    "skills": [
+      "shadow_strike",
+      "truesight",
+      "assassinate"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "dagger",
+      "palette": {
+        "main": "#262233",
+        "accent": "#7f56c9",
+        "skin": "#c98f5f"
+      },
+      "scale": 0.98
+    }
+  },
+  {
+    "id": "wolfkin_striker",
+    "name_th": "วูล์ฟคิน นักตะปบ",
+    "awakenName_th": "วูล์ฟคิน จ่าฝูง",
+    "lore_th": "ลูกฝูงหมาป่าที่โตมากับกองไฟกองแรกของหมู่บ้าน",
+    "class": "thief",
+    "element": "fire",
+    "rarity": 3,
+    "pos": "melee",
+    "cost": 10,
+    "blockCount": 1,
+    "range": 0.95,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 430,
+      "atk": 95,
+      "def": 10,
+      "mres": 0.05,
+      "aspd": 1.3,
+      "critRate": 0.08,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 15,
+      "atk": 3.6,
+      "def": 0.4
+    },
+    "deployWindupSec": 0.3,
+    "redeployCooldownSec": 18,
+    "skills": [
+      "rending_claw"
+    ],
+    "sprite": {
+      "body": "beast",
+      "weapon": "claw",
+      "palette": {
+        "main": "#8d5524",
+        "accent": "#e8703d",
+        "skin": "#c68642"
+      },
+      "scale": 0.9
+    }
+  },
+  {
+    "id": "sylvane_archer",
+    "name_th": "ซิลเวน ภูตนักธนู",
+    "awakenName_th": "ซิลเวน ราชินีขนนก",
+    "lore_th": "ภูตปีกแห่งพงไพร ลูกศรของนางไล่ตามเป้าได้ถึงกลางเวหา",
+    "class": "archer",
+    "element": "wind",
+    "rarity": 5,
+    "pos": "ranged",
+    "cost": 24,
+    "blockCount": 0,
+    "range": 3.6,
+    "damageType": "physical",
+    "targetPriority": "flying_first",
+    "base": {
+      "hp": 380,
+      "atk": 165,
+      "def": 10,
+      "mres": 0.1,
+      "aspd": 1,
+      "critRate": 0.1,
+      "critDmg": 1.6
+    },
+    "growth": {
+      "hp": 12,
+      "atk": 6.6,
+      "def": 0.3
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 25,
+    "skills": [
+      "piercing_shot",
+      "steady_aim",
+      "sylvan_volley"
+    ],
+    "sprite": {
+      "body": "floating",
+      "weapon": "bow",
+      "palette": {
+        "main": "#d8e4a0",
+        "accent": "#56c9bb",
+        "skin": "#f0d2b0"
+      },
+      "scale": 1.05
+    }
+  },
+  {
+    "id": "ranger_bryn",
+    "name_th": "บริน พรานแห่งไพร",
+    "awakenName_th": "บริน นายพรานหลวง",
+    "lore_th": "รู้ทางน้ำทางป่าดีกว่าใครทั้งแคว้น",
+    "class": "archer",
+    "element": "water",
+    "rarity": 4,
+    "pos": "ranged",
+    "cost": 17,
+    "blockCount": 0,
+    "range": 3.4,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 340,
+      "atk": 135,
+      "def": 8,
+      "mres": 0.05,
+      "aspd": 0.95,
+      "critRate": 0.08,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 11,
+      "atk": 5.4,
+      "def": 0.3
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 22,
+    "skills": [
+      "hunter_mark",
+      "steady_aim"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "bow",
+      "palette": {
+        "main": "#2e6b5c",
+        "accent": "#b9a06e",
+        "skin": "#c68642"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "archmage_ignis",
+    "name_th": "อิกนิส จอมเวทเพลิง",
+    "awakenName_th": "อิกนิส เปลวนิรันดร์",
+    "lore_th": "ร่ายคาถาจนดวงตาลุกเป็นไฟ มองสิ่งใดนานเกินไปสิ่งนั้นไหม้",
+    "class": "mage",
+    "element": "fire",
+    "rarity": 5,
+    "pos": "ranged",
+    "cost": 25,
+    "blockCount": 0,
+    "range": 3.2,
+    "damageType": "magic",
+    "targetPriority": "first",
+    "base": {
+      "hp": 330,
+      "atk": 175,
+      "def": 6,
+      "mres": 0.2,
+      "aspd": 0.65,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 10,
+      "atk": 7.2,
+      "def": 0.2
+    },
+    "deployWindupSec": 0.6,
+    "redeployCooldownSec": 28,
+    "skills": [
+      "fire_nova",
+      "meteor_call"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "staff",
+      "palette": {
+        "main": "#b8382c",
+        "accent": "#f5b041",
+        "skin": "#e0c9a6"
+      },
+      "scale": 1.05
+    }
+  },
+  {
+    "id": "tidecaller_naia",
+    "name_th": "ไนอา ผู้เรียกวารี",
+    "awakenName_th": "ไนอา วิญญาณห้วงลึก",
+    "lore_th": "ภูตน้ำที่ถูกปลุกจากก้นทะเลสาบให้มาร่วมรบ",
+    "class": "mage",
+    "element": "water",
+    "rarity": 4,
+    "pos": "ranged",
+    "cost": 19,
+    "blockCount": 0,
+    "range": 3,
+    "damageType": "magic",
+    "targetPriority": "first",
+    "base": {
+      "hp": 350,
+      "atk": 140,
+      "def": 8,
+      "mres": 0.25,
+      "aspd": 0.7,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 11,
+      "atk": 5.6,
+      "def": 0.3
+    },
+    "deployWindupSec": 0.6,
+    "redeployCooldownSec": 24,
+    "skills": [
+      "tidal_surge"
+    ],
+    "sprite": {
+      "body": "spirit",
+      "weapon": "none",
+      "palette": {
+        "main": "#1f7a8c",
+        "accent": "#a5f3e0",
+        "skin": "#2e9fb0"
+      },
+      "scale": 1.15
+    }
+  },
+  {
+    "id": "cleric_seraphine",
+    "name_th": "เซราฟีน นักบวชแสง",
+    "awakenName_th": "เซราฟีน สังฆราชินี",
+    "lore_th": "สวดบทเดียวก็ดึงคนที่ควรตายให้กลับมาได้",
+    "class": "acolyte",
+    "element": "light",
+    "rarity": 4,
+    "pos": "ranged",
+    "cost": 16,
+    "blockCount": 0,
+    "range": 3.2,
+    "damageType": "magic",
+    "targetPriority": "nearest",
+    "base": {
+      "hp": 400,
+      "atk": 90,
+      "def": 8,
+      "mres": 0.2,
+      "aspd": 0.8,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 13,
+      "atk": 3.4,
+      "def": 0.3
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 22,
+    "skills": [
+      "heal_pulse",
+      "sanctuary"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "staff",
+      "palette": {
+        "main": "#f2efe4",
+        "accent": "#e0b84a",
+        "skin": "#e6b98f"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "hexer_morrin",
+    "name_th": "มอร์ริน ผู้ร่ายคำสาป",
+    "awakenName_th": "มอร์ริน ปากคำมรณะ",
+    "lore_th": "ใช้มนตร์มืดสู้กับสิ่งที่มืดยิ่งกว่า",
+    "class": "acolyte",
+    "element": "dark",
+    "rarity": 3,
+    "pos": "ranged",
+    "cost": 11,
+    "blockCount": 0,
+    "range": 3,
+    "damageType": "magic",
+    "targetPriority": "first",
+    "base": {
+      "hp": 360,
+      "atk": 70,
+      "def": 6,
+      "mres": 0.15,
+      "aspd": 0.85,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 11,
+      "atk": 2.6,
+      "def": 0.2
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 20,
+    "skills": [
+      "curse_weaken",
+      "truesight"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "staff",
+      "palette": {
+        "main": "#33294a",
+        "accent": "#9b59b6",
+        "skin": "#a9744f"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "quartermaster_pell",
+    "name_th": "เพลล์ พลาธิการ",
+    "awakenName_th": "เพลล์ นายคลังหลวง",
+    "lore_th": "ไม่ได้รบ แต่ถ้าไม่มีเขา กองทัพก็ไม่มีเสบียง",
+    "class": "merchant",
+    "element": "light",
+    "rarity": 3,
+    "pos": "ranged",
+    "cost": 9,
+    "blockCount": 0,
+    "range": 2.6,
+    "damageType": "physical",
+    "targetPriority": "nearest",
+    "base": {
+      "hp": 400,
+      "atk": 60,
+      "def": 10,
+      "mres": 0.05,
+      "aspd": 0.8,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 12,
+      "atk": 2,
+      "def": 0.4
+    },
+    "deployWindupSec": 0.4,
+    "redeployCooldownSec": 20,
+    "skills": [
+      "coin_flow",
+      "supply_drop"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "none",
+      "palette": {
+        "main": "#c9a227",
+        "accent": "#7a5a37",
+        "skin": "#d9a066"
+      },
+      "scale": 0.95
+    }
+  },
+  {
+    "id": "forgemaster_durn",
+    "name_th": "เดิร์น ช่างตีเหล็กแคระ",
+    "awakenName_th": "เดิร์น เจ้าเตาหลอม",
+    "lore_th": "ตีเหล็กจนมือด้าน วางกับดักจนป่าทั้งป่าเดินไม่ได้",
+    "class": "merchant",
+    "element": "fire",
+    "rarity": 4,
+    "pos": "melee",
+    "cost": 18,
+    "blockCount": 2,
+    "range": 1,
+    "damageType": "physical",
+    "targetPriority": "first",
+    "base": {
+      "hp": 700,
+      "atk": 100,
+      "def": 30,
+      "mres": 0.1,
+      "aspd": 0.8,
+      "critRate": 0.05,
+      "critDmg": 1.5
+    },
+    "growth": {
+      "hp": 28,
+      "atk": 3.8,
+      "def": 1.2
+    },
+    "deployWindupSec": 0.5,
+    "redeployCooldownSec": 24,
+    "skills": [
+      "forge_trap",
+      "iron_bless"
+    ],
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "hammer",
+      "palette": {
+        "main": "#7a4a24",
+        "accent": "#e07b39",
+        "skin": "#c68642"
+      },
+      "scale": 1.08
+    }
+  }
+]

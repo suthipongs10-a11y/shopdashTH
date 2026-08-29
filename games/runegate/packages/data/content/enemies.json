@@ -1,0 +1,500 @@
+[
+  {
+    "id": "restless_shade",
+    "name_th": "เงาไร้สุข",
+    "race": "undead",
+    "element": "dark",
+    "traits": [],
+    "hp": 600,
+    "atk": 68,
+    "def": 7,
+    "mres": 0.05,
+    "moveSpeed": 0.75,
+    "aspd": 0.8,
+    "range": 0.9,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 8,
+      "exp": 4
+    },
+    "skills": [],
+    "cardId": "card_restless_shade",
+    "sprite": {
+      "body": "spirit",
+      "weapon": "none",
+      "palette": {
+        "main": "#6d7f96",
+        "accent": "#cdd8e4",
+        "skin": "#8d9bab"
+      },
+      "scale": 0.95
+    }
+  },
+  {
+    "id": "ghoul",
+    "name_th": "กูล",
+    "race": "undead",
+    "element": "dark",
+    "traits": [
+      "swarm"
+    ],
+    "hp": 300,
+    "atk": 45,
+    "def": 2,
+    "mres": 0,
+    "moveSpeed": 1.5,
+    "aspd": 1.1,
+    "range": 0.9,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 5,
+      "exp": 3
+    },
+    "skills": [],
+    "cardId": "card_ghoul",
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "claw",
+      "palette": {
+        "main": "#4b4237",
+        "accent": "#8e3b2a",
+        "skin": "#7f7a63"
+      },
+      "scale": 0.85
+    }
+  },
+  {
+    "id": "wraith",
+    "name_th": "เรธ วิญญาณลอย",
+    "race": "undead",
+    "element": "dark",
+    "traits": [
+      "flying"
+    ],
+    "hp": 430,
+    "atk": 62,
+    "def": 3,
+    "mres": 0.1,
+    "moveSpeed": 1.1,
+    "aspd": 0.9,
+    "range": 1,
+    "damageType": "magic",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 10,
+      "exp": 6
+    },
+    "skills": [],
+    "cardId": "card_wraith",
+    "sprite": {
+      "body": "floating",
+      "weapon": "none",
+      "palette": {
+        "main": "#5a3f78",
+        "accent": "#a97fe0",
+        "skin": "#c9b8e8"
+      },
+      "scale": 0.9
+    }
+  },
+  {
+    "id": "ember_wolf",
+    "name_th": "หมาป่าเพลิง",
+    "race": "beast",
+    "element": "fire",
+    "traits": [],
+    "hp": 700,
+    "atk": 92,
+    "def": 12,
+    "mres": 0.05,
+    "moveSpeed": 1.15,
+    "aspd": 1,
+    "range": 0.9,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 11,
+      "exp": 6
+    },
+    "skills": [],
+    "cardId": "card_ember_wolf",
+    "sprite": {
+      "body": "beast",
+      "weapon": "claw",
+      "palette": {
+        "main": "#a5501e",
+        "accent": "#f0a03c",
+        "skin": "#d4671f"
+      },
+      "scale": 1.05
+    }
+  },
+  {
+    "id": "bog_serpent",
+    "name_th": "อสรพิษหนองน้ำ",
+    "race": "beast",
+    "element": "water",
+    "traits": [],
+    "hp": 1420,
+    "atk": 105,
+    "def": 21,
+    "mres": 0.1,
+    "moveSpeed": 0.6,
+    "aspd": 0.7,
+    "range": 1.1,
+    "damageType": "physical",
+    "blockWeight": 2,
+    "leakDamage": 2,
+    "bounty": {
+      "gold": 16,
+      "exp": 9
+    },
+    "skills": [],
+    "cardId": "card_bog_serpent",
+    "sprite": {
+      "body": "beast",
+      "weapon": "none",
+      "palette": {
+        "main": "#2c8055",
+        "accent": "#14512f",
+        "skin": "#4fae7a"
+      },
+      "scale": 1.2
+    }
+  },
+  {
+    "id": "carapace_scorpion",
+    "name_th": "แมงป่องเกราะหิน",
+    "race": "insect",
+    "element": "wind",
+    "traits": [
+      "armored"
+    ],
+    "hp": 1000,
+    "atk": 82,
+    "def": 52,
+    "mres": 0.05,
+    "moveSpeed": 0.65,
+    "aspd": 0.8,
+    "range": 1,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 2,
+    "bounty": {
+      "gold": 15,
+      "exp": 8
+    },
+    "skills": [],
+    "cardId": "card_scorpion",
+    "sprite": {
+      "body": "insect",
+      "weapon": "claw",
+      "palette": {
+        "main": "#5a5148",
+        "accent": "#8b8175",
+        "skin": "#35302a"
+      },
+      "scale": 1.05
+    }
+  },
+  {
+    "id": "venom_wasp",
+    "name_th": "ต่อพิษ",
+    "race": "insect",
+    "element": "wind",
+    "traits": [
+      "flying",
+      "swarm"
+    ],
+    "hp": 240,
+    "atk": 40,
+    "def": 1,
+    "mres": 0.1,
+    "moveSpeed": 1.75,
+    "aspd": 1.4,
+    "range": 0.9,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 6,
+      "exp": 4
+    },
+    "skills": [],
+    "cardId": "card_venom_wasp",
+    "sprite": {
+      "body": "insect",
+      "weapon": "none",
+      "palette": {
+        "main": "#d8c02c",
+        "accent": "#1c1c1c",
+        "skin": "#eddc72"
+      },
+      "scale": 0.75
+    }
+  },
+  {
+    "id": "cult_acolyte",
+    "name_th": "สาวกลัทธิมืด",
+    "race": "human",
+    "element": "light",
+    "traits": [
+      "healer"
+    ],
+    "hp": 550,
+    "atk": 32,
+    "def": 6,
+    "mres": 0.25,
+    "moveSpeed": 0.8,
+    "aspd": 0.6,
+    "range": 1,
+    "damageType": "magic",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 14,
+      "exp": 8
+    },
+    "skills": [
+      "dark_communion"
+    ],
+    "cardId": "card_cult_acolyte",
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "staff",
+      "palette": {
+        "main": "#ded6c6",
+        "accent": "#a02c2c",
+        "skin": "#d7bfa3"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "revenant_knight",
+    "name_th": "อัศวินคืนชีพ",
+    "race": "human",
+    "element": "dark",
+    "traits": [
+      "magic_resist"
+    ],
+    "hp": 780,
+    "atk": 86,
+    "def": 14,
+    "mres": 0.6,
+    "moveSpeed": 0.9,
+    "aspd": 0.85,
+    "range": 0.95,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 13,
+      "exp": 7
+    },
+    "skills": [],
+    "cardId": "card_revenant",
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "spear",
+      "palette": {
+        "main": "#3b4a5c",
+        "accent": "#86b3cf",
+        "skin": "#8a97a3"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "shadow_stalker",
+    "name_th": "นักล่าเงา",
+    "race": "demon",
+    "element": "wind",
+    "traits": [
+      "stealth"
+    ],
+    "hp": 580,
+    "atk": 100,
+    "def": 9,
+    "mres": 0.1,
+    "moveSpeed": 1,
+    "aspd": 1,
+    "range": 0.9,
+    "damageType": "physical",
+    "blockWeight": 1,
+    "leakDamage": 1,
+    "bounty": {
+      "gold": 15,
+      "exp": 9
+    },
+    "skills": [],
+    "cardId": "card_shadow_stalker",
+    "sprite": {
+      "body": "humanoid",
+      "weapon": "dagger",
+      "palette": {
+        "main": "#2f2b3d",
+        "accent": "#6f4fd0",
+        "skin": "#6b6273"
+      },
+      "scale": 1
+    }
+  },
+  {
+    "id": "ogre_bruiser",
+    "name_th": "ออร์คยักษ์ทุบ",
+    "race": "demon",
+    "element": "fire",
+    "traits": [
+      "armored",
+      "elite"
+    ],
+    "hp": 2750,
+    "atk": 168,
+    "def": 68,
+    "mres": 0.15,
+    "moveSpeed": 0.55,
+    "aspd": 0.6,
+    "range": 1.1,
+    "damageType": "physical",
+    "blockWeight": 2,
+    "leakDamage": 3,
+    "bounty": {
+      "gold": 40,
+      "exp": 25
+    },
+    "skills": [
+      "ogre_smash"
+    ],
+    "cardId": "card_ogre",
+    "sprite": {
+      "body": "hulk",
+      "weapon": "hammer",
+      "palette": {
+        "main": "#4a7a3a",
+        "accent": "#d8b44a",
+        "skin": "#6a9c50"
+      },
+      "scale": 1.35
+    }
+  },
+  {
+    "id": "night_terror",
+    "name_th": "ฝันร้ายราตรี",
+    "race": "undead",
+    "element": "dark",
+    "traits": [
+      "stealth",
+      "elite"
+    ],
+    "hp": 1380,
+    "atk": 122,
+    "def": 16,
+    "mres": 0.3,
+    "moveSpeed": 0.95,
+    "aspd": 0.9,
+    "range": 1,
+    "damageType": "magic",
+    "blockWeight": 1,
+    "leakDamage": 2,
+    "bounty": {
+      "gold": 34,
+      "exp": 20
+    },
+    "skills": [
+      "nightmare_touch"
+    ],
+    "cardId": "card_night_terror",
+    "sprite": {
+      "body": "spirit",
+      "weapon": "none",
+      "palette": {
+        "main": "#3d2352",
+        "accent": "#a274d4",
+        "skin": "#4d2d66"
+      },
+      "scale": 1.1
+    }
+  },
+  {
+    "id": "banshee",
+    "name_th": "แบนชี",
+    "race": "undead",
+    "element": "dark",
+    "traits": [
+      "flying",
+      "elite"
+    ],
+    "hp": 2320,
+    "atk": 144,
+    "def": 12,
+    "mres": 0.25,
+    "moveSpeed": 0.85,
+    "aspd": 0.9,
+    "range": 1.2,
+    "damageType": "magic",
+    "blockWeight": 1,
+    "leakDamage": 3,
+    "bounty": {
+      "gold": 38,
+      "exp": 24
+    },
+    "skills": [],
+    "cardId": "card_banshee",
+    "sprite": {
+      "body": "floating",
+      "weapon": "none",
+      "palette": {
+        "main": "#8f3a5a",
+        "accent": "#f0a0b8",
+        "skin": "#e0b6c4"
+      },
+      "scale": 1.25
+    }
+  },
+  {
+    "id": "malakar",
+    "name_th": "มาลาการ์ จอมมาร",
+    "race": "demon",
+    "element": "fire",
+    "traits": [
+      "boss",
+      "armored"
+    ],
+    "hp": 9000,
+    "atk": 198,
+    "def": 80,
+    "mres": 0.3,
+    "moveSpeed": 0.45,
+    "aspd": 0.55,
+    "range": 1.3,
+    "damageType": "physical",
+    "blockWeight": 3,
+    "leakDamage": 5,
+    "bounty": {
+      "gold": 120,
+      "exp": 80
+    },
+    "skills": [
+      "demon_roar",
+      "demon_hide"
+    ],
+    "cardId": "card_malakar",
+    "sprite": {
+      "body": "hulk",
+      "weapon": "spear",
+      "palette": {
+        "main": "#5a1414",
+        "accent": "#f5a03c",
+        "skin": "#8f2020"
+      },
+      "scale": 1.6
+    }
+  }
+]

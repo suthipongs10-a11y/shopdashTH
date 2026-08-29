@@ -1,0 +1,160 @@
+{
+  "id": "ch1_01",
+  "name_th": "ประตูหมู่บ้านอีสต์มาร์ช",
+  "chapter": 1,
+  "index": 1,
+  "difficulty": "normal",
+  "brief_th": "เงาไร้สุขเริ่มคืบออกจากป่าดำมาป้วนเปี้ยนหน้าหมู่บ้าน ตั้งด่านสกัดไว้ที่ทางเข้า",
+  "energyCost": 6,
+  "grid": {
+    "w": 14,
+    "h": 8
+  },
+  "tiles": [
+    "..............",
+    "..HH...HH.....",
+    "..GG...GG.....",
+    "SRRRRR........",
+    ".....R..HH....",
+    ".....RRRRRRRRE",
+    "....GG..GG....",
+    "....HH..HH...."
+  ],
+  "paths": {
+    "main": [
+      [
+        0,
+        3
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        5,
+        5
+      ],
+      [
+        13,
+        5
+      ]
+    ]
+  },
+  "baseHp": 12,
+  "deploy": {
+    "initialCost": 15,
+    "costPerSec": 1,
+    "deployLimit": 6,
+    "retreatRefund": 0.5
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "startSec": 5,
+      "label_th": "เงากลุ่มแรก",
+      "groups": [
+        {
+          "enemy": "restless_shade",
+          "count": 4,
+          "intervalSec": 1.6,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "startSec": 24,
+      "label_th": "ฝูงกูล",
+      "groups": [
+        {
+          "enemy": "ghoul",
+          "count": 6,
+          "intervalSec": 0.8,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "startSec": 44,
+      "label_th": "เรธลอยมา",
+      "groups": [
+        {
+          "enemy": "restless_shade",
+          "count": 4,
+          "intervalSec": 1.4,
+          "path": "main"
+        },
+        {
+          "enemy": "wraith",
+          "count": 2,
+          "intervalSec": 2.5,
+          "delaySec": 3,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "startSec": 66,
+      "label_th": "หมาป่าเพลิงออกล่า",
+      "groups": [
+        {
+          "enemy": "ember_wolf",
+          "count": 4,
+          "intervalSec": 1.6,
+          "path": "main"
+        },
+        {
+          "enemy": "ghoul",
+          "count": 6,
+          "intervalSec": 0.7,
+          "delaySec": 5,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w5",
+      "startSec": 92,
+      "label_th": "แมงป่องนำทัพ",
+      "groups": [
+        {
+          "enemy": "carapace_scorpion",
+          "count": 2,
+          "intervalSec": 4,
+          "path": "main"
+        },
+        {
+          "enemy": "restless_shade",
+          "count": 4,
+          "intervalSec": 1.5,
+          "delaySec": 2,
+          "path": "main"
+        },
+        {
+          "enemy": "wraith",
+          "count": 2,
+          "intervalSec": 2,
+          "delaySec": 8,
+          "path": "main"
+        }
+      ]
+    }
+  ],
+  "stars": {
+    "two": {
+      "type": "base_hp_pct",
+      "value": 80
+    },
+    "three": {
+      "type": "no_leak"
+    }
+  },
+  "rewards": {
+    "gold": 900,
+    "exp": 120,
+    "firstClearGems": 60,
+    "dropTable": "drop_ch1_common"
+  }
+}

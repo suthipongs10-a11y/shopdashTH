@@ -1,0 +1,30 @@
+{
+  "name": "runegate",
+  "version": "0.3.0",
+  "private": true,
+  "description": "RUNEGATE — Tower Defense (Arknights-style) x Summoners War (runes/gacha) x Ragnarok Online (cards/refine)",
+  "type": "module",
+  "workspaces": [
+    "packages/data",
+    "packages/sim",
+    "packages/tools",
+    "packages/client"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json && tsc -p packages/client/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "npm run dev --workspace @runegate/client",
+    "build": "npm run build --workspace @runegate/client",
+    "balance": "tsx packages/tools/src/balance-runner.ts",
+    "economy": "tsx packages/tools/src/economy-model.ts",
+    "validate": "tsx packages/tools/src/validate-content.ts",
+    "verify": "npm run validate && npm run typecheck && npm run test && npm run balance -- --runs 100"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

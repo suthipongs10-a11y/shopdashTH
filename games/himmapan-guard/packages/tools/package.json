@@ -1,7 +1,0 @@
-{
-  "name": "@himmapan/tools",
-  "version": "0.3.0",
-  "private": true,
-  "type": "module",
-  "dependencies": { "@himmapan/data": "*", "@himmapan/sim": "*" }
-}
