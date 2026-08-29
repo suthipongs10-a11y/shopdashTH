@@ -66,6 +66,7 @@
           "enemy": "restless_shade",
           "count": 5,
           "intervalSec": 1.4,
+          "delaySec": 0.0,
           "path": "main"
         },
         {
@@ -86,6 +87,7 @@
           "enemy": "ogre_bruiser",
           "count": 1,
           "intervalSec": 1,
+          "delaySec": 0,
           "path": "main",
           "hpMult": 1.1,
           "atkMult": 1.05
@@ -104,12 +106,13 @@
     {
       "id": "w3",
       "startSec": 56,
-      "label_th": "ทัพผสม",
+      "label_th": "แบนชีกับทัพผสม",
       "groups": [
         {
           "enemy": "banshee",
           "count": 1,
           "intervalSec": 1,
+          "delaySec": 0,
           "path": "main",
           "hpMult": 1.2,
           "atkMult": 1.1
@@ -137,12 +140,22 @@
     {
       "id": "w4",
       "startSec": 86,
-      "label_th": "หมอกดำ",
+      "label_th": "มิโนทอร์",
       "groups": [
+        {
+          "enemy": "minotaur",
+          "count": 1,
+          "intervalSec": 1,
+          "delaySec": 0,
+          "path": "main",
+          "hpMult": 1.3,
+          "atkMult": 1.15
+        },
         {
           "enemy": "shadow_stalker",
           "count": 5,
           "intervalSec": 1.6,
+          "delaySec": 2,
           "path": "main",
           "hpMult": 1.3,
           "atkMult": 1.15
@@ -155,27 +168,19 @@
           "path": "main",
           "hpMult": 1.3,
           "atkMult": 1.15
-        },
-        {
-          "enemy": "ogre_bruiser",
-          "count": 2,
-          "intervalSec": 6,
-          "delaySec": 6,
-          "path": "main",
-          "hpMult": 1.3,
-          "atkMult": 1.15
         }
       ]
     },
     {
       "id": "w5",
-      "startSec": 120,
+      "startSec": 122,
       "label_th": "มาลาการ์ตื่น",
       "groups": [
         {
           "enemy": "malakar",
           "count": 1,
           "intervalSec": 1,
+          "delaySec": 0,
           "path": "main",
           "hpMult": 1.45,
           "atkMult": 1.25
@@ -193,7 +198,7 @@
           "enemy": "bog_serpent",
           "count": 3,
           "intervalSec": 4,
-          "delaySec": 16,
+          "delaySec": 18,
           "path": "main",
           "hpMult": 1.45,
           "atkMult": 1.25

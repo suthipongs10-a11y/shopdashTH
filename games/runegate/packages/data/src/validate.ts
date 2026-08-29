@@ -57,6 +57,18 @@ export function validateContent(): ContentIssue[] {
     if (e.skills.some((s) => skillById.get(s)?.type === 'ultimate')) {
       err(`enemy:${e.id}`, 'ศัตรูใช้สกิลชนิด ultimate ไม่ได้ (ต้องเป็น passive/auto)');
     }
+    if (e.tier === 'elite' && !e.traits.includes('elite')) err(`enemy:${e.id}`, 'tier=elite ต้องมี trait "elite" ด้วย');
+    if (e.tier === 'mvp' && !e.traits.includes('boss')) err(`enemy:${e.id}`, 'tier=mvp ต้องมี trait "boss" ด้วย');
+    if (e.tier === 'normal' && (e.traits.includes('elite') || e.traits.includes('boss'))) {
+      err(`enemy:${e.id}`, 'มอนธรรมดาต้องไม่มี trait elite/boss');
+    }
+    for (const sid of e.skills) {
+      for (const eff of skillById.get(sid)?.effects ?? []) {
+        if (eff.kind === 'summon' && !enemyById.has(eff.enemy)) {
+          err(`enemy:${e.id}`, `สกิล "${sid}" เรียกลูกสมุน "${eff.enemy}" ที่ไม่มีอยู่`);
+        }
+      }
+    }
   }
 
   for (const c of cards) {

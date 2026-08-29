@@ -229,5 +229,316 @@
       }
     ],
     "desc_th": "ATK +20% และลดแต้มวางลง 1"
+  },
+  {
+    "id": "card_gel_slime",
+    "name_th": "การ์ดเจลสไลม์",
+    "sourceEnemy": "gel_slime",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "hp",
+        "pct": 6
+      }
+    ],
+    "desc_th": "HP +6%"
+  },
+  {
+    "id": "card_larva",
+    "name_th": "การ์ดหนอนดักแด้",
+    "sourceEnemy": "larva_grub",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "insect",
+        "pct": 10
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าแมลง +10%"
+  },
+  {
+    "id": "card_cave_bat",
+    "name_th": "การ์ดค้างคาวถ้ำ",
+    "sourceEnemy": "cave_bat",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "aspd",
+        "pct": 5
+      }
+    ],
+    "desc_th": "ความเร็วโจมตี +5%"
+  },
+  {
+    "id": "card_goblin",
+    "name_th": "การ์ดก็อบลิน",
+    "sourceEnemy": "goblin_raider",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "demon",
+        "pct": 10
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าปีศาจ +10%"
+  },
+  {
+    "id": "card_skeleton",
+    "name_th": "การ์ดโครงกระดูกทหาร",
+    "sourceEnemy": "skeleton_soldier",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "def",
+        "pct": 10
+      }
+    ],
+    "desc_th": "DEF +10%"
+  },
+  {
+    "id": "card_ridge_runner",
+    "name_th": "การ์ดนกกีบเร็ว",
+    "sourceEnemy": "ridge_runner",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "aspd",
+        "pct": 6
+      }
+    ],
+    "desc_th": "ความเร็วโจมตี +6%"
+  },
+  {
+    "id": "card_fang_hound",
+    "name_th": "การ์ดหมาล่าเนื้อ",
+    "sourceEnemy": "fang_hound",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "beast",
+        "pct": 10
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าสัตว์ +10%"
+  },
+  {
+    "id": "card_gargoyle",
+    "name_th": "การ์ดการ์กอยล์",
+    "sourceEnemy": "gargoyle",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "def",
+        "pct": 14
+      }
+    ],
+    "desc_th": "DEF +14%"
+  },
+  {
+    "id": "card_orc_warrior",
+    "name_th": "การ์ดออร์คนักรบ",
+    "sourceEnemy": "orc_warrior",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "atk",
+        "pct": 8
+      }
+    ],
+    "desc_th": "ATK +8%"
+  },
+  {
+    "id": "card_orc_slinger",
+    "name_th": "การ์ดออร์คขว้างหอก",
+    "sourceEnemy": "orc_slinger",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "accessory",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "range",
+        "pct": 8
+      }
+    ],
+    "desc_th": "ระยะโจมตี +8%"
+  },
+  {
+    "id": "card_undine",
+    "name_th": "การ์ดอันดีนน้ำแข็ง",
+    "sourceEnemy": "frost_undine",
+    "dropRate": 0.008,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "element_damage",
+        "element": "water",
+        "pct": 12
+      }
+    ],
+    "desc_th": "ความเสียหายธาตุน้ำ +12%"
+  },
+  {
+    "id": "card_golem",
+    "name_th": "การ์ดโกเลมหิน",
+    "sourceEnemy": "stone_golem",
+    "dropRate": 0.003,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "hp",
+        "pct": 18
+      }
+    ],
+    "desc_th": "HP +18%"
+  },
+  {
+    "id": "card_minotaur",
+    "name_th": "การ์ดมิโนทอร์",
+    "sourceEnemy": "minotaur",
+    "dropRate": 0.003,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "atk",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ATK +15%"
+  },
+  {
+    "id": "card_tomb_warden",
+    "name_th": "การ์ดผู้เฝ้าสุสาน",
+    "sourceEnemy": "tomb_warden",
+    "dropRate": 0.003,
+    "shardsToCraft": 50,
+    "slot": "armor",
+    "effects": [
+      {
+        "kind": "race_damage",
+        "race": "undead",
+        "pct": 20
+      }
+    ],
+    "desc_th": "ความเสียหายต่อเผ่าอันเดด +20%"
+  },
+  {
+    "id": "card_hellhound",
+    "name_th": "การ์ดเฮลล์ฮาวด์",
+    "sourceEnemy": "hellhound",
+    "dropRate": 0.003,
+    "shardsToCraft": 50,
+    "slot": "weapon",
+    "effects": [
+      {
+        "kind": "on_hit_status",
+        "status": "def_down",
+        "chance": 0.12,
+        "durationSec": 3,
+        "potency": 0.15
+      }
+    ],
+    "desc_th": "โจมตีมีโอกาส 12% ลดการป้องกันศัตรู 15%"
+  },
+  {
+    "id": "card_lich",
+    "name_th": "การ์ดลิชราชันย์",
+    "sourceEnemy": "lich_sovereign",
+    "dropRate": 0.0005,
+    "shardsToCraft": 50,
+    "slot": "any",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "atk",
+        "pct": 18
+      },
+      {
+        "kind": "element_damage",
+        "element": "dark",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ATK +18% และความเสียหายธาตุมืด +15%"
+  },
+  {
+    "id": "card_chimera",
+    "name_th": "การ์ดไคมีร่า",
+    "sourceEnemy": "chimera",
+    "dropRate": 0.0005,
+    "shardsToCraft": 50,
+    "slot": "any",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "crit_dmg",
+        "pct": 25
+      }
+    ],
+    "desc_th": "ความเสียหายคริติคอล +25%"
+  },
+  {
+    "id": "card_ifrit",
+    "name_th": "การ์ดอิฟรีต",
+    "sourceEnemy": "ifrit",
+    "dropRate": 0.0005,
+    "shardsToCraft": 50,
+    "slot": "any",
+    "effects": [
+      {
+        "kind": "element_damage",
+        "element": "fire",
+        "pct": 25
+      }
+    ],
+    "desc_th": "ความเสียหายธาตุไฟ +25%"
+  },
+  {
+    "id": "card_moonfang",
+    "name_th": "การ์ดจ้าวจิ้งจอกจันทรา",
+    "sourceEnemy": "moonfang_matriarch",
+    "dropRate": 0.0005,
+    "shardsToCraft": 50,
+    "slot": "any",
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "aspd",
+        "pct": 15
+      }
+    ],
+    "desc_th": "ความเร็วโจมตี +15%"
   }
 ]

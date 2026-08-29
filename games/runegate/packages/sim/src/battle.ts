@@ -93,6 +93,7 @@ export class Battle {
   currentWaveLabel = '';
 
   private nextUid = 1;
+  private summonedTotal = 0;
   private spawnQueue: SpawnEntry[];
   private spawnIndex = 0;
   private redeployReadyTick = new Map<string, number>();
@@ -118,7 +119,7 @@ export class Battle {
   }
 
   get enemiesTotal(): number {
-    return this.spawnQueue.length;
+    return this.spawnQueue.length + this.summonedTotal;
   }
 
   get deployedHeroes(): HeroUnit[] {
@@ -425,11 +426,12 @@ export class Battle {
     }
   }
 
-  private spawnEnemy(entry: SpawnEntry): void {
+  private spawnEnemy(entry: SpawnEntry, atDist = 0): void {
     const def = getEnemy(entry.enemyId);
     const track = this.paths.get(entry.path);
     if (!track) throw new Error(`ด่าน ${this.stage.id} ไม่มีเส้นทาง "${entry.path}"`);
-    const p = track.at(0);
+    const startDist = Math.max(0, Math.min(atDist, track.length - 0.1));
+    const p = track.at(startDist);
     const hp = Math.round(def.hp * entry.hpMult);
     const u: EnemyUnit = {
       uid: this.nextUid++,
@@ -441,7 +443,7 @@ export class Battle {
       race: def.race,
       traits: [...def.traits],
       pathId: entry.path,
-      dist: 0,
+      dist: startDist,
       x: p.x,
       y: p.y,
       hp,
@@ -806,7 +808,13 @@ export class Battle {
   }
 
   private resolveTargets(caster: Unit, effect: Effect, forcedTarget?: Unit): Unit[] {
-    if (effect.kind === 'cost_gain' || effect.kind === 'cost_rate' || effect.kind === 'trait' || effect.kind === 'splash_on_hit') {
+    if (
+      effect.kind === 'cost_gain' ||
+      effect.kind === 'cost_rate' ||
+      effect.kind === 'trait' ||
+      effect.kind === 'splash_on_hit' ||
+      effect.kind === 'summon'
+    ) {
       return [caster];
     }
     const target = 'target' in effect ? effect.target : 'self';
@@ -932,6 +940,27 @@ export class Battle {
           }
         }
         break;
+      case 'summon': {
+        // MVP เรียกลูกสมุนออกมาบนเส้นทางเดียวกัน ถัดจากตัวเองไปข้างหลัง
+        if (!isEnemy(caster)) break;
+        for (let i = 0; i < effect.count; i++) {
+          this.summonedTotal++;
+          this.spawnEnemy(
+            {
+              timeSec: this.elapsedSec,
+              enemyId: effect.enemy,
+              path: caster.pathId,
+              hpMult: 1,
+              atkMult: 1,
+              waveId: 'summon',
+              waveLabel: '',
+              order: -1,
+            },
+            caster.dist - effect.behind * (i + 1),
+          );
+        }
+        break;
+      }
       case 'cost_rate':
       case 'trait':
       case 'splash_on_hit':

@@ -91,6 +91,39 @@ button.ghost { background: rgba(255,255,255,.06); }
 .stars { color: var(--brass-dim); letter-spacing: 2px; font-size: 15px; }
 .stars .on { color: var(--brass); }
 
+.codex-cta {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px;
+  font-size: 12.5px; color: var(--muted);
+}
+
+/* ---------------- สมุดมอนสเตอร์ ---------------- */
+.tier-note { margin: -4px 0 12px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.mon-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); margin-bottom: 8px; }
+.mon-card {
+  position: relative; background: var(--panel); border: 1px solid var(--line);
+  border-left: 3px solid var(--brass-dim); border-radius: 10px; padding: 10px 10px 9px; text-align: center;
+}
+.mon-card.tier-mvp { border-left-color: var(--ember); background: var(--panel-2); }
+.mon-card.tier-elite { border-left-color: var(--brass); }
+.mon-card.tier-normal { border-left-color: rgba(143, 163, 184, .45); }
+.mon-card .pic { width: 74px; height: 74px; display: block; margin: 2px auto 4px; image-rendering: pixelated; }
+.mon-card .nm { font-family: 'Chakra Petch', sans-serif; font-size: 13px; font-weight: 600; line-height: 1.3; }
+.mon-card .sub { font-size: 11px; color: var(--muted); display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 2px; }
+.tier-badge {
+  position: absolute; top: 7px; right: 7px; font-size: 9.5px; font-weight: 700; letter-spacing: .3px;
+  padding: 1px 6px; border-radius: 4px; font-family: 'Chakra Petch', sans-serif;
+}
+.tier-badge.tier-normal { background: rgba(143,163,184,.16); color: var(--muted); }
+.tier-badge.tier-elite { background: rgba(201,168,106,.18); color: var(--brass); }
+.tier-badge.tier-mvp { background: rgba(240,128,60,.2); color: var(--ember); }
+.mon-stats {
+  display: flex; justify-content: center; gap: 7px; margin-top: 6px; white-space: nowrap;
+  font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 6px; }
+.chip { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(127,212,232,.12); color: var(--rune); }
+.mon-card .where { margin-top: 7px; font-size: 10.5px; color: rgba(143,163,184,.75); }
+
 .hero-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); }
 .hero-card {
   background: var(--panel); border: 2px solid transparent; border-radius: 12px; padding: 8px;
@@ -108,7 +141,7 @@ button.ghost { background: rgba(255,255,255,.06); }
 
 .sticky-actions {
   position: sticky; bottom: 0; margin-top: 18px; padding: 12px 0 max(12px, env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent, var(--bg) 35%);
+  background: linear-gradient(180deg, rgba(10,14,21,0), rgba(10,14,21,.85) 30%, var(--bg) 60%);
   display: flex; gap: 10px; align-items: center;
 }
 .sticky-actions .grow { flex: 1; font-size: 13px; color: var(--muted); }
@@ -189,6 +222,15 @@ button.ghost { background: rgba(255,255,255,.06); }
 .hpbar > div { height: 100%; width: 100%; background: var(--ember); transition: width .1s linear; }
 .hpbar.hero > div { background: var(--good); }
 .hpbar.shielded { box-shadow: 0 0 0 1.5px #8fd6ff; }
+.hpbar.elite { width: 54px; margin-left: -27px; height: 6px; }
+.hpbar.mvp { width: 76px; margin-left: -38px; height: 7px; }
+.nameplate {
+  position: absolute; top: 0; left: 0; pointer-events: none; white-space: nowrap;
+  font-family: 'Chakra Petch', sans-serif; font-size: 11px; font-weight: 700;
+  transform-origin: center; text-shadow: 0 2px 4px rgba(0,0,0,.9); margin-top: -14px;
+}
+.nameplate.elite { color: var(--brass); margin-left: -27px; }
+.nameplate.mvp { color: var(--ember); font-size: 12.5px; margin-left: -38px; }
 .floater {
   position: absolute; top: 0; left: 0; transform-origin: center; pointer-events: none;
   font-family: 'Kanit', sans-serif; font-weight: 700; font-size: 14px; margin: -10px 0 0 -14px;

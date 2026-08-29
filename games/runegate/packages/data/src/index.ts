@@ -10,6 +10,7 @@ import dropsJson from '../content/drops.json';
 import stage101 from '../content/stages/ch1_01.json';
 import stage102 from '../content/stages/ch1_02.json';
 import stage103 from '../content/stages/ch1_03.json';
+import stage104 from '../content/stages/ch1_04.json';
 
 import { Hero, heroStatsAtLevel, MAX_LEVEL_BY_STAR } from './schema/hero.js';
 import { Enemy } from './schema/enemy.js';
@@ -60,7 +61,7 @@ export const enemies: Enemy[] = parseAll(Enemy, enemiesJson as unknown[], 'enemy
 export const skills: Skill[] = parseAll(Skill, skillsJson as unknown[], 'skill');
 export const cards: Card[] = parseAll(Card, cardsJson as unknown[], 'card');
 export const dropTables: DropTable[] = parseAll(DropTable, dropsJson as unknown[], 'dropTable');
-export const stages: Stage[] = parseAll(Stage, [stage101, stage102, stage103] as unknown[], 'stage');
+export const stages: Stage[] = parseAll(Stage, [stage101, stage102, stage103, stage104] as unknown[], 'stage');
 export const runeConfig: RuneConfig = parseOne(RuneConfig, runesJson, 'runeConfig');
 export const economy: EconomyConfig = parseOne(EconomyConfig, economyJson, 'economy');
 

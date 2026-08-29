@@ -51,12 +51,13 @@
     {
       "id": "w1",
       "startSec": 5,
-      "label_th": "เงากลุ่มแรก",
+      "label_th": "สไลม์กลุ่มแรก",
       "groups": [
         {
-          "enemy": "restless_shade",
-          "count": 4,
-          "intervalSec": 1.6,
+          "enemy": "gel_slime",
+          "count": 5,
+          "intervalSec": 1.5,
+          "delaySec": 0.0,
           "path": "main"
         }
       ]
@@ -64,12 +65,13 @@
     {
       "id": "w2",
       "startSec": 24,
-      "label_th": "ฝูงกูล",
+      "label_th": "ฝูงหนอนดักแด้",
       "groups": [
         {
-          "enemy": "ghoul",
-          "count": 6,
-          "intervalSec": 0.8,
+          "enemy": "larva_grub",
+          "count": 8,
+          "intervalSec": 0.7,
+          "delaySec": 0.0,
           "path": "main"
         }
       ]
@@ -77,18 +79,19 @@
     {
       "id": "w3",
       "startSec": 44,
-      "label_th": "เรธลอยมา",
+      "label_th": "เงาไร้สุขกับค้างคาว",
       "groups": [
         {
           "enemy": "restless_shade",
           "count": 4,
           "intervalSec": 1.4,
+          "delaySec": 0.0,
           "path": "main"
         },
         {
-          "enemy": "wraith",
-          "count": 2,
-          "intervalSec": 2.5,
+          "enemy": "cave_bat",
+          "count": 4,
+          "intervalSec": 1.2,
           "delaySec": 3,
           "path": "main"
         }
@@ -97,12 +100,13 @@
     {
       "id": "w4",
       "startSec": 66,
-      "label_th": "หมาป่าเพลิงออกล่า",
+      "label_th": "ก็อบลินบุก",
       "groups": [
         {
-          "enemy": "ember_wolf",
-          "count": 4,
-          "intervalSec": 1.6,
+          "enemy": "goblin_raider",
+          "count": 6,
+          "intervalSec": 1.0,
+          "delaySec": 0.0,
           "path": "main"
         },
         {
@@ -123,10 +127,11 @@
           "enemy": "carapace_scorpion",
           "count": 2,
           "intervalSec": 4,
+          "delaySec": 0.0,
           "path": "main"
         },
         {
-          "enemy": "restless_shade",
+          "enemy": "ember_wolf",
           "count": 4,
           "intervalSec": 1.5,
           "delaySec": 2,

@@ -578,5 +578,312 @@
       }
     ],
     "vfx": "buff"
+  },
+  {
+    "id": "frost_touch",
+    "name_th": "สัมผัสเหน็บ",
+    "desc_th": "โจมตีมีโอกาส 50% ทำให้ผู้ป้องกันช้าลง 30% นาน 2 วิ",
+    "type": "passive",
+    "trigger": "on_attack",
+    "effects": [
+      {
+        "kind": "status",
+        "target": "current_target",
+        "status": "slow",
+        "durationSec": 2,
+        "potency": 0.3
+      }
+    ],
+    "vfx": "nova",
+    "chance": 0.5
+  },
+  {
+    "id": "ground_slam",
+    "name_th": "ทุบพื้นสะเทือน",
+    "desc_th": "ทุบพื้นรอบตัว 160% ATK และทำให้มึนงง 1.2 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 2,
+        "ratio": 1.6,
+        "damageType": "physical"
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 2,
+        "status": "stun",
+        "durationSec": 1.2
+      }
+    ],
+    "vfx": "nova",
+    "cooldownSec": 10,
+    "initialCooldownSec": 4
+  },
+  {
+    "id": "gore_charge",
+    "name_th": "พุ่งขวิด",
+    "desc_th": "ขวิดเป้าหมาย 220% ATK และทำให้มึนงง 1 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "current_target",
+        "ratio": 2.2,
+        "damageType": "physical"
+      },
+      {
+        "kind": "status",
+        "target": "current_target",
+        "status": "stun",
+        "durationSec": 1
+      }
+    ],
+    "vfx": "slash",
+    "cooldownSec": 9,
+    "initialCooldownSec": 4
+  },
+  {
+    "id": "sealing_gaze",
+    "name_th": "สายตาผนึก",
+    "desc_th": "จ้องผู้ป้องกันรอบตัวให้มึนงง 1.5 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 2.2,
+        "status": "stun",
+        "durationSec": 1.5,
+        "chance": 0.7
+      }
+    ],
+    "vfx": "shadow",
+    "cooldownSec": 11,
+    "initialCooldownSec": 6
+  },
+  {
+    "id": "dread_howl",
+    "name_th": "หอนสยองขวัญ",
+    "desc_th": "ลดการป้องกันของผู้ป้องกันรอบตัว 30% นาน 5 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 3,
+        "status": "def_down",
+        "durationSec": 5,
+        "potency": 0.3
+      }
+    ],
+    "vfx": "shadow",
+    "cooldownSec": 12,
+    "initialCooldownSec": 5
+  },
+  {
+    "id": "raise_dead",
+    "name_th": "ปลุกซากศพ",
+    "desc_th": "เรียกโครงกระดูกทหารออกมา 2 ตน",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "summon",
+        "enemy": "skeleton_soldier",
+        "count": 2,
+        "behind": 0.7
+      }
+    ],
+    "vfx": "shadow",
+    "cooldownSec": 12,
+    "initialCooldownSec": 8
+  },
+  {
+    "id": "soul_barrage",
+    "name_th": "ห่ากระสุนวิญญาณ",
+    "desc_th": "กระหน่ำผู้ป้องกันรอบตัว 170% ATK และทำให้ช้าลง",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 2.6,
+        "ratio": 1.7,
+        "damageType": "magic",
+        "element": "dark"
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 2.6,
+        "status": "slow",
+        "durationSec": 3,
+        "potency": 0.35
+      }
+    ],
+    "vfx": "nova",
+    "cooldownSec": 9,
+    "initialCooldownSec": 5
+  },
+  {
+    "id": "triple_maw",
+    "name_th": "สามเขี้ยว",
+    "desc_th": "ขย้ำเป้าหมาย 3 ครั้ง ครั้งละ 140% ATK",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "current_target",
+        "ratio": 1.4,
+        "hits": 3,
+        "damageType": "physical"
+      }
+    ],
+    "vfx": "slash",
+    "cooldownSec": 8,
+    "initialCooldownSec": 4
+  },
+  {
+    "id": "beast_frenzy",
+    "name_th": "คลั่งอสูร",
+    "desc_th": "เพิ่ม ATK 40% และความเร็วโจมตี 30% ให้ตัวเอง นาน 12 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "atk",
+        "mult": 1.4,
+        "durationSec": 12
+      },
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "aspd",
+        "mult": 1.3,
+        "durationSec": 12
+      }
+    ],
+    "vfx": "buff",
+    "cooldownSec": 16,
+    "initialCooldownSec": 10
+  },
+  {
+    "id": "flame_aura",
+    "name_th": "ออร่าเพลิง",
+    "desc_th": "แผดเผาผู้ป้องกันรอบตัว 90% ATK และทำให้ติดไฟ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "damage",
+        "target": "enemies_in_radius",
+        "radius": 2.4,
+        "ratio": 0.9,
+        "damageType": "magic",
+        "element": "fire"
+      },
+      {
+        "kind": "status",
+        "target": "enemies_in_radius",
+        "radius": 2.4,
+        "status": "poison",
+        "durationSec": 4,
+        "potency": 0.15
+      }
+    ],
+    "vfx": "nova",
+    "cooldownSec": 6,
+    "initialCooldownSec": 3
+  },
+  {
+    "id": "summon_embers",
+    "name_th": "เรียกเปลวบริวาร",
+    "desc_th": "เรียกหมาป่าเพลิงออกมา 2 ตัว",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "summon",
+        "enemy": "ember_wolf",
+        "count": 2,
+        "behind": 0.7
+      }
+    ],
+    "vfx": "nova",
+    "cooldownSec": 14,
+    "initialCooldownSec": 9
+  },
+  {
+    "id": "moon_howl",
+    "name_th": "หอนเรียกฝูง",
+    "desc_th": "เรียกหมาล่าเนื้อออกมา 3 ตัว",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "summon",
+        "enemy": "fang_hound",
+        "count": 3,
+        "behind": 0.6
+      }
+    ],
+    "vfx": "buff",
+    "cooldownSec": 13,
+    "initialCooldownSec": 7
+  },
+  {
+    "id": "lunar_veil",
+    "name_th": "ม่านจันทรา",
+    "desc_th": "สร้างโล่ 25% และเพิ่ม ATK 25% ให้ตัวเอง นาน 12 วิ",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "status",
+        "target": "self",
+        "status": "shield",
+        "durationSec": 12,
+        "potency": 0.25
+      },
+      {
+        "kind": "stat_mod",
+        "target": "self",
+        "stat": "atk",
+        "mult": 1.25,
+        "durationSec": 12
+      }
+    ],
+    "vfx": "buff",
+    "cooldownSec": 15,
+    "initialCooldownSec": 8
+  },
+  {
+    "id": "summon_horde",
+    "name_th": "เรียกกองโจร",
+    "desc_th": "เรียกก็อบลินจู่โจมออกมา 3 ตน",
+    "type": "auto",
+    "trigger": "interval",
+    "effects": [
+      {
+        "kind": "summon",
+        "enemy": "goblin_raider",
+        "count": 3,
+        "behind": 0.6
+      }
+    ],
+    "vfx": "shadow",
+    "cooldownSec": 15,
+    "initialCooldownSec": 12
   }
 ]

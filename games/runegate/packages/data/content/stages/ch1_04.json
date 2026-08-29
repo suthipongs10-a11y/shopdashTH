@@ -1,0 +1,203 @@
+{
+  "id": "ch1_04",
+  "name_th": "ห้องบัลลังก์ลิช",
+  "chapter": 1,
+  "index": 4,
+  "difficulty": "normal",
+  "brief_th": "ลิชราชันย์ปลุกกองทัพซากศพขึ้นมาไม่หยุด — ต้องฆ่ามันให้ได้ก่อนที่ลูกสมุนจะท่วมด่าน",
+  "energyCost": 12,
+  "grid": {
+    "w": 16,
+    "h": 10
+  },
+  "tiles": [
+    "................",
+    "..GGHH..GG..HH..",
+    "....RRRRRRRR....",
+    "..HHR..GG..R.HH.",
+    "..GGR..HH..R.GG.",
+    "SRRRR..HH..R....",
+    ".....GG.HH.R.HH.",
+    "....HH...GGR.GG.",
+    "........GGGRRRRE",
+    "........HHH.HH.."
+  ],
+  "paths": {
+    "main": [
+      [
+        0,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        11,
+        2
+      ],
+      [
+        11,
+        8
+      ],
+      [
+        15,
+        8
+      ]
+    ]
+  },
+  "baseHp": 12,
+  "deploy": {
+    "initialCost": 24,
+    "costPerSec": 1.15,
+    "deployLimit": 8,
+    "retreatRefund": 0.5
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "startSec": 5,
+      "label_th": "กองระวังหน้า",
+      "groups": [
+        {
+          "enemy": "skeleton_soldier",
+          "count": 6,
+          "intervalSec": 1.3,
+          "delaySec": 0.0,
+          "path": "main"
+        },
+        {
+          "enemy": "cave_bat",
+          "count": 6,
+          "intervalSec": 0.7,
+          "delaySec": 6,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "startSec": 30,
+      "label_th": "กองออร์ค",
+      "groups": [
+        {
+          "enemy": "orc_warrior",
+          "count": 4,
+          "intervalSec": 1.8,
+          "delaySec": 0.0,
+          "path": "main"
+        },
+        {
+          "enemy": "orc_slinger",
+          "count": 3,
+          "intervalSec": 2,
+          "delaySec": 4,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "startSec": 56,
+      "label_th": "โกเลมหิน",
+      "groups": [
+        {
+          "enemy": "stone_golem",
+          "count": 1,
+          "intervalSec": 1,
+          "delaySec": 0.0,
+          "path": "main"
+        },
+        {
+          "enemy": "gargoyle",
+          "count": 4,
+          "intervalSec": 2,
+          "delaySec": 3,
+          "path": "main"
+        },
+        {
+          "enemy": "ghoul",
+          "count": 8,
+          "intervalSec": 0.6,
+          "delaySec": 8,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "startSec": 88,
+      "label_th": "ผู้เฝ้าสุสาน",
+      "groups": [
+        {
+          "enemy": "tomb_warden",
+          "count": 1,
+          "intervalSec": 1,
+          "delaySec": 0.0,
+          "path": "main"
+        },
+        {
+          "enemy": "hellhound",
+          "count": 2,
+          "intervalSec": 4,
+          "delaySec": 5,
+          "path": "main"
+        },
+        {
+          "enemy": "frost_undine",
+          "count": 3,
+          "intervalSec": 2,
+          "delaySec": 10,
+          "path": "main"
+        }
+      ]
+    },
+    {
+      "id": "w5",
+      "startSec": 124,
+      "label_th": "ลิชราชันย์",
+      "groups": [
+        {
+          "enemy": "lich_sovereign",
+          "count": 1,
+          "intervalSec": 1,
+          "delaySec": 0.0,
+          "path": "main"
+        },
+        {
+          "enemy": "revenant_knight",
+          "count": 4,
+          "intervalSec": 2,
+          "delaySec": 12,
+          "path": "main"
+        },
+        {
+          "enemy": "venom_wasp",
+          "count": 8,
+          "intervalSec": 0.6,
+          "delaySec": 20,
+          "path": "main"
+        }
+      ]
+    }
+  ],
+  "stars": {
+    "two": {
+      "type": "base_hp_pct",
+      "value": 80
+    },
+    "three": {
+      "type": "no_leak"
+    }
+  },
+  "rewards": {
+    "gold": 3200,
+    "exp": 420,
+    "firstClearGems": 120,
+    "dropTable": "drop_ch1_boss"
+  }
+}

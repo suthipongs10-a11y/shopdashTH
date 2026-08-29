@@ -73,15 +73,17 @@
       "label_th": "สองทางพร้อมกัน",
       "groups": [
         {
-          "enemy": "restless_shade",
+          "enemy": "skeleton_soldier",
           "count": 4,
           "intervalSec": 1.5,
+          "delaySec": 0,
           "path": "north"
         },
         {
-          "enemy": "restless_shade",
-          "count": 4,
-          "intervalSec": 1.5,
+          "enemy": "ghoul",
+          "count": 5,
+          "intervalSec": 1.2,
+          "delaySec": 0,
           "path": "south"
         }
       ]
@@ -95,10 +97,11 @@
           "enemy": "venom_wasp",
           "count": 8,
           "intervalSec": 0.6,
+          "delaySec": 0,
           "path": "north"
         },
         {
-          "enemy": "ghoul",
+          "enemy": "goblin_raider",
           "count": 6,
           "intervalSec": 0.8,
           "delaySec": 2,
@@ -122,12 +125,14 @@
           "enemy": "revenant_knight",
           "count": 4,
           "intervalSec": 1.8,
+          "delaySec": 0,
           "path": "north"
         },
         {
           "enemy": "ember_wolf",
           "count": 4,
           "intervalSec": 1.6,
+          "delaySec": 0,
           "path": "south"
         }
       ]
@@ -135,24 +140,26 @@
     {
       "id": "w4",
       "startSec": 74,
-      "label_th": "นักล่าเงาเข้าโจมตี",
+      "label_th": "การ์กอยล์กับออร์คขว้างหอก",
       "groups": [
         {
           "enemy": "shadow_stalker",
           "count": 4,
           "intervalSec": 2,
+          "delaySec": 0,
           "path": "south"
         },
         {
-          "enemy": "wraith",
+          "enemy": "gargoyle",
           "count": 3,
           "intervalSec": 2,
+          "delaySec": 0,
           "path": "north"
         },
         {
-          "enemy": "bog_serpent",
-          "count": 2,
-          "intervalSec": 5,
+          "enemy": "orc_slinger",
+          "count": 3,
+          "intervalSec": 2,
           "delaySec": 4,
           "path": "south"
         }
@@ -167,12 +174,14 @@
           "enemy": "night_terror",
           "count": 2,
           "intervalSec": 6,
+          "delaySec": 0,
           "path": "north"
         },
         {
           "enemy": "carapace_scorpion",
           "count": 3,
           "intervalSec": 3,
+          "delaySec": 0,
           "path": "south"
         },
         {

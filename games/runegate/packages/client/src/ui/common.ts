@@ -1,4 +1,4 @@
-import type { Element, HeroClass, Race } from '@runegate/data';
+import type { Element, EnemyTrait, HeroClass, Race } from '@runegate/data';
 
 type Attrs = Record<string, string | number | boolean | EventListener | undefined>;
 
@@ -52,6 +52,25 @@ export const RACE_TH: Record<Race, string> = {
   demon: 'ปีศาจ',
   undead: 'อันเดด',
   insect: 'แมลง',
+};
+
+export const TRAIT_TH: Record<EnemyTrait, string> = {
+  flying: 'บิน',
+  stealth: 'ล่องหน',
+  armored: 'หุ้มเกราะ',
+  magic_resist: 'ต้านเวท',
+  healer: 'ฮีลพวกเดียวกัน',
+  swarm: 'มาเป็นฝูง',
+  elite: 'มินิบอส',
+  boss: 'บอส MVP',
+};
+
+export type EnemyTier = 'normal' | 'elite' | 'mvp';
+
+export const TIER_TH: Record<EnemyTier, string> = {
+  normal: 'ธรรมดา',
+  elite: 'มินิบอส',
+  mvp: 'บอส MVP',
 };
 
 export function starStr(n: number, max = 3): string {

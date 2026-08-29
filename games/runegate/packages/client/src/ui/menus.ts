@@ -1,16 +1,16 @@
-import { heroes, stages, type Hero, type Stage } from '@runegate/data';
+import { enemies, heroes, stages, type Enemy, type Hero, type Stage } from '@runegate/data';
 import { portraitDataUrl } from '../render/sprites.js';
-import { CLASS_TH, ELEMENT_COLOR, ELEMENT_TH, h, progress, starHtml, toast } from './common.js';
+import { CLASS_TH, ELEMENT_COLOR, ELEMENT_TH, RACE_TH, TIER_TH, TRAIT_TH, h, progress, starHtml, toast, type EnemyTier } from './common.js';
 
 const SQUAD_SIZE = 8;
 
 /** เลเวลที่แนะนำต่อด่าน (ตรงกับเกณฑ์ใน balance runner) */
 export function recommendedLevel(stage: Stage): number {
-  const table: Record<string, number> = { ch1_01: 1, ch1_02: 8, ch1_03: 15 };
+  const table: Record<string, number> = { ch1_01: 1, ch1_02: 8, ch1_03: 15, ch1_04: 28 };
   return table[stage.id] ?? 1 + (stage.index - 1) * 7;
 }
 
-export function stageSelectScreen(onPick: (stage: Stage) => void): HTMLElement {
+export function stageSelectScreen(onPick: (stage: Stage) => void, onBestiary: () => void): HTMLElement {
   const cards = stages.map((s) => {
     const best = progress.bestStars(s.id);
     return h(
@@ -59,6 +59,12 @@ export function stageSelectScreen(onPick: (stage: Stage) => void): HTMLElement {
       ),
       h('div', { class: 'section-title' }, 'เลือกด่าน'),
       h('div', { class: 'stage-list' }, ...cards),
+      h(
+        'div',
+        { class: 'codex-cta' },
+        h('button', { class: 'ghost', onclick: onBestiary }, `📖 สมุดมอนสเตอร์ (${enemies.length} ชนิด)`),
+        h('span', {}, `ธรรมดา ${count('normal')} · มินิบอส ${count('elite')} · บอส MVP ${count('mvp')}`),
+      ),
       h(
         'div',
         { class: 'section-title' },
@@ -180,4 +186,69 @@ function defaultSquad(): string[] {
     'quartermaster_pell',
   ];
   return order.filter((id) => heroes.some((h2) => h2.id === id)).slice(0, SQUAD_SIZE);
+}
+
+
+function count(tier: EnemyTier): number {
+  return enemies.filter((e) => e.tier === tier).length;
+}
+
+function stagesWith(enemyId: string): string[] {
+  const out: string[] = [];
+  for (const s of stages) {
+    if (s.waves.some((w) => w.groups.some((g) => g.enemy === enemyId))) out.push(`${s.chapter}-${s.index}`);
+  }
+  return out;
+}
+
+function monsterCard(e: Enemy): HTMLElement {
+  const where = stagesWith(e.id);
+  return h(
+    'div',
+    { class: `mon-card tier-${e.tier}` },
+    h('span', { class: `tier-badge tier-${e.tier}` }, TIER_TH[e.tier]),
+    h('img', { class: 'pic', src: portraitDataUrl(e.sprite), alt: e.name_th }),
+    h('div', { class: 'nm' }, e.name_th),
+    h(
+      'div',
+      { class: 'sub' },
+      h('span', { class: 'el-dot', style: `background:${ELEMENT_COLOR[e.element]}` }),
+      h('span', {}, `${ELEMENT_TH[e.element]} · ${RACE_TH[e.race]}`),
+    ),
+    h(
+      'div',
+      { class: 'mon-stats' },
+      h('span', {}, `HP ${e.hp.toLocaleString('th-TH')}`),
+      h('span', {}, `ATK ${e.atk}`),
+      h('span', {}, `DEF ${e.def}`),
+    ),
+    e.traits.length > 0
+      ? h('div', { class: 'chips' }, ...e.traits.filter((t) => t !== 'elite' && t !== 'boss').map((t) => h('span', { class: 'chip' }, TRAIT_TH[t])))
+      : null,
+    h('div', { class: 'where' }, where.length > 0 ? `ปรากฏในด่าน ${where.join(', ')}` : 'ยังไม่ลงด่าน — รอบทที่ 2'),
+  );
+}
+
+export function bestiaryScreen(onBack: () => void): HTMLElement {
+  const section = (tier: EnemyTier, title: string, note: string): HTMLElement[] => {
+    const list = enemies.filter((e) => e.tier === tier);
+    return [
+      h('div', { class: 'section-title' }, `${title} (${list.length})`),
+      h('p', { class: 'tier-note' }, note),
+      h('div', { class: 'mon-grid' }, ...list.map(monsterCard)),
+    ];
+  };
+  return h(
+    'div',
+    { class: 'screen' },
+    h(
+      'div',
+      { class: 'screen-inner' },
+      h('div', { class: 'brand' }, h('h1', { class: 'wordmark' }, 'BESTIARY'), h('p', { class: 'sub-th' }, `สมุดมอนสเตอร์ — ${enemies.length} ชนิด`)),
+      ...section('mvp', 'บอส MVP', 'บอสประจำบท เลือดหนามาก มีสกิลเรียกลูกสมุนและบัฟตัวเอง ต้องจัดทีมมาเฉพาะ'),
+      ...section('elite', 'มินิบอส', 'โผล่กลางด่าน หนากว่ามอนธรรมดาหลายเท่าและมีสกิลของตัวเอง'),
+      ...section('normal', 'มอนสเตอร์ธรรมดา', 'กำลังพลหลักของทัพอสูร มาเป็นเวฟ บางชนิดบิน ล่องหน หุ้มเกราะ หรือฮีลพวกเดียวกัน'),
+      h('div', { class: 'sticky-actions' }, h('button', { class: 'ghost', onclick: onBack }, '← กลับ')),
+    ),
+  );
 }

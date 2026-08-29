@@ -57,6 +57,14 @@ export const Effect = z.discriminatedUnion('kind', [
     radius: z.number().min(0),
   }),
   z.object({
+    kind: z.literal('summon'),
+    /** id ของศัตรูที่จะเรียกออกมา (ใช้ได้เฉพาะฝั่งศัตรู) */
+    enemy: Id,
+    count: z.number().int().min(1).max(6),
+    /** ปล่อยถอยหลังจากจุดที่ผู้เรียกยืนกี่ช่อง (กันซ้อนทับกัน) */
+    behind: z.number().min(0).default(0.6),
+  }),
+  z.object({
     kind: z.literal('splash_on_hit'),
     /** passive: การโจมตีปกติกระจายรอบเป้า */
     radius: z.number().min(0),

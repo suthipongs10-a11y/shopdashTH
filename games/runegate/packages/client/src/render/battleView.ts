@@ -26,6 +26,8 @@ interface UnitView {
   dying: boolean;
   bar: HTMLDivElement;
   barFill: HTMLDivElement;
+  /** ป้ายชื่อ — มีเฉพาะมินิบอสและ MVP */
+  plate: HTMLDivElement | null;
   flash: number;
 }
 
@@ -70,11 +72,20 @@ export class BattleView {
     sprite.center.set(0.5, 0.06);
     this.scene.root.add(sprite);
 
+    const tier = isEnemy(u) ? u.def.tier : 'normal';
     const bar = document.createElement('div');
-    bar.className = `hpbar ${u.faction}`;
+    bar.className = `hpbar ${u.faction}${tier === 'normal' ? '' : ` ${tier}`}`;
     const barFill = document.createElement('div');
     bar.appendChild(barFill);
     this.overlay.appendChild(bar);
+
+    let plate: HTMLDivElement | null = null;
+    if (tier !== 'normal') {
+      plate = document.createElement('div');
+      plate.className = `nameplate ${tier}`;
+      plate.textContent = tier === 'mvp' ? `☠ ${u.name}` : u.name;
+      this.overlay.appendChild(plate);
+    }
 
     const view: UnitView = {
       uid: u.uid,
@@ -92,6 +103,7 @@ export class BattleView {
       dying: false,
       bar,
       barFill,
+      plate,
       flash: 0,
     };
     this.views.set(u.uid, view);
@@ -218,8 +230,10 @@ export class BattleView {
       this.tmp.copy(this.scene.project(u.x, height + v.headY + 0.14, u.y));
       const visible = this.tmp.z < 1 && (ratio < 1 || u.faction === 'enemy');
       v.bar.style.display = visible ? 'block' : 'none';
+      if (v.plate) v.plate.style.display = visible ? 'block' : 'none';
       if (visible) {
         v.bar.style.transform = `translate(${this.tmp.x}px, ${this.tmp.y}px)`;
+        if (v.plate) v.plate.style.transform = `translate(${this.tmp.x}px, ${this.tmp.y}px)`;
         v.barFill.style.width = `${ratio * 100}%`;
         const shield = u.statuses.find((s) => s.kind === 'shield');
         v.bar.classList.toggle('shielded', !!shield && shield.value > 0);
@@ -235,6 +249,7 @@ export class BattleView {
         v.frameIndex = 0;
         v.frameTime = 0;
         v.bar.style.display = 'none';
+        if (v.plate) v.plate.style.display = 'none';
       }
       v.frameTime += dt;
       const clip = v.atlas.anims.death;
@@ -246,6 +261,7 @@ export class BattleView {
         v.sprite.material.dispose();
         v.tex.dispose();
         v.bar.remove();
+        v.plate?.remove();
         this.views.delete(uid);
       }
     }
@@ -312,6 +328,7 @@ export class BattleView {
       v.sprite.material.dispose();
       v.tex.dispose();
       v.bar.remove();
+      v.plate?.remove();
     }
     this.views.clear();
     for (const f of this.floaters) f.el.remove();

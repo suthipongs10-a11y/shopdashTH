@@ -7,6 +7,8 @@ export const Enemy = z
     name_th: z.string().min(1),
     race: Race,
     element: Element,
+    /** ระดับของมอนสเตอร์ (§5.4) — normal ทั่วไป / elite มินิบอส / mvp บอสประจำบท */
+    tier: z.enum(['normal', 'elite', 'mvp']).default('normal'),
     traits: z.array(EnemyTrait).default([]),
     hp: z.number().min(1),
     atk: z.number().min(0),

@@ -25,6 +25,7 @@ const REFERENCE_LEVEL: Record<string, number> = {
   ch1_01: 1,
   ch1_02: 8,
   ch1_03: 15,
+  ch1_04: 28,
 };
 /** win-rate ขั้นต่ำที่เลเวลอ้างอิง (AutoPlayer เล่นไม่เก่งเท่าคน จึงตั้งไว้ 80%) */
 const MIN_WIN_RATE = 0.8;
