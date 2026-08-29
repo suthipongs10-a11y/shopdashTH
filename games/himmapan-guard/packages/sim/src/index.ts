@@ -1,0 +1,10 @@
+export { Battle } from './battle.js';
+export type { BattleOptions, DeployCheck, SquadEntry } from './battle.js';
+export { AutoPlayer, runHeadless } from './autoplay.js';
+export { Rng, seedFrom } from './rng.js';
+export { PathTrack, buildPaths, canDeployOn, dist2, tileOf } from './path.js';
+export type { Vec2 } from './path.js';
+export { computeDamage } from './damage.js';
+export type { DamageOptions, DamageOutput } from './damage.js';
+export * from './stats.js';
+export * from './types.js';

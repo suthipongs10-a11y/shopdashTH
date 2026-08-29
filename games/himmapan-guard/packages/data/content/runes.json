@@ -1,0 +1,143 @@
+{
+  "sets": [
+    {
+      "id": "energy",
+      "name_th": "พลังชีวิต",
+      "pieces": 2,
+      "bonus": {
+        "stat": "hp_pct",
+        "value": 15
+      },
+      "desc_th": "HP +15%",
+      "source": "giants_keep"
+    },
+    {
+      "id": "fatal",
+      "name_th": "สังหาร",
+      "pieces": 4,
+      "bonus": {
+        "stat": "atk_pct",
+        "value": 30
+      },
+      "desc_th": "ATK +30%",
+      "source": "giants_keep"
+    },
+    {
+      "id": "blade",
+      "name_th": "คมดาบ",
+      "pieces": 2,
+      "bonus": {
+        "stat": "crit_rate",
+        "value": 12
+      },
+      "desc_th": "อัตราคริติคอล +12%",
+      "source": "giants_keep"
+    },
+    {
+      "id": "swift",
+      "name_th": "ว่องไว",
+      "pieces": 4,
+      "bonus": {
+        "stat": "aspd_pct",
+        "value": 25
+      },
+      "desc_th": "ความเร็วโจมตี +25%",
+      "source": "dragons_lair"
+    },
+    {
+      "id": "tactic",
+      "name_th": "กลศึก",
+      "pieces": 2,
+      "bonus": {
+        "stat": "cost_down",
+        "value": 2
+      },
+      "desc_th": "แต้มวางของฮีโร่ตัวนี้ −2",
+      "source": "dragons_lair"
+    },
+    {
+      "id": "violent",
+      "name_th": "รุนแรง",
+      "pieces": 4,
+      "bonus": {
+        "stat": "cdr_pct",
+        "value": 20
+      },
+      "desc_th": "คูลดาวน์ท่าไม้ตาย −20%",
+      "source": "dragons_lair"
+    }
+  ],
+  "slotRules": [
+    {
+      "slot": 1,
+      "fixedMain": "atk_flat",
+      "mainPool": []
+    },
+    {
+      "slot": 2,
+      "mainPool": [
+        "atk_pct",
+        "hp_pct",
+        "def_pct",
+        "aspd_pct",
+        "cost_down"
+      ]
+    },
+    {
+      "slot": 3,
+      "fixedMain": "def_flat",
+      "mainPool": []
+    },
+    {
+      "slot": 4,
+      "mainPool": [
+        "atk_pct",
+        "hp_pct",
+        "def_pct",
+        "crit_rate",
+        "crit_dmg"
+      ]
+    },
+    {
+      "slot": 5,
+      "fixedMain": "hp_flat",
+      "mainPool": []
+    },
+    {
+      "slot": 6,
+      "mainPool": [
+        "atk_pct",
+        "hp_pct",
+        "def_pct",
+        "cdr_pct",
+        "range_flat"
+      ]
+    }
+  ],
+  "subStatPool": [
+    "hp_flat",
+    "hp_pct",
+    "atk_flat",
+    "atk_pct",
+    "def_flat",
+    "def_pct",
+    "aspd_pct",
+    "crit_rate",
+    "crit_dmg",
+    "cdr_pct"
+  ],
+  "rarityStartingSubs": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "subUpgradeEveryLevels": 3,
+  "maxLevel": 15,
+  "upgradeCost": {
+    "base": 380,
+    "gradeExp": 1.8,
+    "levelExp": 1.4
+  }
+}
