@@ -1,4 +1,4 @@
-import { cards, dropTableById, dropTables, enemies, enemyById, heroById, heroes, MELEE_MAX_RANGE, MELEE_MIN_RANGE, progression, skillById, stages } from './index.js';
+import { artBriefById, artBriefs, cards, dropTableById, dropTables, enemies, enemyById, heroById, heroes, MELEE_MAX_RANGE, MELEE_MIN_RANGE, progression, skillById, stages, turretById, turrets } from './index.js';
 import type { Stage } from './schema/stage.js';
 
 export interface ContentIssue {
@@ -77,6 +77,17 @@ export function validateContent(): ContentIssue[] {
       const known = KNOWN_ITEMS.has(e.item) || KNOWN_ITEM_PREFIX.some((p) => e.item.startsWith(p));
       if (!known) err(`dropTable:${t.id}`, `ไอเทม "${e.item}" ไม่อยู่ในรายการที่ระบบรู้จัก`);
       if (e.max < e.min) err(`dropTable:${t.id}`, `ไอเทม "${e.item}" max < min`);
+    }
+  }
+
+  // ทุกตัวละครต้องมีคำบรรยายภาพ ไม่งั้น prompt ที่ generate ออกมาจะกลวง (เพิ่มมอนใหม่แล้วลืมเขียน = จับได้ตรงนี้)
+  const drawableIds = [...heroes.map((x) => x.id), ...enemies.map((x) => x.id), ...turrets.map((x) => x.id)];
+  for (const id of drawableIds) {
+    if (!artBriefById.has(id)) err(`artBrief:${id}`, 'ไม่มีคำบรรยายภาพใน content/art_briefs.json');
+  }
+  for (const b of artBriefs) {
+    if (!heroById.has(b.id) && !enemyById.has(b.id) && !turretById.has(b.id)) {
+      err(`artBrief:${b.id}`, 'มีคำบรรยายภาพของตัวละครที่ไม่มีอยู่แล้ว');
     }
   }
 

@@ -2,7 +2,7 @@
   "name": "runegate",
   "version": "0.3.0",
   "private": true,
-  "description": "RUNEGATE — Tower Defense (Arknights-style) x Summoners War (runes/gacha) x Ragnarok Online (cards/refine)",
+  "description": "RUNEGATE \u2014 Tower Defense (Arknights-style) x Summoners War (runes/gacha) x Ragnarok Online (cards/refine)",
   "type": "module",
   "workspaces": [
     "packages/data",
@@ -22,7 +22,8 @@
     "validate": "tsx packages/tools/src/validate-content.ts",
     "verify": "npm run validate && npm run typecheck && npm run test && npm run balance -- --runs 400",
     "pack-sprites": "tsx packages/tools/src/pack-sprites.ts",
-    "art-status": "tsx packages/tools/src/pack-sprites.ts --check"
+    "art-status": "tsx packages/tools/src/pack-sprites.ts --check",
+    "art-prompts": "tsx packages/tools/src/gen-art-prompts.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

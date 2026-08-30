@@ -10,6 +10,7 @@ import dropsJson from '../content/drops.json';
 import weaponsJson from '../content/weapons.json';
 import turretsJson from '../content/turrets.json';
 import progressionJson from '../content/progression.json';
+import artBriefsJson from '../content/art_briefs.json';
 import stage101 from '../content/stages/ch1_01.json';
 import stage102 from '../content/stages/ch1_02.json';
 import stage103 from '../content/stages/ch1_03.json';
@@ -25,6 +26,7 @@ import { DropTable } from './schema/drop.js';
 import { Weapon } from './schema/weapon.js';
 import { Turret } from './schema/turret.js';
 import { ProgressionConfig } from './schema/progression.js';
+import { ArtBrief } from './schema/art-brief.js';
 import { Stage } from './schema/stage.js';
 import { heroStatsFor, skillAtLevel, type HeroProgress } from './progress.js';
 
@@ -40,6 +42,7 @@ export * from './schema/drop.js';
 export * from './schema/weapon.js';
 export * from './schema/turret.js';
 export * from './schema/progression.js';
+export * from './schema/art-brief.js';
 export * from './progress.js';
 export * from './balance.js';
 export { validateContent, tilesAlongPath, tileAt } from './validate.js';
@@ -77,6 +80,7 @@ export const stages: Stage[] = parseAll(Stage, [stage101, stage102, stage103, st
 export const runeConfig: RuneConfig = parseOne(RuneConfig, runesJson, 'runeConfig');
 export const economy: EconomyConfig = parseOne(EconomyConfig, economyJson, 'economy');
 export const progression: ProgressionConfig = parseOne(ProgressionConfig, progressionJson, 'progression');
+export const artBriefs: ArtBrief[] = parseAll(ArtBrief, artBriefsJson as unknown[], 'artBrief');
 
 function index<T extends { id: string }>(rows: T[]): ReadonlyMap<string, T> {
   const m = new Map<string, T>();
@@ -95,6 +99,7 @@ export const stageById = index(stages);
 export const dropTableById = index(dropTables);
 export const weaponById = index(weapons);
 export const turretById = index(turrets);
+export const artBriefById = index(artBriefs);
 
 export function getHero(id: string): Hero {
   const h = heroById.get(id);

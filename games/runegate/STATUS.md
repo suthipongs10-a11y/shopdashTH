@@ -112,8 +112,10 @@
 - [ ] **Phase 5 — Server + Gacha**: auth+save ฝั่ง server, สุ่มฮีโร่ + pity, Energy, Mail, ตัวซ้ำ→เศษวิญญาณ
   - `@runegate/meta` ออกแบบมาให้ยกไปรันฝั่ง server ได้ทั้งก้อน (ไม่มี DOM/localStorage, สุ่มผ่าน seed)
   - ตอนนี้ผู้เล่นมีฮีโร่ 8 จาก 20 ตัว — อีก 12 ตัวรอระบบอัญเชิญ
-- [ ] **Phase 3 — Sprite Factory** (ค้าง): ต้องมีคนวาด 60 เฟรม/ตัว — เครื่องมือ (`npm run pack-sprites`) และ
-      `ART_GUIDE.md` พร้อมแล้ว โค้ด render รับ atlas จริงได้ทันทีที่ไฟล์มา
+- [ ] **Phase 3 — Sprite Factory** (ค้างที่ "ต้อง gen รูปจริง" เท่านั้น): เครื่องมือครบแล้วทั้งเส้น
+  - `npm run art-prompts` → prompt ภาษาอังกฤษพร้อมใช้ 63 ตัว × 7 ชุด ใน `art/prompts/` (ครอบคลุม 3,780 เฟรม)
+  - คำบรรยายตัวละครทุกตัวอยู่ใน `content/art_briefs.json` + validator บังคับว่าต้องมีครบ
+  - `npm run pack-sprites` แพ็คเข้าเกม · `npm run art-status` ดูว่าตัวไหนยังเป็น placeholder
 - [ ] วัด fps บนมือถือจริง (ปิด DoD ข้อ 5 ของ Phase 2)
 
 ---

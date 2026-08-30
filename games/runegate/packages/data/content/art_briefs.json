@@ -1,0 +1,443 @@
+[
+  {
+    "id": "warden_kael",
+    "silhouette": "Towering plate-armoured knight, shoulders twice as broad as a normal man, slab-like tower shield and a two-handed warhammer",
+    "details": "Blue-steel plate with worn brass trim, tattered dark cloak, closed great helm with one horizontal visor slit glowing faint cold blue, rune-etched pauldrons",
+    "attack": "Raises the warhammer overhead and slams it down, hammer head buried in the ground on the final frame",
+    "death": "Drops to one knee, shield falls away, then pitches forward onto the hammer"
+  },
+  {
+    "id": "militia_swordsman",
+    "silhouette": "Ordinary villager turned soldier: padded gambeson, small round wooden shield, plain short sword",
+    "details": "Deep blue tunic over off-white padding, leather straps and belt, no helmet, cropped brown hair, tanned skin, mud on the boots",
+    "attack": "Steps forward and thrusts the short sword straight ahead, shield tucked in",
+    "death": "Staggers back, sword slips from the hand, collapses sideways"
+  },
+  {
+    "id": "varr_beastkin",
+    "silhouette": "Lean upright wolf-man, long cream-white fur, oversized clawed gauntlets, whip-thin tail",
+    "details": "Pale ivory fur with cyan-blue leather harness and arm wraps, no shirt, bare muscled chest, pointed ears, cyan eyes",
+    "attack": "Two-frame cross slash with both claw gauntlets, body twisting with the swing",
+    "death": "Recoils, drops onto all fours, then flattens to the ground"
+  },
+  {
+    "id": "nyx_shadowblade",
+    "silhouette": "Slim hooded assassin wrapped in dark cloth, twin curved daggers held in reverse grip",
+    "details": "Near-black robes with deep violet lining, face fully hidden in the hood except a violet glint where the eyes are, wrapped forearms, soft boots",
+    "attack": "Vanishes into a low crouch and lunges with both daggers crossing in front",
+    "death": "Body dissolves into thin violet smoke from the feet upward"
+  },
+  {
+    "id": "wolfkin_striker",
+    "silhouette": "Small hunched wolf-kin scrapper, patchy brown fur, ember-orange claws",
+    "details": "Sandy brown fur, burnt-orange leather scraps and a singed shoulder wrap, ember glow at the claw tips, one ear notched",
+    "attack": "Quick pounce with a forward claw rake",
+    "death": "Rolls onto its back and goes limp"
+  },
+  {
+    "id": "sylvane_archer",
+    "silhouette": "Slender winged forest sprite hovering just off the ground, long recurve bow of living wood",
+    "details": "Pale green-gold leaf armour, translucent teal insect wings, long light hair, bare feet that never touch the ground",
+    "attack": "Draws the bowstring fully back and looses, wings flaring wide on release",
+    "death": "Wings crumple, the sprite sinks slowly and folds inward"
+  },
+  {
+    "id": "ranger_bryn",
+    "silhouette": "Practical woodland hunter in a hooded cloak, longbow, quiver at the hip",
+    "details": "Deep green cloak over tan leather, fur trim at the collar, hood down showing a weathered face, arm bracer on the bow arm",
+    "attack": "Nocks, draws and releases an arrow in three clean beats",
+    "death": "Takes the hit in the chest, drops the bow, kneels then falls forward"
+  },
+  {
+    "id": "archmage_ignis",
+    "silhouette": "Robed spellcaster wreathed in fire, tall staff crowned with a burning core",
+    "details": "Deep crimson robes with gold trim, high collar, grey beard, eyes glowing molten orange, small flames drifting off the shoulders",
+    "attack": "Raises the staff, fire gathers at the crown, then thrusts it forward as the flame bursts",
+    "death": "Fire gutters out, the robe collapses inward leaving drifting embers"
+  },
+  {
+    "id": "tidecaller_naia",
+    "silhouette": "Translucent water spirit with no legs, a flowing column of water below the waist",
+    "details": "Body made of clear teal water with a brighter aqua core, long hair of falling water, faint white foam at the edges, no clothing detail — silhouette is the whole design",
+    "attack": "Sweeps both arms forward and a curl of water arcs from the hands",
+    "death": "Loses cohesion and splashes down into a spreading pool"
+  },
+  {
+    "id": "cleric_seraphine",
+    "silhouette": "Upright priestess in flowing white robes, tall staff topped with a golden sun disc",
+    "details": "Ivory-white robes with warm gold hem and sash, shoulder-length fair hair, calm face, faint golden halo behind the head",
+    "attack": "Lifts the staff, the sun disc flares, then lowers it with both hands",
+    "death": "Light fades from the disc, she sinks to her knees then slumps"
+  },
+  {
+    "id": "hexer_morrin",
+    "silhouette": "Stooped hooded witch leaning on a gnarled staff hung with charms",
+    "details": "Dark indigo robe with violet trim, deep hood shadowing the face, bony hands, small bone charms and vials on the belt",
+    "attack": "Jabs the staff forward, a violet hex sigil flashing at its tip",
+    "death": "Curls inward, the staff falls, the body sags into the robe"
+  },
+  {
+    "id": "quartermaster_pell",
+    "silhouette": "Round-bellied merchant with an overstuffed backpack taller than his head",
+    "details": "Mustard-gold coat, brown leather straps and pouches, flat cap, no weapon, coin purse swinging at the hip, cheerful face",
+    "attack": "Swings the pack around and hurls a supply crate forward",
+    "death": "Sits down hard, the pack bursts and coins scatter"
+  },
+  {
+    "id": "forgemaster_durn",
+    "silhouette": "Broad, short dwarf smith with a huge braided beard and a heavy forge hammer",
+    "details": "Rust-brown apron over ember-orange under-tunic, thick leather gloves, soot on the arms, iron rings braided into the beard",
+    "attack": "Winds the hammer back over the shoulder and drives it forward low",
+    "death": "Plants the hammer to stay upright, then topples backward over it"
+  },
+  {
+    "id": "dawnguard_arien",
+    "silhouette": "Knight in gleaming golden plate with a kite shield and an arming sword raised in guard",
+    "details": "Pale gold plate with cream cloth surcoat, open-faced helm with a dawn-ray crest, warm highlights along every armour edge",
+    "attack": "Shield-bash forward then a downward sword cut",
+    "death": "Kneels behind the shield, the shield drops, and the body slides down"
+  },
+  {
+    "id": "ironvow_gunnar",
+    "silhouette": "Stocky soldier in mismatched scavenged armour with a battered maul",
+    "details": "Rust-red breastplate over dark leather, a torn cloth wrap on the forearm, close-cropped hair, hard set jaw, soot smudges",
+    "attack": "Two-handed horizontal sweep of the maul that ends chest-high",
+    "death": "Takes a step back, drops to both knees, then falls face down"
+  },
+  {
+    "id": "stormcaller_vela",
+    "silhouette": "Levitating mage in storm-grey robes, arms outstretched, hair and cloth streaming upward",
+    "details": "Teal-grey layered robes with pale mint trim, floating just off the ground, small arcs of white lightning crackling between the fingers and the staff",
+    "attack": "Both arms rise, lightning gathers overhead, then snaps down and forward",
+    "death": "Lightning discharges outward all at once, then the body drops limp"
+  },
+  {
+    "id": "plaguebinder_sorrel",
+    "silhouette": "Gaunt hooded figure half-dissolved into drifting green mist below the waist",
+    "details": "Muted purple robes, plague-doctor beak mask in dull bone white, sickly green vapour trailing from the sleeves and hem, a stoppered vial staff",
+    "attack": "Extends one hand and a puff of green spores billows forward",
+    "death": "The mist thins, the mask tips forward, the robe empties and settles"
+  },
+  {
+    "id": "sunwarden_lyra",
+    "silhouette": "Alert archer in light golden scale, longbow held high, quiver over the shoulder",
+    "details": "Warm gold scale over cream cloth, a short cape, braided hair, an open circlet, arrow fletchings tipped in white-gold",
+    "attack": "Draws and looses upward at a steep angle, following through with the bow arm",
+    "death": "Bow falls first, she sinks backward onto one hip and settles"
+  },
+  {
+    "id": "tideheart_maren",
+    "silhouette": "Serene healer in deep blue robes with a wide collar, staff topped with a spiral shell",
+    "details": "Ocean blue robes with pale ice-blue trim, long dark hair with a single pale streak, small water droplets orbiting the staff head",
+    "attack": "Sweeps the staff in a wide arc, a ribbon of water following the tip",
+    "death": "The orbiting droplets fall, she folds forward and sinks down"
+  },
+  {
+    "id": "windrunner_tam",
+    "silhouette": "Light-footed pedlar caught mid-stride, satchel bouncing, a throwing knife in hand",
+    "details": "Olive-green travelling coat with pale trim, cloth wrapped shins, wide-brimmed hat pushed back, several small pouches",
+    "attack": "Spins once and flicks the knife forward underhand",
+    "death": "Trips forward, satchel spilling, and lands sprawled"
+  },
+  {
+    "id": "restless_shade",
+    "silhouette": "Faceless grey wraith, roughly human-shaped, lower body trailing off into ragged tatters",
+    "details": "Cold slate-grey vapour with pale silver edges, two empty white eye-holes, no mouth, torn shroud edges that never settle",
+    "attack": "Lunges forward with both arms stretched out",
+    "death": "Tears apart into ribbons of grey mist"
+  },
+  {
+    "id": "ghoul",
+    "silhouette": "Hunched emaciated corpse walking on knuckles and feet, jaw hanging open",
+    "details": "Grey-brown mottled skin stretched over ribs, torn burial rags in dull maroon, long dirty claws, sunken eyes",
+    "attack": "Rears up and swipes downward with both claws",
+    "death": "Collapses into a heap of limbs"
+  },
+  {
+    "id": "wraith",
+    "silhouette": "Floating hollow robe with no body inside, long sleeves hanging empty",
+    "details": "Deep violet robe with pale lavender inner glow, hood open onto darkness, hem shredded into smoke, hovers a full body-length above the ground",
+    "attack": "Sleeves whip forward and the hood lunges",
+    "death": "The robe folds flat and drifts down like falling cloth"
+  },
+  {
+    "id": "ember_wolf",
+    "silhouette": "Four-legged wolf with a mane of live fire along its spine",
+    "details": "Charcoal and rust fur, orange embers glowing between the shoulder blades, molten cracks along the flanks, smoking paw prints",
+    "attack": "Leaps forward and snaps its jaws",
+    "death": "Fire goes out, the body collapses and smoke rises"
+  },
+  {
+    "id": "bog_serpent",
+    "silhouette": "Thick low snake coiled in an S, head raised, no legs",
+    "details": "Mossy green scales with a darker spine stripe, pale belly, wet sheen, small yellow eyes",
+    "attack": "Rears back then strikes forward, jaws wide",
+    "death": "Uncoils limp and flattens out"
+  },
+  {
+    "id": "carapace_scorpion",
+    "silhouette": "Broad armoured scorpion, heavy claws forward, tail arched overhead",
+    "details": "Stone-grey plated shell with darker joint seams, sand-worn edges, dull matte finish, no shine",
+    "attack": "Both claws snap shut, then the tail stabs down over the head",
+    "death": "Legs fold under, the tail drops and the shell settles"
+  },
+  {
+    "id": "venom_wasp",
+    "silhouette": "Small hovering wasp with a long stinger and blurred wings",
+    "details": "Bright yellow and black banded abdomen, translucent wings drawn as motion blur, a wet green bead at the stinger tip",
+    "attack": "Hovers back then darts forward stinger-first",
+    "death": "Wings stop, it tumbles and lands upside down"
+  },
+  {
+    "id": "cult_acolyte",
+    "silhouette": "Robed human cultist with a bowed head and a raised offering bowl",
+    "details": "Bone-white robe with a blood-red sash and hood lining, face hidden, bare feet, ritual staff with a red gem",
+    "attack": "Raises both arms and the gem pulses",
+    "death": "The bowl falls, the figure crumples inside the robe"
+  },
+  {
+    "id": "revenant_knight",
+    "silhouette": "Dead knight in rusted plate, spear held level, walking stiffly",
+    "details": "Blue-grey corroded plate with pale ice highlights, gaps showing nothing but shadow, ragged cloth tabard, notched spear",
+    "attack": "Sets the feet and drives the spear straight forward",
+    "death": "Armour comes apart at the joints and clatters down"
+  },
+  {
+    "id": "shadow_stalker",
+    "silhouette": "Lithe humanoid made of solid shadow, crouched low, one dagger reversed",
+    "details": "Matte black body with faint violet edge light, no facial features except two thin violet slits, wisps trailing from the shoulders",
+    "attack": "Flickers forward and slashes across",
+    "death": "Sinks straight down into its own shadow"
+  },
+  {
+    "id": "ogre_bruiser",
+    "silhouette": "Massive green ogre, one shoulder plated in scrap iron, dragging a crude maul",
+    "details": "Moss-green hide with yellow-gold scrap armour, tusks, small angry eyes, thick rope belt, scars across the chest",
+    "attack": "Winds up a huge overhead maul swing that shakes the ground",
+    "death": "Sways, drops the maul, then falls straight backward"
+  },
+  {
+    "id": "night_terror",
+    "silhouette": "Tall shapeless nightmare of dark purple smoke with too many faint eyes",
+    "details": "Deep aubergine mist with lilac highlights, five or six dim violet eye-lights scattered in the mass, edges constantly fraying",
+    "attack": "Swells outward and lashes with a smoke tendril",
+    "death": "Contracts to a single point of light and blinks out"
+  },
+  {
+    "id": "banshee",
+    "silhouette": "Floating woman-shaped spirit, mouth open in a scream, hair streaming upward",
+    "details": "Wine-red and pale pink translucent gown, long white hair rising as if underwater, hollow eyes, no legs below the gown",
+    "attack": "Head snaps back then forward with the mouth open wide, scream rings visible as arcs",
+    "death": "The scream cuts off, the form thins and unravels upward"
+  },
+  {
+    "id": "malakar",
+    "silhouette": "Enormous horned demon lord in blackened armour with a burning halberd",
+    "details": "Blood-red hide under scorched black plate, curved back-swept horns, molten orange cracks across the chest, cape of burnt leather, tall enough to fill the frame",
+    "attack": "Plants the halberd, rears back and sweeps it in a wide burning arc",
+    "death": "Falls to one knee, armour cracks open with light pouring out, then slams face-down"
+  },
+  {
+    "id": "gel_slime",
+    "silhouette": "Simple rounded blob with a wobbling top, two dot eyes",
+    "details": "Translucent teal jelly with a brighter aqua core visible inside, glossy highlight on the upper left, small drips at the base",
+    "attack": "Squashes down then springs forward as a body slam",
+    "death": "Splits and spreads flat into a shallow puddle"
+  },
+  {
+    "id": "larva_grub",
+    "silhouette": "Fat segmented grub, low to the ground, blunt head",
+    "details": "Pale cream segments with tan bands, glossy wet skin, tiny black eye dots, small stubby legs",
+    "attack": "Rears the front segments up and lunges with its mouth",
+    "death": "Curls into a comma shape and stops moving"
+  },
+  {
+    "id": "cave_bat",
+    "silhouette": "Small bat in flight, wings spread wide, ears larger than the head",
+    "details": "Dusty purple-grey fur, thin membrane wings with visible bone struts, tiny fangs, red pinprick eyes",
+    "attack": "Folds the wings and dives forward",
+    "death": "Wings crumple and it drops in a tumble"
+  },
+  {
+    "id": "goblin_raider",
+    "silhouette": "Small hunched goblin sprinting with a crude knife held low",
+    "details": "Bright green skin, dirty red rag tunic, oversized pointed ears, chipped teeth, a single leather bracer",
+    "attack": "Skids to a stop and stabs upward",
+    "death": "Flips onto its back with limbs in the air"
+  },
+  {
+    "id": "skeleton_soldier",
+    "silhouette": "Bare skeleton in a rusted helm carrying a notched sword and buckler",
+    "details": "Bone white with grey-brown grime in the crevices, empty eye sockets with a faint spark, a few scraps of leather strap still holding the ribs",
+    "attack": "Chops downward with the sword in a stiff two-frame arc",
+    "death": "Comes apart mid-motion, bones scattering, skull last"
+  },
+  {
+    "id": "ridge_runner",
+    "silhouette": "Long-legged flightless bird, body low and forward, running posture",
+    "details": "Sandy gold plumage with a blue-teal neck ruff, strong scaled legs, small hooked beak, stub wings",
+    "attack": "Kicks forward with one clawed foot",
+    "death": "Legs buckle and it tumbles beak-first"
+  },
+  {
+    "id": "fang_hound",
+    "silhouette": "Sleek pale hunting hound, head low, ears back",
+    "details": "Cream-white short fur with light tan markings, black nose, amber eyes, lean visible ribs",
+    "attack": "Springs and bites",
+    "death": "Rolls onto its side and stretches out"
+  },
+  {
+    "id": "gargoyle",
+    "silhouette": "Stone-winged demon perched or gliding, hunched shoulders, clawed hands",
+    "details": "Weathered grey stone body with darker cracks and moss in the seams, blank carved eyes, folded bat-like stone wings",
+    "attack": "Sweeps both stone claws inward",
+    "death": "Cracks apart into chunks of rubble"
+  },
+  {
+    "id": "orc_warrior",
+    "silhouette": "Heavy-set orc with a broad cleaver-like sword and a plank shield",
+    "details": "Olive-green skin, brass-studded leather armour, lower tusks, topknot, thick forearms",
+    "attack": "Overhead chop with the cleaver, shield raised",
+    "death": "Drops to one knee, then falls sideways with the shield clattering"
+  },
+  {
+    "id": "orc_slinger",
+    "silhouette": "Lean orc winding up to hurl a short throwing spear",
+    "details": "Darker olive skin, minimal leather harness, a quiver of spears on the back, war paint stripes on the arms",
+    "attack": "Rocks back, then throws the spear overhand with a full follow-through",
+    "death": "Spins with the momentum and drops"
+  },
+  {
+    "id": "frost_undine",
+    "silhouette": "Elegant ice spirit with a crystalline lower body, arms crossed at the chest",
+    "details": "Bright ice blue body with white frost edges, crystal shards floating around the shoulders, glass-clear highlights",
+    "attack": "Uncrosses the arms and pushes forward as frost shards fly",
+    "death": "Shatters into falling shards that fade"
+  },
+  {
+    "id": "stone_golem",
+    "silhouette": "Colossal humanoid of stacked boulders with a tiny head between huge shoulders",
+    "details": "Grey granite blocks with darker mortar-like seams, glowing pale blue runes on the chest and knuckles, moss on the shoulders",
+    "attack": "Raises both fists together and pounds the ground",
+    "death": "Runes go dark, then it collapses into a pile of blocks"
+  },
+  {
+    "id": "minotaur",
+    "silhouette": "Huge bull-headed brute, hunched forward, massive axe-hammer in both hands",
+    "details": "Chestnut brown fur, brass nose ring, gold-banded horns, leather harness across the chest, hooved feet",
+    "attack": "Lowers the horns for a shoulder charge, then swings the hammer across",
+    "death": "Bellows, drops to one knee, then falls forward horns-first"
+  },
+  {
+    "id": "tomb_warden",
+    "silhouette": "Armoured guardian mummy with a long ceremonial spear held upright",
+    "details": "Bleached bone-gold wrappings under blue-lapis armour plates, tall crowned helm, ceremonial spear with a blue pennant",
+    "attack": "Levels the spear and thrusts twice in quick succession",
+    "death": "The wrappings unravel and the armour drops in place"
+  },
+  {
+    "id": "hellhound",
+    "silhouette": "Large black hound with three heads and burning red eyes",
+    "details": "Charcoal-black fur with red-hot cracks along the ribs, three heads on thick necks, smoke leaking from the jaws",
+    "attack": "All three heads lunge and bite in sequence",
+    "death": "The fires go out one head at a time, then the body drops"
+  },
+  {
+    "id": "lich_sovereign",
+    "silhouette": "Skeletal sorcerer-king floating above the ground in a tattered crown and robes, holding a long staff",
+    "details": "Deep navy robes with teal inner glow, bare skull with a broken gold crown, teal soul-fire in the eye sockets, skeletal hands, robe hem trailing into mist",
+    "attack": "Raises the staff overhead, teal fire gathering, then points it forward",
+    "death": "Crown falls first, the skull cracks, then the robes collapse into teal fire"
+  },
+  {
+    "id": "chimera",
+    "silhouette": "Monstrous hybrid: lion body, goat head at the shoulder, serpent tail raised",
+    "details": "Tawny gold lion fur, dark red mane, grey goat head with curled horns, green serpent tail with its own open mouth, feathered joints",
+    "attack": "Lion head bites while the serpent tail strikes over the back",
+    "death": "All three heads fall at different moments, then the body slumps"
+  },
+  {
+    "id": "ifrit",
+    "silhouette": "Giant flame demon with a molten rock body and a crown of fire",
+    "details": "Cracked obsidian-red skin with white-hot fissures, no legs below a swirling column of fire, huge shoulders, blazing yellow eyes",
+    "attack": "Slams both fists together, then throws a wave of fire forward",
+    "death": "The fire collapses inward, the rock body dims to black and crumbles"
+  },
+  {
+    "id": "moonfang_matriarch",
+    "silhouette": "Nine-tailed white fox spirit standing tall, tails fanned out behind",
+    "details": "Pearl-white fur with pale blue tips on each of the nine tails, silver-blue markings around the eyes, floating pale-blue orb above the brow",
+    "attack": "Sweeps forward with a claw while the tails snap outward in a fan",
+    "death": "The tails fall one by one, the orb winks out, then the body settles"
+  },
+  {
+    "id": "rock_thrower",
+    "silhouette": "Small wooden torsion catapult with a loaded stone in the sling arm",
+    "details": "Rough timber frame with rope bindings, iron pins, a grey boulder in the cradle, no crew figure",
+    "attack": "The arm swings up and releases the stone, ropes snapping taut",
+    "death": "The frame splinters and the arm falls off its pivot"
+  },
+  {
+    "id": "repeater",
+    "silhouette": "Compact three-barrel gun on a swivel mount, barrels stacked in a triangle",
+    "details": "Gunmetal grey housing with bright cyan rune inlays along the barrels, brass fittings, a small rune core glowing between the barrels",
+    "attack": "Muzzle flashes travel from barrel to barrel in a fast burst",
+    "death": "Barrels split apart and the cyan core dims out"
+  },
+  {
+    "id": "scattergun",
+    "silhouette": "Wide-mouthed blunderbuss on a squat tripod, bell muzzle facing forward",
+    "details": "Warm copper barrel with orange-heated bands near the muzzle, dark wooden stock, iron tripod legs",
+    "attack": "The bell muzzle flares with a wide cone of fire and recoils hard",
+    "death": "The barrel bursts open like a peeled flower and the tripod folds"
+  },
+  {
+    "id": "mortar",
+    "silhouette": "Short fat mortar tube angled steeply upward on a heavy base",
+    "details": "Slate-grey iron tube with brass reinforcing rings, dark iron base plate, a faint violet rune ring at the muzzle",
+    "attack": "The tube kicks and a shell arcs out of the muzzle with a smoke ring",
+    "death": "The tube cracks along its length and topples off the base"
+  },
+  {
+    "id": "autocannon",
+    "silhouette": "Rotary five-barrel cannon on a heavy swivel, barrel cluster mid-spin",
+    "details": "Steel-blue housing with glowing cyan rune bands, exposed ammunition feed, heavy bolted base",
+    "attack": "The barrel cluster spins and rattles off a rapid string of muzzle flashes",
+    "death": "The cluster seizes, throws sparks, and the housing splits open"
+  },
+  {
+    "id": "lance",
+    "silhouette": "Slim white crystal spire on a ring mount, focusing lens at the tip",
+    "details": "Polished pale-ivory casing with cyan light channels, a floating crystal prism held in a ring at the tip, no visible barrel",
+    "attack": "Light charges along the channels then fires a straight lance of cyan light",
+    "death": "The prism cracks and the light drains away down the channels"
+  },
+  {
+    "id": "fivefold",
+    "silhouette": "Fan of five short barrels spread like a hand on a low mount",
+    "details": "Burnt-orange metal with gold heat bands, five muzzles angled outward, dark scorch marks around each mouth",
+    "attack": "All five muzzles flash at once in a spread pattern",
+    "death": "The fan collapses inward and the muzzles droop"
+  },
+  {
+    "id": "flamewheel",
+    "silhouette": "Ring-shaped brazier on a stand with a spinning wheel of fire in the middle",
+    "details": "Blackened iron ring with runic notches, a wheel of orange-yellow flame turning inside it, heat shimmer above",
+    "attack": "The wheel spins faster and flings off a spiralling fireball",
+    "death": "The wheel breaks apart, fire spills out and gutters down"
+  },
+  {
+    "id": "hellfire",
+    "silhouette": "Massive wide-bore mortar with a fire-lit chamber and a scorched maw",
+    "details": "Dark blood-red iron plating with orange-hot seams, a scorched flared muzzle, ash caked around the base",
+    "attack": "The chamber flares white-hot and a huge fire shell arcs out",
+    "death": "The chamber blows open, fire pours from the seams, and the barrel drops"
+  },
+  {
+    "id": "cluster",
+    "silhouette": "Bulbous mortar with a segmented shell visible in the open breech",
+    "details": "Dark violet-grey plating with purple rune seams, a segmented shell showing in the breech, four small pods around the muzzle",
+    "attack": "The shell launches and the four pods pop open in its wake",
+    "death": "The pods detonate in place and the body caves in"
+  }
+]
