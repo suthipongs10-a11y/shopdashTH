@@ -1,0 +1,11 @@
+# Marks ads-insight/ as its own pnpm root so that `pnpm install` here stays
+# local instead of walking up into the ShopDash project in the parent folder.
+# The PWA (milestone M6) becomes a second package under pwa/.
+packages:
+  - '.'
+
+# wrangler ships the workerd runtime and esbuild as native binaries; their
+# postinstall scripts must run or `pnpm dev` / `wrangler deploy` will not work.
+onlyBuiltDependencies:
+  - esbuild
+  - workerd

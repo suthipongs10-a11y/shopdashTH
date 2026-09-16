@@ -1,0 +1,31 @@
+# Ads Insight — local secrets (SPEC §5.4)
+# Copy to `.dev.vars` and fill in. `.dev.vars` is gitignored — never commit it.
+# `wrangler dev` loads this file automatically; the M0 scripts read it too.
+#
+# For deploys the same values go in as Worker secrets:
+#   pnpm exec wrangler secret put GOOGLE_OAUTH_CLIENT_ID
+
+# ── Google OAuth client (Web application) ─────────────────────────────────────
+# From the Google Cloud project that has the Google Ads API enabled.
+GOOGLE_OAUTH_CLIENT_ID=
+GOOGLE_OAUTH_CLIENT_SECRET=
+
+# Refresh token for the Google Ads account, obtained with `pnpm auth:google`.
+# Stored AES-GCM encrypted in D1 from M2 onward; plaintext here is local-only.
+GOOGLE_ADS_REFRESH_TOKEN=
+
+# ── Access control ────────────────────────────────────────────────────────────
+# Comma-separated emails allowed to authorize the MCP connector and sign in to
+# the PWA. Everyone else is rejected.
+OWNER_EMAILS=
+
+# ── Crypto / sessions ─────────────────────────────────────────────────────────
+# 32 random bytes, base64. Generate with:
+#   node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
+TOKEN_ENC_KEY=
+SESSION_SECRET=
+
+# ── Dev only ──────────────────────────────────────────────────────────────────
+# Bearer token for connecting Claude Code to the local MCP server.
+# Honoured only when ENV=dev. Generate the same way as the keys above.
+DEV_BEARER_TOKEN=

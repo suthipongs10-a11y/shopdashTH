@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# wrangler / workers local state
+.wrangler/
+dist/
+
+# secrets — .dev.vars holds real credentials, only the example is committed
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# PWA build output (M6)
+pwa/dist/
+pwa/node_modules/
+pwa/dev-dist/
+
+# typescript
+*.tsbuildinfo
+
+# fixtures captured from a live account before scrubbing (SPEC M1)
+test/fixtures/*.raw.json
+
+.DS_Store

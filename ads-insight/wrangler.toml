@@ -1,0 +1,48 @@
+# Ads Insight — Cloudflare Worker (SPEC §3, §5.4, §9.1)
+# One Worker serves MCP + OAuth + PWA API + cron + static assets.
+
+name = "ads-insight"
+main = "src/index.ts"
+compatibility_date = "2026-09-15"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Vars (non-secret; SPEC §5.4) ──────────────────────────────────────────────
+# Secrets live in .dev.vars locally and in `wrangler secret put` for deploys.
+[vars]
+ENV = "dev"
+ACCOUNT_TZ = "Asia/Bangkok"
+# Google Ads REST API version. Bumping this must be followed by re-running the
+# fixture tests (SPEC §4).
+ADS_API_VERSION = "v25"
+# Filled in during M0 once the real account is known (digits only, no dashes).
+DEFAULT_CUSTOMER_ID = ""
+# Only set when the account is reached through an MCC.
+LOGIN_CUSTOMER_ID = ""
+# Test client account — the ONLY account mutate tests may touch (CLAUDE.md).
+TEST_CUSTOMER_ID = ""
+
+# ── D1 (SPEC §10) ─────────────────────────────────────────────────────────────
+# M0: run `pnpm exec wrangler d1 create ads_insight` and paste the id below.
+# The schema itself lands in M3; src/db/migrations/ is intentionally empty now.
+[[d1_databases]]
+binding = "DB"
+database_name = "ads_insight"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "src/db/migrations"
+
+# ── Cron triggers (SPEC §9.1) — enabled in M3 with the scheduled() handler ─────
+# Times below are the Asia/Bangkok schedule from the spec converted to UTC:
+#   "30 23 * * *"            -> 06:30 ICT daily  (snapshots)
+#   "40 23 * * *"            -> 06:40 ICT daily  (alerts, change-set expiry)
+#   "0 1,4,7,10,13,16 * * *" -> every 3h, 08:00-23:00 ICT (light checks)
+#   "0 0 * * 1"              -> Monday 07:00 ICT (keyword weekly)
+# [triggers]
+# crons = ["30 23 * * *", "40 23 * * *", "0 1,4,7,10,13,16 * * *", "0 0 * * 1"]
+
+# ── PWA static assets (SPEC §11) — enabled in M6 once pwa/dist exists ─────────
+# [assets]
+# directory = "pwa/dist"
+# not_found_handling = "single-page-application"
+
+[observability]
+enabled = true

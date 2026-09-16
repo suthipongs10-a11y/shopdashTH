@@ -1,0 +1,16 @@
+{
+  // Local Node tooling: the M0 setup scripts, the test suite and vitest config.
+  //
+  // Node types only — @cloudflare/workers-types is deliberately left out because
+  // the two type sets clash (workers-types stubs globals such as Buffer). Tests
+  // therefore reach into src/config.ts and other runtime-agnostic modules, never
+  // into Worker-binding code; a type error here means that line was violated.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": ["scripts/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+  "exclude": ["node_modules", "pwa", "dist", ".wrangler"]
+}

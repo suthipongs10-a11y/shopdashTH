@@ -1,0 +1,12 @@
+{
+  // Worker code. Node types are deliberately absent: src/ads and src/services
+  // must stay runtime-agnostic so the project can move off Workers (SPEC §2 D1).
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "pwa", "dist", ".wrangler"]
+}
