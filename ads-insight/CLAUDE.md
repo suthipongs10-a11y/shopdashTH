@@ -11,6 +11,7 @@
 Google Ads MCP server + PWA ส่วนตัวบน Cloudflare Workers
 ดึงข้อมูลบัญชี Google Ads ให้ Claude (claude.ai) วิเคราะห์ และให้ Claude เสนอการแก้ไขผ่าน **Change Set + guardrails + การอนุมัติ**
 - สเปคเต็ม: `docs/SPEC.md` · กรอบวิเคราะห์ของ Claude: `docs/PLAYBOOK.md` · การตัดสินใจ: `docs/DECISIONS.md`
+- ตั้งค่า Google Cloud (M0): `docs/SETUP-GOOGLE-CLOUD.md` — ถ้าผู้ใช้รายงานว่าหน้าจอไม่ตรง ให้แก้ไฟล์นี้
 - ขอบเขตตอนนี้: บัญชีเจ้าของ **1 บัญชี** แต่โค้ดต้องรองรับหลายบัญชี (`org_id`, `account_id`, `customer_id`)
 
 ## Milestone ปัจจุบัน

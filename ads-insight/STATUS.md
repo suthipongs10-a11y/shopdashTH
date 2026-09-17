@@ -6,6 +6,8 @@
 ## M0 Checklist
 
 ### ฝั่ง Google Cloud / Google Ads (ผู้ใช้ทำ — Claude Code ช่วยตรวจ)
+> คู่มือทีละขั้นพร้อมลิงก์ตรง: [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md)
+
 - [ ] สร้าง Google Cloud project + Enable Google Ads API
 - [ ] OAuth consent screen (External) → สถานะ **In production**
       (ถ้าค้างที่ Testing refresh token จะหมดอายุใน 7 วัน — `pnpm check:access` จะบอกอาการนี้ให้)

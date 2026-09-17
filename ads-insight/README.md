@@ -16,6 +16,7 @@ Google Ads MCP server + PWA ส่วนตัว บน Cloudflare Workers
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | กฎการทำงานของ Claude Code — **อ่านก่อนทุกเซสชัน** |
 | [`STATUS.md`](STATUS.md) | milestone ปัจจุบัน, งานที่ทำไปแล้ว, งานค้าง — **อ่านต่อจาก CLAUDE.md** |
+| [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md) | **คู่มือตั้งค่า Google Cloud + Google Ads API ทีละขั้น (M0)** |
 | [`docs/SPEC.md`](docs/SPEC.md) | สเปคเต็ม: สถาปัตยกรรม, MCP tools, change set, schema, milestone + gate |
 | [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | กรอบวิเคราะห์ของ Claude ในแชท (ใช้เป็น Claude Project instructions) |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | การตัดสินใจที่เปลี่ยน/เพิ่มจาก SPEC §2 |
@@ -23,7 +24,9 @@ Google Ads MCP server + PWA ส่วนตัว บน Cloudflare Workers
 ## สถานะตอนนี้: M0 — Access & Setup
 
 โครงโปรเจ็คพร้อมแล้ว ส่วนที่เหลือของ M0 คือการตั้งค่าฝั่ง Google Cloud ซึ่ง **ต้องทำเอง**
-(ดู checklist ครบใน `STATUS.md` และรายละเอียดใน `docs/SPEC.md §4`)
+
+👉 **ทำตาม [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md)** — มีทุกขั้นพร้อมลิงก์ตรง
+และตารางแก้ปัญหาที่เจอบ่อย · checklist สรุปอยู่ใน `STATUS.md`
 
 ### เริ่มใช้งาน
 
