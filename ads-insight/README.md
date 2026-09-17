@@ -43,8 +43,27 @@ pnpm exec wrangler d1 create ads_insight
 #    ต้องใส่ GOOGLE_OAUTH_CLIENT_ID / SECRET ใน .dev.vars ก่อน
 pnpm auth:google
 
-# 3. ตรวจว่าเรียก Google Ads API ด้วยบัญชีจริงได้ — นี่คือ Gate ของ M0
+# 3. ดูว่า token นี้เข้าถึงบัญชีไหนได้บ้าง แล้วเอาค่าที่แนะนำไปใส่ wrangler.toml
+pnpm list:accounts
+
+# 4. ตรวจว่าเรียก Google Ads API ด้วยบัญชีจริงได้ — นี่คือ Gate ของ M0
 pnpm check:access 1234567890
+```
+
+`pnpm list:accounts` จะพิมพ์ผังบัญชีแบบนี้ พร้อมบอกค่าที่ควรใส่ให้เลย —
+ช่วยตัดปัญหาหยิบ Customer ID ผิดตัว (เช่น เอา ID ของ MCC มาใส่เป็น `DEFAULT_CUSTOMER_ID`
+ซึ่ง MCC ไม่มีข้อมูล performance ของตัวเอง):
+
+```
+--- ผังบัญชี ---
+111-111-1111  MCC หลัก  THB · Asia/Bangkok  [MCC]
+  222-222-2222  ลูกค้า A  THB · Asia/Bangkok
+  333-333-3333  ลูกค้าเก่า  THB · Asia/Bangkok  [CANCELED]
+
+--- ค่าที่แนะนำให้ใส่ใน wrangler.toml [vars] ---
+DEFAULT_CUSTOMER_ID = "2222222222"
+LOGIN_CUSTOMER_ID = "1111111111"
+TEST_CUSTOMER_ID = ""   # ← ยังไม่มี test account — สร้างก่อนถึง M4
 ```
 
 `pnpm check:access` จะบอกชื่อบัญชี สกุลเงิน ไทม์โซน และเตือนถ้ามีอะไรตั้งค่าไม่ตรง
@@ -58,6 +77,7 @@ pnpm check:access 1234567890
 | `pnpm test` | vitest — ต้องผ่านก่อน commit ที่ปิดงาน |
 | `pnpm typecheck` | `tsc` ทั้งฝั่ง Worker และฝั่ง Node scripts |
 | `pnpm auth:google` | ขอ refresh token (M0) |
+| `pnpm list:accounts` | บัญชีที่ token เข้าถึงได้ + ค่าที่ควรใส่ใน `wrangler.toml` (M0) |
 | `pnpm check:access` | ตรวจการเข้าถึง Google Ads API (Gate M0) |
 | `pnpm db:migrate` | apply migrations ลง D1 local (ใช้ตั้งแต่ M3) |
 | `pnpm deploy` | **ต้องได้รับคำสั่งจากผู้ใช้เท่านั้น** |

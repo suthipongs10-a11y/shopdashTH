@@ -60,8 +60,14 @@ Google Ads MCP server + PWA ส่วนตัวบน Cloudflare Workers
 pnpm dev            # wrangler dev (Worker + MCP ที่ http://localhost:8787/mcp)
 # pnpm dev:pwa      # Vite dev server — เพิ่มตอน M6 ที่สร้าง pwa/ (ดู pwa/README.md)
 pnpm test           # vitest
+pnpm typecheck      # tsc ทั้งฝั่ง Worker และฝั่ง Node scripts
 pnpm db:migrate     # wrangler d1 migrations apply (local)
 pnpm deploy         # ต้องได้รับคำสั่งจากผู้ใช้เท่านั้น
+
+# M0 — ตั้งค่าการเข้าถึง Google Ads (รันบนเครื่องที่มี .dev.vars จริง)
+pnpm auth:google    # OAuth flow -> เขียน refresh token ลง .dev.vars
+pnpm list:accounts  # บัญชีที่ token นี้เข้าถึงได้ + ค่าที่ควรใส่ใน wrangler.toml
+pnpm check:access   # Gate M0: query ตาราง customer ของบัญชีจริง
 ```
 เชื่อม Claude Code กับ MCP ตอน dev (ใช้ DEV_BEARER_TOKEN, เปิดเฉพาะ ENV=dev):
 ```bash

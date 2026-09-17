@@ -13,6 +13,7 @@
     "db:migrate:remote": "wrangler d1 migrations apply ads_insight --remote",
     "cf-typegen": "wrangler types",
     "auth:google": "tsx scripts/get-refresh-token.ts",
+    "list:accounts": "tsx scripts/list-accounts.ts",
     "check:access": "tsx scripts/check-access.ts",
     "deploy": "wrangler deploy"
   },

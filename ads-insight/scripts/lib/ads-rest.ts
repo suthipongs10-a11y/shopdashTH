@@ -51,6 +51,36 @@ export function flattenSearchStream(payload: unknown): Record<string, unknown>[]
   return chunks.flatMap((chunk) => chunk.results ?? []);
 }
 
+/**
+ * Accounts the authorizing user can reach **directly**.
+ *
+ * Access through a manager account shows up as the manager itself, not its
+ * children — expand those with a `customer_client` query against the manager.
+ */
+export async function listAccessibleCustomers(options: {
+  apiVersion: string;
+  accessToken: string;
+}): Promise<string[]> {
+  const url = `${ADS_API_HOST}/${options.apiVersion}/customers:listAccessibleCustomers`;
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { authorization: `Bearer ${options.accessToken}` },
+  });
+  const text = await res.text();
+  if (!res.ok) throw new AdsApiError(res.status, text);
+  return parseAccessibleCustomers(JSON.parse(text));
+}
+
+/** `{ resourceNames: ["customers/123..."] }` -> `["123..."]`. */
+export function parseAccessibleCustomers(payload: unknown): string[] {
+  const names = (payload as { resourceNames?: unknown }).resourceNames;
+  if (!Array.isArray(names)) return [];
+  return names
+    .filter((n): n is string => typeof n === 'string')
+    .map((n) => n.replace(/^customers\//, ''))
+    .filter((id) => /^\d+$/.test(id));
+}
+
 export class AdsApiError extends Error {
   override name = 'AdsApiError';
   constructor(
@@ -96,11 +126,19 @@ export function explainAdsError(status: number, body: string): string {
       '(ข) ถ้าเข้าผ่าน MCC ต้องตั้ง LOGIN_CUSTOMER_ID (ค) Cloud project ได้รับสิทธิ์ Explorer ขึ้นไปแล้ว',
     404: 'ไม่พบบัญชีนี้ — ตรวจ Customer ID (ตัวเลข 10 หลักไม่มีขีด)',
     429: 'เกินโควตาการเรียก API ของวันนี้',
+    // ณ ก.ย. 2026 Google เลิกใช้ developer token แล้ว (DECISIONS D11) — โค้ดนี้จึงไม่ส่ง header ตัวนั้น
+    // ถ้า API ยังบ่นหา developer token แปลว่านโยบายไม่ตรงกับที่ SPEC เข้าใจ ให้บันทึกลง DECISIONS
   };
 
   const parts = [`Google Ads API ตอบกลับ HTTP ${status}`];
   const hint = hints[status];
   if (hint) parts.push(`— ${hint}`);
+  if (/developer.?token/i.test(body)) {
+    parts.push(
+      '\n  ⚠️ Google ขอ developer token ซึ่ง SPEC เข้าใจว่าถูกยกเลิกไปแล้ว (DECISIONS D11) — ' +
+        'ตรวจนโยบายล่าสุดที่ developers.google.com/google-ads/api แล้วบันทึกผลลง docs/DECISIONS.md',
+    );
+  }
   if (message) parts.push(`\n  ข้อความจาก Google: ${message}`);
   for (const detail of detailMessages) {
     if (detail) parts.push(`\n  · ${detail}`);

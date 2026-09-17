@@ -24,8 +24,10 @@
 - [x] `src/config.ts` + `src/env.ts` — validation ด้วย Zod, error ภาษาไทย
 - [x] `src/index.ts` — router โครง + `GET /health` (บอกว่าตั้งค่าอะไรครบแล้วบ้าง)
 - [x] `pnpm auth:google` — ขอ refresh token (เขียนลง `.dev.vars` ให้, ไม่พิมพ์ค่าเต็ม)
+- [x] `pnpm list:accounts` — ไล่บัญชีที่ token เข้าถึงได้ (รวมบัญชีลูกใต้ MCC) + แนะนำค่า
+      `DEFAULT_CUSTOMER_ID` / `LOGIN_CUSTOMER_ID` / `TEST_CUSTOMER_ID`
 - [x] `pnpm check:access` — สคริปต์ Gate M0 (refresh token → access token → GAQL `customer`)
-- [x] `pnpm test` ผ่าน (36 tests) · `pnpm typecheck` ผ่าน · `wrangler deploy --dry-run` ผ่าน
+- [x] `pnpm test` ผ่าน (64 tests) · `pnpm typecheck` ผ่าน · `wrangler deploy --dry-run` ผ่าน
 - [ ] `wrangler d1 create ads_insight` แล้วใส่ `database_id` ใน `wrangler.toml` (ยังเป็น `REPLACE_WITH_D1_DATABASE_ID`)
 - [ ] กรอก `.dev.vars` จริง + `DEFAULT_CUSTOMER_ID` ใน `wrangler.toml`
 
@@ -42,18 +44,27 @@
 ## ทำไปแล้ว
 - ตั้งโครงโปรเจ็คทั้งหมดของ M0 (รายการด้านบน) — ทดสอบแล้วว่า Worker บูตได้จริง,
   `/health` ตอบถูก, route ที่ยังไม่ถึง milestone ตอบ 501 พร้อมบอกว่าอยู่ milestone ไหน
-- ทดสอบ `pnpm check:access` ทุกเส้นทาง error: ไม่มี `.dev.vars` / secret ขาด / ไม่มี Customer ID /
-  Customer ID ผิดรูปแบบ / credentials ผิด (ยิงจริงถึง Google แล้วได้ `invalid_client` พร้อมคำอธิบายไทย)
+- ทดสอบ `pnpm check:access` / `pnpm list:accounts` ทุกเส้นทาง error: ไม่มี `.dev.vars` /
+  secret ขาด / ไม่มี Customer ID / Customer ID ผิดรูปแบบ / credentials ผิด
+  (ยิงจริงถึง Google แล้วได้ `invalid_client` พร้อมคำอธิบายไทย)
+- ตอบคำถามเรื่อง Cloud project กับบัญชี Google Ads เป็นคนละ Gmail ได้ไหม → ได้ (DECISIONS D19)
 
 ## ค้าง / ปัญหา
 - **ต้องยืนยัน `ADS_API_VERSION`** — ตอนนี้ตั้ง `v25` ตาม SPEC §4 ซึ่งเขียนไว้ว่า "ตรวจเวอร์ชันล่าสุดใน M1"
   ยังไม่ได้เทียบกับเอกสาร Google จริง ถ้าเวอร์ชันเปลี่ยน แก้ที่ `wrangler.toml` จุดเดียว
+- **`list:accounts` / `check:access` ยังไม่เคยยิงบัญชีจริง** — เขียนตาม shape ที่เอกสาร Google ระบุ
+  (`customers:listAccessibleCustomers` → `{resourceNames}`, `customer_client` → `level`/`status`/`hidden`
+  ที่ REST ส่ง int64 มาเป็น string) และ unit test ครอบ parsing/จัดผัง/คำแนะนำไว้ 64 เคส
+  แต่เส้นทาง network จริงยังรอ credentials — ถ้ารันแล้วผิด shape ให้แก้ที่ `scripts/lib/accounts.ts`
+- เอกสาร Google บางหน้ายังเขียนว่าต้องส่ง header `developer-token` ซึ่งขัดกับ D11 —
+  `explainAdsError()` ดักกรณีนี้ไว้แล้ว ถ้าเจอจริงให้บันทึกลง DECISIONS
 - **นโยบาย developer token** — DECISIONS D11 บันทึกว่า Google ยกเลิก developer token เมื่อ 9 ก.ย. 2026
   สิทธิ์ผูกกับ Cloud project แทน ต้องยืนยันกับเอกสารล่าสุดตอนทำ M0 checklist ฝั่ง Google
 - `src/db/` ยังว่าง (ตั้งใจ — schema เป็นงาน M3) · `pwa/` ยังว่าง (งาน M6)
 
 ## ขั้นต่อไป
-- ผู้ใช้ทำ checklist ฝั่ง Google Cloud + กรอก `.dev.vars` → รัน `pnpm check:access`
+- ผู้ใช้ทำ checklist ฝั่ง Google Cloud + กรอก `.dev.vars` →
+  `pnpm auth:google` → `pnpm list:accounts` → `pnpm check:access`
 - ผ่าน Gate M0 → **หยุดรอผู้ใช้ยืนยัน** → เริ่ม M1 Ads Core Client
 
 ## Ideas (นอก scope — รอพิจารณา)
