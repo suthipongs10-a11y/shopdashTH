@@ -1,6 +1,6 @@
 # STATUS — Ads Insight
 
-**Milestone ปัจจุบัน:** M0 — Access & Setup
+**Milestone ปัจจุบัน:** M0 — Access & Setup ✅ **ผ่าน Gate แล้ว** (รอผู้ใช้ยืนยันก่อนเริ่ม M1)
 **อัปเดตล่าสุด:** 2026-09-16
 
 ## M0 Checklist
@@ -17,9 +17,9 @@
       - `http://localhost:8787/connect/google/callback` (dev — สคริปต์ `pnpm auth:google` ใช้ตัวนี้)
       - `https://<worker-domain>/connect/google/callback` และ `/oauth/google/callback` (prod, ใส่ตอน M2)
 - [x] ขอ Explorer access — **อนุมัติแล้ว 17 ก.ย. 2569** (2,880 ops/วัน สำหรับบัญชีจริง + 15,000 สำหรับ test account)
-- [ ] (แนะนำ) Brand verification → ขอ Basic access — จำเป็นถ้าจะใช้ `gads_research_keywords` (M5)
-- [ ] Test manager account + test client account
-- [ ] จด Customer ID จริง / login-customer-id (ถ้าผ่าน MCC) / TEST_CUSTOMER_ID
+- [ ] (แนะนำ) Brand verification → ขอ Basic access — ยังไม่ทำ จำเป็นเฉพาะถ้าจะใช้ `gads_research_keywords` (M5)
+- [ ] Test manager account + test client account — **ยังไม่มี ต้องสร้างก่อนถึง M4**
+- [x] จด Customer ID จริง — เก็บใน `.dev.vars` ไม่ commit (D24) · เข้าบัญชีตรง **ไม่มี MCC** จึงไม่ต้องใช้ `LOGIN_CUSTOMER_ID`
 
 ### ฝั่ง repo (Claude Code ทำ)
 - [x] โครงโปรเจ็ค: package.json, tsconfig (แยก Worker / Node), vitest, .gitignore
@@ -32,19 +32,29 @@
       `DEFAULT_CUSTOMER_ID` / `LOGIN_CUSTOMER_ID` / `TEST_CUSTOMER_ID`
 - [x] `pnpm check:access` — สคริปต์ Gate M0 (refresh token → access token → GAQL `customer`)
 - [x] `pnpm test` ผ่าน (64 tests) · `pnpm typecheck` ผ่าน · `wrangler deploy --dry-run` ผ่าน
-- [ ] `wrangler d1 create ads_insight` แล้วใส่ `database_id` ใน `wrangler.toml` (ยังเป็น `REPLACE_WITH_D1_DATABASE_ID`)
-- [ ] กรอก `.dev.vars` จริง + `DEFAULT_CUSTOMER_ID` ใน `wrangler.toml`
+- [x] กรอก `.dev.vars` จริงครบ (client id/secret, refresh token, owner emails, keys, customer id)
+- [ ] `wrangler d1 create ads_insight` แล้วใส่ `database_id` ใน `wrangler.toml` — **ยังไม่ทำ ไม่บังคับจนถึง M3**
 
-### Gate M0
-- [ ] `pnpm check:access <customer_id>` สำเร็จกับบัญชีจริง
-      **ฝั่ง Google Cloud พร้อมหมดแล้ว** เหลือรันบนเครื่องผู้ใช้อย่างเดียว
+### Gate M0 ✅ ผ่าน (17 ก.ย. 2569)
+- [x] `pnpm check:access` สำเร็จกับบัญชีจริง — access token ออก, GAQL query ตาราง `customer` คืน 1 แถว
+- [x] refresh token ใช้ได้ (consent screen อยู่ In production จึงไม่หมดอายุ 7 วัน)
 
 ## คำตอบคำถาม SPEC §16
-1. MCC หรือเข้าตรง:
-2. Conversion actions ที่เป็นเป้าหมาย:
-3. ประเภทแคมเปญปัจจุบัน:
-4. งบรายวัน/รายเดือนสูงสุด:
+1. MCC หรือเข้าตรง: **เข้าตรง** — `listAccessibleCustomers` คืนบัญชีเดียว ไม่ใช่ manager → ไม่ต้องส่ง header `login-customer-id`
+2. Conversion actions ที่เป็นเป้าหมาย: **ยังไม่ทราบ** → ตรวจด้วย `gads_get_conversion_setup` ตอน M3
+3. ประเภทแคมเปญปัจจุบัน: **ยังไม่ทราบ** → ดูตอน M1 ที่ดึง campaigns จริง
+4. งบรายวัน/รายเดือนสูงสุด: **ยังไม่ทราบ — ต้องได้คำตอบก่อน M4** (เป็น hard guardrail ตาม SPEC §7.5)
 5. ระดับสิทธิ์ API ที่ได้: **Explorer** (2,880 ops/วัน) — พอสำหรับบัญชีเดียว · ถ้าจะใช้ Keyword Planner (M5) ต้องขยับเป็น Basic ซึ่งต้องผ่าน brand verification
+
+## ข้อมูลบัญชีที่ยืนยันแล้ว (จาก `pnpm check:access`)
+| | |
+|---|---|
+| ชื่อบัญชี | AIS 12Call โปรเน็ต เว็ปค้นหา |
+| Customer ID | อยู่ใน `.dev.vars` (ไม่ commit — D24) |
+| ประเภท | บัญชีโฆษณาปกติ ไม่ใช่ manager ไม่ใช่ test account |
+| สกุลเงิน | **THB** — ตรงกับที่ระบบสมมติ |
+| ไทม์โซน | **Asia/Bangkok** — ตรงกับ `ACCOUNT_TZ` |
+| auto-tagging | **เปิด** — conversion tracking มีโอกาสครบ (PLAYBOOK ข้อ 1) |
 
 ## ทำไปแล้ว
 - ตั้งโครงโปรเจ็คทั้งหมดของ M0 (รายการด้านบน) — ทดสอบแล้วว่า Worker บูตได้จริง,
@@ -71,9 +81,17 @@
 - `src/db/` ยังว่าง (ตั้งใจ — schema เป็นงาน M3) · `pwa/` ยังว่าง (งาน M6)
 
 ## ขั้นต่อไป
-- ผู้ใช้ทำ checklist ฝั่ง Google Cloud + กรอก `.dev.vars` →
-  `pnpm auth:google` → `pnpm list:accounts` → `pnpm check:access`
-- ผ่าน Gate M0 → **หยุดรอผู้ใช้ยืนยัน** → เริ่ม M1 Ads Core Client
+**หยุดรอผู้ใช้ยืนยันก่อนเริ่ม M1** (กฎ Gate ข้อ 1)
+
+M1 — Ads Core Client จะสร้าง:
+- `src/ads/client.ts` (searchStream รวม chunks, mutate แบบ validateOnly, retry/backoff, quota counter)
+- `src/ads/gaql.ts` (query builder + field allowlist) · `money.ts` · `errors.ts` · `enums.ts`
+- เก็บ fixtures จาก response จริงที่ลบข้อมูลส่วนตัวแล้ว — **ต้องให้ผู้ใช้รันสคริปต์บนเครื่องตัวเอง**
+  เพราะ container ของ Claude Code ไม่มี (และไม่ควรมี) credentials
+
+สิ่งที่ต้องได้จากผู้ใช้ระหว่าง M1:
+- fixtures จากบัญชีจริง (campaigns + metrics 30 วัน)
+- คำตอบ SPEC §16 ข้อ 2–4 (conversion actions, ประเภทแคมเปญ, งบสูงสุด)
 
 ## Ideas (นอก scope — รอพิจารณา)
 -
