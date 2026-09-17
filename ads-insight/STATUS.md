@@ -8,13 +8,15 @@
 ### ฝั่ง Google Cloud / Google Ads (ผู้ใช้ทำ — Claude Code ช่วยตรวจ)
 > คู่มือทีละขั้นพร้อมลิงก์ตรง: [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md)
 
-- [ ] สร้าง Google Cloud project + Enable Google Ads API
-- [ ] OAuth consent screen (External) → สถานะ **In production**
-      (ถ้าค้างที่ Testing refresh token จะหมดอายุใน 7 วัน — `pnpm check:access` จะบอกอาการนี้ให้)
-- [ ] OAuth Client (Web) + redirect URIs
+- [x] สร้าง Google Cloud project + Enable Google Ads API (`ads-insight-508906`)
+- [~] OAuth consent screen (External) → สถานะ **In production** — **ยังค้าง**
+      Google บังคับ homepage URL + privacy policy URL ก่อนถึงจะกด Publish ได้ (ดู DECISIONS D21)
+      กำลังทำหน้า https://ragalpha.com/privacy อยู่ (ร่างอยู่ที่ `docs/privacy-policy-template.md`)
+      ถ้าค้างที่ Testing refresh token หมดอายุทุก 7 วัน — ใช้กับ cron ของ M3 ไม่ได้
+- [x] OAuth Client (Web) + redirect URIs — `http://localhost:8787/connect/google/callback`
       - `http://localhost:8787/connect/google/callback` (dev — สคริปต์ `pnpm auth:google` ใช้ตัวนี้)
       - `https://<worker-domain>/connect/google/callback` และ `/oauth/google/callback` (prod, ใส่ตอน M2)
-- [ ] ขอ Explorer access
+- [x] ขอ Explorer access — **อนุมัติแล้ว 17 ก.ย. 2569** (2,880 ops/วัน สำหรับบัญชีจริง + 15,000 สำหรับ test account)
 - [ ] (แนะนำ) Brand verification → ขอ Basic access — จำเป็นถ้าจะใช้ `gads_research_keywords` (M5)
 - [ ] Test manager account + test client account
 - [ ] จด Customer ID จริง / login-customer-id (ถ้าผ่าน MCC) / TEST_CUSTOMER_ID
@@ -41,7 +43,7 @@
 2. Conversion actions ที่เป็นเป้าหมาย:
 3. ประเภทแคมเปญปัจจุบัน:
 4. งบรายวัน/รายเดือนสูงสุด:
-5. ระดับสิทธิ์ API ที่ได้:
+5. ระดับสิทธิ์ API ที่ได้: **Explorer** (2,880 ops/วัน) — พอสำหรับบัญชีเดียว · ถ้าจะใช้ Keyword Planner (M5) ต้องขยับเป็น Basic ซึ่งต้องผ่าน brand verification
 
 ## ทำไปแล้ว
 - ตั้งโครงโปรเจ็คทั้งหมดของ M0 (รายการด้านบน) — ทดสอบแล้วว่า Worker บูตได้จริง,
