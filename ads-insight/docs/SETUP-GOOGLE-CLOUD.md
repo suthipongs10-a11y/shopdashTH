@@ -76,7 +76,11 @@ https://console.cloud.google.com/auth/branding
 - **App name:** `Ads Insight`
 - **User support email:** อีเมลคุณ
 - **Developer contact email:** อีเมลคุณ
-- ไม่ต้องใส่โลโก้ (ใส่แล้วจะต้องผ่าน brand verification)
+- **ข้ามได้:** โลโก้ (ใส่แล้วต้องผ่าน brand verification), Application home page,
+  privacy policy link, terms of service link, Authorized domains — ใช้เองไม่ต้องมี
+- เสร็จแล้วปุ่ม **Save** จะกลายเป็นสีเทา = ไม่มีอะไรค้าง
+
+มุมขวาของหน้านี้จะเขียนว่า *"your app is in Testing status"* — ปกติ ยังไม่ต้องตกใจ แก้ในข้อ 3.4
 
 ### 3.2 Audience
 https://console.cloud.google.com/auth/audience
@@ -84,17 +88,30 @@ https://console.cloud.google.com/auth/audience
   (Internal เลือกได้เฉพาะบัญชี Google Workspace ขององค์กร — Gmail ธรรมดาจะไม่มีตัวเลือกนี้)
 
 ### 3.3 Data Access — เพิ่ม scope
-https://console.cloud.google.com/auth/scopes → **Add or remove scopes**
 
-ต้องมี 3 ตัวนี้:
+**Data Access** อยู่ในเมนูซ้าย (ใต้ Clients) — คนละหน้ากับ Branding
+https://console.cloud.google.com/auth/scopes → ปุ่ม **Add or remove scopes**
 
-| Scope | ใช้ทำอะไร |
-|---|---|
-| `openid` | ระบุตัวตน |
-| `https://www.googleapis.com/auth/userinfo.email` | อ่านอีเมลคนที่ล็อกอิน (ใช้กับ `OWNER_EMAILS`) |
-| `https://www.googleapis.com/auth/adwords` | **เข้าถึง Google Ads** — ตัวสำคัญ |
+| Scope | ใช้ทำอะไร | จำเป็น |
+|---|---|---|
+| `https://www.googleapis.com/auth/adwords` | **เข้าถึง Google Ads** | **ขาดไม่ได้** |
+| `https://www.googleapis.com/auth/userinfo.email` | อ่านอีเมลคนที่ล็อกอิน (ใช้กับ `OWNER_EMAILS`) | ควรมี |
+| `openid` | ระบุตัวตน | ไม่ต้องประกาศก็ได้ |
 
-`adwords` ไม่อยู่ในลิสต์ที่โชว์ให้เลือก ให้พิมพ์ลงช่อง **"Manually add scopes"** แล้วกด Add to table
+วิธีหา: ในช่อง **Filter** พิมพ์ `adwords` → จะเจอแถว "Google Ads API · .../auth/adwords"
+คำอธิบายว่า *"See, edit, create, and delete your Google Ads accounts and data"* → **ติ๊ก**
+
+> panel แสดงเฉพาะ scope ของ API ที่ **enable แล้ว** เท่านั้น — ถ้าหา `adwords` ไม่เจอ แปลว่าข้ามขั้นตอนที่ 2
+> (ยังไม่ได้ enable Google Ads API) ให้กลับไปทำก่อนแล้ว refresh หน้านี้
+
+จากนั้นล้าง filter (กด X ที่ชิป) แล้วหา `userinfo.email` ติ๊กเพิ่ม
+ส่วน `openid` ใส่ในช่อง "Manually add scopes" ไม่ได้ เพราะช่องนั้นบังคับให้ขึ้นต้นด้วย `https://` —
+ไม่เป็นไร เป็น scope มาตรฐานที่ Google ให้อยู่แล้ว
+
+**ติ๊กเฉยๆ ไม่บันทึก** — ต้องกด **Update** (ปุ่มน้ำเงินล่าง panel) แล้วกด **Save** ในหน้า Data Access อีกที
+
+พอบันทึกแล้ว `adwords` จะไปอยู่ใต้หัวข้อ **"Your sensitive scopes"** ซึ่งถูกต้อง
+(และเป็นเหตุผลที่ต้องทำข้อ 3.4 ต่อ)
 
 ### 3.4 Publish app — ข้อนี้สำคัญมาก
 กลับไปหน้า **Audience** → กด **Publish app** → ยืนยัน → สถานะต้องเป็น **In production**
