@@ -1,7 +1,10 @@
 /**
  * M1 — capture real Google Ads responses as scrubbed test fixtures.
  *
- *   pnpm capture:fixtures [--keep-search-terms] [--out test/fixtures]
+ *   pnpm capture:fixtures [--keep-search-terms] [--only <ชื่อไฟล์>] [--out test/fixtures]
+ *
+ * `--only` re-runs a single fixture, which costs one API call instead of seven
+ * when one query needs fixing.
  *
  * Why this exists: Google's test accounts carry no performance data at all
  * (SPEC §4), so metrics, pacing and guardrail logic cannot be tested without
@@ -131,6 +134,16 @@ function readFlag(flag: string): string | undefined {
 async function main(): Promise<void> {
   const keepSearchTerms = process.argv.includes('--keep-search-terms');
   const outDir = resolve(PROJECT_ROOT, readFlag('--out') ?? 'test/fixtures');
+  const only = readFlag('--only');
+
+  const selected = only
+    ? FIXTURES.filter((f) => f.file.includes(only))
+    : FIXTURES;
+  if (selected.length === 0) {
+    throw new Error(
+      `--only "${only}" ไม่ตรงกับ fixture ใดเลย · มีให้เลือก: ${FIXTURES.map((f) => f.file).join(', ')}`,
+    );
+  }
 
   const config = loadConfig();
   const apiVersion = requireVar(config, 'ADS_API_VERSION');
@@ -182,7 +195,7 @@ async function main(): Promise<void> {
   let written = 0;
   let skipped = 0;
 
-  for (const fixture of FIXTURES) {
+  for (const fixture of selected) {
     process.stdout.write(`• ${fixture.file.padEnd(28)} `);
 
     let rows: Record<string, unknown>[];
@@ -190,8 +203,10 @@ async function main(): Promise<void> {
       rows = await runQuery(ctx, fixture.query);
     } catch (err) {
       skipped += 1;
-      const first = err instanceof Error ? err.message.split('\n')[0] : String(err);
-      console.log(`ข้าม — ${first}`);
+      // Print the whole error, not just its first line: the GoogleAdsFailure
+      // detail underneath is what names the field that was rejected.
+      console.log('ข้าม ❌');
+      console.log(`    ${(err instanceof Error ? err.message : String(err)).replace(/\n/g, '\n    ')}`);
       continue;
     }
 
@@ -233,7 +248,7 @@ async function main(): Promise<void> {
   console.log(`URL         : ${report.urls}`);
   console.log(`อีเมล/เบอร์  : ${report.contacts}`);
 
-  console.log(`\nเขียนไฟล์ ${written}/${FIXTURES.length}${skipped > 0 ? ` (ข้าม ${skipped})` : ''} · ใช้ไป ${apiCalls} API call\n`);
+  console.log(`\nเขียนไฟล์ ${written}/${selected.length}${skipped > 0 ? ` (ข้าม ${skipped})` : ''} · ใช้ไป ${apiCalls} API call\n`);
 
   if (written === 0) {
     console.log('ไม่ได้ไฟล์เลย — ดูข้อความ "ข้าม" ด้านบนว่าติดอะไร\n');
