@@ -16,7 +16,8 @@ Google Ads MCP server + PWA ส่วนตัว บน Cloudflare Workers
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | กฎการทำงานของ Claude Code — **อ่านก่อนทุกเซสชัน** |
 | [`STATUS.md`](STATUS.md) | milestone ปัจจุบัน, งานที่ทำไปแล้ว, งานค้าง — **อ่านต่อจาก CLAUDE.md** |
-| [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md) | **คู่มือตั้งค่า Google Cloud + Google Ads API ทีละขั้น (M0)** |
+| [`docs/TESTING.md`](docs/TESTING.md) | **วิธีทดสอบทั้งหมด — ชั้นไหนรันที่ไหน, คำสั่งอะไร** |
+| [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md) | คู่มือตั้งค่า Google Cloud + Google Ads API ทีละขั้น (M0) |
 | [`docs/SPEC.md`](docs/SPEC.md) | สเปคเต็ม: สถาปัตยกรรม, MCP tools, change set, schema, milestone + gate |
 | [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | กรอบวิเคราะห์ของ Claude ในแชท (ใช้เป็น Claude Project instructions) |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | การตัดสินใจที่เปลี่ยน/เพิ่มจาก SPEC §2 |
@@ -79,6 +80,7 @@ Customer ID อยู่ใน `.dev.vars` ไม่ใช่ `wrangler.toml` �
 | คำสั่ง | ทำอะไร |
 |---|---|
 | `pnpm dev` | รัน Worker ที่ `http://localhost:8787` (ตอนนี้มีแค่ `/health`) |
+| `pnpm verify` | **typecheck + test + build Worker** — ใช้ตัวนี้ก่อน commit |
 | `pnpm test` | vitest — ต้องผ่านก่อน commit ที่ปิดงาน |
 | `pnpm typecheck` | `tsc` ทั้งฝั่ง Worker และฝั่ง Node scripts |
 | `pnpm auth:google` | ขอ refresh token (M0) |
