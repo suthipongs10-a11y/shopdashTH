@@ -133,6 +133,13 @@ export function explainAdsError(status: number, body: string): string {
   const parts = [`Google Ads API ตอบกลับ HTTP ${status}`];
   const hint = hints[status];
   if (hint) parts.push(`— ${hint}`);
+  // When nothing could be parsed out, the guessed hint is all the caller would
+  // see and it may be actively misleading. Show the body so the real cause is
+  // visible (this is how the v26 404 stayed a mystery for a round).
+  if (!message && detailMessages.length === 0) {
+    const excerpt = body.trim() === '' ? '(ว่างเปล่า)' : body.slice(0, 500);
+    parts.push(`\n  body ดิบจาก Google: ${excerpt}`);
+  }
   if (/developer.?token/i.test(body)) {
     parts.push(
       '\n  ⚠️ Google ขอ developer token ซึ่ง SPEC เข้าใจว่าถูกยกเลิกไปแล้ว (DECISIONS D11) — ' +

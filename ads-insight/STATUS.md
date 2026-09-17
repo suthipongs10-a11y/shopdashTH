@@ -88,8 +88,10 @@
 - [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
 
 ### งานย่อย
-- [x] ยืนยัน `ADS_API_VERSION` — ยิงถาม API ตรงๆ: v23–v26 มีอยู่, v27+ ยังไม่มี
-      → เปลี่ยนจาก v25 เป็น **v26** (DECISIONS D25) · รอผู้ใช้ยืนยันด้วย `pnpm check:access`
+- [x] `ADS_API_VERSION` — **คงไว้ที่ v25** (ลองขยับเป็น v26 แล้วบัญชีจริงตอบ 404 จึงถอยกลับ)
+      route ของ v26 มีอยู่จริงแต่ใช้กับบัญชีนี้ไม่ได้ · ยังไม่รู้สาเหตุแน่ชัดเพราะ body ของ 404 ว่างเปล่า
+      v25 ทำงานปกติ ไม่บล็อกงาน — ดู DECISIONS D25
+- [x] สคริปต์กลบ body ดิบด้วยข้อความที่เดาจาก status → แก้แล้ว ให้โชว์ body เสมอเมื่อแกะไม่ออก
 - [ ] `src/ads/money.ts` — micros ↔ THB (int64 มาเป็น string, ใช้ bigint ถ้าเกิน safe integer)
 - [ ] `src/ads/errors.ts` — GoogleAdsFailure → ข้อความไทย + เก็บ raw ไว้ + บอกว่า retry ได้ไหม
 - [ ] `src/ads/gaql.ts` — query builder + field allowlist + บังคับ SELECT-only, LIMIT ≤ 1000

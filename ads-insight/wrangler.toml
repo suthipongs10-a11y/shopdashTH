@@ -13,7 +13,7 @@ ENV = "dev"
 ACCOUNT_TZ = "Asia/Bangkok"
 # Google Ads REST API version. Bumping this must be followed by re-running the
 # fixture tests (SPEC §4).
-ADS_API_VERSION = "v26"
+ADS_API_VERSION = "v25"
 # Deliberately left blank in the repository — this file is committed and the
 # repository is public, so a real customer id here would publish which ad
 # account this is (DECISIONS D24). Set them in .dev.vars locally; deploys get

@@ -182,3 +182,20 @@ describe('AdsApiError', () => {
     expect(error.retryable).toBe(true);
   });
 });
+
+describe('unparseable error bodies', () => {
+  it('shows the raw body when nothing could be extracted, instead of only a guess', () => {
+    // The v26 404 looked like "ไม่พบบัญชีนี้ — ตรวจ Customer ID" purely because
+    // of the status code, which sent diagnosis down the wrong path entirely.
+    const error = AdsApiError.fromResponse(404, '');
+    expect(error.message).toContain('ว่างเปล่า');
+
+    const html = AdsApiError.fromResponse(404, '<html><body>Not Found</body></html>');
+    expect(html.message).toContain('Not Found');
+  });
+
+  it('does not append the raw body when a real failure was parsed', () => {
+    const body = failureBody([{ errorCode: { quotaError: 'RESOURCE_EXHAUSTED' } }]);
+    expect(AdsApiError.fromResponse(429, body).message).not.toContain('body ดิบ');
+  });
+});

@@ -97,7 +97,7 @@ export class AdsApiError extends Error {
     readonly raw: string,
     readonly failure: ParsedAdsFailure,
   ) {
-    super(describeFailure(failure));
+    super(describeFailure(failure, raw));
   }
 
   /** Worth another attempt after a wait? */
@@ -193,8 +193,14 @@ export function isRetryable(failure: ParsedAdsFailure): boolean {
   return RETRYABLE_HTTP.has(failure.status);
 }
 
-/** Build the human-readable message, most specific part first. */
-export function describeFailure(failure: ParsedAdsFailure): string {
+/**
+ * Build the human-readable message, most specific part first.
+ *
+ * `raw` is appended when nothing could be parsed out of the body: without it
+ * the reader sees only a guess made from the HTTP status, which can point at
+ * the wrong cause entirely.
+ */
+export function describeFailure(failure: ParsedAdsFailure, raw?: string): string {
   const lines: string[] = [];
 
   const first = failure.details.find((d) => d.code && CODE_MESSAGES[d.code]);
@@ -213,6 +219,10 @@ export function describeFailure(failure: ParsedAdsFailure): string {
 
   if (failure.details.length === 0 && failure.message) {
     lines.push(`  · ${failure.message}`);
+  }
+
+  if (failure.details.length === 0 && !failure.message && raw !== undefined) {
+    lines.push(`  · body ดิบจาก Google: ${raw.trim() === '' ? '(ว่างเปล่า)' : raw.slice(0, 500)}`);
   }
 
   lines.push(`  (HTTP ${failure.status}${failure.requestId ? `, request ${failure.requestId}` : ''})`);
