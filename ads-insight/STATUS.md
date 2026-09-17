@@ -41,8 +41,10 @@
 
 ## คำตอบคำถาม SPEC §16
 1. MCC หรือเข้าตรง: **เข้าตรง** — `listAccessibleCustomers` คืนบัญชีเดียว ไม่ใช่ manager → ไม่ต้องส่ง header `login-customer-id`
-2. Conversion actions ที่เป็นเป้าหมาย: **ยังไม่ทราบ** → ตรวจด้วย `gads_get_conversion_setup` ตอน M3
-3. ประเภทแคมเปญปัจจุบัน: **ยังไม่ทราบ** → ดูตอน M1 ที่ดึง campaigns จริง
+2. Conversion actions ที่เป็นเป้าหมาย: **`PAGE_VIEW` (primary) — เป้าหมายคือ traffic/คลิก ไม่ใช่ lead**
+   ผู้ใช้ยืนยันแล้ว 17 ก.ย. → `objective: 'traffic'` (DECISIONS D26)
+3. ประเภทแคมเปญปัจจุบัน: Search · **ยังไม่เคยแสดงผลเลย** — 374 คีย์เวิร์ด (BROAD 362, EXACT 9, PHRASE 3)
+   metric ทุกตัวเป็น 0 และไม่มี Quality Score สักตัว
 4. งบรายวัน/รายเดือนสูงสุด: **ยังไม่ทราบ — ต้องได้คำตอบก่อน M4** (เป็น hard guardrail ตาม SPEC §7.5)
 5. ระดับสิทธิ์ API ที่ได้: **Explorer** (2,880 ops/วัน) — พอสำหรับบัญชีเดียว · ถ้าจะใช้ Keyword Planner (M5) ต้องขยับเป็น Basic ซึ่งต้องผ่าน brand verification
 
@@ -84,7 +86,10 @@
 
 ### Gate M1 (SPEC §12)
 - [x] unit tests ผ่านครบ (182)
-- [ ] ดึง campaigns + metrics 30 วันของบัญชีจริงได้
+- [~] ดึง campaigns + metrics 30 วันของบัญชีจริงได้ — **ดึงสำเร็จแต่บัญชียังไม่มีข้อมูล**
+      metric เป็น 0 ทั้งหมด · fixtures ที่ได้พิสูจน์ *โครงสร้าง* response ได้ แต่ทดสอบ *คณิตศาสตร์* ไม่ได้
+      → ต้องมี fixtures สังเคราะห์เพิ่ม (ใช้โครงสร้างจริงเป็นแม่แบบ) ก่อน M3
+      → `campaigns.json` ยัง 400 อยู่ รอ error เต็มจากผู้ใช้ (`--only campaigns`)
 - [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
 
 ### งานย่อย
