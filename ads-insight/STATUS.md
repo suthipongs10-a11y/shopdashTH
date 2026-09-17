@@ -83,7 +83,7 @@
 ## M1 Checklist — Ads Core Client
 
 ### Gate M1 (SPEC §12)
-- [ ] unit tests ผ่านครบ
+- [x] unit tests ผ่านครบ (182)
 - [ ] ดึง campaigns + metrics 30 วันของบัญชีจริงได้
 - [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
 
@@ -92,14 +92,14 @@
       route ของ v26 มีอยู่จริงแต่ใช้กับบัญชีนี้ไม่ได้ · ยังไม่รู้สาเหตุแน่ชัดเพราะ body ของ 404 ว่างเปล่า
       v25 ทำงานปกติ ไม่บล็อกงาน — ดู DECISIONS D25
 - [x] สคริปต์กลบ body ดิบด้วยข้อความที่เดาจาก status → แก้แล้ว ให้โชว์ body เสมอเมื่อแกะไม่ออก
-- [ ] `src/ads/money.ts` — micros ↔ THB (int64 มาเป็น string, ใช้ bigint ถ้าเกิน safe integer)
-- [ ] `src/ads/errors.ts` — GoogleAdsFailure → ข้อความไทย + เก็บ raw ไว้ + บอกว่า retry ได้ไหม
-- [ ] `src/ads/gaql.ts` — query builder + field allowlist + บังคับ SELECT-only, LIMIT ≤ 1000
-- [ ] `src/ads/enums.ts` — enum ที่ใช้บ่อย
-- [ ] `src/ads/resources.ts` — resource name helpers + temporary IDs (เลขติดลบ)
-- [ ] `src/ads/client.ts` — searchStream (รวม chunks), mutate (validateOnly), retry/backoff, quota counter
-- [ ] สคริปต์เก็บ fixtures ให้ผู้ใช้รันบนเครื่อง + ลบข้อมูลส่วนตัวอัตโนมัติ
-- [ ] unit tests ทุกตัวตาม CLAUDE.md (money, GAQL builder/allowlist, error mapping, retry)
+- [x] `src/ads/money.ts` — micros ↔ THB (int64 มาเป็น string, ใช้ bigint ถ้าเกิน safe integer)
+- [x] `src/ads/errors.ts` — GoogleAdsFailure → ข้อความไทย + เก็บ raw ไว้ + บอกว่า retry ได้ไหม
+- [x] `src/ads/gaql.ts` — query builder + field allowlist + บังคับ SELECT-only, LIMIT ≤ 1000
+- [~] `src/ads/enums.ts` — **เลื่อนไป M4/M5** ที่มีคนเรียกใช้จริง (SPEC ไม่ได้ระบุไว้ในงาน M1)
+- [~] `src/ads/resources.ts` — **เลื่อนไป M4/M5** ตอนสร้าง mutate จริง
+- [x] `src/ads/client.ts` — searchStream (รวม chunks), mutate (validateOnly), retry/backoff, quota counter
+- [x] `pnpm capture:fixtures` + `scripts/lib/scrub.ts` — **รอผู้ใช้รันบนเครื่อง**
+- [x] unit tests — 182 ตัว (money, error mapping/retry, GAQL/injection, client, scrub)
 
 ### ข้อจำกัดที่รู้ล่วงหน้า
 - Claude Code ไม่มี credentials (และไม่ควรมี) → ส่วนที่ต้องยิง API จริงต้องให้ผู้ใช้รันบนเครื่อง

@@ -57,6 +57,7 @@ curl -s localhost:8787/health       # ต้องได้ JSON บอกว่
 | `pnpm check:access` | **Gate M0** — refresh token → access token → GAQL query ตาราง `customer` สำเร็จ |
 | `pnpm list:accounts` | บัญชีที่ token เข้าถึงได้ + แนะนำค่าที่ควรใส่ `.dev.vars` |
 | `pnpm auth:google` | ขอ refresh token ใหม่ (เมื่อหมดอายุหรือเปลี่ยนบัญชี) |
+| `pnpm capture:fixtures` | ดึง response จริงมาทำ fixtures + ลบข้อมูลส่วนตัวอัตโนมัติ (~7 ops) |
 
 **ใช้ quota:** `check:access` = 1 ops · `list:accounts` = 2–3 ops
 (Explorer มี 2,880 ops/วัน — รันวันละหลายสิบครั้งยังเหลือเฟือ)
@@ -105,7 +106,7 @@ curl -s localhost:8787/health       # ต้องได้ JSON บอกว่
 
 - **`src/index.ts`** (router ของ Worker) — ตอนนี้มีแค่ `/health` กับ stub 501 ทดสอบด้วย `curl` ตอน `pnpm dev` พอ · จะเขียนเทสต์จริงตอน M2 ที่ route มีเนื้อหา
 - **`src/env.ts`** — เป็นแค่ interface + ฟังก์ชันส่งต่อ 2 ตัว logic จริงอยู่ใน `src/config.ts` ซึ่งมีเทสต์แล้ว
-- **fixtures จากบัญชีจริง** — ยังไม่ได้เก็บ (งานที่เหลือของ M1) · จำเป็นเพราะ test account ของ Google **ไม่มีข้อมูล performance เลย** ถ้าไม่มี fixtures จะทดสอบ logic วิเคราะห์ (metrics, pacing, guardrails) ไม่ได้ — ดู `test/fixtures/README.md`
+- **fixtures จากบัญชีจริง** — สคริปต์พร้อมแล้ว (`pnpm capture:fixtures`) แต่ยังไม่ได้รัน · จำเป็นเพราะ test account ของ Google **ไม่มีข้อมูล performance เลย** ถ้าไม่มี fixtures จะทดสอบ logic วิเคราะห์ (metrics, pacing, guardrails) ไม่ได้ — ดู `test/fixtures/README.md`
 - **integration test ที่ยิง Google จริง** — `test/integration/` ยังว่าง จะมีตอน M4 และรันกับ test account เท่านั้น
 
 ---
