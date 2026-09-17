@@ -1,0 +1,12 @@
+{
+  "_meta": {
+    "what": "ชั่วโมง × วันในสัปดาห์ — ใช้ทดสอบ ad schedule",
+    "query": "SELECT campaign.id, segments.hour, segments.day_of_week, metrics.clicks, metrics.cost_micros, metrics.conversions FROM campaign WHERE segments.date DURING LAST_30_DAYS LIMIT 1000",
+    "apiVersion": "v25",
+    "rows": 0,
+    "capturedAt": "2026-09-17",
+    "scrubbed": true,
+    "searchTermsKept": false
+  },
+  "rows": []
+}

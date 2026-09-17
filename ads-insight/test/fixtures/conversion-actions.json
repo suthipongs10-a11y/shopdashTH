@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "what": "conversion action — PLAYBOOK ข้อ 1 ตรวจ tracking ก่อนอย่างอื่น",
+    "query": "SELECT conversion_action.id, conversion_action.name, conversion_action.type, conversion_action.category, conversion_action.status, conversion_action.primary_for_goal, conversion_action.counting_type FROM conversion_action LIMIT 100",
+    "apiVersion": "v25",
+    "rows": 1,
+    "capturedAt": "2026-09-17",
+    "scrubbed": true,
+    "searchTermsKept": false
+  },
+  "rows": [
+    {
+      "conversionAction": {
+        "resourceName": "customers/1000000001/conversionActions/1000000336",
+        "status": "ENABLED",
+        "type": "WEBPAGE",
+        "category": "PAGE_VIEW",
+        "countingType": "MANY_PER_CLICK",
+        "id": "1000000336",
+        "name": "name-3",
+        "primaryForGoal": true
+      }
+    }
+  ]
+}

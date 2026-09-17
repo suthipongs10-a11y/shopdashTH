@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "what": "metrics ราย campaign ราย วัน 30 วัน — ตัวหลักสำหรับทดสอบ metrics/pacing",
+    "query": "SELECT campaign.id, campaign.name, segments.date, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.conversions_value, metrics.ctr, metrics.average_cpc, metrics.search_impression_share, metrics.search_budget_lost_impression_share, metrics.search_rank_lost_impression_share FROM campaign WHERE segments.date DURING LAST_30_DAYS ORDER BY segments.date LIMIT 1000",
+    "apiVersion": "v25",
+    "rows": 2,
+    "capturedAt": "2026-09-17",
+    "scrubbed": true,
+    "searchTermsKept": false
+  },
+  "rows": [
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000002",
+        "name": "name-1",
+        "id": "1000000002"
+      },
+      "metrics": {
+        "clicks": "0",
+        "searchBudgetLostImpressionShare": 0,
+        "searchImpressionShare": 0.0999,
+        "searchRankLostImpressionShare": 0.9001,
+        "conversionsValue": 0,
+        "conversions": 0,
+        "costMicros": "0",
+        "impressions": "0"
+      },
+      "segments": {
+        "date": "2026-09-16"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000003",
+        "name": "name-2",
+        "id": "1000000003"
+      },
+      "metrics": {
+        "clicks": "0",
+        "searchBudgetLostImpressionShare": 0,
+        "searchImpressionShare": 0.0999,
+        "searchRankLostImpressionShare": 0.9001,
+        "conversionsValue": 0,
+        "conversions": 0,
+        "costMicros": "0",
+        "impressions": "0"
+      },
+      "segments": {
+        "date": "2026-09-16"
+      }
+    }
+  ]
+}
