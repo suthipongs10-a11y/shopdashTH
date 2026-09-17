@@ -21,6 +21,8 @@
 
 | 2026-09-17 | D24 | Customer ID อยู่ใน `.dev.vars` ไม่ใช่ `wrangler.toml` | `DEFAULT_CUSTOMER_ID` / `LOGIN_CUSTOMER_ID` / `TEST_CUSTOMER_ID` เก็บใน `.dev.vars` (อยู่ใน `.gitignore`) · ตอน deploy ใส่เป็น Worker secret แทน | รีโปนี้เป็น **public** — commit Customer ID จริงลงไปเท่ากับประกาศว่าบัญชีโฆษณาไหนเป็นของใคร และลบออกจากประวัติ git ไม่ได้ · ผลพลอยได้: ไฟล์ที่ tracked ไม่ถูกแก้ในเครื่อง จึงไม่เกิด conflict ตอน `git pull` (ปัญหาที่เจอมาแล้วกับ `pnpm-workspace.yaml`) · `loadConfig()` อ่าน `.dev.vars` ทับ `wrangler.toml` อยู่แล้ว จึงไม่ต้องแก้โค้ด |
 
+| 2026-09-17 | D25 | `ADS_API_VERSION` = **v26** (จากเดิม v25) | ขยับเป็นเวอร์ชันล่าสุดตอนเริ่ม M1 | SPEC §4 สั่งให้ตรวจเวอร์ชันใน M1 · WebFetch เข้า developers.google.com ไม่ได้ จึงถาม API ตรงๆ แทน: POST ไปที่แต่ละเวอร์ชันโดยไม่ส่ง token — v23/v24/v25/v26 คืน 401 (มีอยู่), v27/v28/v99 คืน 404 (ไม่มี) → v26 คือล่าสุด · ขยับตอนนี้ถูกที่สุดเพราะ fixtures ยังไม่ได้เก็บ — เก็บด้วย v25 แล้วค่อยขยับทีหลังต้องเก็บใหม่หมด |
+
 ## รอยืนยัน (ยังไม่ตัดสินใจ)
 - **`ADS_API_VERSION`** ตั้งต้น `v25` ตาม SPEC §4 แต่ยังไม่ได้เทียบกับเอกสาร Google จริง —
   SPEC ระบุให้ตรวจใน M1 ถ้าไม่ตรงให้บันทึกเป็น D19 ที่นี่ แล้วแก้ค่าใน `wrangler.toml` จุดเดียว

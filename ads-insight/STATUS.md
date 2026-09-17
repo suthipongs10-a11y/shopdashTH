@@ -1,6 +1,6 @@
 # STATUS — Ads Insight
 
-**Milestone ปัจจุบัน:** M0 — Access & Setup ✅ **ผ่าน Gate แล้ว** (รอผู้ใช้ยืนยันก่อนเริ่ม M1)
+**Milestone ปัจจุบัน:** M1 — Ads Core Client (M0 ✅ ผ่าน Gate 17 ก.ย. 2569)
 **อัปเดตล่าสุด:** 2026-09-16
 
 ## M0 Checklist
@@ -80,18 +80,30 @@
   สิทธิ์ผูกกับ Cloud project แทน ต้องยืนยันกับเอกสารล่าสุดตอนทำ M0 checklist ฝั่ง Google
 - `src/db/` ยังว่าง (ตั้งใจ — schema เป็นงาน M3) · `pwa/` ยังว่าง (งาน M6)
 
-## ขั้นต่อไป
-**หยุดรอผู้ใช้ยืนยันก่อนเริ่ม M1** (กฎ Gate ข้อ 1)
+## M1 Checklist — Ads Core Client
 
-M1 — Ads Core Client จะสร้าง:
-- `src/ads/client.ts` (searchStream รวม chunks, mutate แบบ validateOnly, retry/backoff, quota counter)
-- `src/ads/gaql.ts` (query builder + field allowlist) · `money.ts` · `errors.ts` · `enums.ts`
-- เก็บ fixtures จาก response จริงที่ลบข้อมูลส่วนตัวแล้ว — **ต้องให้ผู้ใช้รันสคริปต์บนเครื่องตัวเอง**
-  เพราะ container ของ Claude Code ไม่มี (และไม่ควรมี) credentials
+### Gate M1 (SPEC §12)
+- [ ] unit tests ผ่านครบ
+- [ ] ดึง campaigns + metrics 30 วันของบัญชีจริงได้
+- [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
 
-สิ่งที่ต้องได้จากผู้ใช้ระหว่าง M1:
-- fixtures จากบัญชีจริง (campaigns + metrics 30 วัน)
-- คำตอบ SPEC §16 ข้อ 2–4 (conversion actions, ประเภทแคมเปญ, งบสูงสุด)
+### งานย่อย
+- [x] ยืนยัน `ADS_API_VERSION` — ยิงถาม API ตรงๆ: v23–v26 มีอยู่, v27+ ยังไม่มี
+      → เปลี่ยนจาก v25 เป็น **v26** (DECISIONS D25) · รอผู้ใช้ยืนยันด้วย `pnpm check:access`
+- [ ] `src/ads/money.ts` — micros ↔ THB (int64 มาเป็น string, ใช้ bigint ถ้าเกิน safe integer)
+- [ ] `src/ads/errors.ts` — GoogleAdsFailure → ข้อความไทย + เก็บ raw ไว้ + บอกว่า retry ได้ไหม
+- [ ] `src/ads/gaql.ts` — query builder + field allowlist + บังคับ SELECT-only, LIMIT ≤ 1000
+- [ ] `src/ads/enums.ts` — enum ที่ใช้บ่อย
+- [ ] `src/ads/resources.ts` — resource name helpers + temporary IDs (เลขติดลบ)
+- [ ] `src/ads/client.ts` — searchStream (รวม chunks), mutate (validateOnly), retry/backoff, quota counter
+- [ ] สคริปต์เก็บ fixtures ให้ผู้ใช้รันบนเครื่อง + ลบข้อมูลส่วนตัวอัตโนมัติ
+- [ ] unit tests ทุกตัวตาม CLAUDE.md (money, GAQL builder/allowlist, error mapping, retry)
+
+### ข้อจำกัดที่รู้ล่วงหน้า
+- Claude Code ไม่มี credentials (และไม่ควรมี) → ส่วนที่ต้องยิง API จริงต้องให้ผู้ใช้รันบนเครื่อง
+  แล้ว commit fixtures ที่ลบข้อมูลส่วนตัวแล้วกลับมา
+- `src/ads` ต้อง runtime-agnostic → รับ `fetch` / token provider / quota counter เป็น parameter
+  ห้าม import ของเฉพาะ Workers หรือ Node
 
 ## Ideas (นอก scope — รอพิจารณา)
 -
