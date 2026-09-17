@@ -14,11 +14,12 @@ ACCOUNT_TZ = "Asia/Bangkok"
 # Google Ads REST API version. Bumping this must be followed by re-running the
 # fixture tests (SPEC §4).
 ADS_API_VERSION = "v25"
-# Filled in during M0 once the real account is known (digits only, no dashes).
+# Deliberately left blank in the repository — this file is committed and the
+# repository is public, so a real customer id here would publish which ad
+# account this is (DECISIONS D24). Set them in .dev.vars locally; deploys get
+# them as Worker secrets (`wrangler secret put DEFAULT_CUSTOMER_ID`).
 DEFAULT_CUSTOMER_ID = ""
-# Only set when the account is reached through an MCC.
 LOGIN_CUSTOMER_ID = ""
-# Test client account — the ONLY account mutate tests may touch (CLAUDE.md).
 TEST_CUSTOMER_ID = ""
 
 # ── D1 (SPEC §10) ─────────────────────────────────────────────────────────────

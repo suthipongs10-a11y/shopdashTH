@@ -46,7 +46,7 @@ pnpm exec wrangler d1 create ads_insight
 #    ต้องใส่ GOOGLE_OAUTH_CLIENT_ID / SECRET ใน .dev.vars ก่อน
 pnpm auth:google
 
-# 3. ดูว่า token นี้เข้าถึงบัญชีไหนได้บ้าง แล้วเอาค่าที่แนะนำไปใส่ wrangler.toml
+# 3. ดูว่า token นี้เข้าถึงบัญชีไหนได้บ้าง แล้วเอาค่าที่แนะนำไปใส่ .dev.vars
 pnpm list:accounts
 
 # 4. ตรวจว่าเรียก Google Ads API ด้วยบัญชีจริงได้ — นี่คือ Gate ของ M0
@@ -63,11 +63,13 @@ pnpm check:access 1234567890
   222-222-2222  ลูกค้า A  THB · Asia/Bangkok
   333-333-3333  ลูกค้าเก่า  THB · Asia/Bangkok  [CANCELED]
 
---- ค่าที่แนะนำให้ใส่ใน wrangler.toml [vars] ---
+--- ค่าที่แนะนำให้ใส่ใน .dev.vars ---
 DEFAULT_CUSTOMER_ID = "2222222222"
 LOGIN_CUSTOMER_ID = "1111111111"
 TEST_CUSTOMER_ID = ""   # ← ยังไม่มี test account — สร้างก่อนถึง M4
 ```
+
+Customer ID อยู่ใน `.dev.vars` ไม่ใช่ `wrangler.toml` เพราะรีโปนี้เป็น public (DECISIONS D24)
 
 `pnpm check:access` จะบอกชื่อบัญชี สกุลเงิน ไทม์โซน และเตือนถ้ามีอะไรตั้งค่าไม่ตรง
 (เช่น ใส่ Customer ID ของ MCC มาแทนบัญชีลูก หรือไทม์โซนไม่ตรงกับ `ACCOUNT_TZ`)

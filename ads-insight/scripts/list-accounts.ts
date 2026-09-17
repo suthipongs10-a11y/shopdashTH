@@ -5,7 +5,8 @@
  *
  * Answers the M0 checklist item "จด Customer ID จริง / login-customer-id" by
  * showing the real hierarchy instead of making you hunt for IDs in the UI, and
- * prints the exact wrangler.toml values to paste.
+ * prints the exact values to paste into `.dev.vars` (which is gitignored —
+ * see DECISIONS D24 for why these do not go in wrangler.toml).
  *
  * Read-only.
  */
@@ -126,7 +127,7 @@ async function main(): Promise<void> {
 
   const recommendation = recommendSettings(accounts, reachedVia);
 
-  console.log('--- ค่าที่แนะนำให้ใส่ใน wrangler.toml [vars] ---');
+  console.log('--- ค่าที่แนะนำให้ใส่ใน .dev.vars ---');
   for (const key of ['DEFAULT_CUSTOMER_ID', 'LOGIN_CUSTOMER_ID', 'TEST_CUSTOMER_ID'] as const) {
     const value = recommendation[key];
     if (value) {
@@ -144,6 +145,7 @@ async function main(): Promise<void> {
     console.log('');
   }
 
+  console.log('(.dev.vars อยู่ใน .gitignore — Customer ID จะไม่ถูก commit ขึ้น GitHub)\n');
   console.log(`ใช้ไป ${apiCalls} API call`);
   if (recommendation.DEFAULT_CUSTOMER_ID) {
     console.log(`ขั้นต่อไป: pnpm check:access ${recommendation.DEFAULT_CUSTOMER_ID}\n`);

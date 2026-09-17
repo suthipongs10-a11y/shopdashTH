@@ -255,8 +255,12 @@ pnpm auth:google
 ```bash
 pnpm list:accounts
 ```
-→ ดูผังบัญชี แล้วเอาค่าที่แนะนำไปใส่ `wrangler.toml` ใต้ `[vars]`
+→ ดูผังบัญชี แล้วเอาค่าที่แนะนำไปใส่ **`.dev.vars`**
    (`DEFAULT_CUSTOMER_ID`, `LOGIN_CUSTOMER_ID`, `TEST_CUSTOMER_ID`)
+
+> ใส่ใน `.dev.vars` ไม่ใช่ `wrangler.toml` เพราะรีโปนี้เป็น public — commit Customer ID จริง
+> ลงไปแล้วลบออกจากประวัติ git ไม่ได้ (DECISIONS D24) · `.dev.vars` อยู่ใน `.gitignore` แล้ว
+> และการไม่แก้ไฟล์ที่ tracked ยังกัน conflict ตอน `git pull` ด้วย
 
 ```bash
 pnpm check:access

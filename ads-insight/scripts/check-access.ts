@@ -48,7 +48,7 @@ async function main(): Promise<void> {
   const rawCustomerId = process.argv[2] ?? config['DEFAULT_CUSTOMER_ID'] ?? '';
   if (!rawCustomerId.trim()) {
     throw new Error(
-      'ยังไม่ได้ระบุ Customer ID — ใส่ DEFAULT_CUSTOMER_ID ใน wrangler.toml ' +
+      'ยังไม่ได้ระบุ Customer ID — ใส่ DEFAULT_CUSTOMER_ID ใน .dev.vars ' +
         'หรือส่งเป็นอาร์กิวเมนต์: pnpm check:access 1234567890',
     );
   }
