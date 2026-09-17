@@ -9,10 +9,10 @@
 > คู่มือทีละขั้นพร้อมลิงก์ตรง: [`docs/SETUP-GOOGLE-CLOUD.md`](docs/SETUP-GOOGLE-CLOUD.md)
 
 - [x] สร้าง Google Cloud project + Enable Google Ads API (`ads-insight-508906`)
-- [~] OAuth consent screen (External) → สถานะ **In production** — **ยังค้าง**
-      Google บังคับ homepage URL + privacy policy URL ก่อนถึงจะกด Publish ได้ (ดู DECISIONS D21)
-      กำลังทำหน้า https://ragalpha.com/privacy อยู่ (ร่างอยู่ที่ `docs/privacy-policy-template.md`)
-      ถ้าค้างที่ Testing refresh token หมดอายุทุก 7 วัน — ใช้กับ cron ของ M3 ไม่ได้
+- [x] OAuth consent screen (External) → **In production** (17 ก.ย. 2569)
+      ปลดล็อกด้วยการทำหน้า https://ragalpha.com/privacy + ใส่ Authorized domain `ragalpha.com`
+      (ดู DECISIONS D21) → refresh token ไม่หมดอายุ 7 วันแล้ว ใช้กับ cron ของ M3 ได้
+      หมายเหตุ: แอปยังไม่ผ่าน verification จำกัด 100 users ตลอดอายุโปรเจ็ค — เหลือเฟือสำหรับใช้เอง
 - [x] OAuth Client (Web) + redirect URIs — `http://localhost:8787/connect/google/callback`
       - `http://localhost:8787/connect/google/callback` (dev — สคริปต์ `pnpm auth:google` ใช้ตัวนี้)
       - `https://<worker-domain>/connect/google/callback` และ `/oauth/google/callback` (prod, ใส่ตอน M2)
@@ -36,7 +36,8 @@
 - [ ] กรอก `.dev.vars` จริง + `DEFAULT_CUSTOMER_ID` ใน `wrangler.toml`
 
 ### Gate M0
-- [ ] `pnpm check:access <customer_id>` สำเร็จกับบัญชีจริง (ยังรอ credentials)
+- [ ] `pnpm check:access <customer_id>` สำเร็จกับบัญชีจริง
+      **ฝั่ง Google Cloud พร้อมหมดแล้ว** เหลือรันบนเครื่องผู้ใช้อย่างเดียว
 
 ## คำตอบคำถาม SPEC §16
 1. MCC หรือเข้าตรง:
@@ -52,6 +53,9 @@
   secret ขาด / ไม่มี Customer ID / Customer ID ผิดรูปแบบ / credentials ผิด
   (ยิงจริงถึง Google แล้วได้ `invalid_client` พร้อมคำอธิบายไทย)
 - ตอบคำถามเรื่อง Cloud project กับบัญชี Google Ads เป็นคนละ Gmail ได้ไหม → ได้ (DECISIONS D19)
+- ผู้ใช้ทำฝั่ง Google Cloud เสร็จครบ 17 ก.ย. 2569: project `ads-insight-508906`, เปิด Google Ads API,
+  scopes (`adwords` + `userinfo.email`), OAuth client + redirect URI, Explorer access อนุมัติ,
+  consent screen = In production · ระหว่างทางเจอว่าคู่มือผิด 3 จุด แก้แล้วทั้งหมด
 
 ## ค้าง / ปัญหา
 - **ต้องยืนยัน `ADS_API_VERSION`** — ตอนนี้ตั้ง `v25` ตาม SPEC §4 ซึ่งเขียนไว้ว่า "ตรวจเวอร์ชันล่าสุดใน M1"
