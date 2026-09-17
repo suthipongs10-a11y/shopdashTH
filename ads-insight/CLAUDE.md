@@ -46,7 +46,7 @@ Google Ads MCP server + PWA ส่วนตัวบน Cloudflare Workers
 - ทุก tool call เขียน `audit_log` และนับ ops ลง `quota_usage`
 
 ## ก่อนเขียนโค้ดที่แตะ API ภายนอก ให้ตรวจเอกสารล่าสุดก่อน
-- Google Ads API: เวอร์ชันปัจจุบัน, ชื่อ field ใน GAQL (ใช้ `GoogleAdsFieldService` หรือ reference docs), ระดับสิทธิ์ (Explorer/Basic), ฟิลด์บังคับตอนสร้างแคมเปญ, การแก้ RSA ได้หรือไม่
+- Google Ads API: เวอร์ชันปัจจุบัน, ชื่อ field ใน GAQL — **ใช้ `pnpm fields <รูปแบบ>` ถาม API ตรงๆ** อย่าเดาจากความจำ, ระดับสิทธิ์ (Explorer/Basic), ฟิลด์บังคับตอนสร้างแคมเปญ, การแก้ RSA ได้หรือไม่
 - Cloudflare: template remote MCP + `@cloudflare/workers-oauth-provider` เวอร์ชันล่าสุด
 - MCP TypeScript SDK: API ของ `McpServer` / Streamable HTTP
 - ถ้าเอกสารขัดกับ SPEC → หยุด บอกผู้ใช้ และบันทึกใน `docs/DECISIONS.md`
@@ -69,7 +69,8 @@ pnpm deploy         # ต้องได้รับคำสั่งจาก�
 
 # M0 — ตั้งค่าการเข้าถึง Google Ads (รันบนเครื่องที่มี .dev.vars จริง)
 pnpm auth:google    # OAuth flow -> เขียน refresh token ลง .dev.vars
-pnpm list:accounts  # บัญชีที่ token นี้เข้าถึงได้ + ค่าที่ควรใส่ใน wrangler.toml
+pnpm list:accounts  # บัญชีที่ token นี้เข้าถึงได้ + ค่าที่ควรใส่ใน .dev.vars
+pnpm fields <รูปแบบ> # ถาม GoogleAdsFieldService ว่าฟิลด์ไหนมีจริง — ใช้ก่อนเขียน GAQL ทุกครั้ง
 pnpm check:access   # Gate M0: query ตาราง customer ของบัญชีจริง
 ```
 เชื่อม Claude Code กับ MCP ตอน dev (ใช้ DEV_BEARER_TOKEN, เปิดเฉพาะ ENV=dev):

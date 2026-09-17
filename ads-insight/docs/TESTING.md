@@ -58,6 +58,7 @@ curl -s localhost:8787/health       # ต้องได้ JSON บอกว่
 | `pnpm list:accounts` | บัญชีที่ token เข้าถึงได้ + แนะนำค่าที่ควรใส่ `.dev.vars` |
 | `pnpm auth:google` | ขอ refresh token ใหม่ (เมื่อหมดอายุหรือเปลี่ยนบัญชี) |
 | `pnpm capture:fixtures` | ดึง response จริงมาทำ fixtures + ลบข้อมูลส่วนตัวอัตโนมัติ (~7 ops) |
+| `pnpm fields <รูปแบบ>` | **ถาม API ว่าฟิลด์ไหนมีจริง** ก่อนเขียน query · เช่น `pnpm fields campaign.%date%` (1 ops) |
 
 **ใช้ quota:** `check:access` = 1 ops · `list:accounts` = 2–3 ops
 (Explorer มี 2,880 ops/วัน — รันวันละหลายสิบครั้งยังเหลือเฟือ)

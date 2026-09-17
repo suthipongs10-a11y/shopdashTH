@@ -81,6 +81,32 @@ export function parseAccessibleCustomers(payload: unknown): string[] {
     .filter((id) => /^\d+$/.test(id));
 }
 
+/**
+ * Ask the API which fields exist, instead of guessing from memory or docs
+ * (CLAUDE.md: "ชื่อ field ใน GAQL ใช้ GoogleAdsFieldService").
+ *
+ * Not scoped to a customer — it is metadata about the API version itself.
+ */
+export async function searchFields(options: {
+  apiVersion: string;
+  accessToken: string;
+  query: string;
+}): Promise<Record<string, unknown>[]> {
+  const url = `${ADS_API_HOST}/${options.apiVersion}/googleAdsFields:search`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${options.accessToken}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ query: options.query, pageSize: 200 }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new AdsApiError(res.status, text);
+  const body = JSON.parse(text) as { results?: Record<string, unknown>[] };
+  return body.results ?? [];
+}
+
 export class AdsApiError extends Error {
   override name = 'AdsApiError';
   constructor(

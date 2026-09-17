@@ -16,6 +16,7 @@
     "cf-typegen": "wrangler types",
     "auth:google": "tsx scripts/get-refresh-token.ts",
     "list:accounts": "tsx scripts/list-accounts.ts",
+    "fields": "tsx scripts/list-fields.ts",
     "capture:fixtures": "tsx scripts/capture-fixtures.ts",
     "check:access": "tsx scripts/check-access.ts",
     "deploy": "wrangler deploy"

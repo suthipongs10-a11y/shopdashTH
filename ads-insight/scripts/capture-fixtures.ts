@@ -45,7 +45,7 @@ const FIXTURES: FixtureSpec[] = [
     what: 'แคมเปญทั้งหมด + งบ + กลยุทธ์บิด',
     query: `
       SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
-             campaign.bidding_strategy_type, campaign.start_date, campaign.end_date,
+             campaign.bidding_strategy_type,
              campaign_budget.amount_micros, campaign_budget.explicitly_shared
       FROM campaign
       ORDER BY campaign.id
