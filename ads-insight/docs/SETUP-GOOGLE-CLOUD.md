@@ -33,6 +33,11 @@ cd ads-insight
 pnpm install
 ```
 
+> **Windows / PowerShell:** path ที่มีเว้นวรรคต้องครอบด้วยเครื่องหมายคำพูด
+> เช่น `cd "C:\Work\Google Ads Manage"` ไม่งั้นจะขึ้น
+> *"A positional parameter cannot be found that accepts argument 'Ads'"*
+> — เลี่ยงปัญหาได้ด้วยการตั้งชื่อโฟลเดอร์ไม่มีเว้นวรรค
+
 ตรวจว่าโครงใช้ได้ก่อนเริ่มยุ่งกับ Google:
 
 ```bash
@@ -289,6 +294,8 @@ pnpm exec wrangler d1 create ads_insight
 | `invalid_grant` | consent screen ยังเป็น Testing แล้ว token หมดอายุ 7 วัน → รัน `pnpm auth:google` ใหม่ (หรือย้ายไปทาง A ในข้อ 3.4) |
 | `access_denied` ตอนล็อกอิน | อยู่ Testing แต่ยังไม่ได้เพิ่ม Gmail นั้นใน **Test users** (ข้อ 3.4 ทาง B) |
 | ปุ่ม **Publish app** เป็นสีเทา | ข้อ 3.1 ยังขาด homepage URL / privacy policy URL / Authorized domains |
+| `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` ตอน `pnpm install` | lockfile มีแพ็กเกจที่เผยแพร่ไม่ถึง 24 ชม. **อย่าปิดนโยบายนี้** — เป็นระบบกันภัย supply-chain · แจ้ง Claude Code ให้ resolve lockfile ใหม่ด้วยเวอร์ชันที่นิ่งกว่า (ดู DECISIONS D22) |
+| `A positional parameter cannot be found` ใน PowerShell | path มีเว้นวรรคแต่ไม่ได้ครอบด้วย `"..."` |
 | Google ไม่ส่ง refresh token กลับมา | เคยให้สิทธิ์แอปนี้ไปแล้ว → ถอนที่ https://myaccount.google.com/permissions แล้วรันใหม่ |
 | HTTP 403 ตอน `check:access` | ยังไม่ได้ Explorer access (ขั้นตอน 5) หรือ Gmail ที่ล็อกอินไม่มีสิทธิ์ในบัญชีนั้น หรือเข้าผ่าน MCC แต่ไม่ได้ตั้ง `LOGIN_CUSTOMER_ID` |
 | บ่นหา `developer-token` | ขัดกับ D11 ที่ว่า Google ยกเลิกไปแล้ว → แคปหน้าจอมาให้ Claude Code ดู แล้วบันทึกลง DECISIONS |

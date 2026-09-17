@@ -4,6 +4,13 @@
 packages:
   - '.'
 
+# Refuse packages published less than 24h ago. Newer pnpm enforces this by
+# default, so without it here a lockfile resolved on a permissive machine gets
+# rejected on a strict one (ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION). Declaring
+# it in the repo means whoever regenerates the lockfile hits the same rule the
+# next person installing will.
+minimumReleaseAge: 1440
+
 # wrangler ships the workerd runtime and esbuild as native binaries; their
 # postinstall scripts must run or `pnpm dev` / `wrangler deploy` will not work.
 onlyBuiltDependencies:
