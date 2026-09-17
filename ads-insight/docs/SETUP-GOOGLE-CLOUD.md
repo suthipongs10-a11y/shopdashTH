@@ -73,14 +73,25 @@ pnpm typecheck   # ต้องไม่มี error
 
 ### 3.1 Branding
 https://console.cloud.google.com/auth/branding
+
+**บังคับ:**
 - **App name:** `Ads Insight`
 - **User support email:** อีเมลคุณ
 - **Developer contact email:** อีเมลคุณ
-- **ข้ามได้:** โลโก้ (ใส่แล้วต้องผ่าน brand verification), Application home page,
-  privacy policy link, terms of service link, Authorized domains — ใช้เองไม่ต้องมี
-- เสร็จแล้วปุ่ม **Save** จะกลายเป็นสีเทา = ไม่มีอะไรค้าง
 
-มุมขวาของหน้านี้จะเขียนว่า *"your app is in Testing status"* — ปกติ ยังไม่ต้องตกใจ แก้ในข้อ 3.4
+**บังคับเพิ่ม ถ้าจะกด Publish app ในข้อ 3.4** (ยืนยันจากหน้าจอจริง — ไม่ใส่แล้วปุ่ม Publish เป็นสีเทา):
+- **Application home page:** URL เว็บของคุณ
+- **Application privacy policy link:** URL หน้านโยบายความเป็นส่วนตัว
+- **Authorized domains:** กด **Add domain** ใส่โดเมนของ URL ข้างบน
+  (ใส่แค่โดเมนเปล่า เช่น `example.com` ไม่ต้องมี `https://` หรือ `www.`)
+  — ถ้าไม่ใส่ตรงนี้ URL ข้างบนจะไม่ผ่าน
+
+**ข้ามได้จริง:** โลโก้ (ใส่แล้วต้องผ่าน brand verification), terms of service link
+
+> **ยังไม่มีเว็บ?** ข้ามไปก่อนได้ แล้วใช้ทาง B ในข้อ 3.4 — ตอน M2 ที่ deploy Worker ขึ้น Cloudflare
+> จะได้โดเมน `*.workers.dev` มาใช้ทำหน้าแรก + `/privacy` แล้วค่อยกลับมากรอกตรงนี้
+
+มุมขวาของหน้านี้จะเขียนว่า *"your app is in Testing status"* — ปกติ แก้ในข้อ 3.4
 
 ### 3.2 Audience
 https://console.cloud.google.com/auth/audience
@@ -113,18 +124,31 @@ https://console.cloud.google.com/auth/scopes → ปุ่ม **Add or remove sc
 พอบันทึกแล้ว `adwords` จะไปอยู่ใต้หัวข้อ **"Your sensitive scopes"** ซึ่งถูกต้อง
 (และเป็นเหตุผลที่ต้องทำข้อ 3.4 ต่อ)
 
-### 3.4 Publish app — ข้อนี้สำคัญมาก
-กลับไปหน้า **Audience** → กด **Publish app** → ยืนยัน → สถานะต้องเป็น **In production**
+### 3.4 Publishing status — เลือก 1 ใน 2 ทาง
+https://console.cloud.google.com/auth/audience
 
-**ทำไมต้องทำ:** ถ้าปล่อยไว้ที่ **Testing** refresh token จะ**หมดอายุใน 7 วัน** ต้องมานั่งขอใหม่เรื่อยๆ
+#### ทาง A — Publish app (ดีกว่า ถ้ามีเว็บ)
+กด **Publish app** → ยืนยัน → สถานะเป็น **In production**
 
-คุณจะเห็นคำเตือนว่าแอปยังไม่ผ่าน verification — **ไม่เป็นไร** ตอนล็อกอินจะมีหน้าจอ
-"Google hasn't verified this app" ให้กด **Advanced → Go to Ads Insight (unsafe)** ผ่านไปได้
-เพราะเป็นแอปที่คุณสร้างเองใช้เอง
+ถ้าปุ่มเป็น **สีเทากดไม่ได้** แปลว่าข้อ 3.1 ยังกรอกไม่ครบ (homepage URL + privacy policy URL)
+— เอาเมาส์ไปชี้ที่ปุ่มจะมี tooltip บอกว่าขาดอะไร
 
-> ถ้ากด Publish แล้วโดนบังคับให้ส่ง verification จริงๆ (เป็นไปได้เพราะ `adwords` เป็น sensitive scope):
-> ให้อยู่ที่ **Testing** ไปก่อน แล้วไปที่ Audience → **Test users** → เพิ่ม Gmail ที่ทำ Google Ads เข้าไป
-> ใช้งานได้เหมือนกัน แค่ต้องรัน `pnpm auth:google` ใหม่ทุก 7 วัน — แล้วบอก Claude Code ให้บันทึกลง DECISIONS
+ตอนล็อกอินจะเจอหน้า "Google hasn't verified this app" → กด **Advanced → Go to Ads Insight (unsafe)**
+ผ่านได้ เพราะเป็นแอปที่คุณสร้างเองใช้เอง (จำกัด 100 users ตลอดอายุแอป ซึ่งเหลือเฟือ)
+
+#### ทาง B — อยู่ Testing ไปก่อน
+ใช้งานได้ครบเหมือนกัน แต่ **ต้องเพิ่มตัวเองเป็น test user ก่อน** ไม่งั้นล็อกอินไม่ผ่าน:
+
+**Audience → Test users → `+ Add users`** → ใส่ **Gmail ที่ทำ Google Ads**
+
+**ข้อเสียที่ต้องรู้:** ใน Testing status **refresh token หมดอายุทุก 7 วัน**
+- ช่วง M1 ที่ยังพัฒนาบนเครื่อง: พอทนได้ แค่รัน `pnpm auth:google` ใหม่
+- **ตั้งแต่ M3 เป็นต้นไป: ใช้ไม่ได้** เพราะมี cron รันทุกวันบน Cloudflare จะพังทุกสัปดาห์
+  → ต้องย้ายไปทาง A ก่อนถึง M3
+
+**แผนถ้ายังไม่มีเว็บ:** ตอน M2 deploy Worker ขึ้น Cloudflare จะได้โดเมน `*.workers.dev`
+ให้ทำหน้าแรก + `/privacy` ใน Worker แล้วเอา URL มากรอกในข้อ 3.1 → กด Publish → จบ
+(ดู DECISIONS D21)
 
 ---
 
@@ -262,7 +286,9 @@ pnpm exec wrangler d1 create ads_insight
 |---|---|
 | `invalid_client` | Client ID/Secret ไม่ตรง — copy มาไม่ครบ หรือใส่สลับช่อง |
 | `redirect_uri_mismatch` | URI ใน OAuth client ไม่ตรงกับที่สคริปต์ใช้ — ต้องเป็น `http://localhost:8787/connect/google/callback` เป๊ะๆ (ไม่มี `/` ท้าย) |
-| `invalid_grant` | consent screen ยังเป็น Testing แล้ว token หมดอายุ 7 วัน → ทำขั้นตอน 3.4 แล้วรัน `pnpm auth:google` ใหม่ |
+| `invalid_grant` | consent screen ยังเป็น Testing แล้ว token หมดอายุ 7 วัน → รัน `pnpm auth:google` ใหม่ (หรือย้ายไปทาง A ในข้อ 3.4) |
+| `access_denied` ตอนล็อกอิน | อยู่ Testing แต่ยังไม่ได้เพิ่ม Gmail นั้นใน **Test users** (ข้อ 3.4 ทาง B) |
+| ปุ่ม **Publish app** เป็นสีเทา | ข้อ 3.1 ยังขาด homepage URL / privacy policy URL / Authorized domains |
 | Google ไม่ส่ง refresh token กลับมา | เคยให้สิทธิ์แอปนี้ไปแล้ว → ถอนที่ https://myaccount.google.com/permissions แล้วรันใหม่ |
 | HTTP 403 ตอน `check:access` | ยังไม่ได้ Explorer access (ขั้นตอน 5) หรือ Gmail ที่ล็อกอินไม่มีสิทธิ์ในบัญชีนั้น หรือเข้าผ่าน MCC แต่ไม่ได้ตั้ง `LOGIN_CUSTOMER_ID` |
 | บ่นหา `developer-token` | ขัดกับ D11 ที่ว่า Google ยกเลิกไปแล้ว → แคปหน้าจอมาให้ Claude Code ดู แล้วบันทึกลง DECISIONS |
