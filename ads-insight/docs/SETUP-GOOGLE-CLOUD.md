@@ -296,6 +296,7 @@ pnpm exec wrangler d1 create ads_insight
 | ปุ่ม **Publish app** เป็นสีเทา | ข้อ 3.1 ยังขาด homepage URL / privacy policy URL / Authorized domains |
 | `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` ตอน `pnpm install` | lockfile มีแพ็กเกจที่เผยแพร่ไม่ถึง 24 ชม. **อย่าปิดนโยบายนี้** — เป็นระบบกันภัย supply-chain · แจ้ง Claude Code ให้ resolve lockfile ใหม่ด้วยเวอร์ชันที่นิ่งกว่า (ดู DECISIONS D22) |
 | `A positional parameter cannot be found` ใน PowerShell | path มีเว้นวรรคแต่ไม่ได้ครอบด้วย `"..."` |
+| `ERR_PNPM_IGNORED_BUILDS` (esbuild / workerd) | `pnpm-workspace.yaml` ต้องใช้คีย์ `allowBuilds` — pnpm 11 เมิน `onlyBuiltDependencies` (ดู DECISIONS D23) · ถ้ายังเจอ ให้เช็คว่า pnpm ตรงกับ `packageManager` ใน `package.json` |
 | Google ไม่ส่ง refresh token กลับมา | เคยให้สิทธิ์แอปนี้ไปแล้ว → ถอนที่ https://myaccount.google.com/permissions แล้วรันใหม่ |
 | HTTP 403 ตอน `check:access` | ยังไม่ได้ Explorer access (ขั้นตอน 5) หรือ Gmail ที่ล็อกอินไม่มีสิทธิ์ในบัญชีนั้น หรือเข้าผ่าน MCC แต่ไม่ได้ตั้ง `LOGIN_CUSTOMER_ID` |
 | บ่นหา `developer-token` | ขัดกับ D11 ที่ว่า Google ยกเลิกไปแล้ว → แคปหน้าจอมาให้ Claude Code ดู แล้วบันทึกลง DECISIONS |

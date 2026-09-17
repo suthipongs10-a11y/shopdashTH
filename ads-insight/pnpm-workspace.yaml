@@ -13,6 +13,8 @@ minimumReleaseAge: 1440
 
 # wrangler ships the workerd runtime and esbuild as native binaries; their
 # postinstall scripts must run or `pnpm dev` / `wrangler deploy` will not work.
-onlyBuiltDependencies:
-  - esbuild
-  - workerd
+# `allowBuilds` is the key pnpm 11 understands — `onlyBuiltDependencies` is
+# silently ignored there and the install fails with ERR_PNPM_IGNORED_BUILDS.
+allowBuilds:
+  esbuild: true
+  workerd: true

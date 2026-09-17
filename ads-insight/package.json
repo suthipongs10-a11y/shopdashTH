@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Google Ads MCP server + PWA on Cloudflare Workers",
+  "packageManager": "pnpm@11.5.2",
   "scripts": {
     "dev": "wrangler dev",
     "test": "vitest run",
