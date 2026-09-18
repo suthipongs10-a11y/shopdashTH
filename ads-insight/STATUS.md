@@ -107,10 +107,17 @@
       (ดูตาราง "ข้อมูลบัญชี" ด้านล่าง) — ไม่ใช่ข้อผิดพลาด บัญชียังใหม่
       → ทดสอบคณิตศาสตร์ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แทน (D29)
       → **ควรรัน `pnpm capture:fixtures` ซ้ำอีกครั้งราวต้น ต.ค.** เมื่อบัญชีมี traffic จริงแล้ว
-- [ ] `validateOnly` บน **test account** ผ่าน ← **ค้างอยู่ที่นี่ที่เดียว**
-      สคริปต์ตรวจพร้อมแล้ว: `pnpm check:mutate` (ใช้ `src/ads/client.ts` ตัวจริง ไม่ใช่โค้ดคัดลอก)
-      เหลือฝั่งผู้ใช้: สร้าง test manager + test client แล้วใส่ `TEST_CUSTOMER_ID`
-      **และ `TEST_LOGIN_CUSTOMER_ID`** — ขั้นตอนเต็มใน `docs/SETUP-GOOGLE-CLOUD.md` ข้อ 10
+- [ ] `validateOnly` บน **test account** ผ่าน ← **บล็อกอยู่ที่ข้อจำกัดแพลตฟอร์ม ไม่ใช่บั๊ก**
+      สคริปต์พร้อมหมดแล้ว (`pnpm check:mutate` ใช้ `src/ads/client.ts` ตัวจริง) มี test manager
+      (372-340-9601) + test client (470-557-4425) แล้ว แต่ client ติด `CUSTOMER_NOT_ENABLED` (403)
+      ลองแก้ไปแล้ว 3 ทาง **ตันทั้งหมดที่สิทธิ์ Explorer**:
+      1. รอเวลา (ลองข้ามชั่วโมง ไม่หาย)
+      2. สร้างผ่าน API ตรง (`pnpm create:test-client`) → 403 `DEVELOPER_TOKEN_NOT_APPROVED`
+         ต้องมีสิทธิ์ Basic ขึ้นไป (D32) — เก็บสคริปต์ไว้ใช้ตอนได้ Basic
+      3. กรอก wizard สร้างแคมเปญให้จบแทนกด ✕ → จบที่ขั้นใส่ billing ซึ่งห้ามทำ (D33)
+      **ผู้ใช้ตัดสินใจ 18 ก.ย.: รอเพิ่มก่อน** (ไม่ขอ Basic access ตอนนี้, ไม่ข้าม gate)
+      → เซสชันถัดไป: บอกให้ลอง `pnpm check:mutate` อีกครั้งก่อนทำอย่างอื่น ถ้ายังไม่ผ่าน
+      ถามอีกครั้งว่าจะรอต่อหรือขอ Basic access
 
 ### งานย่อย
 - [x] `ADS_API_VERSION` — **คงไว้ที่ v25** (ลองขยับเป็น v26 แล้วบัญชีจริงตอบ 404 จึงถอยกลับ)
