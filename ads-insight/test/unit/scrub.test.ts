@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { createScrubber, findLeaks, scrub } from '../../scripts/lib/scrub';
+import {
+  createScrubber,
+  findLeaks,
+  findMeasurementChanges,
+  scrub,
+} from '../../scripts/lib/scrub';
 
 /** A row shaped like a real campaign performance response. */
 const row = {
@@ -227,5 +232,99 @@ describe('numbers that are not phone numbers', () => {
   it('still catches a real phone number surrounded by text', () => {
     const out = scrub({ note: 'โทร 089-123-4567 ครับ' }) as { note: string };
     expect(out.note).not.toContain('089-123-4567');
+  });
+});
+
+/**
+ * These assert exact values, not shapes. The earlier round of phone-mangling
+ * tests above checks `/^\d+$/`, which a substituted id like `1000000003`
+ * satisfies perfectly — so they passed while every budget in the fixtures was
+ * quietly being replaced.
+ */
+describe('scrub — measurements survive verbatim', () => {
+  it('keeps a budget in micros exactly as it arrived', () => {
+    const out = scrub({
+      campaignBudget: { amountMicros: '1080000000', explicitlyShared: false },
+    }) as { campaignBudget: { amountMicros: string } };
+    expect(out.campaignBudget.amountMicros).toBe('1080000000');
+  });
+
+  it('keeps every metric under `metrics`, however many digits', () => {
+    const out = scrub({
+      metrics: {
+        clicks: '412',
+        impressions: '184503',
+        costMicros: '2345670000',
+        conversions: 88.5,
+        ctr: 0.0223,
+        averageCpc: 5692889,
+      },
+    }) as { metrics: Record<string, unknown> };
+    expect(out.metrics).toEqual({
+      clicks: '412',
+      impressions: '184503',
+      costMicros: '2345670000',
+      conversions: 88.5,
+      ctr: 0.0223,
+      averageCpc: 5692889,
+    });
+  });
+
+  it('keeps bids and targets, which live outside `metrics`', () => {
+    const out = scrub({
+      adGroupCriterion: { cpcBidMicros: '12500000', effectiveCpcBidMicros: '12500000' },
+      campaign: { targetSpend: { cpcBidCeilingMicros: '45000000' } },
+    }) as Record<string, Record<string, unknown>>;
+    expect(out['adGroupCriterion']).toEqual({
+      cpcBidMicros: '12500000',
+      effectiveCpcBidMicros: '12500000',
+    });
+    expect(out['campaign']?.['targetSpend']).toEqual({ cpcBidCeilingMicros: '45000000' });
+  });
+
+  it('still replaces ids that happen to sit beside a measurement', () => {
+    const out = scrub({
+      campaign: { id: '22334455', resourceName: 'customers/2555586360/campaigns/22334455' },
+      metrics: { costMicros: '22334455000' },
+    }) as { campaign: { id: string }; metrics: { costMicros: string } };
+    expect(out.campaign.id).not.toBe('22334455');
+    expect(out.metrics.costMicros).toBe('22334455000');
+  });
+});
+
+describe('findMeasurementChanges', () => {
+  const before = {
+    campaign: { id: '22334455', name: 'Search - แบรนด์' },
+    campaignBudget: { amountMicros: '1080000000' },
+    metrics: { clicks: '412', costMicros: '2345670000' },
+  };
+
+  it('passes a scrub that only touched catalogued keys', () => {
+    expect(findMeasurementChanges(before, scrub(before))).toEqual([]);
+  });
+
+  it('catches a measurement that was rewritten', () => {
+    const after = structuredClone(before);
+    after.campaignBudget.amountMicros = '1000000003';
+    const problems = findMeasurementChanges(before, after);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain('amountMicros');
+    expect(problems[0]).toContain('1080000000');
+  });
+
+  it('catches the mangled form the phone sweep produced', () => {
+    const after = structuredClone(before);
+    (after.campaignBudget as { amountMicros: string }).amountMicros = '1080-000-0000';
+    expect(findMeasurementChanges(before, after)).toHaveLength(1);
+  });
+
+  it('catches rows going missing', () => {
+    expect(findMeasurementChanges([before, before], [before])[0]).toContain('จำนวนแถว');
+  });
+
+  it('ignores names and text, which are meant to change', () => {
+    const after = structuredClone(before);
+    after.campaign.name = 'name-1';
+    expect(findMeasurementChanges(before, after)).toEqual([]);
   });
 });

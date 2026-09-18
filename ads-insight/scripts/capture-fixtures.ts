@@ -19,7 +19,7 @@ import { loadConfig, PROJECT_ROOT, requireVar } from './lib/config';
 import { assertCustomerId, formatCustomerId } from './lib/customer-id';
 import { refreshAccessToken } from './lib/google-auth';
 import { searchStream } from './lib/ads-rest';
-import { createScrubber, findLeaks } from './lib/scrub';
+import { createScrubber, findLeaks, findMeasurementChanges } from './lib/scrub';
 
 interface Context {
   apiVersion: string;
@@ -214,6 +214,21 @@ async function main(): Promise<void> {
       continue;
     }
 
+    const scrubbed = scrubber.scrub(rows);
+
+    // Refuse to write a fixture whose numbers the scrubber changed. A file that
+    // is safe but wrong is worse than no file: every later test would be
+    // asserting against fiction.
+    const mangled = findMeasurementChanges(rows, scrubbed);
+    if (mangled.length > 0) {
+      skipped += 1;
+      console.log('❌ ไม่เขียน — ตัวเลขถูกแก้ระหว่างลบข้อมูลส่วนตัว:');
+      for (const problem of mangled.slice(0, 5)) console.log(`    ${problem}`);
+      if (mangled.length > 5) console.log(`    ... อีก ${mangled.length - 5} จุด`);
+      console.log('    แจ้ง field ที่ขึ้นมาให้ Claude เพิ่มใน scrub.ts — อย่าแก้ไฟล์เอง');
+      continue;
+    }
+
     const payload = {
       _meta: {
         what: fixture.what,
@@ -224,7 +239,7 @@ async function main(): Promise<void> {
         scrubbed: true,
         searchTermsKept: keepSearchTerms,
       },
-      rows: scrubber.scrub(rows),
+      rows: scrubbed,
     };
 
     const serialized = `${JSON.stringify(payload, null, 2)}\n`;
