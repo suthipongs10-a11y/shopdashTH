@@ -1,0 +1,6888 @@
+{
+  "_meta": {
+    "what": "ชั่วโมง × วันในสัปดาห์ — พีคสาย และหลังเลิกงาน",
+    "query": "SELECT campaign.id, segments.hour, segments.day_of_week, metrics.clicks, metrics.cost_micros, metrics.conversions FROM campaign WHERE segments.date DURING LAST_30_DAYS LIMIT 1000",
+    "apiVersion": "v25",
+    "rows": 459,
+    "synthetic": true,
+    "generatedBy": "pnpm fixtures:synthetic",
+    "seed": 20260917,
+    "period": "2026-08-18 .. 2026-09-16",
+    "note": "เขียนขึ้นเอง ไม่ใช่ข้อมูลบัญชีจริง — บัญชีจริงยังไม่มี traffic (STATUS M1)"
+  },
+  "rows": [
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "13029205",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "5273852",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3317856",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "2165294",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3419275",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "7939364",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "8",
+        "costMicros": "25327983",
+        "conversions": 8
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "20",
+        "costMicros": "61770394",
+        "conversions": 19
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "25",
+        "costMicros": "76982929",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "32",
+        "costMicros": "97325198",
+        "conversions": 30
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "32",
+        "costMicros": "98666410",
+        "conversions": 30
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "34",
+        "costMicros": "102302187",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "29",
+        "costMicros": "87132226",
+        "conversions": 27
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "26",
+        "costMicros": "80473777",
+        "conversions": 25
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "34",
+        "costMicros": "104641187",
+        "conversions": 32
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "34",
+        "costMicros": "104834920",
+        "conversions": 32
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "34",
+        "costMicros": "103643257",
+        "conversions": 32
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "35",
+        "costMicros": "107858963",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "47",
+        "costMicros": "142707605",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "42",
+        "costMicros": "127986439",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "37",
+        "costMicros": "113851056",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "30",
+        "costMicros": "91715365",
+        "conversions": 28
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "17",
+        "costMicros": "51866910",
+        "conversions": 16
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "7",
+        "costMicros": "22521365",
+        "conversions": 7
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "18167161",
+        "conversions": 6
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "8330772",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "5849596",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3809923",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "5615030",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "5",
+        "costMicros": "14172821",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "12",
+        "costMicros": "35966922",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "24",
+        "costMicros": "74573810",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "137864702",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "57",
+        "costMicros": "174965261",
+        "conversions": 53
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "52",
+        "costMicros": "158527511",
+        "conversions": 48
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "167679646",
+        "conversions": 51
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "145167084",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "154234659",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "166823245",
+        "conversions": 51
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "49",
+        "costMicros": "150883128",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "146990087",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "153539254",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "69",
+        "costMicros": "209697124",
+        "conversions": 64
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "162967772",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "58",
+        "costMicros": "177687898",
+        "conversions": 54
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "37",
+        "costMicros": "113332108",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "24",
+        "costMicros": "73824405",
+        "conversions": 22
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "12",
+        "costMicros": "37781083",
+        "conversions": 12
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "18085760",
+        "conversions": 6
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "8469590",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "4808443",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3190271",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "4584482",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "12641801",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "13",
+        "costMicros": "40033810",
+        "conversions": 12
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "26",
+        "costMicros": "79609249",
+        "conversions": 24
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "42",
+        "costMicros": "129441784",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "54",
+        "costMicros": "164871012",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "46",
+        "costMicros": "140630192",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "44",
+        "costMicros": "133104218",
+        "conversions": 41
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "124894295",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "39",
+        "costMicros": "119311003",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "146963003",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "146539381",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "155169724",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "58",
+        "costMicros": "176735041",
+        "conversions": 54
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "64",
+        "costMicros": "194332733",
+        "conversions": 59
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "151269449",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "57",
+        "costMicros": "173100678",
+        "conversions": 53
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "122177048",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "22",
+        "costMicros": "65924866",
+        "conversions": 20
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "11",
+        "costMicros": "34005463",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "18015212",
+        "conversions": 5
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "8495351",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "4849367",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3631112",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "4387078",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "12186482",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "12",
+        "costMicros": "37780845",
+        "conversions": 12
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "25",
+        "costMicros": "77114989",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "38",
+        "costMicros": "117037637",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "162015412",
+        "conversions": 49
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "60",
+        "costMicros": "181872207",
+        "conversions": 55
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "136533807",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "38",
+        "costMicros": "117349113",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "37",
+        "costMicros": "112164070",
+        "conversions": 34
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "124041446",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "43",
+        "costMicros": "130073637",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "42",
+        "costMicros": "128206178",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "147497365",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "62",
+        "costMicros": "188368558",
+        "conversions": 57
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "61",
+        "costMicros": "187623083",
+        "conversions": 57
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "54",
+        "costMicros": "165766883",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "42",
+        "costMicros": "129070021",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "20",
+        "costMicros": "61559658",
+        "conversions": 19
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "11",
+        "costMicros": "32388311",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "17286701",
+        "conversions": 5
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "8811184",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "4713537",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "2986331",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "4343578",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "13204547",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "10",
+        "costMicros": "31396767",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "28",
+        "costMicros": "85465353",
+        "conversions": 26
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "35",
+        "costMicros": "105805686",
+        "conversions": 32
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "145450753",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "54",
+        "costMicros": "165201715",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "126151712",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "122696675",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "43",
+        "costMicros": "131139484",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "121970330",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "122472163",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "47",
+        "costMicros": "142795735",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "153286817",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "156251335",
+        "conversions": 48
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "167341281",
+        "conversions": 51
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "152055562",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "32",
+        "costMicros": "97641159",
+        "conversions": 30
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "24",
+        "costMicros": "74041287",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "12",
+        "costMicros": "36769329",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "5",
+        "costMicros": "14078934",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "7785127",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "4736344",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3038121",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "4517540",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "11075098",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "11",
+        "costMicros": "34011882",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "26",
+        "costMicros": "78585864",
+        "conversions": 24
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "122588522",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "49",
+        "costMicros": "149681932",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "58",
+        "costMicros": "178279152",
+        "conversions": 54
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "43",
+        "costMicros": "131908607",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "37",
+        "costMicros": "113562283",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "47",
+        "costMicros": "144865647",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "47",
+        "costMicros": "142690979",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "163219453",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "54",
+        "costMicros": "164430796",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "162003099",
+        "conversions": 49
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "62",
+        "costMicros": "189120008",
+        "conversions": 58
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "54",
+        "costMicros": "166362292",
+        "conversions": 51
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "145219928",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "123992988",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "20",
+        "costMicros": "61793176",
+        "conversions": 19
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "11",
+        "costMicros": "32952541",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "10902173",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "5258210",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "4236310",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "2131479",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "3735145",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "9902970",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "9",
+        "costMicros": "27214262",
+        "conversions": 8
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "21",
+        "costMicros": "65067897",
+        "conversions": 20
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "29",
+        "costMicros": "87537480",
+        "conversions": 27
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "122343591",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "37",
+        "costMicros": "113399319",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "33",
+        "costMicros": "102140958",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "29",
+        "costMicros": "88252691",
+        "conversions": 27
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "33",
+        "costMicros": "101712322",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "123114394",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "39",
+        "costMicros": "118194840",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "33",
+        "costMicros": "100197154",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "44",
+        "costMicros": "132903470",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "156586287",
+        "conversions": 48
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "46",
+        "costMicros": "138931529",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "124257559",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "33",
+        "costMicros": "100224047",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "20",
+        "costMicros": "60446610",
+        "conversions": 18
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "8",
+        "costMicros": "24004832",
+        "conversions": 7
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "33233240",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "19721717",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "10707911",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "6742713",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "10907720",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "29302730",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "11",
+        "costMicros": "83415053",
+        "conversions": 8
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "24",
+        "costMicros": "183280400",
+        "conversions": 17
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "31",
+        "costMicros": "237835729",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "311316722",
+        "conversions": 30
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "46",
+        "costMicros": "357944248",
+        "conversions": 34
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "309319436",
+        "conversions": 29
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "32",
+        "costMicros": "246977671",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "37",
+        "costMicros": "289071374",
+        "conversions": 27
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "34",
+        "costMicros": "264720801",
+        "conversions": 25
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "35",
+        "costMicros": "270387870",
+        "conversions": 26
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "315044913",
+        "conversions": 30
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "46",
+        "costMicros": "359550924",
+        "conversions": 34
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "56",
+        "costMicros": "435821306",
+        "conversions": 41
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "369409978",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "353529994",
+        "conversions": 34
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "32",
+        "costMicros": "250240445",
+        "conversions": 24
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "22",
+        "costMicros": "172581916",
+        "conversions": 16
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "9",
+        "costMicros": "66507813",
+        "conversions": 6
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "7",
+        "costMicros": "50890412",
+        "conversions": 5
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "28227697",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "13679170",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "10442623",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "14572983",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "5",
+        "costMicros": "35682826",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "13",
+        "costMicros": "104840300",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "29",
+        "costMicros": "223807529",
+        "conversions": 21
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "374734756",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "423922999",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "72",
+        "costMicros": "556456258",
+        "conversions": 53
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "413616926",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "59",
+        "costMicros": "460853402",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "370008997",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "52",
+        "costMicros": "404502142",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "59",
+        "costMicros": "457834191",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "64",
+        "costMicros": "494925495",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "79",
+        "costMicros": "610729540",
+        "conversions": 58
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "80",
+        "costMicros": "622395061",
+        "conversions": 59
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "79",
+        "costMicros": "611772673",
+        "conversions": 58
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "61",
+        "costMicros": "474495443",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "399443744",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "26",
+        "costMicros": "200349349",
+        "conversions": 19
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "15",
+        "costMicros": "116766267",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "7",
+        "costMicros": "53249877",
+        "conversions": 5
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "26435980",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "15326032",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "9423795",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "12748734",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "5",
+        "costMicros": "38737232",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "15",
+        "costMicros": "120434141",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "29",
+        "costMicros": "226064155",
+        "conversions": 21
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "349623558",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "64",
+        "costMicros": "495007296",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "69",
+        "costMicros": "539898895",
+        "conversions": 51
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "376331275",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "52",
+        "costMicros": "402801493",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "411732614",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "414619592",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "52",
+        "costMicros": "403355752",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "67",
+        "costMicros": "517541950",
+        "conversions": 49
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "63",
+        "costMicros": "491953471",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "68",
+        "costMicros": "525517480",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "71",
+        "costMicros": "554975997",
+        "conversions": 53
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "60",
+        "costMicros": "464099252",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "44",
+        "costMicros": "344332714",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "30",
+        "costMicros": "231217127",
+        "conversions": 22
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "13",
+        "costMicros": "100133745",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "47498602",
+        "conversions": 5
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "26068911",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "14455934",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "10438376",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "14210328",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "5",
+        "costMicros": "36876409",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "15",
+        "costMicros": "115551243",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "31",
+        "costMicros": "238792662",
+        "conversions": 23
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "375501659",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "57",
+        "costMicros": "440439194",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "423549158",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "58",
+        "costMicros": "447155982",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "41",
+        "costMicros": "321624267",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "49",
+        "costMicros": "381478604",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "424526300",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "376586605",
+        "conversions": 36
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "61",
+        "costMicros": "473822014",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "62",
+        "costMicros": "483436527",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "64",
+        "costMicros": "494356899",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "76",
+        "costMicros": "593231433",
+        "conversions": 56
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "68",
+        "costMicros": "527066932",
+        "conversions": 50
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "396777928",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "29",
+        "costMicros": "224140538",
+        "conversions": 21
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "15",
+        "costMicros": "114001750",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "49257254",
+        "conversions": 5
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "26909324",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "13662188",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "8839847",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "15455198",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "33399287",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "13",
+        "costMicros": "100233378",
+        "conversions": 10
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "32",
+        "costMicros": "247682779",
+        "conversions": 24
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "352364128",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "409203763",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "57",
+        "costMicros": "443649759",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "59",
+        "costMicros": "454932639",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "347350934",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "48",
+        "costMicros": "372757514",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "55",
+        "costMicros": "426866474",
+        "conversions": 41
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "63",
+        "costMicros": "489357571",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "413912865",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "59",
+        "costMicros": "460332175",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "71",
+        "costMicros": "554879785",
+        "conversions": 53
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "76",
+        "costMicros": "586701688",
+        "conversions": 56
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "56",
+        "costMicros": "434823137",
+        "conversions": 41
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "42",
+        "costMicros": "322551487",
+        "conversions": 31
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "27",
+        "costMicros": "206169509",
+        "conversions": 20
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "13",
+        "costMicros": "99741864",
+        "conversions": 9
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "6",
+        "costMicros": "46486416",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "22404519",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "13799305",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "9648225",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "13323115",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "5",
+        "costMicros": "41995586",
+        "conversions": 4
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "15",
+        "costMicros": "113060810",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "27",
+        "costMicros": "211544438",
+        "conversions": 20
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "308092207",
+        "conversions": 29
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "65",
+        "costMicros": "508313961",
+        "conversions": 48
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "54",
+        "costMicros": "416491405",
+        "conversions": 40
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "52",
+        "costMicros": "401554701",
+        "conversions": 38
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "387155207",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "57",
+        "costMicros": "444122568",
+        "conversions": 42
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "408182193",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "391324377",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "63",
+        "costMicros": "489376635",
+        "conversions": 46
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "64",
+        "costMicros": "499915740",
+        "conversions": 47
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "65",
+        "costMicros": "508270406",
+        "conversions": 48
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "60",
+        "costMicros": "465603853",
+        "conversions": 44
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "61",
+        "costMicros": "475099641",
+        "conversions": 45
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "39",
+        "costMicros": "306311699",
+        "conversions": 29
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "27",
+        "costMicros": "213624463",
+        "conversions": 20
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "15",
+        "costMicros": "116039588",
+        "conversions": 11
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 0,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "34715589",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 1,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "21232983",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 2,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "12838433",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 3,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "8296438",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 4,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "11271948",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 5,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "26731573",
+        "conversions": 3
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "12",
+        "costMicros": "89838116",
+        "conversions": 9
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "26",
+        "costMicros": "205634672",
+        "conversions": 20
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "36",
+        "costMicros": "279286727",
+        "conversions": 27
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "352934576",
+        "conversions": 34
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "44",
+        "costMicros": "340493128",
+        "conversions": 32
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "51",
+        "costMicros": "393590155",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "36",
+        "costMicros": "279418884",
+        "conversions": 27
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "45",
+        "costMicros": "346753931",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "44",
+        "costMicros": "342506129",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "44",
+        "costMicros": "341820337",
+        "conversions": 32
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "40",
+        "costMicros": "313130365",
+        "conversions": 30
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "58",
+        "costMicros": "449356130",
+        "conversions": 43
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "53",
+        "costMicros": "414270539",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "50",
+        "costMicros": "391480703",
+        "conversions": 37
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "47",
+        "costMicros": "364131688",
+        "conversions": 35
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "38",
+        "costMicros": "291752301",
+        "conversions": 28
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "24",
+        "costMicros": "184600442",
+        "conversions": 18
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "10",
+        "costMicros": "75464789",
+        "conversions": 7
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "22231516",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "36401521",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "44421487",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "55997099",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "46818676",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "37283900",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "44370936",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "46467340",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "37975664",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "40352940",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "57929422",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "60466590",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "48807182",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "49695811",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "39681901",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "SUNDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "19543626"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "18712731"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "35524752",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "48268004",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "67913958",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "67432887",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "71180685",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "51356675",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "69942647",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "67292656",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "70982830",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "60624514",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "74156599",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "4",
+        "costMicros": "90343525",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "77115247",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "69012984",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "50487685",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "28029920",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "MONDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "18072687"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "16515018"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "37431321",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "48992776",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "70534672",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "59610980",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "68653758",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "49681449",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "53217564",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "57076737",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "65399083",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "57126842",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "70204897",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "83195720",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "71977387",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "74349118",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "54466225",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "28190279",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "TUESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "15365016"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "16666861"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "32957914",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "52088380",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "67084149",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "68644638",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "65022300",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "51994482",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "63529689",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "58260451",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "54939682",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "72669000",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "73854866",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "82864638",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "68269924",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "61822243",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "44503961",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "32612076",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "WEDNESDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "14690000"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "16859014"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "31316860",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "47028898",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "61955184",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "62065656",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "63992543",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "58080516",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "62600838",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "60943423",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "54953250",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "58601737",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "76077142",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "83266479",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "69625409",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "68901663",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "44872252",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "32925069",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "THURSDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "16653997"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "14478642"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "29933546",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "53466781",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "71948156",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "74695043",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "67124363",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "58776027",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "59120555",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "65700110",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "66005578",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "73668437",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "73914295",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "74629483",
+        "conversions": 2
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "66828687",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "69602783",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "44496140",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "31910867",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 23,
+        "dayOfWeek": "FRIDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "16982092"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 6,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "12311284"
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 7,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "27305650",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 8,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "37169807",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 9,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "54716211",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 10,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "52102053",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 11,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "46618992",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 12,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "37537013",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 13,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "46006642",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 14,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "50860684",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 15,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "44707641",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 16,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "55260757",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 17,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "54254153",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 18,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "54329062",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 19,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "3",
+        "costMicros": "63246582",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 20,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "49920146",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 21,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "2",
+        "costMicros": "36199272",
+        "conversions": 1
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "segments": {
+        "hour": 22,
+        "dayOfWeek": "SATURDAY"
+      },
+      "metrics": {
+        "clicks": "1",
+        "costMicros": "24291843",
+        "conversions": 1
+      }
+    }
+  ]
+}

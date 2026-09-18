@@ -1,0 +1,351 @@
+{
+  "_meta": {
+    "what": "คำค้น 16 คำ — มีคำหาของฟรี/หางาน/จะยกเลิก ที่ควรเป็น negative",
+    "query": "SELECT search_term_view.search_term, search_term_view.status, campaign.id, ad_group.id, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions FROM search_term_view WHERE segments.date DURING LAST_30_DAYS ORDER BY metrics.cost_micros DESC LIMIT 500",
+    "apiVersion": "v25",
+    "rows": 16,
+    "synthetic": true,
+    "generatedBy": "pnpm fixtures:synthetic",
+    "seed": 20260917,
+    "period": "2026-08-18 .. 2026-09-16",
+    "note": "เขียนขึ้นเอง ไม่ใช่ข้อมูลบัญชีจริง — บัญชีจริงยังไม่มี traffic (STATUS M1)"
+  },
+  "rows": [
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000301~%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%20ais",
+        "searchTerm": "โปรเน็ต ais",
+        "status": "ADDED"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "metrics": {
+        "impressions": "9800",
+        "clicks": "1688",
+        "costMicros": "4895200000",
+        "conversions": 1572
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000302~%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%AD%E0%B8%B1%E0%B9%89%E0%B8%99%20%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2%E0%B8%96%E0%B8%B9%E0%B8%81%20%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%AA%E0%B8%B8%E0%B8%94",
+        "searchTerm": "เน็ตไม่อั้น ราคาถูก ที่สุด",
+        "status": "ADDED"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "metrics": {
+        "impressions": "8300",
+        "clicks": "402",
+        "costMicros": "3296400000",
+        "conversions": 331
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000304~%E0%B8%A2%E0%B9%89%E0%B8%B2%E0%B8%A2%E0%B8%84%E0%B9%88%E0%B8%B2%E0%B8%A2%20%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%94%E0%B8%B4%E0%B8%A1%20ais",
+        "searchTerm": "ย้ายค่าย เบอร์เดิม ais",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000304",
+        "id": "3000000304"
+      },
+      "metrics": {
+        "impressions": "4100",
+        "clicks": "88",
+        "costMicros": "2543200000",
+        "conversions": 52
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000302~%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%20ais%20%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%A5%E0%B8%94%E0%B8%AA%E0%B8%9B%E0%B8%B5%E0%B8%94",
+        "searchTerm": "โปรเน็ต ais ไม่ลดสปีด",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "metrics": {
+        "impressions": "5100",
+        "clicks": "289",
+        "costMicros": "2138600000",
+        "conversions": 249
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000303~%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%E0%B8%9F%E0%B8%A3%E0%B8%B5%20%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%95%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%88%E0%B9%88%E0%B8%B2%E0%B8%A2",
+        "searchTerm": "เน็ตฟรี ไม่ต้องจ่าย",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "metrics": {
+        "impressions": "6400",
+        "clicks": "318",
+        "costMicros": "1621800000",
+        "conversions": 58
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000301~%E0%B8%AA%E0%B8%A1%E0%B8%B1%E0%B8%84%E0%B8%A3%20%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%20ais%20%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B9%80%E0%B8%94%E0%B8%B7%E0%B8%AD%E0%B8%99",
+        "searchTerm": "สมัคร โปรเน็ต ais รายเดือน",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "metrics": {
+        "impressions": "2140",
+        "clicks": "402",
+        "costMicros": "1246200000",
+        "conversions": 381
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000304~true%20%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%20%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+        "searchTerm": "true โปรเน็ต ราคา",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000304",
+        "id": "3000000304"
+      },
+      "metrics": {
+        "impressions": "3900",
+        "clicks": "62",
+        "costMicros": "1184200000",
+        "conversions": 14
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000303~%E0%B9%82%E0%B8%AB%E0%B8%A5%E0%B8%94%E0%B9%81%E0%B8%AD%E0%B8%9E%20ais%20%E0%B8%9F%E0%B8%A3%E0%B8%B5",
+        "searchTerm": "โหลดแอพ ais ฟรี",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "metrics": {
+        "impressions": "4900",
+        "clicks": "244",
+        "costMicros": "1171200000",
+        "conversions": 41
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000302~%E0%B8%8B%E0%B8%B4%E0%B8%A1%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%9B%E0%B8%B5%20%E0%B8%A3%E0%B8%B2%E0%B8%84%E0%B8%B2",
+        "searchTerm": "ซิมรายปี ราคา",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "metrics": {
+        "impressions": "2600",
+        "clicks": "118",
+        "costMicros": "1109200000",
+        "conversions": 96
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000303~%E0%B8%A7%E0%B8%B4%E0%B8%98%E0%B8%B5%E0%B8%A2%E0%B8%81%E0%B9%80%E0%B8%A5%E0%B8%B4%E0%B8%81%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95",
+        "searchTerm": "วิธียกเลิกโปรเน็ต",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "metrics": {
+        "impressions": "3600",
+        "clicks": "174",
+        "costMicros": "1026600000",
+        "conversions": 31
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000301~ais%20%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%20199%20%E0%B8%9A%E0%B8%B2%E0%B8%97",
+        "searchTerm": "ais โปรเน็ต 199 บาท",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "metrics": {
+        "impressions": "1920",
+        "clicks": "341",
+        "costMicros": "920700000",
+        "conversions": 322
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000302~ais%20call%20center%20%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%AD%E0%B8%B0%E0%B9%84%E0%B8%A3",
+        "searchTerm": "ais call center เบอร์อะไร",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "metrics": {
+        "impressions": "2800",
+        "clicks": "141",
+        "costMicros": "789600000",
+        "conversions": 22
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000304~dtac%20%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95",
+        "searchTerm": "dtac โปรเน็ต",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000304",
+        "id": "3000000304"
+      },
+      "metrics": {
+        "impressions": "2200",
+        "clicks": "41",
+        "costMicros": "705200000",
+        "conversions": 24
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000301~%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%20ais%20%E0%B9%80%E0%B8%94%E0%B8%B7%E0%B8%AD%E0%B8%99%E0%B8%A5%E0%B8%B0%20100",
+        "searchTerm": "โปรเน็ต ais เดือนละ 100",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "metrics": {
+        "impressions": "1480",
+        "clicks": "226",
+        "costMicros": "678000000",
+        "conversions": 214
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000302~%E0%B8%AA%E0%B8%A1%E0%B8%B1%E0%B8%84%E0%B8%A3%E0%B8%87%E0%B8%B2%E0%B8%99%20ais",
+        "searchTerm": "สมัครงาน ais",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "metrics": {
+        "impressions": "3200",
+        "clicks": "96",
+        "costMicros": "614400000",
+        "conversions": 7
+      }
+    },
+    {
+      "searchTermView": {
+        "resourceName": "customers/3000000001/searchTermViews/3000000303~%E0%B9%80%E0%B8%8A%E0%B9%87%E0%B8%84%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B9%87%E0%B8%95%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%83%E0%B8%8A%E0%B9%89%E0%B8%AD%E0%B8%A2%E0%B8%B9%E0%B9%88",
+        "searchTerm": "เช็คโปรเน็ตที่ใช้อยู่",
+        "status": "NONE"
+      },
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "metrics": {
+        "impressions": "7200",
+        "clicks": "12",
+        "costMicros": "74400000",
+        "conversions": 9
+      }
+    }
+  ]
+}

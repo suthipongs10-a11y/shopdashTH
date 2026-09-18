@@ -1,7 +1,7 @@
 # STATUS — Ads Insight
 
 **Milestone ปัจจุบัน:** M1 — Ads Core Client (M0 ✅ ผ่าน Gate 17 ก.ย. 2569)
-**อัปเดตล่าสุด:** 2026-09-16
+**อัปเดตล่าสุด:** 2026-09-18
 
 ## M0 Checklist
 
@@ -85,11 +85,11 @@
 ## M1 Checklist — Ads Core Client
 
 ### Gate M1 (SPEC §12)
-- [x] unit tests ผ่านครบ (182)
+- [x] unit tests ผ่านครบ (233)
 - [~] ดึง campaigns + metrics 30 วันของบัญชีจริงได้ — **ดึงสำเร็จแต่บัญชียังไม่มีข้อมูล**
       metric เป็น 0 ทั้งหมด · fixtures ที่ได้พิสูจน์ *โครงสร้าง* response ได้ แต่ทดสอบ *คณิตศาสตร์* ไม่ได้
-      → ต้องมี fixtures สังเคราะห์เพิ่ม (ใช้โครงสร้างจริงเป็นแม่แบบ) ก่อน M3
-      → `campaigns.json` ยัง 400 อยู่ รอ error เต็มจากผู้ใช้ (`--only campaigns`)
+      → แก้ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แล้ว (D29)
+      → เหลือ `campaigns.json` ของจริง: ผู้ใช้รัน `pnpm capture:fixtures --only campaigns` แล้ว commit
 - [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
 
 ### งานย่อย
@@ -103,8 +103,15 @@
 - [~] `src/ads/enums.ts` — **เลื่อนไป M4/M5** ที่มีคนเรียกใช้จริง (SPEC ไม่ได้ระบุไว้ในงาน M1)
 - [~] `src/ads/resources.ts` — **เลื่อนไป M4/M5** ตอนสร้าง mutate จริง
 - [x] `src/ads/client.ts` — searchStream (รวม chunks), mutate (validateOnly), retry/backoff, quota counter
-- [x] `pnpm capture:fixtures` + `scripts/lib/scrub.ts` — **รอผู้ใช้รันบนเครื่อง**
-- [x] unit tests — 182 ตัว (money, error mapping/retry, GAQL/injection, client, scrub)
+- [x] `pnpm capture:fixtures` + `scripts/lib/scrub.ts` — ผู้ใช้รันแล้ว 5 ไฟล์ commit เข้ามาแล้ว
+- [x] **แก้บั๊ก scrubber ทับเงินด้วย id ปลอม** (D28) — งบ ฿1,080 ถูกบันทึกเป็น ฿1,000
+      ตัวที่เห็นเป็น `"1080-000-0000"` เมื่อวานเป็นแค่อาการ ไม่ใช่สาเหตุ · เพิ่มด่าน
+      `findMeasurementChanges()` ให้ capture ปฏิเสธการเขียนไฟล์ถ้าตัวเลขเปลี่ยน
+- [x] `pnpm fixtures:synthetic` — fixtures สังเคราะห์ traffic-oriented (D29)
+      3 แคมเปญ × 30 วัน + 18 คีย์เวิร์ด + 16 คำค้น + ราย ชั่วโมง · seed คงที่ regenerate แล้ว diff ว่าง
+- [x] `test/unit/fixtures.test.ts` — อ่าน fixtures ที่ commit แล้ว: กันข้อมูลรั่ว (D30)
+      + บังคับความสอดคล้องของ fixtures สังเคราะห์
+- [x] unit tests — 233 ตัว (money, error mapping/retry, GAQL/injection, client, scrub, fixtures)
 
 ### ข้อจำกัดที่รู้ล่วงหน้า
 - Claude Code ไม่มี credentials (และไม่ควรมี) → ส่วนที่ต้องยิง API จริงต้องให้ผู้ใช้รันบนเครื่อง

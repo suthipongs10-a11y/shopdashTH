@@ -55,6 +55,8 @@ Google Ads MCP server + PWA ส่วนตัวบน Cloudflare Workers
 - `pnpm test` (Vitest) ต้องผ่านก่อนทุก commit ที่ปิดงาน
 - Unit tests บังคับ: money utils, GAQL builder/allowlist, derived metrics, pacing, guardrails ทุก rule, risk tier, inverse ops (rollback), RSA/keyword validation
 - Analysis logic ทดสอบด้วย `test/fixtures/*.json` (response จริงที่ลบข้อมูลส่วนตัวแล้ว) — test account ไม่มีข้อมูล performance
+- บัญชีจริงยังไม่มี traffic (metric เป็น 0 ทั้งหมด) → คณิตศาสตร์ทดสอบด้วย `test/fixtures/synthetic/*.json`
+  (`pnpm fixtures:synthetic` · D29) · ห้ามอ้างไฟล์ในโฟลเดอร์นี้เป็นข้อมูลของบัญชีจริง
 - Integration test mutate → test account เท่านั้น
 
 ## Commands
@@ -72,6 +74,10 @@ pnpm auth:google    # OAuth flow -> เขียน refresh token ลง .dev.va
 pnpm list:accounts  # บัญชีที่ token นี้เข้าถึงได้ + ค่าที่ควรใส่ใน .dev.vars
 pnpm fields <รูปแบบ> # ถาม GoogleAdsFieldService ว่าฟิลด์ไหนมีจริง — ใช้ก่อนเขียน GAQL ทุกครั้ง
 pnpm check:access   # Gate M0: query ตาราง customer ของบัญชีจริง
+
+# M1 — fixtures
+pnpm capture:fixtures      # เก็บ response จริง (ลบข้อมูลส่วนตัว) — ต้องมี .dev.vars
+pnpm fixtures:synthetic    # สร้างบัญชีสมมติที่มี traffic — รันที่ไหนก็ได้ ไม่ต้องมี credentials
 ```
 เชื่อม Claude Code กับ MCP ตอน dev (ใช้ DEV_BEARER_TOKEN, เปิดเฉพาะ ENV=dev):
 ```bash

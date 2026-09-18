@@ -1,0 +1,568 @@
+{
+  "_meta": {
+    "what": "คีย์เวิร์ด 18 คำ — มีทั้งคำที่ดี, CTR ต่ำมาก, CPC แพง, คลิกแล้วไม่เข้าหน้า, และคำที่ไม่เคยแสดง",
+    "query": "SELECT ad_group_criterion.criterion_id, ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type, ad_group_criterion.status, ad_group_criterion.quality_info.quality_score, campaign.id, ad_group.id, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions FROM keyword_view WHERE segments.date DURING LAST_30_DAYS ORDER BY metrics.cost_micros DESC LIMIT 500",
+    "apiVersion": "v25",
+    "rows": 18,
+    "synthetic": true,
+    "generatedBy": "pnpm fixtures:synthetic",
+    "seed": 20260917,
+    "period": "2026-08-18 .. 2026-09-16",
+    "note": "เขียนขึ้นเอง ไม่ใช่ข้อมูลบัญชีจริง — บัญชีจริงยังไม่มี traffic (STATUS M1)"
+  },
+  "rows": [
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000301~3000001000",
+        "criterionId": "3000001000",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ต ais",
+          "matchType": "EXACT"
+        },
+        "qualityInfo": {
+          "qualityScore": 10
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000301~3000001000"
+      },
+      "metrics": {
+        "impressions": "12400",
+        "clicks": "2108",
+        "costMicros": "6113200000",
+        "conversions": 1961
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000301~3000001001",
+        "criterionId": "3000001001",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "ais 12call เติมเงิน",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 9
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000301~3000001001"
+      },
+      "metrics": {
+        "impressions": "8950",
+        "clicks": "1043",
+        "costMicros": "3546200000",
+        "conversions": 962
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000302~3000001002",
+        "criterionId": "3000001002",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "สมัครโปรเน็ตรายเดือน",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 7
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000302~3000001002"
+      },
+      "metrics": {
+        "impressions": "41200",
+        "clicks": "1297",
+        "costMicros": "9338400000",
+        "conversions": 1118
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000302~3000001003",
+        "criterionId": "3000001003",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "เน็ตไม่อั้น ราคาถูก",
+          "matchType": "BROAD"
+        },
+        "qualityInfo": {
+          "qualityScore": 6
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000302~3000001003"
+      },
+      "metrics": {
+        "impressions": "63800",
+        "clicks": "1842",
+        "costMicros": "15841200000",
+        "conversions": 1534
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000303~3000001004",
+        "criterionId": "3000001004",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ตรายวัน",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 7
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000303~3000001004"
+      },
+      "metrics": {
+        "impressions": "18700",
+        "clicks": "614",
+        "costMicros": "4236600000",
+        "conversions": 522
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000303~3000001005",
+        "criterionId": "3000001005",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "อินเทอร์เน็ตบ้าน",
+          "matchType": "BROAD"
+        },
+        "qualityInfo": {
+          "qualityScore": 3
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000303~3000001005"
+      },
+      "metrics": {
+        "impressions": "52300",
+        "clicks": "78",
+        "costMicros": "709800000",
+        "conversions": 61
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000304",
+        "id": "3000000304"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000304~3000001006",
+        "criterionId": "3000001006",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "ย้ายค่ายเบอร์เดิม",
+          "matchType": "BROAD"
+        },
+        "qualityInfo": {
+          "qualityScore": 4
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000304~3000001006"
+      },
+      "metrics": {
+        "impressions": "9400",
+        "clicks": "121",
+        "costMicros": "3799400000",
+        "conversions": 74
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000304",
+        "id": "3000000304"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000304~3000001007",
+        "criterionId": "3000001007",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ต true",
+          "matchType": "EXACT"
+        },
+        "qualityInfo": {
+          "qualityScore": 5
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000304~3000001007"
+      },
+      "metrics": {
+        "impressions": "6100",
+        "clicks": "96",
+        "costMicros": "1747200000",
+        "conversions": 22
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000303~3000001008",
+        "criterionId": "3000001008",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "เน็ตฟรี ไม่ต้องสมัคร",
+          "matchType": "BROAD"
+        },
+        "qualityInfo": {
+          "qualityScore": 4
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000303~3000001008"
+      },
+      "metrics": {
+        "impressions": "28900",
+        "clicks": "903",
+        "costMicros": "4695600000",
+        "conversions": 241
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000103",
+        "id": "3000000103"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000304",
+        "id": "3000000304"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000304~3000001009",
+        "criterionId": "3000001009",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ต dtac",
+          "matchType": "EXACT"
+        },
+        "qualityInfo": {
+          "qualityScore": 4
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000304~3000001009"
+      },
+      "metrics": {
+        "impressions": "4800",
+        "clicks": "52",
+        "costMicros": "873600000",
+        "conversions": 33
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000302~3000001010",
+        "criterionId": "3000001010",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "ซิมเทพ รายปี",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 5
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000302~3000001010"
+      },
+      "metrics": {}
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000301~3000001011",
+        "criterionId": "3000001011",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ต ais รายเดือน 199",
+          "matchType": "EXACT"
+        },
+        "qualityInfo": {
+          "qualityScore": 10
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000301~3000001011"
+      },
+      "metrics": {
+        "impressions": "3120",
+        "clicks": "498",
+        "costMicros": "1294800000",
+        "conversions": 471
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000301~3000001012",
+        "criterionId": "3000001012",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "เติมเงิน ais ออนไลน์",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 8
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000301~3000001012"
+      },
+      "metrics": {
+        "impressions": "5400",
+        "clicks": "389",
+        "costMicros": "1478200000",
+        "conversions": 351
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000302",
+        "id": "3000000302"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000302~3000001013",
+        "criterionId": "3000001013",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "แพ็กเกจเน็ต",
+          "matchType": "BROAD"
+        },
+        "qualityInfo": {
+          "qualityScore": 5
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000302~3000001013"
+      },
+      "metrics": {
+        "impressions": "33100",
+        "clicks": "611",
+        "costMicros": "5987800000",
+        "conversions": 498
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000303~3000001014",
+        "criterionId": "3000001014",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "เน็ต 5g ราคา",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 6
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000303~3000001014"
+      },
+      "metrics": {
+        "impressions": "14600",
+        "clicks": "402",
+        "costMicros": "3256200000",
+        "conversions": 338
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000301~3000001015",
+        "criterionId": "3000001015",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ต ais ล่าสุด",
+          "matchType": "PHRASE"
+        },
+        "qualityInfo": {
+          "qualityScore": 9
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000301~3000001015"
+      },
+      "metrics": {
+        "impressions": "2980",
+        "clicks": "318",
+        "costMicros": "1017600000",
+        "conversions": 294
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000102",
+        "id": "3000000102"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000303",
+        "id": "3000000303"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000303~3000001016",
+        "criterionId": "3000001016",
+        "status": "PAUSED",
+        "keyword": {
+          "text": "เบอร์มงคล ราคาถูก",
+          "matchType": "BROAD"
+        },
+        "qualityInfo": {
+          "qualityScore": 3
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000303~3000001016"
+      },
+      "metrics": {
+        "impressions": "7700",
+        "clicks": "156",
+        "costMicros": "1778400000",
+        "conversions": 39
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/3000000001/campaigns/3000000101",
+        "id": "3000000101"
+      },
+      "adGroup": {
+        "resourceName": "customers/3000000001/adGroups/3000000301",
+        "id": "3000000301"
+      },
+      "adGroupCriterion": {
+        "resourceName": "customers/3000000001/adGroupCriteria/3000000301~3000001017",
+        "criterionId": "3000001017",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "โปรเน็ต ais 1 เดือน",
+          "matchType": "EXACT"
+        },
+        "qualityInfo": {
+          "qualityScore": 10
+        }
+      },
+      "keywordView": {
+        "resourceName": "customers/3000000001/keywordViews/3000000301~3000001017"
+      },
+      "metrics": {
+        "impressions": "4260",
+        "clicks": "602",
+        "costMicros": "1685600000",
+        "conversions": 571
+      }
+    }
+  ]
+}

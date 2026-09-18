@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "what": "PAGE_VIEW เป็น primary ตามเป้าหมาย traffic (D26) + call เป็น secondary",
+    "query": "SELECT conversion_action.id, conversion_action.name, conversion_action.type, conversion_action.category, conversion_action.status, conversion_action.primary_for_goal, conversion_action.counting_type FROM conversion_action LIMIT 100",
+    "apiVersion": "v25",
+    "rows": 2,
+    "synthetic": true,
+    "generatedBy": "pnpm fixtures:synthetic",
+    "seed": 20260917,
+    "period": "2026-08-18 .. 2026-09-16",
+    "note": "เขียนขึ้นเอง ไม่ใช่ข้อมูลบัญชีจริง — บัญชีจริงยังไม่มี traffic (STATUS M1)"
+  },
+  "rows": [
+    {
+      "conversionAction": {
+        "resourceName": "customers/3000000001/conversionActions/3000000401",
+        "id": "3000000401",
+        "name": "เข้าชมหน้าเว็บ (Page view)",
+        "type": "WEBPAGE",
+        "category": "PAGE_VIEW",
+        "status": "ENABLED",
+        "primaryForGoal": true,
+        "countingType": "MANY_PER_CLICK"
+      }
+    },
+    {
+      "conversionAction": {
+        "resourceName": "customers/3000000001/conversionActions/3000000402",
+        "id": "3000000402",
+        "name": "กดโทรจากเว็บไซต์",
+        "type": "WEBSITE_CALL",
+        "category": "PHONE_CALL_LEAD",
+        "status": "ENABLED",
+        "primaryForGoal": false,
+        "countingType": "ONE_PER_CLICK"
+      }
+    }
+  ]
+}
