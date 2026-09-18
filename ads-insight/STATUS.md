@@ -1,6 +1,6 @@
 # STATUS — Ads Insight
 
-**Milestone ปัจจุบัน:** M1 — Ads Core Client (M0 ✅ ผ่าน Gate 17 ก.ย. 2569)
+**Milestone ปัจจุบัน:** M2 — Remote MCP + Read Tools (M0 ✅ · M1 เริ่ม M2 ก่อนปิด gate — D34)
 **อัปเดตล่าสุด:** 2026-09-18
 
 ## M0 Checklist
@@ -149,3 +149,43 @@
 ## Ideas (นอก scope — รอพิจารณา)
 - **ต่อกับ AI เจ้าอื่น (ChatGPT / Copilot / Gemini)** — ทำได้เลยโดยไม่ต้องแก้ transport (D27)
   งานที่ต้องเพิ่มตอน M2: tool `gads_get_playbook` + บังคับ `pwa_all` สำหรับ client ที่ไม่ไว้ใจ
+
+---
+
+## M2 Checklist — Remote MCP + Read Tools ⭐
+
+> เริ่มก่อน M1 gate ปิดสนิท — ข้อยกเว้นที่ผู้ใช้สั่งชัดเจน (D34) M1 gate ยังค้างอยู่ ดูหัวข้อ M1 ด้านบน
+
+### Gate M2 (SPEC §12)
+- [ ] เพิ่ม custom connector ใน claude.ai สำเร็จ
+- [ ] ใช้บนมือถือได้
+- [ ] Claude ทำ weekly audit จากข้อมูลจริงได้ครบตาม PLAYBOOK
+- [ ] `pnpm deploy` — **รอคำสั่งผู้ใช้เท่านั้น** (CLAUDE.md)
+
+### งานย่อย
+- [ ] เพิ่ม dependency: `@modelcontextprotocol/sdk`, `@cloudflare/workers-oauth-provider`
+- [ ] `wrangler.toml`: compat flag `global_fetch_strictly_public` (CIMD) + KV binding `OAUTH_KV`
+- [ ] `src/auth/google.ts` — Google OAuth (login เท่านั้น, คนละตัวกับ scope `adwords` ที่ user เชื่อมทีหลัง)
+- [ ] `src/auth/pending-login.ts` — เก็บ `AuthRequest` เดิมของ MCP client ระหว่างพาไป login Google
+- [ ] `src/oauth.ts` — ประกอบ `OAuthProvider`, `/authorize`, `/oauth/google/callback`, allowlist check
+- [ ] Dev bypass: `ENV=dev` + `Authorization: Bearer $DEV_BEARER_TOKEN` ข้าม OAuth เต็มรูปแบบ (SPEC §5.1)
+- [ ] `src/services/format.ts` + `metrics.ts` — response shape มาตรฐาน (§6.2), derived metrics, truncate+others
+- [ ] `src/mcp/server.ts` — bootstrap `McpServer` (stateless — ไม่ต้องมี Durable Object ใน M2)
+- [ ] Read tools (§12 M2 — 10 ตัวเท่านั้น ที่เหลือเป็น M3):
+  - [ ] `gads_run_gaql`
+  - [ ] `gads_get_conversion_setup`
+  - [ ] `gads_get_bidding_status`
+  - [ ] `gads_get_impression_share`
+  - [ ] `gads_get_keywords`
+  - [ ] `gads_get_search_terms`
+  - [ ] `gads_get_ads`
+  - [ ] `gads_get_time_performance`
+  - [ ] `gads_get_performance`
+  - [ ] `gads_get_account_overview` (ส่วน goals/alerts/change-sets ยังไม่มีเพราะ D1 เป็นงาน M3 — ใส่เฉพาะที่มีข้อมูลจริงตอนนี้)
+- [ ] `gads://playbook` resource + `gads_get_playbook` tool (D27)
+- [ ] `docs/PLAYBOOK.md` ต้องมีอยู่แล้วให้ resource อ่าน (เช็คว่ามีเนื้อหาพอหรือยัง)
+- [ ] อัปเดต `.dev.vars.example` ให้ครบทุกตัวแปรใหม่
+
+### หมายเหตุ
+- อ่านเฉพาะ `DEFAULT_CUSTOMER_ID` (บัญชีจริง) ไม่เกี่ยวกับ test account ที่ยังบล็อกอยู่ — M2 read-only ไม่ต้องรอ M1 gate ปิดจริงๆ (เหตุผลที่ D34 ประเมินความเสี่ยงต่ำ)
+- `gads_get_recommendations`, `gads_get_audience_breakdown`, `gads_get_landing_pages`, `gads_get_policy_issues`, `gads_get_assets`, `gads_get_change_history` เป็นงาน **M3** ห้ามทำล่วงหน้า
