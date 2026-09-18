@@ -1,3 +1,4 @@
+import type { OAuthHelpers } from '@cloudflare/workers-oauth-provider';
 import { configReport, parseConfig, type AppConfig } from './config';
 
 /**
@@ -16,12 +17,19 @@ export interface Env {
   // secrets — .dev.vars locally, `wrangler secret put` when deployed
   GOOGLE_OAUTH_CLIENT_ID: string;
   GOOGLE_OAUTH_CLIENT_SECRET: string;
+  GOOGLE_ADS_REFRESH_TOKEN: string;
   OWNER_EMAILS: string;
   TOKEN_ENC_KEY: string;
   SESSION_SECRET: string;
   DEV_BEARER_TOKEN?: string;
   // bindings
   DB: D1Database;
+  /** Grants/clients/tokens for @cloudflare/workers-oauth-provider, plus our
+   * own short-lived state (src/auth/pending-login.ts) under a distinct key
+   * prefix — see the comment in wrangler.toml. */
+  OAUTH_KV: KVNamespace;
+  /** Injected by OAuthProvider itself (M2) — not a real binding to configure. */
+  OAUTH_PROVIDER: OAuthHelpers;
 }
 
 /** Validate the Worker environment, throwing `ConfigError` if incomplete. */

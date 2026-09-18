@@ -10,6 +10,7 @@ const base: Record<string, string> = {
   TEST_CUSTOMER_ID: '',
   GOOGLE_OAUTH_CLIENT_ID: 'client-id',
   GOOGLE_OAUTH_CLIENT_SECRET: 'client-secret',
+  GOOGLE_ADS_REFRESH_TOKEN: 'refresh-token',
   OWNER_EMAILS: 'Owner@Example.com, second@example.com',
   TOKEN_ENC_KEY: 'key',
   SESSION_SECRET: 'secret',

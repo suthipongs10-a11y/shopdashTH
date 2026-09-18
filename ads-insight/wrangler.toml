@@ -4,7 +4,10 @@
 name = "ads-insight"
 main = "src/index.ts"
 compatibility_date = "2026-09-15"
-compatibility_flags = ["nodejs_compat"]
+# global_fetch_strictly_public: required by @cloudflare/workers-oauth-provider
+# for Client ID Metadata Document support (M2, SPEC §5.1) — without it CIMD
+# fetches could reach internal/private origins (SSRF).
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
 # ── Vars (non-secret; SPEC §5.4) ──────────────────────────────────────────────
 # Secrets live in .dev.vars locally and in `wrangler secret put` for deploys.
@@ -21,6 +24,21 @@ ADS_API_VERSION = "v25"
 DEFAULT_CUSTOMER_ID = ""
 LOGIN_CUSTOMER_ID = ""
 TEST_CUSTOMER_ID = ""
+
+# ── OAuth KV (M2, SPEC §5.1) ───────────────────────────────────────────────────
+# Required by @cloudflare/workers-oauth-provider (clients, grants, tokens —
+# it hashes/encrypts what it stores, see the package's storage-schema.md).
+# We also use this same namespace for our own short-lived state — the parsed
+# MCP AuthRequest, stashed while the browser is off at Google's login screen —
+# under the key prefix `google_login:` (src/auth/pending-login.ts). A second
+# namespace just for that would be one more manual `wrangler kv namespace
+# create` step for a few narrowly-prefixed keys with their own TTL; the
+# prefix makes collision with the library's own keys implausible.
+#
+# M0: run `pnpm exec wrangler kv namespace create OAUTH_KV` and paste the id.
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
 
 # ── D1 (SPEC §10) ─────────────────────────────────────────────────────────────
 # M0: run `pnpm exec wrangler d1 create ads_insight` and paste the id below.

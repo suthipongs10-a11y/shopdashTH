@@ -34,6 +34,13 @@ export const configSchema = z.object({
 
   GOOGLE_OAUTH_CLIENT_ID: requiredSecret('GOOGLE_OAUTH_CLIENT_ID'),
   GOOGLE_OAUTH_CLIENT_SECRET: requiredSecret('GOOGLE_OAUTH_CLIENT_SECRET'),
+  // Used two ways from M2: the M0 scripts already read it to call the Ads API
+  // directly; the Worker now reads it too, to serve MCP read tools with the
+  // one owner account in scope (SPEC "ขอบเขตตอนนี้: บัญชีเจ้าของ 1 บัญชี").
+  // This is a different credential from the MCP connector's own Google login
+  // (src/auth/google.ts) — that one only ever proves an email address and is
+  // never stored.
+  GOOGLE_ADS_REFRESH_TOKEN: requiredSecret('GOOGLE_ADS_REFRESH_TOKEN'),
   OWNER_EMAILS: requiredSecret('OWNER_EMAILS'),
   TOKEN_ENC_KEY: requiredSecret('TOKEN_ENC_KEY'),
   SESSION_SECRET: requiredSecret('SESSION_SECRET'),
@@ -50,6 +57,7 @@ export const CONFIG_KEYS = [
   'TEST_CUSTOMER_ID',
   'GOOGLE_OAUTH_CLIENT_ID',
   'GOOGLE_OAUTH_CLIENT_SECRET',
+  'GOOGLE_ADS_REFRESH_TOKEN',
   'OWNER_EMAILS',
   'TOKEN_ENC_KEY',
   'SESSION_SECRET',
