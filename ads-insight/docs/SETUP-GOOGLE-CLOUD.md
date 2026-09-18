@@ -390,6 +390,11 @@ pnpm check:mutate
 | ปุ่ม **Publish app** เป็นสีเทา | ข้อ 3.1 ยังขาด homepage URL / privacy policy URL / Authorized domains |
 | ยิง test account แล้วได้ **404** | ยังไม่ได้ตั้ง `TEST_LOGIN_CUSTOMER_ID` — test client ต้องเข้าผ่าน test manager (ข้อ 10.3) |
 | หา test account ไม่เจอในหน้า Google Ads | test account ขึ้นเป็น **cancelled** ต้องเปิดตัวกรองให้แสดงบัญชีที่ cancelled (ข้อ 10.2) |
+| `check:mutate` ได้ `CUSTOMER_NOT_ENABLED` (403) | บัญชีที่เพิ่งสร้างผ่านเว็บ (แม้ผ่าน wizard
+  แล้วกด ✕ ออก) ยังไม่ถูก "เปิดใช้งาน" ฝั่ง Google ให้เรียก API ได้ทันที — **รอ 15–30 นาทีแล้ว
+  ลองใหม่** ก่อน ถ้ารอนานแล้วยังไม่หาย ให้บอก Claude Code — เอกสาร Google ระบุว่า test client
+  ควรสร้างผ่านเรียก `CustomerService.CreateCustomerClient` ไม่ใช่ผ่านหน้าเว็บ อาจต้องสร้างใหม่
+  ทางนั้นแทน (ยังไม่ยืนยัน shape ของ request เพราะเข้าเอกสารจากฝั่งนี้ไม่ได้) |
 | `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` ตอน `pnpm install` | lockfile มีแพ็กเกจที่เผยแพร่ไม่ถึง 24 ชม. **อย่าปิดนโยบายนี้** — เป็นระบบกันภัย supply-chain · แจ้ง Claude Code ให้ resolve lockfile ใหม่ด้วยเวอร์ชันที่นิ่งกว่า (ดู DECISIONS D22) |
 | `A positional parameter cannot be found` ใน PowerShell | path มีเว้นวรรคแต่ไม่ได้ครอบด้วย `"..."` |
 | `ERR_PNPM_IGNORED_BUILDS` (esbuild / workerd) | `pnpm-workspace.yaml` ต้องใช้คีย์ `allowBuilds` — pnpm 11 เมิน `onlyBuiltDependencies` (ดู DECISIONS D23) · ถ้ายังเจอ ให้เช็คว่า pnpm ตรงกับ `packageManager` ใน `package.json` |
