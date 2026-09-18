@@ -61,6 +61,9 @@ const ADS_QUERY = buildQuery({
     'ad_group_ad.ad.type',
     'ad_group_ad.status',
     'ad_group_ad.policy_summary.approval_status',
+    'ad_group_ad.policy_summary.review_status',
+    'ad_group_ad.policy_summary.policy_topic_entries.topic',
+    'ad_group_ad.policy_summary.policy_topic_entries.type',
     'ad_group.id',
   ],
   from: 'ad_group_ad',
@@ -73,6 +76,68 @@ const RECENT_METRICS_QUERY = buildQuery({
   from: 'campaign',
   where: [ENABLED, where.during('segments.date', 'LAST_7_DAYS')],
   orderBy: [{ field: 'segments.date', direction: 'ASC' }],
+});
+
+// Everything below answers a different question than the structural check
+// above: the ad group / keyword / ad tree can be 100% complete (as it was —
+// see STATUS.md 18 Sep) and a campaign can still get almost no impressions
+// because of how it's *allowed* to deliver — wrong network, no/odd location
+// targeting, a language mismatch against Thai-language keywords, an ad
+// schedule window, an ad still mid-review, or a policy restriction. Each of
+// these is its own query so one unfamiliar field name (not yet verified
+// against this API version — CLAUDE.md's `pnpm fields` step) only costs that
+// one section instead of aborting the whole report (see `runSafe` below).
+const DELIVERY_QUERY = buildQuery({
+  select: [
+    'campaign.id',
+    'campaign.network_settings.target_google_search',
+    'campaign.network_settings.target_search_network',
+    'campaign.network_settings.target_content_network',
+    'campaign.geo_target_type_setting.positive_geo_target_type',
+    'campaign.target_spend.cpc_bid_ceiling_micros',
+  ],
+  from: 'campaign',
+  where: [ENABLED],
+});
+
+const LOCATION_CRITERIA_QUERY = buildQuery({
+  select: [
+    'campaign.id',
+    'campaign_criterion.negative',
+    'campaign_criterion.location.geo_target_constant',
+    'geo_target_constant.name',
+    'geo_target_constant.country_code',
+  ],
+  from: 'campaign_criterion',
+  where: [ENABLED, where.eq('campaign_criterion.type', 'LOCATION')],
+});
+
+const LANGUAGE_CRITERIA_QUERY = buildQuery({
+  select: ['campaign.id', 'campaign_criterion.language.language_constant', 'language_constant.name'],
+  from: 'campaign_criterion',
+  where: [ENABLED, where.eq('campaign_criterion.type', 'LANGUAGE')],
+});
+
+const AD_SCHEDULE_QUERY = buildQuery({
+  select: [
+    'campaign.id',
+    'campaign_criterion.ad_schedule.day_of_week',
+    'campaign_criterion.ad_schedule.start_hour',
+    'campaign_criterion.ad_schedule.end_hour',
+  ],
+  from: 'campaign_criterion',
+  where: [ENABLED, where.eq('campaign_criterion.type', 'AD_SCHEDULE')],
+});
+
+const IMPRESSION_SHARE_QUERY = buildQuery({
+  select: [
+    'campaign.id',
+    'metrics.search_impression_share',
+    'metrics.search_rank_lost_impression_share',
+    'metrics.search_budget_lost_impression_share',
+  ],
+  from: 'campaign',
+  where: [ENABLED, where.during('segments.date', 'LAST_7_DAYS')],
 });
 
 interface Ctx {
@@ -90,6 +155,26 @@ function run(ctx: Ctx, query: string): Promise<Record<string, unknown>[]> {
     query,
     ...(ctx.loginCustomerId ? { loginCustomerId: ctx.loginCustomerId } : {}),
   });
+}
+
+/** Run one of the new delivery/targeting checks without letting a single
+ * unfamiliar field name (unverified against this API version) take down the
+ * whole report — print a warning and move on instead. */
+async function runSafe(
+  ctx: Ctx,
+  label: string,
+  query: string,
+): Promise<Record<string, unknown>[] | undefined> {
+  try {
+    return await run(ctx, query);
+  } catch (err) {
+    console.log(`   ⚠️  เช็ค "${label}" ไม่ได้ (ข้ามไปก่อน) — ${err instanceof Error ? err.message : String(err)}`);
+    return undefined;
+  }
+}
+
+function pct(value: unknown): string {
+  return value === undefined ? 'ไม่มีข้อมูล' : `${(Number(value) * 100).toFixed(1)}%`;
 }
 
 async function main(): Promise<void> {
@@ -120,12 +205,18 @@ async function main(): Promise<void> {
     return;
   }
 
-  const [adGroups, keywords, ads, metrics] = await Promise.all([
-    run(ctx, AD_GROUPS_QUERY),
-    run(ctx, KEYWORDS_QUERY),
-    run(ctx, ADS_QUERY),
-    run(ctx, RECENT_METRICS_QUERY),
-  ]);
+  const [adGroups, keywords, ads, metrics, delivery, locations, languages, adSchedule, impressionShare] =
+    await Promise.all([
+      run(ctx, AD_GROUPS_QUERY),
+      run(ctx, KEYWORDS_QUERY),
+      run(ctx, ADS_QUERY),
+      run(ctx, RECENT_METRICS_QUERY),
+      runSafe(ctx, 'การตั้งค่าเครือข่าย/บิด', DELIVERY_QUERY),
+      runSafe(ctx, 'พื้นที่เป้าหมาย', LOCATION_CRITERIA_QUERY),
+      runSafe(ctx, 'ภาษาเป้าหมาย', LANGUAGE_CRITERIA_QUERY),
+      runSafe(ctx, 'ช่วงเวลาแสดงแอด', AD_SCHEDULE_QUERY),
+      runSafe(ctx, 'ส่วนแบ่ง impression', IMPRESSION_SHARE_QUERY),
+    ]);
 
   for (const row of campaigns) {
     const c = row['campaign'] as Record<string, unknown>;
@@ -135,6 +226,63 @@ async function main(): Promise<void> {
     console.log(`   กลยุทธ์บิด : ${c['biddingStrategyType']}`);
     if (budget?.['amountMicros']) {
       console.log(`   งบ/วัน     : ฿${(Number(budget['amountMicros']) / 1_000_000).toLocaleString()}`);
+    }
+
+    const deliveryRow = delivery?.find((r) => (r['campaign'] as Record<string, unknown>)['id'] === cid);
+    if (deliveryRow) {
+      const dc = deliveryRow['campaign'] as Record<string, unknown>;
+      const ns = dc['networkSettings'] as Record<string, unknown> | undefined;
+      if (ns) {
+        console.log(
+          `   เครือข่าย   : Google Search=${ns['targetGoogleSearch'] ?? '?'} · Search partners=${ns['targetSearchNetwork'] ?? '?'} · Display=${ns['targetContentNetwork'] ?? '?'}`,
+        );
+        if (ns['targetGoogleSearch'] === false) {
+          console.log('   ❌ ปิด "Google Search" ไว้ — นี่คือสาเหตุที่ไม่มี impression บน Search เลย');
+        }
+      }
+      const geoSetting = dc['geoTargetTypeSetting'] as Record<string, unknown> | undefined;
+      if (geoSetting?.['positiveGeoTargetType']) {
+        console.log(`   Geo target type: ${geoSetting['positiveGeoTargetType']}`);
+      }
+      const targetSpend = dc['targetSpend'] as Record<string, unknown> | undefined;
+      if (targetSpend?.['cpcBidCeilingMicros']) {
+        console.log(
+          `   เพดานราคาต่อคลิก (target spend ceiling): ฿${(Number(targetSpend['cpcBidCeilingMicros']) / 1_000_000).toFixed(2)} — ถ้าต่ำไปเมื่อเทียบกับคู่แข่งจะประมูลแพ้แทบทุกครั้ง`,
+        );
+      }
+    }
+
+    const myLocations = locations?.filter((r) => (r['campaign'] as Record<string, unknown>)['id'] === cid) ?? [];
+    if (locations !== undefined && myLocations.length === 0) {
+      console.log('   ⚠️  ไม่พบการตั้งพื้นที่เป้าหมาย (LOCATION) เลย — ตรวจในหน้าเว็บว่ากำลังยิงกว้างเกินไปหรือไม่');
+    } else {
+      for (const r of myLocations) {
+        const critRow = r['campaignCriterion'] as Record<string, unknown>;
+        const geo = r['geoTargetConstant'] as Record<string, unknown> | undefined;
+        const tag = critRow['negative'] ? 'ยกเว้น' : 'เป้าหมาย';
+        const label = geo?.['name'] ?? (critRow['location'] as Record<string, unknown> | undefined)?.['geoTargetConstant'] ?? '?';
+        console.log(`   พื้นที่ (${tag}): ${label}${geo?.['countryCode'] ? ` (${geo['countryCode']})` : ''}`);
+      }
+    }
+
+    const myLanguages = languages?.filter((r) => (r['campaign'] as Record<string, unknown>)['id'] === cid) ?? [];
+    if (languages !== undefined) {
+      if (myLanguages.length === 0) {
+        console.log('   ภาษาเป้าหมาย: ไม่ได้ตั้งค่าไว้เลย (ปกติ Google จะถือว่า "ทุกภาษา")');
+      } else {
+        const names = myLanguages
+          .map((r) => (r['languageConstant'] as Record<string, unknown> | undefined)?.['name'] ?? '?')
+          .join(', ');
+        console.log(`   ภาษาเป้าหมาย: ${names}`);
+        if (!myLanguages.some((r) => (r['languageConstant'] as Record<string, unknown> | undefined)?.['name'] === 'Thai')) {
+          console.log('   ⚠️  ไม่มี "Thai" ในภาษาเป้าหมาย — ถ้าคีย์เวิร์ด/แอดเป็นภาษาไทย นี่อาจเป็นสาเหตุหลักที่แทบไม่มี impression');
+        }
+      }
+    }
+
+    const mySchedule = adSchedule?.filter((r) => (r['campaign'] as Record<string, unknown>)['id'] === cid) ?? [];
+    if (mySchedule.length > 0) {
+      console.log(`   ⚠️  มีการจำกัดช่วงเวลาแสดงแอด (ad schedule) ${mySchedule.length} ช่วง — อาจเป็นสาเหตุที่แสดงผลน้อยกว่าที่ควร`);
     }
 
     const myAdGroups = adGroups.filter(
@@ -175,11 +323,19 @@ async function main(): Promise<void> {
         console.log(`      แอด: ${myAds.length} ตัว (${enabledAds.length} ENABLED)`);
         for (const adRow of myAds) {
           const a = adRow['adGroupAd'] as Record<string, unknown>;
-          const approval = (a['policySummary'] as Record<string, unknown> | undefined)?.[
-            'approvalStatus'
-          ];
+          const adId = (a['ad'] as Record<string, unknown>)['id'];
+          const policy = a['policySummary'] as Record<string, unknown> | undefined;
+          const approval = policy?.['approvalStatus'];
+          const review = policy?.['reviewStatus'];
           if (approval && approval !== 'APPROVED') {
-            console.log(`      ⚠️  แอด id ${(a['ad'] as Record<string, unknown>)['id']} สถานะอนุมัติ: ${approval}`);
+            console.log(`      ⚠️  แอด id ${adId} สถานะอนุมัติ: ${approval}`);
+          }
+          if (review && review !== 'REVIEWED') {
+            console.log(`      ⚠️  แอด id ${adId} สถานะตรวจสอบ: ${review} — ยังตรวจไม่เสร็จอาจแสดงผลได้ไม่เต็มที่`);
+          }
+          const topics = policy?.['policyTopicEntries'] as Record<string, unknown>[] | undefined;
+          for (const t of topics ?? []) {
+            console.log(`      ℹ️  แอด id ${adId} policy topic: ${t['topic']} (${t['type']})`);
           }
         }
       }
@@ -208,6 +364,19 @@ async function main(): Promise<void> {
       console.log(
         `   ${c['name']}: impression ${totals.impressions.toLocaleString()} · คลิก ${totals.clicks} · ค่าใช้จ่าย ฿${totals.cost.toFixed(2)}`,
       );
+    }
+
+    const isRow = impressionShare?.find((r) => (r['campaign'] as Record<string, unknown>)['id'] === cid);
+    if (isRow) {
+      const m = isRow['metrics'] as Record<string, unknown>;
+      const share = m['searchImpressionShare'];
+      const lostRank = m['searchRankLostImpressionShare'];
+      const lostBudget = m['searchBudgetLostImpressionShare'];
+      if (share !== undefined || lostRank !== undefined || lostBudget !== undefined) {
+        console.log(
+          `      ส่วนแบ่ง impression บน Search: ${pct(share)} · เสียเพราะอันดับ/คุณภาพ/บิด: ${pct(lostRank)} · เสียเพราะงบ: ${pct(lostBudget)}`,
+        );
+      }
     }
   }
   console.log();

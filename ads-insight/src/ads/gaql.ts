@@ -43,6 +43,8 @@ export const ALLOWED_FIELD_PREFIXES = [
   'user_location_view',
   'age_range_view',
   'gender_view',
+  'geo_target_constant',
+  'language_constant',
   'conversion_action',
   'asset',
   'campaign_asset',
