@@ -163,16 +163,22 @@
 - [ ] `pnpm deploy` — **รอคำสั่งผู้ใช้เท่านั้น** (CLAUDE.md)
 
 ### งานย่อย
-- [ ] เพิ่ม dependency: `@modelcontextprotocol/sdk`, `@cloudflare/workers-oauth-provider`
-- [ ] `wrangler.toml`: compat flag `global_fetch_strictly_public` (CIMD) + KV binding `OAUTH_KV`
-- [ ] `src/auth/google.ts` — Google OAuth (login เท่านั้น, คนละตัวกับ scope `adwords` ที่ user เชื่อมทีหลัง)
-- [ ] `src/auth/pending-login.ts` — เก็บ `AuthRequest` เดิมของ MCP client ระหว่างพาไป login Google
-- [ ] `src/oauth.ts` — ประกอบ `OAuthProvider`, `/authorize`, `/oauth/google/callback`, allowlist check
-- [ ] Dev bypass: `ENV=dev` + `Authorization: Bearer $DEV_BEARER_TOKEN` ข้าม OAuth เต็มรูปแบบ (SPEC §5.1)
+- [x] เพิ่ม dependency: `@modelcontextprotocol/sdk@1.30.0`, `@cloudflare/workers-oauth-provider@0.10.3`
+      (ตรวจจาก source จริงที่ดาวน์โหลดมาอ่าน ไม่ใช่เดา — README + .d.ts)
+- [x] `wrangler.toml`: compat flag `global_fetch_strictly_public` (CIMD) + KV binding `OAUTH_KV`
+- [x] `src/auth/google.ts` — Google OAuth (login เท่านั้น, คนละตัวกับ scope `adwords` ที่ user เชื่อมทีหลัง)
+- [x] `src/auth/pending-login.ts` — เก็บ `AuthRequest` เดิมของ MCP client ระหว่างพาไป login Google
+- [x] `src/ads/token.ts` — refresh access token ของ Google Ads เอง (คนละตัวกับ Google login ข้างบน)
+- [x] `src/oauth.ts` — ประกอบ `OAuthProvider`, `/authorize`, `/oauth/google/callback`, allowlist check
+      **ทดสอบ live ผ่าน `wrangler dev` จริงแล้ว** ครบทุก branch ยกเว้นการ login Google จริง
+      (DCR register → authorize redirect ไป Google ถูกต้อง → access_denied กลับไป client เดิม
+      พร้อม state เดิม → replay/bogus state ถูกปฏิเสธ → 401 WWW-Authenticate ถูกต้อง)
+- [x] Dev bypass: `ENV=dev` + `Authorization: Bearer $DEV_BEARER_TOKEN` ข้าม OAuth เต็มรูปแบบ (SPEC §5.1)
+      ทดสอบแล้ว: initialize → tools/list → tools/call ผ่าน MCP protocol จริง
 - [ ] `src/services/format.ts` + `metrics.ts` — response shape มาตรฐาน (§6.2), derived metrics, truncate+others
-- [ ] `src/mcp/server.ts` — bootstrap `McpServer` (stateless — ไม่ต้องมี Durable Object ใน M2)
+- [x] `src/mcp/server.ts` — bootstrap `McpServer` (stateless — ไม่ต้องมี Durable Object ใน M2)
 - [ ] Read tools (§12 M2 — 10 ตัวเท่านั้น ที่เหลือเป็น M3):
-  - [ ] `gads_run_gaql`
+  - [x] `gads_run_gaql` — ทดสอบ live: query ถูกต้องไปถึง Google, query อันตราย (DELETE) ถูกบล็อกก่อนออกจาก Worker
   - [ ] `gads_get_conversion_setup`
   - [ ] `gads_get_bidding_status`
   - [ ] `gads_get_impression_share`
@@ -184,7 +190,8 @@
   - [ ] `gads_get_account_overview` (ส่วน goals/alerts/change-sets ยังไม่มีเพราะ D1 เป็นงาน M3 — ใส่เฉพาะที่มีข้อมูลจริงตอนนี้)
 - [ ] `gads://playbook` resource + `gads_get_playbook` tool (D27)
 - [ ] `docs/PLAYBOOK.md` ต้องมีอยู่แล้วให้ resource อ่าน (เช็คว่ามีเนื้อหาพอหรือยัง)
-- [ ] อัปเดต `.dev.vars.example` ให้ครบทุกตัวแปรใหม่
+- [ ] อัปเดต `.dev.vars.example` ให้ครบทุกตัวแปรใหม่ (`GOOGLE_ADS_REFRESH_TOKEN` เพิ่ม M0 แล้ว ไม่ใช่ใหม่จาก M2)
+- [x] `/connect/google` ในสตับ `src/index.ts` แก้ milestone จาก M2 → M3 (D1 storage ของมันยังไม่มี)
 
 ### หมายเหตุ
 - อ่านเฉพาะ `DEFAULT_CUSTOMER_ID` (บัญชีจริง) ไม่เกี่ยวกับ test account ที่ยังบล็อกอยู่ — M2 read-only ไม่ต้องรอ M1 gate ปิดจริงๆ (เหตุผลที่ D34 ประเมินความเสี่ยงต่ำ)
