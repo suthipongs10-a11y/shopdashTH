@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "what": "แคมเปญทั้งหมด + งบ + กลยุทธ์บิด + ช่วงเวลา",
+    "query": "SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, campaign.bidding_strategy_type, campaign.start_date_time, campaign.end_date_time, campaign_budget.amount_micros, campaign_budget.explicitly_shared FROM campaign ORDER BY campaign.id LIMIT 200",
+    "apiVersion": "v25",
+    "rows": 8,
+    "capturedAt": "2026-09-18",
+    "scrubbed": true,
+    "searchTermsKept": false
+  },
+  "rows": [
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000002",
+        "status": "REMOVED",
+        "advertisingChannelType": "PERFORMANCE_MAX",
+        "biddingStrategyType": "MAXIMIZE_CONVERSIONS",
+        "name": "name-1",
+        "id": "1000000002",
+        "startDateTime": "2024-12-19 21:04:55"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000003",
+        "amountMicros": "780000000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000004",
+        "status": "PAUSED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_SPEND",
+        "name": "name-2",
+        "id": "1000000004",
+        "startDateTime": "2024-12-24 00:03:18"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000005",
+        "amountMicros": "1900000000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000006",
+        "status": "REMOVED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_SPEND",
+        "name": "name-3",
+        "id": "1000000006",
+        "startDateTime": "2024-12-20 23:15:07"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000007",
+        "amountMicros": "900000000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000008",
+        "status": "PAUSED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_SPEND",
+        "name": "name-4",
+        "id": "1000000008",
+        "startDateTime": "2025-01-12 10:49:50"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000009",
+        "amountMicros": "1125000000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000010",
+        "status": "REMOVED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_SPEND",
+        "name": "name-5",
+        "id": "1000000010",
+        "startDateTime": "2025-10-26 20:07:09"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000011",
+        "amountMicros": "391020000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000012",
+        "status": "REMOVED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_IMPRESSION_SHARE",
+        "name": "name-6",
+        "id": "1000000012",
+        "startDateTime": "2025-11-10 22:50:58"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000013",
+        "amountMicros": "100000000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000014",
+        "status": "ENABLED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_SPEND",
+        "name": "name-7",
+        "id": "1000000014",
+        "startDateTime": "2026-09-16 19:53:58"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000015",
+        "amountMicros": "500000000",
+        "explicitlyShared": false
+      }
+    },
+    {
+      "campaign": {
+        "resourceName": "customers/1000000001/campaigns/1000000016",
+        "status": "ENABLED",
+        "advertisingChannelType": "SEARCH",
+        "biddingStrategyType": "TARGET_SPEND",
+        "name": "name-8",
+        "id": "1000000016",
+        "startDateTime": "2026-09-16 19:50:06"
+      },
+      "campaignBudget": {
+        "resourceName": "customers/1000000001/campaignBudgets/1000000017",
+        "amountMicros": "300000000",
+        "explicitlyShared": false
+      }
+    }
+  ]
+}
