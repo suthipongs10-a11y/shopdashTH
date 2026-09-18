@@ -55,20 +55,38 @@ const KEYWORDS_QUERY = buildQuery({
   orderBy: [{ field: 'ad_group.id', direction: 'ASC' }],
 });
 
+// Unchanged from the version that already ran clean against this account —
+// keep it that way. The newer, unverified policy fields below (review_status,
+// policy_topic_entries — 'topic'/'type' turned out UNRECOGNIZED_FIELD on this
+// API version, see DECISIONS) must never land back in this query: it has no
+// runSafe guard, so one bad field here aborts the whole report before the
+// proven structural check even runs.
 const ADS_QUERY = buildQuery({
   select: [
     'ad_group_ad.ad.id',
     'ad_group_ad.ad.type',
     'ad_group_ad.status',
     'ad_group_ad.policy_summary.approval_status',
-    'ad_group_ad.policy_summary.review_status',
-    'ad_group_ad.policy_summary.policy_topic_entries.topic',
-    'ad_group_ad.policy_summary.policy_topic_entries.type',
     'ad_group.id',
   ],
   from: 'ad_group_ad',
   where: [ENABLED],
   orderBy: [{ field: 'ad_group.id', direction: 'ASC' }],
+});
+
+// Split out from ADS_QUERY on purpose (see comment above) and run through
+// runSafe: 'policy_topic_entries.topic'/'.type' already came back
+// UNRECOGNIZED_FIELD once on this account's API version, and review_status
+// hasn't been verified at all yet.
+const AD_POLICY_DETAIL_QUERY = buildQuery({
+  select: [
+    'ad_group_ad.ad.id',
+    'ad_group_ad.policy_summary.review_status',
+    'ad_group_ad.policy_summary.policy_topic_entries.topic',
+    'ad_group_ad.policy_summary.policy_topic_entries.type',
+  ],
+  from: 'ad_group_ad',
+  where: [ENABLED],
 });
 
 const RECENT_METRICS_QUERY = buildQuery({
@@ -205,18 +223,37 @@ async function main(): Promise<void> {
     return;
   }
 
-  const [adGroups, keywords, ads, metrics, delivery, locations, languages, adSchedule, impressionShare] =
-    await Promise.all([
-      run(ctx, AD_GROUPS_QUERY),
-      run(ctx, KEYWORDS_QUERY),
-      run(ctx, ADS_QUERY),
-      run(ctx, RECENT_METRICS_QUERY),
-      runSafe(ctx, 'การตั้งค่าเครือข่าย/บิด', DELIVERY_QUERY),
-      runSafe(ctx, 'พื้นที่เป้าหมาย', LOCATION_CRITERIA_QUERY),
-      runSafe(ctx, 'ภาษาเป้าหมาย', LANGUAGE_CRITERIA_QUERY),
-      runSafe(ctx, 'ช่วงเวลาแสดงแอด', AD_SCHEDULE_QUERY),
-      runSafe(ctx, 'ส่วนแบ่ง impression', IMPRESSION_SHARE_QUERY),
-    ]);
+  const [
+    adGroups,
+    keywords,
+    ads,
+    metrics,
+    delivery,
+    locations,
+    languages,
+    adSchedule,
+    impressionShare,
+    adPolicyDetail,
+  ] = await Promise.all([
+    run(ctx, AD_GROUPS_QUERY),
+    run(ctx, KEYWORDS_QUERY),
+    run(ctx, ADS_QUERY),
+    run(ctx, RECENT_METRICS_QUERY),
+    runSafe(ctx, 'การตั้งค่าเครือข่าย/บิด', DELIVERY_QUERY),
+    runSafe(ctx, 'พื้นที่เป้าหมาย', LOCATION_CRITERIA_QUERY),
+    runSafe(ctx, 'ภาษาเป้าหมาย', LANGUAGE_CRITERIA_QUERY),
+    runSafe(ctx, 'ช่วงเวลาแสดงแอด', AD_SCHEDULE_QUERY),
+    runSafe(ctx, 'ส่วนแบ่ง impression', IMPRESSION_SHARE_QUERY),
+    runSafe(ctx, 'สถานะตรวจสอบ/policy ของแอด', AD_POLICY_DETAIL_QUERY),
+  ]);
+
+  const policyByAdId = new Map<string, Record<string, unknown>>();
+  for (const row of adPolicyDetail ?? []) {
+    const adId = ((row['adGroupAd'] as Record<string, unknown>)['ad'] as Record<string, unknown>)[
+      'id'
+    ] as string;
+    policyByAdId.set(adId, row['adGroupAd'] as Record<string, unknown>);
+  }
 
   for (const row of campaigns) {
     const c = row['campaign'] as Record<string, unknown>;
@@ -323,17 +360,21 @@ async function main(): Promise<void> {
         console.log(`      แอด: ${myAds.length} ตัว (${enabledAds.length} ENABLED)`);
         for (const adRow of myAds) {
           const a = adRow['adGroupAd'] as Record<string, unknown>;
-          const adId = (a['ad'] as Record<string, unknown>)['id'];
-          const policy = a['policySummary'] as Record<string, unknown> | undefined;
-          const approval = policy?.['approvalStatus'];
-          const review = policy?.['reviewStatus'];
+          const adId = (a['ad'] as Record<string, unknown>)['id'] as string;
+          const approval = (a['policySummary'] as Record<string, unknown> | undefined)?.[
+            'approvalStatus'
+          ];
           if (approval && approval !== 'APPROVED') {
             console.log(`      ⚠️  แอด id ${adId} สถานะอนุมัติ: ${approval}`);
           }
+
+          const detail = policyByAdId.get(adId);
+          const detailPolicy = detail?.['policySummary'] as Record<string, unknown> | undefined;
+          const review = detailPolicy?.['reviewStatus'];
           if (review && review !== 'REVIEWED') {
             console.log(`      ⚠️  แอด id ${adId} สถานะตรวจสอบ: ${review} — ยังตรวจไม่เสร็จอาจแสดงผลได้ไม่เต็มที่`);
           }
-          const topics = policy?.['policyTopicEntries'] as Record<string, unknown>[] | undefined;
+          const topics = detailPolicy?.['policyTopicEntries'] as Record<string, unknown>[] | undefined;
           for (const t of topics ?? []) {
             console.log(`      ℹ️  แอด id ${adId} policy topic: ${t['topic']} (${t['type']})`);
           }
