@@ -42,10 +42,14 @@ const LAST_30 = 'segments.date DURING LAST_30_DAYS';
 const FIXTURES: FixtureSpec[] = [
   {
     file: 'campaigns.json',
-    what: 'แคมเปญทั้งหมด + งบ + กลยุทธ์บิด',
+    // The date fields are `start_date_time` / `end_date_time` in v25, not
+    // `start_date` / `end_date`, which v25 rejects outright. Found with
+    // `pnpm fields date` rather than guessed.
+    what: 'แคมเปญทั้งหมด + งบ + กลยุทธ์บิด + ช่วงเวลา',
     query: `
       SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
              campaign.bidding_strategy_type,
+             campaign.start_date_time, campaign.end_date_time,
              campaign_budget.amount_micros, campaign_budget.explicitly_shared
       FROM campaign
       ORDER BY campaign.id
