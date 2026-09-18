@@ -113,4 +113,5 @@
   ห้าม import ของเฉพาะ Workers หรือ Node
 
 ## Ideas (นอก scope — รอพิจารณา)
--
+- **ต่อกับ AI เจ้าอื่น (ChatGPT / Copilot / Gemini)** — ทำได้เลยโดยไม่ต้องแก้ transport (D27)
+  งานที่ต้องเพิ่มตอน M2: tool `gads_get_playbook` + บังคับ `pwa_all` สำหรับ client ที่ไม่ไว้ใจ

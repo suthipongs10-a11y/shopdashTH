@@ -25,6 +25,8 @@
 
 | 2026-09-17 | D26 | เป้าหมายของบัญชีคือ **traffic (คลิก)** ไม่ใช่ lead | `objective: 'traffic'` ตาม Goal model ใน SPEC §8.1 · conversion action เป็น `PAGE_VIEW` และตั้ง primary ได้ถูกต้องแล้ว | ผู้ใช้ยืนยันเอง · **มีผลกับการออกแบบ M3:** เกณฑ์ใน PLAYBOOK ที่อิง CPA (เช่น "spend ≥ 2× target CPA แต่ 0 conversion → ใส่ negative") ใช้ตรงๆ ไม่ได้ — ตัวชี้วัดหลักคือ **CPC, จำนวนคลิก, CTR, คลิกต่อคีย์เวิร์ด** ต้องมีเกณฑ์ชุด traffic แยกตอน M3 |
 
+| 2026-09-18 | D27 | รองรับ AI เจ้าอื่นนอกจาก Claude | ไม่ต้องแก้ transport — D4 (Streamable HTTP + OAuth 2.1) เป็นมาตรฐานที่ ChatGPT / Copilot / Gemini Enterprise / Cursor ต่อได้อยู่แล้ว · **แต่ต้องเพิ่ม  2 อย่างตอน M2** | MCP ถูกยกให้ Linux Foundation ธ.ค. 2025 ไม่ผูกกับ Anthropic แล้ว · ChatGPT รับเฉพาะ remote HTTPS (STDIO ไม่ได้) ซึ่งเราเลือกถูกอยู่แล้ว · **(ก) PLAYBOOK อยู่ฝั่ง client** — client บางเจ้าไม่อ่าน MCP resource → เพิ่ม tool `gads_get_playbook` ควบคู่ `gads://playbook` · **(ข) การยืนยันในแชทเชื่อไม่ได้กับ client ที่เราคุมไม่ได้** — กฎ "ห้าม apply โดยไม่มีคำยืนยัน" อยู่ใน PLAYBOOK ซึ่งโมเดลอื่นไม่ได้อ่าน และ server พิสูจน์ไม่ได้ว่ามีคนยืนยันจริง → **ให้ server บังคับ `approval_mode: 'pwa_all'` อัตโนมัติเมื่อ OAuth client ไม่ใช่ตัวที่ไว้ใจ** ไม่พึ่งว่าใครจะจำตั้งค่า · guardrails ที่เหลืออยู่ server หมดแล้ว ไม่พึ่ง client |
+
 ## รอยืนยัน (ยังไม่ตัดสินใจ)
 - **`ADS_API_VERSION`** ตั้งต้น `v25` ตาม SPEC §4 แต่ยังไม่ได้เทียบกับเอกสาร Google จริง —
   SPEC ระบุให้ตรวจใน M1 ถ้าไม่ตรงให้บันทึกเป็น D19 ที่นี่ แล้วแก้ค่าใน `wrangler.toml` จุดเดียว
