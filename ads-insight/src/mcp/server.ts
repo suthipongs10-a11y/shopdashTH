@@ -14,6 +14,7 @@ import { createAdsClient } from '../ads/client';
 import { cachedAccessTokenProvider } from '../ads/token';
 import type { AuthProps } from '../auth/types';
 import type { Env } from '../env';
+import { registerPlaybookResource } from './resources';
 import { registerAccountOverviewTool } from './tools/account-overview';
 import { registerAdsTool } from './tools/ads';
 import { registerBiddingStatusTool } from './tools/bidding-status';
@@ -21,6 +22,7 @@ import { registerConversionSetupTool } from './tools/conversion-setup';
 import { registerImpressionShareTool } from './tools/impression-share';
 import { registerKeywordsTool } from './tools/keywords';
 import { registerPerformanceTool } from './tools/performance';
+import { registerPlaybookTool } from './tools/playbook';
 import { registerRunGaqlTool } from './tools/run-gaql';
 import { registerSearchTermsTool } from './tools/search-terms';
 import type { ToolDeps } from './tools/shared';
@@ -70,6 +72,8 @@ function buildServer(deps: ToolDeps): McpServer {
   registerAdsTool(server, deps);
   registerTimePerformanceTool(server, deps);
   registerPerformanceTool(server, deps);
+  registerPlaybookTool(server, deps);
+  registerPlaybookResource(server);
   return server;
 }
 
