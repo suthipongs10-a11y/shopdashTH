@@ -156,11 +156,19 @@
 
 > เริ่มก่อน M1 gate ปิดสนิท — ข้อยกเว้นที่ผู้ใช้สั่งชัดเจน (D34) M1 gate ยังค้างอยู่ ดูหัวข้อ M1 ด้านบน
 
-### Gate M2 (SPEC §12)
-- [ ] เพิ่ม custom connector ใน claude.ai สำเร็จ
+### Gate M2 (SPEC §12) — **โค้ดเสร็จหมดแล้ว เหลือแต่ deploy จริง (ต้องใช้บัญชี Cloudflare ผู้ใช้)**
+- [ ] `wrangler kv namespace create OAUTH_KV` แล้วใส่ id ใน `wrangler.toml`
+- [ ] `wrangler secret put` ครบทุกตัว (GOOGLE_OAUTH_CLIENT_ID/SECRET, GOOGLE_ADS_REFRESH_TOKEN,
+      OWNER_EMAILS, TOKEN_ENC_KEY, SESSION_SECRET, DEV_BEARER_TOKEN ไม่ต้องส่งจริงก็ได้เพราะใช้แค่ dev)
+- [ ] เพิ่ม redirect URI ที่ deploy จริงใน Google Cloud OAuth client:
+      `https://<worker-domain>/oauth/google/callback`
+- [ ] `pnpm deploy` — **รอคำสั่งผู้ใช้เท่านั้น** (CLAUDE.md) — ทำได้หลัง 3 ข้อบนเสร็จ
+- [ ] เพิ่ม custom connector ใน claude.ai สำเร็จ (URL = `https://<worker-domain>/mcp`)
 - [ ] ใช้บนมือถือได้
 - [ ] Claude ทำ weekly audit จากข้อมูลจริงได้ครบตาม PLAYBOOK
-- [ ] `pnpm deploy` — **รอคำสั่งผู้ใช้เท่านั้น** (CLAUDE.md)
+
+ทั้งหมดนี้ต้องใช้บัญชี Cloudflare ของผู้ใช้ (KV/secrets/deploy) — Claude Code ทำแทนไม่ได้
+เหมือน M0 ที่ต้องใช้บัญชี Google — ขั้นตอนละเอียดจะเขียนให้เป็นเอกสารแยกตอนผู้ใช้พร้อม deploy
 
 ### งานย่อย
 - [x] เพิ่ม dependency: `@modelcontextprotocol/sdk@1.30.0`, `@cloudflare/workers-oauth-provider@0.10.3`
@@ -175,23 +183,33 @@
       พร้อม state เดิม → replay/bogus state ถูกปฏิเสธ → 401 WWW-Authenticate ถูกต้อง)
 - [x] Dev bypass: `ENV=dev` + `Authorization: Bearer $DEV_BEARER_TOKEN` ข้าม OAuth เต็มรูปแบบ (SPEC §5.1)
       ทดสอบแล้ว: initialize → tools/list → tools/call ผ่าน MCP protocol จริง
-- [ ] `src/services/format.ts` + `metrics.ts` — response shape มาตรฐาน (§6.2), derived metrics, truncate+others
+- [x] `src/services/format.ts` + `metrics.ts` — response shape มาตรฐาน (§6.2), derived metrics, truncate+others
 - [x] `src/mcp/server.ts` — bootstrap `McpServer` (stateless — ไม่ต้องมี Durable Object ใน M2)
-- [ ] Read tools (§12 M2 — 10 ตัวเท่านั้น ที่เหลือเป็น M3):
+- [x] Read tools (§12 M2 — 10 ตัวครบ ที่เหลือ 6 ตัวใน §6.3 เป็น M3 ห้ามทำล่วงหน้า):
   - [x] `gads_run_gaql` — ทดสอบ live: query ถูกต้องไปถึง Google, query อันตราย (DELETE) ถูกบล็อกก่อนออกจาก Worker
-  - [ ] `gads_get_conversion_setup`
-  - [ ] `gads_get_bidding_status`
-  - [ ] `gads_get_impression_share`
-  - [ ] `gads_get_keywords`
-  - [ ] `gads_get_search_terms`
-  - [ ] `gads_get_ads`
-  - [ ] `gads_get_time_performance`
-  - [ ] `gads_get_performance`
-  - [ ] `gads_get_account_overview` (ส่วน goals/alerts/change-sets ยังไม่มีเพราะ D1 เป็นงาน M3 — ใส่เฉพาะที่มีข้อมูลจริงตอนนี้)
-- [ ] `gads://playbook` resource + `gads_get_playbook` tool (D27)
-- [ ] `docs/PLAYBOOK.md` ต้องมีอยู่แล้วให้ resource อ่าน (เช็คว่ามีเนื้อหาพอหรือยัง)
-- [ ] อัปเดต `.dev.vars.example` ให้ครบทุกตัวแปรใหม่ (`GOOGLE_ADS_REFRESH_TOKEN` เพิ่ม M0 แล้ว ไม่ใช่ใหม่จาก M2)
+  - [x] `gads_get_conversion_setup`
+  - [x] `gads_get_bidding_status` (ไม่รวม target values/learning status/ประวัติเปลี่ยนกลยุทธ์ — ดู "ค้าง" ด้านล่าง)
+  - [x] `gads_get_impression_share`
+  - [x] `gads_get_keywords` (ไม่รวม QS 3 องค์ประกอบ — ยังไม่ verify field กับ API จริง)
+  - [x] `gads_get_search_terms`
+  - [x] `gads_get_ads` (RSA/ad_strength/policy_summary ยังไม่ verify field — ดู "ค้าง")
+  - [x] `gads_get_time_performance` (ไม่รวม ad schedule ปัจจุบัน)
+  - [x] `gads_get_performance` (level รองรับแค่ account/campaign — ad_group/keyword ตอบ "ยังไม่รองรับ")
+  - [x] `gads_get_account_overview` (ไม่รวม goals/alerts/change-sets — เป็นงาน M3 ต้องมี D1)
+  - หน่วยเทส 34 เคสผ่าน MCP protocol จริง (`InMemoryTransport`) + smoke test สด `wrangler dev` ครบทั้ง 11 tool
+- [x] `gads://playbook` resource + `gads_get_playbook` tool (D27) — เนื้อหาเดียวกัน ดึงจาก
+      `docs/PLAYBOOK.md` ไฟล์เดียว (wrangler `[[rules]]` text module — D37) ทดสอบ live แล้วตรงกัน 100%
+- [x] `docs/PLAYBOOK.md` มีอยู่แล้ว 110 บรรทัด เนื้อหาครบ (บทบาท/กฎเหล็ก/ลำดับตรวจ/เกณฑ์ตัดสินใจ) พอสำหรับ M2
+- [x] `.dev.vars.example` มี `GOOGLE_ADS_REFRESH_TOKEN` อยู่แล้วตั้งแต่ M0 — ไม่มีตัวแปรใหม่ที่ต้องเพิ่มใน M2
 - [x] `/connect/google` ในสตับ `src/index.ts` แก้ milestone จาก M2 → M3 (D1 storage ของมันยังไม่มี)
+
+### ค้าง (ต้อง verify กับ API จริงก่อนใช้งานจริง — ไม่ใช่บั๊ก แต่ยังไม่ยืนยัน)
+- `pnpm fields quality_info` แล้วพิจารณาเพิ่ม creative/post_click quality score + predicted CTR
+  ใน `gads_get_keywords` (ตอนนี้ตัดออกเพราะเสี่ยงพัง query ทั้งหมดถ้าชื่อ field ผิด)
+- `pnpm fields responsive_search_ad` และ `pnpm fields ad_strength` ก่อนเชื่อ `gads_get_ads` เต็มที่ —
+  เป็น field ชุดเดียวในทั้ง M2 ที่ไม่ได้มาจาก fixture ที่ capture ไว้จริง
+- `gads_get_performance` level=ad_group/keyword, `gads_get_bidding_status` learning status,
+  `gads_get_time_performance` ad schedule ปัจจุบัน — ทำได้ใน M3 ถ้าต้องการ (ไม่ใช่ทำไม่ได้ แค่ไม่ทำล่วงหน้า)
 
 ### หมายเหตุ
 - อ่านเฉพาะ `DEFAULT_CUSTOMER_ID` (บัญชีจริง) ไม่เกี่ยวกับ test account ที่ยังบล็อกอยู่ — M2 read-only ไม่ต้องรอ M1 gate ปิดจริงๆ (เหตุผลที่ D34 ประเมินความเสี่ยงต่ำ)
