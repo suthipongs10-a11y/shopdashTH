@@ -14,8 +14,17 @@ import { createAdsClient } from '../ads/client';
 import { cachedAccessTokenProvider } from '../ads/token';
 import type { AuthProps } from '../auth/types';
 import type { Env } from '../env';
+import { registerAccountOverviewTool } from './tools/account-overview';
+import { registerAdsTool } from './tools/ads';
+import { registerBiddingStatusTool } from './tools/bidding-status';
+import { registerConversionSetupTool } from './tools/conversion-setup';
+import { registerImpressionShareTool } from './tools/impression-share';
+import { registerKeywordsTool } from './tools/keywords';
+import { registerPerformanceTool } from './tools/performance';
 import { registerRunGaqlTool } from './tools/run-gaql';
+import { registerSearchTermsTool } from './tools/search-terms';
 import type { ToolDeps } from './tools/shared';
+import { registerTimePerformanceTool } from './tools/time-performance';
 
 /** One access-token cache per Worker isolate. Module scope on purpose: it
  * outlives any single request, so a warm isolate skips the refresh for the
@@ -41,9 +50,26 @@ function buildToolDeps(env: Env, auth: AuthProps): ToolDeps {
   return { client, env, auth };
 }
 
+/**
+ * SPEC §12 M2 names exactly these ten read tools. The other six in §6.3's
+ * full table (`get_audience_breakdown`, `get_landing_pages`,
+ * `get_policy_issues`, `get_assets`, `get_recommendations`,
+ * `get_change_history`) are explicitly M3 — CLAUDE.md's gate rule is not to
+ * build them ahead of that milestone even though they'd slot into this same
+ * list just as easily.
+ */
 function buildServer(deps: ToolDeps): McpServer {
   const server = new McpServer({ name: 'ads-insight', version: '0.1.0' });
   registerRunGaqlTool(server, deps);
+  registerAccountOverviewTool(server, deps);
+  registerConversionSetupTool(server, deps);
+  registerBiddingStatusTool(server, deps);
+  registerImpressionShareTool(server, deps);
+  registerKeywordsTool(server, deps);
+  registerSearchTermsTool(server, deps);
+  registerAdsTool(server, deps);
+  registerTimePerformanceTool(server, deps);
+  registerPerformanceTool(server, deps);
   return server;
 }
 
