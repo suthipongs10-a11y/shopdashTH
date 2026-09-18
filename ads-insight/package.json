@@ -22,6 +22,7 @@
     "check:access": "tsx scripts/check-access.ts",
     "check:mutate": "tsx scripts/check-mutate.ts",
     "create:test-client": "tsx scripts/create-test-client.ts",
+    "check:campaign-setup": "tsx scripts/check-campaign-setup.ts",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

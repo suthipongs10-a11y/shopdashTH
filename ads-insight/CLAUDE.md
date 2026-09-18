@@ -80,6 +80,10 @@ pnpm check:mutate   # Gate M1: validateOnly บน test account (ต้องม
 # M1 — fixtures
 pnpm capture:fixtures      # เก็บ response จริง (ลบข้อมูลส่วนตัว) — ต้องมี .dev.vars
 pnpm fixtures:synthetic    # สร้างบัญชีสมมติที่มี traffic — รันที่ไหนก็ได้ ไม่ต้องมี credentials
+
+# ตรวจบัญชีจริงแบบ ad-hoc (read-only, ไม่ต้อง deploy)
+pnpm check:campaign-setup [customer_id]  # ทำไมแคมเปญ ENABLED ไม่มี impression/คลิก —
+                                          # เช็ค ad group / คีย์เวิร์ด / แอด ที่ขาดหาย
 ```
 เชื่อม Claude Code กับ MCP ตอน dev (ใช้ DEV_BEARER_TOKEN, เปิดเฉพาะ ENV=dev):
 ```bash

@@ -1,0 +1,219 @@
+/**
+ * Diagnose why an ENABLED campaign shows no impressions/clicks — read-only,
+ * no deployment or MCP server needed, so it can answer "why is there no
+ * traffic yet" the same day the question comes up rather than waiting on
+ * M2's Cloudflare deployment.
+ *
+ * Checks the things that make a campaign structurally unable to serve at
+ * all, which a brand-new campaign is the classic way to hit: no ad groups,
+ * no keywords, no enabled ads, an ad still pending Google's review.
+ *
+ *   pnpm check:campaign-setup [customer_id]
+ *
+ * Queries `ad_group` / `ad_group_criterion` / `ad_group_ad` directly (config
+ * resources, not stats views) rather than `keyword_view`, so a keyword or ad
+ * that has never served still shows up — a metrics view would have nothing
+ * to show for it (STATUS.md: this is exactly why fixtures needed a
+ * synthetic account, and the same gap applies here).
+ */
+import { buildQuery, where } from '../src/ads/gaql';
+import { loadConfig, requireVar } from './lib/config';
+import { assertCustomerId, formatCustomerId } from './lib/customer-id';
+import { refreshAccessToken } from './lib/google-auth';
+import { searchStream } from './lib/ads-rest';
+
+// Built with the same validated query builder gads_run_gaql and every M2
+// report tool use (src/ads/gaql.ts) rather than hand-written strings — its
+// assertField()/assertResource() catch a typo'd field name before this ever
+// reaches the network, the same protection Claude's own free-form queries get.
+const ENABLED = where.eq('campaign.status', 'ENABLED');
+
+const CAMPAIGNS_QUERY = buildQuery({
+  select: ['campaign.id', 'campaign.name', 'campaign.status', 'campaign.bidding_strategy_type', 'campaign_budget.amount_micros'],
+  from: 'campaign',
+  where: [ENABLED],
+  orderBy: [{ field: 'campaign.id', direction: 'ASC' }],
+});
+
+const AD_GROUPS_QUERY = buildQuery({
+  select: ['ad_group.id', 'ad_group.name', 'ad_group.status', 'campaign.id'],
+  from: 'ad_group',
+  where: [ENABLED],
+  orderBy: [{ field: 'ad_group.id', direction: 'ASC' }],
+});
+
+const KEYWORDS_QUERY = buildQuery({
+  select: [
+    'ad_group_criterion.criterion_id',
+    'ad_group_criterion.keyword.text',
+    'ad_group_criterion.keyword.match_type',
+    'ad_group_criterion.status',
+    'ad_group.id',
+  ],
+  from: 'ad_group_criterion',
+  where: [ENABLED, where.eq('ad_group_criterion.type', 'KEYWORD')],
+  orderBy: [{ field: 'ad_group.id', direction: 'ASC' }],
+});
+
+const ADS_QUERY = buildQuery({
+  select: [
+    'ad_group_ad.ad.id',
+    'ad_group_ad.ad.type',
+    'ad_group_ad.status',
+    'ad_group_ad.policy_summary.approval_status',
+    'ad_group.id',
+  ],
+  from: 'ad_group_ad',
+  where: [ENABLED],
+  orderBy: [{ field: 'ad_group.id', direction: 'ASC' }],
+});
+
+const RECENT_METRICS_QUERY = buildQuery({
+  select: ['campaign.id', 'segments.date', 'metrics.impressions', 'metrics.clicks', 'metrics.cost_micros'],
+  from: 'campaign',
+  where: [ENABLED, where.during('segments.date', 'LAST_7_DAYS')],
+  orderBy: [{ field: 'segments.date', direction: 'ASC' }],
+});
+
+interface Ctx {
+  apiVersion: string;
+  customerId: string;
+  loginCustomerId: string | undefined;
+  accessToken: string;
+}
+
+function run(ctx: Ctx, query: string): Promise<Record<string, unknown>[]> {
+  return searchStream({
+    apiVersion: ctx.apiVersion,
+    customerId: ctx.customerId,
+    accessToken: ctx.accessToken,
+    query,
+    ...(ctx.loginCustomerId ? { loginCustomerId: ctx.loginCustomerId } : {}),
+  });
+}
+
+async function main(): Promise<void> {
+  const config = loadConfig();
+  const apiVersion = requireVar(config, 'ADS_API_VERSION');
+  const argId = process.argv[2];
+  const customerId = assertCustomerId(
+    argId ?? requireVar(config, 'DEFAULT_CUSTOMER_ID'),
+    argId ? 'customer_id (argument)' : 'DEFAULT_CUSTOMER_ID',
+  );
+  const rawLoginId = (config['LOGIN_CUSTOMER_ID'] ?? '').trim();
+  const loginCustomerId = rawLoginId ? assertCustomerId(rawLoginId, 'LOGIN_CUSTOMER_ID') : undefined;
+
+  const tokens = await refreshAccessToken(
+    {
+      clientId: requireVar(config, 'GOOGLE_OAUTH_CLIENT_ID'),
+      clientSecret: requireVar(config, 'GOOGLE_OAUTH_CLIENT_SECRET'),
+    },
+    requireVar(config, 'GOOGLE_ADS_REFRESH_TOKEN'),
+  );
+  const ctx: Ctx = { apiVersion, customerId, loginCustomerId, accessToken: tokens.access_token };
+
+  console.log(`\n=== ตรวจโครงสร้างแคมเปญที่เปิดอยู่ — ${formatCustomerId(customerId)} ===\n`);
+
+  const campaigns = await run(ctx, CAMPAIGNS_QUERY);
+  if (campaigns.length === 0) {
+    console.log('❌ ไม่มีแคมเปญที่สถานะ ENABLED เลย — นี่คือสาเหตุที่ไม่มี traffic\n');
+    return;
+  }
+
+  const [adGroups, keywords, ads, metrics] = await Promise.all([
+    run(ctx, AD_GROUPS_QUERY),
+    run(ctx, KEYWORDS_QUERY),
+    run(ctx, ADS_QUERY),
+    run(ctx, RECENT_METRICS_QUERY),
+  ]);
+
+  for (const row of campaigns) {
+    const c = row['campaign'] as Record<string, unknown>;
+    const budget = row['campaignBudget'] as Record<string, unknown> | undefined;
+    const cid = c['id'] as string;
+    console.log(`── แคมเปญ: ${c['name']} (id ${cid}) ──`);
+    console.log(`   กลยุทธ์บิด : ${c['biddingStrategyType']}`);
+    if (budget?.['amountMicros']) {
+      console.log(`   งบ/วัน     : ฿${(Number(budget['amountMicros']) / 1_000_000).toLocaleString()}`);
+    }
+
+    const myAdGroups = adGroups.filter(
+      (r) => (r['campaign'] as Record<string, unknown>)['id'] === cid,
+    );
+    if (myAdGroups.length === 0) {
+      console.log('   ❌ ไม่มี ad group เลย — แคมเปญนี้แสดงผลไม่ได้จนกว่าจะสร้าง ad group\n');
+      continue;
+    }
+
+    for (const agRow of myAdGroups) {
+      const ag = agRow['adGroup'] as Record<string, unknown>;
+      const agId = ag['id'] as string;
+      console.log(`   ad group: ${ag['name']} (id ${agId}) สถานะ ${ag['status']}`);
+
+      const myKeywords = keywords.filter(
+        (r) => (r['adGroup'] as Record<string, unknown>)['id'] === agId,
+      );
+      const enabledKeywords = myKeywords.filter(
+        (r) => (r['adGroupCriterion'] as Record<string, unknown>)['status'] === 'ENABLED',
+      );
+      if (myKeywords.length === 0) {
+        console.log('      ❌ ไม่มีคีย์เวิร์ดเลย — ad group นี้แสดงผลไม่ได้');
+      } else {
+        console.log(`      คีย์เวิร์ด: ${myKeywords.length} คำ (${enabledKeywords.length} ENABLED)`);
+        if (enabledKeywords.length === 0) {
+          console.log('      ❌ มีคีย์เวิร์ดแต่ไม่มีตัวไหน ENABLED เลย');
+        }
+      }
+
+      const myAds = ads.filter((r) => (r['adGroup'] as Record<string, unknown>)['id'] === agId);
+      const enabledAds = myAds.filter(
+        (r) => (r['adGroupAd'] as Record<string, unknown>)['status'] === 'ENABLED',
+      );
+      if (myAds.length === 0) {
+        console.log('      ❌ ไม่มีแอดเลย — ad group นี้แสดงผลไม่ได้');
+      } else {
+        console.log(`      แอด: ${myAds.length} ตัว (${enabledAds.length} ENABLED)`);
+        for (const adRow of myAds) {
+          const a = adRow['adGroupAd'] as Record<string, unknown>;
+          const approval = (a['policySummary'] as Record<string, unknown> | undefined)?.[
+            'approvalStatus'
+          ];
+          if (approval && approval !== 'APPROVED') {
+            console.log(`      ⚠️  แอด id ${(a['ad'] as Record<string, unknown>)['id']} สถานะอนุมัติ: ${approval}`);
+          }
+        }
+      }
+    }
+    console.log();
+  }
+
+  const recentByCampaign = new Map<string, { impressions: number; clicks: number; cost: number }>();
+  for (const row of metrics) {
+    const cid = (row['campaign'] as Record<string, unknown>)['id'] as string;
+    const m = row['metrics'] as Record<string, unknown>;
+    const entry = recentByCampaign.get(cid) ?? { impressions: 0, clicks: 0, cost: 0 };
+    entry.impressions += Number(m['impressions'] ?? '0');
+    entry.clicks += Number(m['clicks'] ?? '0');
+    entry.cost += Number(m['costMicros'] ?? '0') / 1_000_000;
+    recentByCampaign.set(cid, entry);
+  }
+  console.log('── ยอด 7 วันล่าสุด (รวมทุกวันที่มีข้อมูล) ──');
+  for (const row of campaigns) {
+    const c = row['campaign'] as Record<string, unknown>;
+    const cid = c['id'] as string;
+    const totals = recentByCampaign.get(cid);
+    if (!totals) {
+      console.log(`   ${c['name']}: ไม่มีข้อมูลเลยในช่วง 7 วัน (แคมเปญอาจสร้างมาไม่ถึงวัน หรือยังไม่เคยแสดงผล)`);
+    } else {
+      console.log(
+        `   ${c['name']}: impression ${totals.impressions.toLocaleString()} · คลิก ${totals.clicks} · ค่าใช้จ่าย ฿${totals.cost.toFixed(2)}`,
+      );
+    }
+  }
+  console.log();
+}
+
+main().catch((err) => {
+  console.error(`\n❌ ${err instanceof Error ? err.message : String(err)}\n`);
+  process.exit(1);
+});
