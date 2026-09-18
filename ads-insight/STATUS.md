@@ -44,8 +44,9 @@
 2. Conversion actions ที่เป็นเป้าหมาย: **`PAGE_VIEW` (primary) — เป้าหมายคือ traffic/คลิก ไม่ใช่ lead**
    ผู้ใช้ยืนยันแล้ว 17 ก.ย. → `objective: 'traffic'` (DECISIONS D26)
 3. ประเภทแคมเปญปัจจุบัน: Search · **ยังไม่เคยแสดงผลเลย** — 374 คีย์เวิร์ด (BROAD 362, EXACT 9, PHRASE 3)
-   metric ทุกตัวเป็น 0 และไม่มี Quality Score สักตัว
+   metric ทุกตัวเป็น 0 และไม่มี Quality Score สักตัว — สาเหตุ: แคมเปญที่เปิดอยู่เพิ่งสร้าง 16 ก.ย. 2569
 4. งบรายวัน/รายเดือนสูงสุด: **ยังไม่ทราบ — ต้องได้คำตอบก่อน M4** (เป็น hard guardrail ตาม SPEC §7.5)
+   อ้างอิงจากของจริงตอนนี้: แคมเปญที่ ENABLED รวม **฿800/วัน** (฿500 + ฿300) ≈ ฿24,000/เดือน
 5. ระดับสิทธิ์ API ที่ได้: **Explorer** (2,880 ops/วัน) — พอสำหรับบัญชีเดียว · ถ้าจะใช้ Keyword Planner (M5) ต้องขยับเป็น Basic ซึ่งต้องผ่าน brand verification
 
 ## ข้อมูลบัญชีที่ยืนยันแล้ว (จาก `pnpm check:access`)
@@ -57,6 +58,21 @@
 | สกุลเงิน | **THB** — ตรงกับที่ระบบสมมติ |
 | ไทม์โซน | **Asia/Bangkok** — ตรงกับ `ACCOUNT_TZ` |
 | auto-tagging | **เปิด** — conversion tracking มีโอกาสครบ (PLAYBOOK ข้อ 1) |
+
+### แคมเปญในบัญชี (จาก `test/fixtures/campaigns.json` — ชื่อถูกแทนด้วยนามแฝงตามลำดับ id)
+| สถานะ | ประเภท | กลยุทธ์บิด | งบ/วัน | เริ่ม |
+|---|---|---|---:|---|
+| REMOVED | PERFORMANCE_MAX | MAXIMIZE_CONVERSIONS | ฿780.00 | 2024-12-19 |
+| PAUSED | SEARCH | TARGET_SPEND | ฿1,900.00 | 2024-12-24 |
+| REMOVED | SEARCH | TARGET_SPEND | ฿900.00 | 2024-12-20 |
+| PAUSED | SEARCH | TARGET_SPEND | ฿1,125.00 | 2025-01-12 |
+| REMOVED | SEARCH | TARGET_SPEND | ฿391.02 | 2025-10-26 |
+| REMOVED | SEARCH | TARGET_IMPRESSION_SHARE | ฿100.00 | 2025-11-10 |
+| **ENABLED** | SEARCH | TARGET_SPEND | **฿500.00** | **2026-09-16 19:53** |
+| **ENABLED** | SEARCH | TARGET_SPEND | **฿300.00** | **2026-09-16 19:50** |
+
+ทั้งสองตัวที่เปิดอยู่ใช้ `TARGET_SPEND` (Maximize clicks) — ตรงกับเป้าหมาย traffic (D26)
+ไม่มีแคมเปญไหนตั้ง `end_date_time` เลย · `฿391.02` เป็นหลักฐานว่างบไม่ถูก scrubber ทับ (D28)
 
 ## ทำไปแล้ว
 - ตั้งโครงโปรเจ็คทั้งหมดของ M0 (รายการด้านบน) — ทดสอบแล้วว่า Worker บูตได้จริง,
@@ -86,10 +102,11 @@
 
 ### Gate M1 (SPEC §12)
 - [x] unit tests ผ่านครบ (233)
-- [~] ดึง campaigns + metrics 30 วันของบัญชีจริงได้ — **ดึงสำเร็จแต่บัญชียังไม่มีข้อมูล**
-      metric เป็น 0 ทั้งหมด · fixtures ที่ได้พิสูจน์ *โครงสร้าง* response ได้ แต่ทดสอบ *คณิตศาสตร์* ไม่ได้
-      → แก้ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แล้ว (D29)
-      → เหลือ `campaigns.json` ของจริง: ผู้ใช้รัน `pnpm capture:fixtures --only campaigns` แล้ว commit
+- [x] ดึง campaigns + metrics 30 วันของบัญชีจริงได้ — fixtures ครบ 6 ไฟล์ commit แล้ว
+      **แต่ metric เป็น 0 ทั้งหมด** เพราะแคมเปญที่ ENABLED ทั้ง 2 ตัวเพิ่งสร้าง 16 ก.ย. 19:50/19:53
+      (ดูตาราง "ข้อมูลบัญชี" ด้านล่าง) — ไม่ใช่ข้อผิดพลาด บัญชียังใหม่
+      → ทดสอบคณิตศาสตร์ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แทน (D29)
+      → **ควรรัน `pnpm capture:fixtures` ซ้ำอีกครั้งราวต้น ต.ค.** เมื่อบัญชีมี traffic จริงแล้ว
 - [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
 
 ### งานย่อย
