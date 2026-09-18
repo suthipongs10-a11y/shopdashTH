@@ -74,6 +74,7 @@ pnpm auth:google    # OAuth flow -> เขียน refresh token ลง .dev.va
 pnpm list:accounts  # บัญชีที่ token นี้เข้าถึงได้ + ค่าที่ควรใส่ใน .dev.vars
 pnpm fields <รูปแบบ> # ถาม GoogleAdsFieldService ว่าฟิลด์ไหนมีจริง — ใช้ก่อนเขียน GAQL ทุกครั้ง
 pnpm check:access   # Gate M0: query ตาราง customer ของบัญชีจริง
+pnpm check:mutate   # Gate M1: validateOnly บน test account (ต้องมี TEST_CUSTOMER_ID + TEST_LOGIN_CUSTOMER_ID)
 
 # M1 — fixtures
 pnpm capture:fixtures      # เก็บ response จริง (ลบข้อมูลส่วนตัว) — ต้องมี .dev.vars

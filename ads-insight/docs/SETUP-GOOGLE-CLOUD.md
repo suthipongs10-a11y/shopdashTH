@@ -279,13 +279,74 @@ pnpm exec wrangler d1 create ads_insight
 
 ---
 
-## 10. Test account (ต้องมีก่อน M4 — ยังไม่ต้องรีบ)
+## 10. Test account (ต้องมีก่อน **ปิด Gate M1** — ไม่ใช่ M4)
+
+> แก้จากเดิมที่เขียนว่า "ต้องมีก่อน M4": SPEC §12 กำหนดว่า Gate M1 ต้องมี
+> "validateOnly บน test account ผ่าน" จึงต้องมีตั้งแต่ตอนนี้
 
 จำเป็นเพราะ **ห้ามทดสอบคำสั่งแก้ไขบัญชีกับบัญชีจริง** (CLAUDE.md)
+test account ไม่มีการเรียกเก็บเงิน ไม่แสดงโฆษณาจริง และไม่มีข้อมูล performance เลย
 
-สร้าง test manager account + test client account ที่ https://ads.google.com
-(เป็นบัญชีคนละชุดกับบัญชีจริง ไม่มีข้อมูล performance) แล้วเอา Customer ID
-ของ test client ไปใส่ `TEST_CUSTOMER_ID`
+### 10.1 สร้าง test manager account
+
+test account ต้องอยู่ใน **สายบัญชีแยกของตัวเอง** โดยมี test manager account เป็นราก —
+มันคุยกับบัญชีจริงไม่ได้ จึงเอาบัญชีจริงมาแปลงเป็น test ไม่ได้ ต้องสร้างใหม่
+
+1. ไปที่ https://ads.google.com → สร้าง **manager account** ใหม่
+2. **ห้ามใส่ข้อมูลการชำระเงิน** — ถ้าใส่ จะกลายเป็นบัญชีจริง ไม่ใช่ test
+3. เสร็จแล้วจดเลข Customer ID ของ manager ตัวนี้ไว้ → ใช้เป็น `TEST_LOGIN_CUSTOMER_ID`
+
+**⚠️ จุดที่ต้องตัดสินใจ: จะใช้ Gmail ไหนสร้าง**
+
+เอกสาร Google บอกให้ใช้ Gmail ที่ **ไม่ผูกกับ manager account จริง** — บัญชีของเราเป็น
+บัญชีตรงไม่มี MCC (STATUS) จึงมีโอกาสใช้ `wilaibumbim34@gmail.com` (ตัวเดิม) ได้เลย
+**ถ้า Google ไม่ยอม** ให้สร้างด้วย Gmail อื่น แล้ว**เพิ่ม `wilaibumbim34@gmail.com`
+เป็นผู้ใช้ของ test manager** (Admin access) — สำคัญมาก เพราะ refresh token ที่มีอยู่
+ผูกกับ Gmail ตัวนั้น ถ้า test manager อยู่คนละ Gmail แล้วไม่ได้เชิญเข้ามา
+token เดิมจะมองไม่เห็น ต้องไปรัน `pnpm auth:google` ใหม่ทั้งชุด
+
+### 10.2 สร้าง test client account
+
+**อยู่ใน test manager account** แล้วไปที่ **Accounts → Create new account** กรอกฟอร์ม —
+บัญชีลูกทุกตัวที่สร้างจาก test manager **เป็น test account อัตโนมัติ** ไม่ต้องตั้งค่าอะไรเพิ่ม
+
+จด Customer ID ของ **client** ตัวนี้ → ใช้เป็น `TEST_CUSTOMER_ID`
+
+> **หาบัญชีไม่เจอในหน้าจอ?** test account จะขึ้นสถานะ **cancelled** ใน UI
+> ต้องเปลี่ยนตัวกรองให้แสดงบัญชีที่ cancelled ด้วย ถึงจะเห็น
+> (จำกัด 50 บัญชีต่อ 1 สายบัญชี)
+
+### 10.3 ใส่ค่าใน `.dev.vars`
+
+```
+TEST_CUSTOMER_ID=xxxxxxxxxx        # client (ตัวที่จะโดนคำสั่งทดสอบ)
+TEST_LOGIN_CUSTOMER_ID=xxxxxxxxxx  # manager (ตัวราก)
+```
+
+**ทั้งคู่ ไม่ใช่แค่ตัวเดียว** — test client อยู่ใต้ manager การเรียก API จึงต้องบอกว่า
+เข้ามาทาง manager ตัวไหน ถ้าไม่ใส่ Google ตอบ **404** ซึ่งอ่านแล้วเหมือน "ไม่มีบัญชีนี้"
+ทำให้ไปไล่หาผิดจุด (บทเรียนเดียวกับ D25)
+
+ไม่ต้องขอสิทธิ์ API เพิ่ม — Explorer ที่มีอยู่ใช้กับ test account ได้อยู่แล้ว
+(Cloud project ที่ยังไม่ได้สิทธิ์ production ก็ยิง test account ได้)
+
+### 10.4 รัน Gate
+
+```bash
+pnpm check:mutate
+```
+
+ตรวจ 3 ข้อ: อ่านบัญชีได้ + **ยืนยันว่าเป็น test account จริง** (`customer.test_account`) →
+คำสั่งที่ถูกต้องผ่าน `validateOnly` โดยไม่สร้างของจริง → คำสั่งที่ผิด (งบติดลบ) ถูกปฏิเสธ
+พร้อมข้อความไทย
+
+สคริปต์**ไม่ยอมรัน**ถ้า `TEST_CUSTOMER_ID` ตรงกับบัญชีจริง หรือถ้าบัญชีปลายทาง
+ไม่ใช่ test account — ไม่พึ่ง `validateOnly` อย่างเดียว เพราะนั่นเป็นคำสัญญาจากฝั่ง
+เซิร์ฟเวอร์ ไม่ใช่สิ่งที่สคริปต์บังคับได้เอง
+
+> ขั้นตอนข้างบนเรียบเรียงจากเอกสาร Google (เข้าถึงหน้าเอกสารตรงๆ จากฝั่ง Claude ไม่ได้
+> โดนบล็อก) **ถ้าหน้าจอจริงไม่ตรง ส่งภาพมา แล้วจะแก้ไฟล์นี้ให้** — คู่มือนี้ผิดมาแล้ว 3 จุด
+> ตอนทำข้อ 1–9 และแก้จากภาพหน้าจอจริงทุกครั้ง
 
 ---
 
@@ -298,6 +359,8 @@ pnpm exec wrangler d1 create ads_insight
 | `invalid_grant` | consent screen ยังเป็น Testing แล้ว token หมดอายุ 7 วัน → รัน `pnpm auth:google` ใหม่ (หรือย้ายไปทาง A ในข้อ 3.4) |
 | `access_denied` ตอนล็อกอิน | อยู่ Testing แต่ยังไม่ได้เพิ่ม Gmail นั้นใน **Test users** (ข้อ 3.4 ทาง B) |
 | ปุ่ม **Publish app** เป็นสีเทา | ข้อ 3.1 ยังขาด homepage URL / privacy policy URL / Authorized domains |
+| ยิง test account แล้วได้ **404** | ยังไม่ได้ตั้ง `TEST_LOGIN_CUSTOMER_ID` — test client ต้องเข้าผ่าน test manager (ข้อ 10.3) |
+| หา test account ไม่เจอในหน้า Google Ads | test account ขึ้นเป็น **cancelled** ต้องเปิดตัวกรองให้แสดงบัญชีที่ cancelled (ข้อ 10.2) |
 | `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` ตอน `pnpm install` | lockfile มีแพ็กเกจที่เผยแพร่ไม่ถึง 24 ชม. **อย่าปิดนโยบายนี้** — เป็นระบบกันภัย supply-chain · แจ้ง Claude Code ให้ resolve lockfile ใหม่ด้วยเวอร์ชันที่นิ่งกว่า (ดู DECISIONS D22) |
 | `A positional parameter cannot be found` ใน PowerShell | path มีเว้นวรรคแต่ไม่ได้ครอบด้วย `"..."` |
 | `ERR_PNPM_IGNORED_BUILDS` (esbuild / workerd) | `pnpm-workspace.yaml` ต้องใช้คีย์ `allowBuilds` — pnpm 11 เมิน `onlyBuiltDependencies` (ดู DECISIONS D23) · ถ้ายังเจอ ให้เช็คว่า pnpm ตรงกับ `packageManager` ใน `package.json` |

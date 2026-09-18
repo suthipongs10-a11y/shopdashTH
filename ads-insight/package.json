@@ -20,6 +20,7 @@
     "capture:fixtures": "tsx scripts/capture-fixtures.ts",
     "fixtures:synthetic": "tsx scripts/make-synthetic-fixtures.ts",
     "check:access": "tsx scripts/check-access.ts",
+    "check:mutate": "tsx scripts/check-mutate.ts",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

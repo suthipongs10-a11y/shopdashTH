@@ -18,7 +18,7 @@
       - `https://<worker-domain>/connect/google/callback` และ `/oauth/google/callback` (prod, ใส่ตอน M2)
 - [x] ขอ Explorer access — **อนุมัติแล้ว 17 ก.ย. 2569** (2,880 ops/วัน สำหรับบัญชีจริง + 15,000 สำหรับ test account)
 - [ ] (แนะนำ) Brand verification → ขอ Basic access — ยังไม่ทำ จำเป็นเฉพาะถ้าจะใช้ `gads_research_keywords` (M5)
-- [ ] Test manager account + test client account — **ยังไม่มี ต้องสร้างก่อนถึง M4**
+- [ ] Test manager account + test client account — **ยังไม่มี ต้องสร้างก่อนปิด Gate M1** (แก้จากเดิมที่เขียนว่า M4)
 - [x] จด Customer ID จริง — เก็บใน `.dev.vars` ไม่ commit (D24) · เข้าบัญชีตรง **ไม่มี MCC** จึงไม่ต้องใช้ `LOGIN_CUSTOMER_ID`
 
 ### ฝั่ง repo (Claude Code ทำ)
@@ -107,7 +107,10 @@
       (ดูตาราง "ข้อมูลบัญชี" ด้านล่าง) — ไม่ใช่ข้อผิดพลาด บัญชียังใหม่
       → ทดสอบคณิตศาสตร์ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แทน (D29)
       → **ควรรัน `pnpm capture:fixtures` ซ้ำอีกครั้งราวต้น ต.ค.** เมื่อบัญชีมี traffic จริงแล้ว
-- [ ] `validateOnly` บน **test account** ผ่าน ← **ต้องสร้าง test account ก่อน (ยังไม่มี)**
+- [ ] `validateOnly` บน **test account** ผ่าน ← **ค้างอยู่ที่นี่ที่เดียว**
+      สคริปต์ตรวจพร้อมแล้ว: `pnpm check:mutate` (ใช้ `src/ads/client.ts` ตัวจริง ไม่ใช่โค้ดคัดลอก)
+      เหลือฝั่งผู้ใช้: สร้าง test manager + test client แล้วใส่ `TEST_CUSTOMER_ID`
+      **และ `TEST_LOGIN_CUSTOMER_ID`** — ขั้นตอนเต็มใน `docs/SETUP-GOOGLE-CLOUD.md` ข้อ 10
 
 ### งานย่อย
 - [x] `ADS_API_VERSION` — **คงไว้ที่ v25** (ลองขยับเป็น v26 แล้วบัญชีจริงตอบ 404 จึงถอยกลับ)

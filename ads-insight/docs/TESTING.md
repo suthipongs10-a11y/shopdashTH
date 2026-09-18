@@ -19,7 +19,7 @@ pnpm verify      # typecheck + unit tests + build Worker — ใช้คำส�
 |---|---|---|---|
 | **1. ไม่ต้องใช้ credentials** | แค่ `pnpm install` | ทุกที่ (รวม Claude Code) | logic ทั้งหมด, types, Worker build ผ่าน |
 | **2. ต้องมีบัญชีจริง** | `.dev.vars` + refresh token | **เครื่องผู้ใช้เท่านั้น** | ยิง Google Ads API ได้จริง |
-| **3. ต้องมี test account** | `TEST_CUSTOMER_ID` | **เครื่องผู้ใช้เท่านั้น** | คำสั่งแก้ไขบัญชี (`validateOnly`) |
+| **3. ต้องมี test account** | `TEST_CUSTOMER_ID` + `TEST_LOGIN_CUSTOMER_ID` | **เครื่องผู้ใช้เท่านั้น** | คำสั่งแก้ไขบัญชี (`validateOnly`) — `pnpm check:mutate` |
 
 **ทำไมชั้น 2–3 ต้องรันบนเครื่องคุณ:** Claude Code ทำงานใน container ชั่วคราวที่ไม่มี (และไม่ควรมี) refresh token ของบัญชีโฆษณาจริง — ดู DECISIONS D24
 
