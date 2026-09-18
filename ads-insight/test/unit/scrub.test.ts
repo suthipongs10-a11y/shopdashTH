@@ -191,3 +191,41 @@ describe('findLeaks', () => {
     ).toEqual([]);
   });
 });
+
+describe('numbers that are not phone numbers', () => {
+  it('leaves a budget in micros intact', () => {
+    // 1080000000 contains 080000000, which looked like a phone number and turned
+    // ฿1,080 into the unparseable string "1080-000-0000"
+    const out = scrub({ campaignBudget: { amountMicros: '1080000000' } }) as {
+      campaignBudget: { amountMicros: string };
+    };
+    expect(out.campaignBudget.amountMicros).toMatch(/^\d+$/);
+    expect(out.campaignBudget.amountMicros).not.toContain('-');
+  });
+
+  it('never leaves a dash inside any value that arrived as pure digits', () => {
+    const input = {
+      a: { amountMicros: '1080000000' },
+      b: { costMicros: '8420500000' },
+      c: { targetCpaMicros: '250000000' },
+      d: { someNumber: '0812345678' },
+    };
+    for (const value of Object.values(scrub(input) as Record<string, Record<string, string>>)) {
+      const [only] = Object.values(value);
+      expect(only).toMatch(/^\d+$/);
+    }
+  });
+
+  it('does not corrupt the fake ids it just generated', () => {
+    // the id sweep runs first, so a later phone sweep must not rewrite its output
+    const out = scrub({ metrics: { costMicros: '1000000004' } }) as {
+      metrics: { costMicros: string };
+    };
+    expect(out.metrics.costMicros).toMatch(/^\d+$/);
+  });
+
+  it('still catches a real phone number surrounded by text', () => {
+    const out = scrub({ note: 'โทร 089-123-4567 ครับ' }) as { note: string };
+    expect(out.note).not.toContain('089-123-4567');
+  });
+});

@@ -75,10 +75,14 @@ const ID_RUN_RE = /\d{6,}/g;
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.]+/g;
 /**
  * Thai mobile and landline shapes: `08x-xxx-xxxx`, `02-xxx-xxxx`, `+66 8x xxx xxxx`.
- * A number written with no separators at all is 10 straight digits, which the
- * id sweep above already replaces, so it never reaches here.
+ *
+ * The lookarounds matter more than the shape. Without them this matches *inside*
+ * a longer number: `1080000000` (a budget in micros) contains `080000000`, and
+ * replacing that turned ฿1,080 into the string "1080-000-0000". Worse, the id
+ * sweep runs first, so it was mangling the fake ids this module had just
+ * generated. A phone number is never flanked by more digits.
  */
-const PHONE_RE = /(?:\+?66[\s-]?|0)\d{1,2}[\s-]?\d{3}[\s-]?\d{4}\b/g;
+const PHONE_RE = /(?<!\d)(?:\+?66[\s-]?|0)\d{1,2}[\s-]?\d{3}[\s-]?\d{4}(?!\d)/g;
 
 export interface ScrubReport {
   ids: number;

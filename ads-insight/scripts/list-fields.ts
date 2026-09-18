@@ -27,16 +27,22 @@ interface FieldRow {
 }
 
 async function main(): Promise<void> {
-  const pattern = process.argv.slice(2).find((a) => !a.startsWith('--'));
-  if (!pattern) {
+  const raw = process.argv.slice(2).find((a) => !a.startsWith('--'));
+  if (!raw) {
     console.error(
-      '\nระบุรูปแบบชื่อฟิลด์ที่จะค้น (ใช้ % เป็น wildcard)\n\n' +
-        '  pnpm fields campaign.%date%\n' +
-        '  pnpm fields "metrics.%impression%"\n' +
-        '  pnpm fields "campaign.%" --selectable\n',
+      '\nระบุคำที่จะค้น\n\n' +
+        '  pnpm fields date               # ค้นทุกฟิลด์ที่มีคำว่า date\n' +
+        '  pnpm fields impression --selectable\n' +
+        '  pnpm fields "campaign.%"       # ใส่ % เองก็ได้ (ครอบด้วย " " บน Windows)\n',
     );
     process.exit(1);
   }
+
+  // A pattern with no % is wrapped in one. Besides being shorter to type, it
+  // avoids `pnpm fields campaign.%date%`, where cmd.exe expands %date% into
+  // today's date before the script ever sees it.
+  const pattern = raw.includes('%') ? raw : `%${raw}%`;
+
   const selectableOnly = process.argv.includes('--selectable');
 
   const config = loadConfig();
