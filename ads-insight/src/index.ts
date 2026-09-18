@@ -1,22 +1,29 @@
 import { envReport, type Env } from './env';
+import { createOAuthProvider } from './oauth';
+import { handleMcpRequest } from './mcp/server';
 
 /**
  * Worker entry point (SPEC §3).
  *
- * M0 scaffolding: only `/health` is implemented. Every other surface is a
- * declared stub so the route map is visible and `pnpm dev` boots, but the
- * behaviour lands in the milestone named in the 501 response. Do not fill
- * these in ahead of their milestone (CLAUDE.md "กฎ Gate").
+ * M2: `/mcp`, `/authorize`, `/oauth/*` and Google login are real
+ * (`src/oauth.ts`). Everything else stays a declared stub so the route map
+ * is visible and `pnpm dev` boots, but the behaviour lands in the milestone
+ * named in the 501 response. Do not fill these in ahead of their milestone
+ * (CLAUDE.md "กฎ Gate").
  */
 const STUBS: { prefix: string; milestone: string; what: string }[] = [
-  { prefix: '/mcp', milestone: 'M2', what: 'MCP server (Streamable HTTP)' },
-  { prefix: '/oauth', milestone: 'M2', what: 'OAuth provider สำหรับ Claude connector' },
-  { prefix: '/connect/google', milestone: 'M2', what: 'เชื่อมบัญชี Google Ads' },
+  // `/connect/google/` — the *ads account* connection (SPEC §5.2, offline
+  // `adwords` scope, D1-encrypted refresh token) — is a separate flow from
+  // the MCP connector's own login at `/authorize` (M2, above): its storage
+  // is the `google_connections` D1 table, which does not exist before M3.
+  { prefix: '/connect/google', milestone: 'M3', what: 'เชื่อมบัญชี Google Ads (เก็บใน D1)' },
   { prefix: '/api', milestone: 'M3', what: 'REST API สำหรับ PWA' },
 ];
 
+const oauthProvider = createOAuthProvider();
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === '/health') {
@@ -28,6 +35,14 @@ export default {
         // booleans only — never echo secret values
         configured: envReport(env),
       });
+    }
+
+    // Dev-only shortcut so Claude Code can attach to a local server without a
+    // full OAuth round trip (SPEC §5.1). Checked before the stub list too,
+    // since /mcp itself is no longer stubbed.
+    if (env.ENV === 'dev' && url.pathname.startsWith('/mcp')) {
+      const devAuth = checkDevBearer(request, env);
+      if (devAuth) return handleMcpRequest(request, env, devAuth);
     }
 
     const stub = STUBS.find(
@@ -44,9 +59,23 @@ export default {
       );
     }
 
-    return json({ error: 'not_found', message: 'ไม่พบเส้นทางนี้' }, 404);
+    // Everything else — /mcp (protected), /authorize, /oauth/*,
+    // /oauth/google/callback, /.well-known/* — goes through the provider.
+    return oauthProvider.fetch(request, env, ctx);
   },
 } satisfies ExportedHandler<Env>;
+
+/** `Authorization: Bearer <DEV_BEARER_TOKEN>`, exact match, `ENV=dev` only. */
+function checkDevBearer(request: Request, env: Env): { email: string } | undefined {
+  if (!env.DEV_BEARER_TOKEN) return undefined;
+  const header = request.headers.get('authorization') ?? '';
+  const match = /^Bearer\s+(.+)$/i.exec(header);
+  if (!match || match[1] !== env.DEV_BEARER_TOKEN) return undefined;
+  const [firstOwner] = env.OWNER_EMAILS.split(',')
+    .map((e) => e.trim())
+    .filter(Boolean);
+  return { email: firstOwner ?? 'dev@localhost' };
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body, null, 2), {
