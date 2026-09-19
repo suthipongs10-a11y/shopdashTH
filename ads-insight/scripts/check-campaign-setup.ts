@@ -74,19 +74,36 @@ const ADS_QUERY = buildQuery({
   orderBy: [{ field: 'ad_group.id', direction: 'ASC' }],
 });
 
-// Split out from ADS_QUERY on purpose (see comment above) and run through
-// runSafe: 'policy_topic_entries.topic'/'.type' already came back
-// UNRECOGNIZED_FIELD once on this account's API version, and review_status
-// hasn't been verified at all yet.
-const AD_POLICY_DETAIL_QUERY = buildQuery({
-  select: [
-    'ad_group_ad.ad.id',
-    'ad_group_ad.policy_summary.review_status',
-    'ad_group_ad.policy_summary.policy_topic_entries.topic',
-    'ad_group_ad.policy_summary.policy_topic_entries.type',
-  ],
+// Ad Strength. Split out from ADS_QUERY (see comment above) even though the
+// field is verified, so ADS_QUERY keeps the exact shape that already runs
+// clean. `policy_summary.policy_topic_entries.*` used to be queried here and
+// was dropped: confirmed UNRECOGNIZED_FIELD on v25.
+const AD_STRENGTH_QUERY = buildQuery({
+  select: ['ad_group_ad.ad.id', 'ad_group_ad.ad_strength'],
   from: 'ad_group_ad',
   where: [ENABLED],
+});
+
+// Quality Score and what Google thinks a bid needs to be. All seven fields
+// confirmed selectable in v25 via `pnpm fields quality|estimate --selectable`
+// before this was written (CLAUDE.md requires asking the API, not memory).
+//
+// position_estimates is the one that turns "the bid looks too low" from a
+// guess into a number: first_page_cpc_micros / top_of_page_cpc_micros are
+// Google's own estimate of the bid needed to place there, so they can be
+// compared directly against the campaign's ฿2.51 ceiling.
+const KEYWORD_QUALITY_QUERY = buildQuery({
+  select: [
+    'ad_group_criterion.criterion_id',
+    'ad_group_criterion.quality_info.quality_score',
+    'ad_group_criterion.quality_info.creative_quality_score',
+    'ad_group_criterion.quality_info.post_click_quality_score',
+    'ad_group_criterion.quality_info.search_predicted_ctr',
+    'ad_group_criterion.position_estimates.first_page_cpc_micros',
+    'ad_group_criterion.position_estimates.top_of_page_cpc_micros',
+  ],
+  from: 'ad_group_criterion',
+  where: [ENABLED, where.eq('ad_group_criterion.type', 'KEYWORD')],
 });
 
 const RECENT_METRICS_QUERY = buildQuery({
@@ -118,14 +135,12 @@ const DELIVERY_QUERY = buildQuery({
   where: [ENABLED],
 });
 
+// No `geo_target_constant.*` here: selecting those from campaign_criterion is
+// rejected with PROHIBITED_RESOURCE_TYPE_IN_SELECT_CLAUSE (unlike
+// language_constant, which joins fine). That leaves the raw resource name
+// rather than a readable country name — enough to confirm what's targeted.
 const LOCATION_CRITERIA_QUERY = buildQuery({
-  select: [
-    'campaign.id',
-    'campaign_criterion.negative',
-    'campaign_criterion.location.geo_target_constant',
-    'geo_target_constant.name',
-    'geo_target_constant.country_code',
-  ],
+  select: ['campaign.id', 'campaign_criterion.negative', 'campaign_criterion.location.geo_target_constant'],
   from: 'campaign_criterion',
   where: [ENABLED, where.eq('campaign_criterion.type', 'LOCATION')],
 });
@@ -235,7 +250,8 @@ async function main(): Promise<void> {
     languages,
     adSchedule,
     impressionShare,
-    adPolicyDetail,
+    adStrength,
+    keywordQuality,
   ] = await Promise.all([
     run(ctx, AD_GROUPS_QUERY),
     run(ctx, KEYWORDS_QUERY),
@@ -246,15 +262,20 @@ async function main(): Promise<void> {
     runSafe(ctx, 'ภาษาเป้าหมาย', LANGUAGE_CRITERIA_QUERY),
     runSafe(ctx, 'ช่วงเวลาแสดงแอด', AD_SCHEDULE_QUERY),
     runSafe(ctx, 'ส่วนแบ่ง impression', IMPRESSION_SHARE_QUERY),
-    runSafe(ctx, 'สถานะตรวจสอบ/policy ของแอด', AD_POLICY_DETAIL_QUERY),
+    runSafe(ctx, 'คะแนนโฆษณา (Ad Strength)', AD_STRENGTH_QUERY),
+    runSafe(ctx, 'คะแนนคุณภาพคีย์เวิร์ด + ราคาบิดที่ควรเป็น', KEYWORD_QUALITY_QUERY),
   ]);
 
-  const policyByAdId = new Map<string, Record<string, unknown>>();
-  for (const row of adPolicyDetail ?? []) {
-    const adId = ((row['adGroupAd'] as Record<string, unknown>)['ad'] as Record<string, unknown>)[
-      'id'
-    ] as string;
-    policyByAdId.set(adId, row['adGroupAd'] as Record<string, unknown>);
+  const strengthByAdId = new Map<string, unknown>();
+  for (const row of adStrength ?? []) {
+    const ad = row['adGroupAd'] as Record<string, unknown>;
+    strengthByAdId.set((ad['ad'] as Record<string, unknown>)['id'] as string, ad['adStrength']);
+  }
+
+  const qualityByCriterionId = new Map<string, Record<string, unknown>>();
+  for (const row of keywordQuality ?? []) {
+    const crit = row['adGroupCriterion'] as Record<string, unknown>;
+    qualityByCriterionId.set(crit['criterionId'] as string, crit);
   }
 
   for (const row of campaigns) {
@@ -299,10 +320,11 @@ async function main(): Promise<void> {
     } else {
       for (const r of myLocations) {
         const critRow = r['campaignCriterion'] as Record<string, unknown>;
-        const geo = r['geoTargetConstant'] as Record<string, unknown> | undefined;
         const tag = critRow['negative'] ? 'ยกเว้น' : 'เป้าหมาย';
-        const label = geo?.['name'] ?? (critRow['location'] as Record<string, unknown> | undefined)?.['geoTargetConstant'] ?? '?';
-        console.log(`   พื้นที่ (${tag}): ${label}${geo?.['countryCode'] ? ` (${geo['countryCode']})` : ''}`);
+        const geoRef = (critRow['location'] as Record<string, unknown> | undefined)?.[
+          'geoTargetConstant'
+        ];
+        console.log(`   พื้นที่ (${tag}): ${geoRef ?? '?'}`);
       }
     }
 
@@ -360,7 +382,30 @@ async function main(): Promise<void> {
           const crit = r['adGroupCriterion'] as Record<string, unknown>;
           const kw = crit['keyword'] as Record<string, unknown> | undefined;
           const match = String(kw?.['matchType'] ?? '?');
-          console.log(`         [${MATCH_ABBR[match] ?? match}] ${kw?.['text'] ?? '?'}`);
+          const parts = [`[${MATCH_ABBR[match] ?? match}] ${kw?.['text'] ?? '?'}`];
+
+          const q = qualityByCriterionId.get(crit['criterionId'] as string);
+          const info = q?.['qualityInfo'] as Record<string, unknown> | undefined;
+          if (info?.['qualityScore'] !== undefined) {
+            const sub = [
+              info['searchPredictedCtr'] ? `ctr:${info['searchPredictedCtr']}` : '',
+              info['creativeQualityScore'] ? `แอด:${info['creativeQualityScore']}` : '',
+              info['postClickQualityScore'] ? `หน้าเว็บ:${info['postClickQualityScore']}` : '',
+            ].filter(Boolean);
+            parts.push(`QS ${info['qualityScore']}${sub.length ? ` (${sub.join(' ')})` : ''}`);
+          } else {
+            parts.push('QS ยังไม่มี');
+          }
+
+          const est = q?.['positionEstimates'] as Record<string, unknown> | undefined;
+          if (est?.['firstPageCpcMicros'] !== undefined) {
+            parts.push(`หน้าแรกต้องบิด ฿${(Number(est['firstPageCpcMicros']) / 1_000_000).toFixed(2)}`);
+          }
+          if (est?.['topOfPageCpcMicros'] !== undefined) {
+            parts.push(`บนสุด ฿${(Number(est['topOfPageCpcMicros']) / 1_000_000).toFixed(2)}`);
+          }
+
+          console.log(`         ${parts.join(' · ')}`);
         }
       }
 
@@ -382,15 +427,10 @@ async function main(): Promise<void> {
             console.log(`      ⚠️  แอด id ${adId} สถานะอนุมัติ: ${approval}`);
           }
 
-          const detail = policyByAdId.get(adId);
-          const detailPolicy = detail?.['policySummary'] as Record<string, unknown> | undefined;
-          const review = detailPolicy?.['reviewStatus'];
-          if (review && review !== 'REVIEWED') {
-            console.log(`      ⚠️  แอด id ${adId} สถานะตรวจสอบ: ${review} — ยังตรวจไม่เสร็จอาจแสดงผลได้ไม่เต็มที่`);
-          }
-          const topics = detailPolicy?.['policyTopicEntries'] as Record<string, unknown>[] | undefined;
-          for (const t of topics ?? []) {
-            console.log(`      ℹ️  แอด id ${adId} policy topic: ${t['topic']} (${t['type']})`);
+          const strength = strengthByAdId.get(adId);
+          if (strength !== undefined) {
+            const weak = strength === 'POOR' || strength === 'AVERAGE';
+            console.log(`      ${weak ? '⚠️ ' : '  '} แอด id ${adId} คะแนนโฆษณา: ${strength}`);
           }
         }
       }
