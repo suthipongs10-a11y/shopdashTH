@@ -195,6 +195,8 @@ function pct(value: unknown): string {
   return value === undefined ? 'ไม่มีข้อมูล' : `${(Number(value) * 100).toFixed(1)}%`;
 }
 
+const MATCH_ABBR: Record<string, string> = { BROAD: 'B', PHRASE: 'P', EXACT: 'E' };
+
 async function main(): Promise<void> {
   const config = loadConfig();
   const apiVersion = requireVar(config, 'ADS_API_VERSION');
@@ -349,6 +351,16 @@ async function main(): Promise<void> {
         console.log(`      คีย์เวิร์ด: ${myKeywords.length} คำ (${enabledKeywords.length} ENABLED)`);
         if (enabledKeywords.length === 0) {
           console.log('      ❌ มีคีย์เวิร์ดแต่ไม่มีตัวไหน ENABLED เลย');
+        }
+        // The actual keyword text, not just the count: a campaign can be fully
+        // built and still see almost no auctions because the words themselves
+        // are too narrow or nobody searches them — impression share only
+        // describes the auctions we were eligible for, not how many exist.
+        for (const r of myKeywords) {
+          const crit = r['adGroupCriterion'] as Record<string, unknown>;
+          const kw = crit['keyword'] as Record<string, unknown> | undefined;
+          const match = String(kw?.['matchType'] ?? '?');
+          console.log(`         [${MATCH_ABBR[match] ?? match}] ${kw?.['text'] ?? '?'}`);
         }
       }
 
