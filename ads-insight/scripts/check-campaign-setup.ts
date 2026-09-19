@@ -286,6 +286,8 @@ async function main(): Promise<void> {
         console.log(
           `   เพดานราคาต่อคลิก (target spend ceiling): ฿${(Number(targetSpend['cpcBidCeilingMicros']) / 1_000_000).toFixed(2)} — ถ้าต่ำไปเมื่อเทียบกับคู่แข่งจะประมูลแพ้แทบทุกครั้ง`,
         );
+      } else {
+        console.log('   เพดานราคาต่อคลิก: ✅ ไม่ได้ตั้งไว้ — ระบบประมูลได้เต็มที่ภายใต้งบต่อวัน');
       }
     }
 
@@ -384,15 +386,42 @@ async function main(): Promise<void> {
     console.log();
   }
 
-  const recentByCampaign = new Map<string, { impressions: number; clicks: number; cost: number }>();
+  // Per-day, not just the 7-day total: after a settings change (e.g. removing
+  // a too-low CPC ceiling) the total still averages in the days before the
+  // change, which hides whether it actually worked. The daily rows show the
+  // before/after directly.
+  interface DayTotals {
+    impressions: number;
+    clicks: number;
+    cost: number;
+  }
+  const byCampaignDay = new Map<string, Map<string, DayTotals>>();
+  const recentByCampaign = new Map<string, DayTotals>();
   for (const row of metrics) {
     const cid = (row['campaign'] as Record<string, unknown>)['id'] as string;
+    const date = (row['segments'] as Record<string, unknown> | undefined)?.['date'] as
+      | string
+      | undefined;
     const m = row['metrics'] as Record<string, unknown>;
+    const impressions = Number(m['impressions'] ?? '0');
+    const clicks = Number(m['clicks'] ?? '0');
+    const cost = Number(m['costMicros'] ?? '0') / 1_000_000;
+
     const entry = recentByCampaign.get(cid) ?? { impressions: 0, clicks: 0, cost: 0 };
-    entry.impressions += Number(m['impressions'] ?? '0');
-    entry.clicks += Number(m['clicks'] ?? '0');
-    entry.cost += Number(m['costMicros'] ?? '0') / 1_000_000;
+    entry.impressions += impressions;
+    entry.clicks += clicks;
+    entry.cost += cost;
     recentByCampaign.set(cid, entry);
+
+    if (date) {
+      const days = byCampaignDay.get(cid) ?? new Map<string, DayTotals>();
+      const day = days.get(date) ?? { impressions: 0, clicks: 0, cost: 0 };
+      day.impressions += impressions;
+      day.clicks += clicks;
+      day.cost += cost;
+      days.set(date, day);
+      byCampaignDay.set(cid, days);
+    }
   }
   console.log('── ยอด 7 วันล่าสุด (รวมทุกวันที่มีข้อมูล) ──');
   for (const row of campaigns) {
@@ -405,6 +434,12 @@ async function main(): Promise<void> {
       console.log(
         `   ${c['name']}: impression ${totals.impressions.toLocaleString()} · คลิก ${totals.clicks} · ค่าใช้จ่าย ฿${totals.cost.toFixed(2)}`,
       );
+      const days = byCampaignDay.get(cid);
+      for (const [date, day] of [...(days ?? new Map<string, DayTotals>())].sort()) {
+        console.log(
+          `      ${date}: impression ${day.impressions.toLocaleString()} · คลิก ${day.clicks} · ฿${day.cost.toFixed(2)}`,
+        );
+      }
     }
 
     const isRow = impressionShare?.find((r) => (r['campaign'] as Record<string, unknown>)['id'] === cid);
