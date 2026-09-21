@@ -133,7 +133,12 @@ test account เป็นวันๆ นานเกินไป ธุรก�
       (ดูตาราง "ข้อมูลบัญชี" ด้านล่าง) — ไม่ใช่ข้อผิดพลาด บัญชียังใหม่
       → ทดสอบคณิตศาสตร์ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แทน (D29)
       → **ควรรัน `pnpm capture:fixtures` ซ้ำอีกครั้งราวต้น ต.ค.** เมื่อบัญชีมี traffic จริงแล้ว
-- [ ] `validateOnly` บน **test account** ผ่าน ← **บล็อกอยู่ที่ข้อจำกัดแพลตฟอร์ม ไม่ใช่บั๊ก**
+- [ ] `validateOnly` บน **test account** ผ่าน ← **21 ก.ย. เจอต้นตอแล้ว (D39): test manager
+      372-340-9601 ไม่ใช่ test account จริง** (`pnpm check:access 3723409601` → `manager (MCC)`
+      เฉยๆ ไม่มี `test account`) → บัญชีลูกใต้มันเป็นบัญชีจริงที่ต้องมี billing จึงค้าง
+      `CUSTOMER_NOT_ENABLED` ถาวร · **ทางแก้: สร้าง test manager ใหม่ด้วย Google account ที่ยัง
+      ไม่ผูกกับบัญชี Google Ads เดิม** แล้วสร้างลูกใต้ตัวใหม่ + เชิญ Gmail เดิมเข้าเป็นผู้ใช้
+      (ไม่งั้น refresh token เดิมมองไม่เห็น — D31) · ด้านล่างนี้คือประวัติทางที่ลองแล้วตันก่อนจะเจอต้นตอ:
       สคริปต์พร้อมหมดแล้ว (`pnpm check:mutate` ใช้ `src/ads/client.ts` ตัวจริง) มี test manager
       (372-340-9601) + test client (470-557-4425) แล้ว แต่ client ติด `CUSTOMER_NOT_ENABLED` (403)
       ลองแก้ไปแล้ว 3 ทาง **ตันทั้งหมดที่สิทธิ์ Explorer**:
