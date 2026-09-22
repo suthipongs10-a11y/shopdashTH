@@ -133,12 +133,16 @@ test account เป็นวันๆ นานเกินไป ธุรก�
       (ดูตาราง "ข้อมูลบัญชี" ด้านล่าง) — ไม่ใช่ข้อผิดพลาด บัญชียังใหม่
       → ทดสอบคณิตศาสตร์ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แทน (D29)
       → **ควรรัน `pnpm capture:fixtures` ซ้ำอีกครั้งราวต้น ต.ค.** เมื่อบัญชีมี traffic จริงแล้ว
-- [ ] `validateOnly` บน **test account** ผ่าน ← **21 ก.ย. เจอต้นตอแล้ว (D39): test manager
-      372-340-9601 ไม่ใช่ test account จริง** (`pnpm check:access 3723409601` → `manager (MCC)`
-      เฉยๆ ไม่มี `test account`) → บัญชีลูกใต้มันเป็นบัญชีจริงที่ต้องมี billing จึงค้าง
-      `CUSTOMER_NOT_ENABLED` ถาวร · **ทางแก้: สร้าง test manager ใหม่ด้วย Google account ที่ยัง
-      ไม่ผูกกับบัญชี Google Ads เดิม** แล้วสร้างลูกใต้ตัวใหม่ + เชิญ Gmail เดิมเข้าเป็นผู้ใช้
-      (ไม่งั้น refresh token เดิมมองไม่เห็น — D31) · ด้านล่างนี้คือประวัติทางที่ลองแล้วตันก่อนจะเจอต้นตอ:
+- [ ] `validateOnly` บน **test account** ผ่าน ← **22 ก.ย. รู้สาเหตุจริงแล้ว (D40): ใช้ลิงก์สมัครผิด**
+      test manager ต้องสร้างจาก **`https://ads.google.com/nav/selectaccount?sf=mt`** เท่านั้น
+      หน้า `ads.google.com/aw/signup/manager` ที่ใช้มาตลอดคือหน้าสมัคร manager **ธรรมดา** จึงได้
+      372-340-9601 ที่ `test_account` เป็น false (D39) → ลูกของมันเป็นบัญชีจริงที่ต้องมี billing
+      จึงค้าง `CUSTOMER_NOT_ENABLED` ถาวร **ไม่เกี่ยวกับการรอ และไม่เกี่ยวกับว่าใช้ Gmail ไหน**
+      · **ขั้นตอนที่เหลือ:** สร้าง test manager จากลิงก์ `sf=mt` → สร้างบัญชีลูก (เป็น test account
+      อัตโนมัติ) → เชิญ Gmail ที่ถือ refresh token เข้าเป็นผู้ดูแล (D31) → ใส่ `TEST_CUSTOMER_ID`
+      + `TEST_LOGIN_CUSTOMER_ID` ใน `.dev.vars` → `pnpm check:access <manager ใหม่>` ต้องเห็น
+      `manager (MCC), test account` → `pnpm check:mutate`
+      · ด้านล่างนี้คือประวัติทางที่ลองแล้วตันก่อนจะเจอต้นตอ:
       สคริปต์พร้อมหมดแล้ว (`pnpm check:mutate` ใช้ `src/ads/client.ts` ตัวจริง) มี test manager
       (372-340-9601) + test client (470-557-4425) แล้ว แต่ client ติด `CUSTOMER_NOT_ENABLED` (403)
       ลองแก้ไปแล้ว 3 ทาง **ตันทั้งหมดที่สิทธิ์ Explorer**:
