@@ -1,7 +1,10 @@
 # STATUS — Ads Insight
 
-**Milestone ปัจจุบัน:** M2 — Remote MCP + Read Tools (M0 ✅ · M1 เริ่ม M2 ก่อนปิด gate — D34)
-**อัปเดตล่าสุด:** 2026-09-18
+**Milestone ปัจจุบัน:** M2 — Remote MCP + Read Tools (M0 ✅ · **M1 ✅ ปิด gate ครบแล้ว 22 ก.ย.**)
+**อัปเดตล่าสุด:** 2026-09-22
+
+> M1 gate ข้อสุดท้าย (`validateOnly` บน test account) ถูกข้ามไปก่อนตาม D34 แล้วเริ่ม M2 ระหว่างรอ
+> — ตอนนี้ย้อนกลับมาปิดครบแล้ว M1 จึงผ่าน gate เต็มรูปแบบ ไม่มีข้อค้าง
 
 ## โฟกัสปัจจุบัน (18 ก.ย. — D38) ⭐ อ่านก่อนทำอย่างอื่น
 ผู้ใช้สั่งชัดเจนให้พักงานที่ค้างไว้ก่อน แล้วโฟกัสเรื่องเดียว: **ทำให้แคมเปญจริงในบัญชี
@@ -133,15 +136,21 @@ test account เป็นวันๆ นานเกินไป ธุรก�
       (ดูตาราง "ข้อมูลบัญชี" ด้านล่าง) — ไม่ใช่ข้อผิดพลาด บัญชียังใหม่
       → ทดสอบคณิตศาสตร์ด้วย fixtures สังเคราะห์ `test/fixtures/synthetic/` แทน (D29)
       → **ควรรัน `pnpm capture:fixtures` ซ้ำอีกครั้งราวต้น ต.ค.** เมื่อบัญชีมี traffic จริงแล้ว
-- [ ] `validateOnly` บน **test account** ผ่าน ← **22 ก.ย. รู้สาเหตุจริงแล้ว (D40): ใช้ลิงก์สมัครผิด**
-      test manager ต้องสร้างจาก **`https://ads.google.com/nav/selectaccount?sf=mt`** เท่านั้น
-      หน้า `ads.google.com/aw/signup/manager` ที่ใช้มาตลอดคือหน้าสมัคร manager **ธรรมดา** จึงได้
-      372-340-9601 ที่ `test_account` เป็น false (D39) → ลูกของมันเป็นบัญชีจริงที่ต้องมี billing
-      จึงค้าง `CUSTOMER_NOT_ENABLED` ถาวร **ไม่เกี่ยวกับการรอ และไม่เกี่ยวกับว่าใช้ Gmail ไหน**
-      · **ขั้นตอนที่เหลือ:** สร้าง test manager จากลิงก์ `sf=mt` → สร้างบัญชีลูก (เป็น test account
-      อัตโนมัติ) → เชิญ Gmail ที่ถือ refresh token เข้าเป็นผู้ดูแล (D31) → ใส่ `TEST_CUSTOMER_ID`
-      + `TEST_LOGIN_CUSTOMER_ID` ใน `.dev.vars` → `pnpm check:access <manager ใหม่>` ต้องเห็น
-      `manager (MCC), test account` → `pnpm check:mutate`
+- [x] `validateOnly` บน **test account** ผ่าน — **22 ก.ย. 2569 ✅** (ผ่านครบ 3 ข้อ, ใช้ 3 operations)
+      1. อ่านบัญชีได้ + `customer.test_account === true` 2. คำสั่งถูกผ่าน validateOnly โดยไม่มี
+      resourceName กลับมา 3. คำสั่งผิด (งบ -1) ถูกปฏิเสธเป็นข้อความไทย พร้อม error code จาก Google
+      (`MONEY_AMOUNT_LESS_THAN_CURRENCY_MINIMUM_CPC`, `NON_MULTIPLE_OF_MINIMUM_CURRENCY_UNIT`,
+      `TOO_LOW`) และ `retryable` = false ถูกต้อง
+      · **test manager 797-510-7893 / test client 269-104-6992** (สายบัญชีใหม่ทั้งหมด —
+      ตัวเก่า 372-340-9601 / 470-557-4425 ทิ้งไว้ ไม่ต้องลบ ไม่มีเงินผูกอยู่)
+      · **สาเหตุที่ค้างมา 6 วันคือใช้ลิงก์สมัครผิด (D40):** test manager ต้องสร้างจาก
+      `https://ads.google.com/nav/selectaccount?sf=mt` เท่านั้น สังเกตได้จาก URL ของฟอร์มที่จะมี
+      `testAccount=true` ต่อท้าย — หน้า `aw/signup/manager` ที่ใช้มาตลอดไม่มีพารามิเตอร์นี้ จึงได้
+      manager ธรรมดาทุกครั้ง ไม่ว่าจะรอนานแค่ไหนหรือใช้ Gmail ไหน
+      · กับดักระหว่างทาง: หลังสร้างบัญชีลูก Google ลากเข้า wizard สร้างแคมเปญทันที — **ออกจาก
+      wizard ได้เลย** บัญชีถูกสร้างแล้ว (ดู customer id ที่ breadcrumb มุมบนซ้าย) และ Gate M1
+      ไม่ต้องใช้แคมเปญใดๆ · test account จะขึ้นสถานะ **cancelled** ต้องเปิดตัวกรองให้แสดงบัญชี
+      ที่ยกเลิกแล้วถึงจะเห็นในรายการ
       · ด้านล่างนี้คือประวัติทางที่ลองแล้วตันก่อนจะเจอต้นตอ:
       สคริปต์พร้อมหมดแล้ว (`pnpm check:mutate` ใช้ `src/ads/client.ts` ตัวจริง) มี test manager
       (372-340-9601) + test client (470-557-4425) แล้ว แต่ client ติด `CUSTOMER_NOT_ENABLED` (403)
