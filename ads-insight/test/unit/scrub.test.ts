@@ -9,13 +9,13 @@ import {
 /** A row shaped like a real campaign performance response. */
 const row = {
   campaign: {
-    resourceName: 'customers/2555586360/campaigns/22334455',
+    resourceName: 'customers/9876543210/campaigns/22334455',
     id: '22334455',
     name: 'Search - ล้างแอร์ ภูเก็ต',
     status: 'ENABLED',
   },
   campaignBudget: {
-    resourceName: 'customers/2555586360/campaignBudgets/99887766',
+    resourceName: 'customers/9876543210/campaignBudgets/99887766',
     amountMicros: '400000000',
   },
   metrics: {
@@ -32,7 +32,7 @@ describe('identifiers', () => {
   it('replaces ids everywhere, including inside resource names', () => {
     const out = scrub(row) as typeof row;
     expect(out.campaign.id).not.toBe('22334455');
-    expect(out.campaign.resourceName).not.toContain('2555586360');
+    expect(out.campaign.resourceName).not.toContain('9876543210');
     expect(out.campaign.resourceName).not.toContain('22334455');
     expect(out.campaign.resourceName).toMatch(/^customers\/\d+\/campaigns\/\d+$/);
   });
@@ -172,8 +172,8 @@ describe('report', () => {
 
 describe('findLeaks', () => {
   it('catches a real customer id that survived, in either format', () => {
-    expect(findLeaks('{"x":"2555586360"}', { customerIds: ['255-558-6360'] })).toHaveLength(1);
-    expect(findLeaks('{"x":"2555586360"}', { customerIds: ['2555586360'] })).toHaveLength(1);
+    expect(findLeaks('{"x":"9876543210"}', { customerIds: ['987-654-3210'] })).toHaveLength(1);
+    expect(findLeaks('{"x":"9876543210"}', { customerIds: ['9876543210'] })).toHaveLength(1);
   });
 
   it('catches a surviving account name', () => {
@@ -190,7 +190,7 @@ describe('findLeaks', () => {
     const serialized = JSON.stringify(scrub(row));
     expect(
       findLeaks(serialized, {
-        customerIds: ['2555586360'],
+        customerIds: ['9876543210'],
         accountNames: ['Search - ล้างแอร์ ภูเก็ต'],
       }),
     ).toEqual([]);
@@ -284,7 +284,7 @@ describe('scrub — measurements survive verbatim', () => {
 
   it('still replaces ids that happen to sit beside a measurement', () => {
     const out = scrub({
-      campaign: { id: '22334455', resourceName: 'customers/2555586360/campaigns/22334455' },
+      campaign: { id: '22334455', resourceName: 'customers/9876543210/campaigns/22334455' },
       metrics: { costMicros: '22334455000' },
     }) as { campaign: { id: string }; metrics: { costMicros: string } };
     expect(out.campaign.id).not.toBe('22334455');
