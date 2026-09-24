@@ -489,17 +489,28 @@ const write = (rel, html) => {
 };
 
 const slugs = new Set();
+const pageImages = new Map(); // slug → photo names used (for the image sitemap)
 for (const p of pages) {
   if (slugs.has(p.slug)) throw new Error(`duplicate slug: ${p.slug}`);
   slugs.add(p.slug);
   for (const r of p.related ?? []) if (!bySlug.has(r)) throw new Error(`${p.slug}: unknown related slug ${r}`);
-  write(p.slug ? join(p.slug, 'index.html') : 'index.html', p.slug ? renderPage(p) : renderHome(p));
+  const html = p.slug ? renderPage(p) : renderHome(p);
+  pageImages.set(p.slug, [...new Set([...html.matchAll(/src="\/img\/([a-z0-9-]+)-\d+\.webp"/g)].map((m) => m[1]))]);
+  write(p.slug ? join(p.slug, 'index.html') : 'index.html', html);
 }
 write('404.html', render404());
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map((p) => `  <url><loc>${abs(p.slug)}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${pages
+  .map((p) => {
+    const imgs = pageImages
+      .get(p.slug)
+      .map((n) => `\n    <image:image><image:loc>${site.origin}/img/${n}-${images[n].widths.at(-1)}.webp</image:loc></image:image>`)
+      .join('');
+    return `  <url>\n    <loc>${abs(p.slug)}</loc>\n    <lastmod>${today}</lastmod>${imgs}\n  </url>`;
+  })
+  .join('\n')}
 </urlset>
 `;
 write('sitemap.xml', sitemap);
