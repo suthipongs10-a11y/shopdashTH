@@ -319,6 +319,8 @@ function layout(p, main, crumbs) {
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/anuphan-thai-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/kanit-thai-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${cssHref}">${p.slug === '' ? `\n<link rel="preload" as="image" href="/img/taxi-at-home-480.webp" imagesrcset="/img/taxi-at-home-480.webp 480w, /img/taxi-at-home-765.webp 765w" imagesizes="(min-width:900px) 420px, 100vw" fetchpriority="high">` : ''}
 ${jsonLd(p, crumbs)}
 </head>
