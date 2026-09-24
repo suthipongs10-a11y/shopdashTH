@@ -19,6 +19,7 @@ export const pages = [
   },
   {
     slug: 'about',
+    image: 'driver-with-customer',
     legacy: true,
     group: 'core',
     title: 'เกี่ยวกับเรา | แท็กซี่อุบลคนบ้านเฮา ประสบการณ์กว่า 15 ปี',
@@ -54,6 +55,7 @@ export const pages = [
   },
   {
     slug: 'contact',
+    image: 'taxi-at-home',
     legacy: true,
     group: 'core',
     title: 'ติดต่อเรา โทร 063-429-2554 LINE 0634292554 | แท็กซี่อุบล',
@@ -437,6 +439,7 @@ export const pages = [
   }),
   district({
     slug: 'แท็กซี่สิรินธร',
+    image: 'taxi-side',
     dest: 'สิรินธร',
     distance: '70 กม.',
     duration: '1 ชม.',
@@ -497,6 +500,7 @@ export const pages = [
   // ───────────────────────────── services ─────────────────────────────
   {
     slug: 'เหมาแท็กซี่เที่ยวอุบล',
+    image: 'taxi-side',
     group: 'service',
     title: 'เหมาแท็กซี่เที่ยวอุบล รายวัน ผาแต้ม สามพันโบก วัดเรืองแสง',
     h1: 'เหมาแท็กซี่เที่ยวอุบล แบบรายวัน',
@@ -529,6 +533,7 @@ export const pages = [
   },
   {
     slug: 'ราคาแท็กซี่อุบล',
+    image: 'taxi-side',
     group: 'service',
     title: 'ราคาแท็กซี่อุบล ค่าเหมารถไปอำเภอและต่างจังหวัด | ขอราคาฟรี',
     h1: 'ราคาแท็กซี่อุบล และระยะทางยอดนิยม',
@@ -555,6 +560,7 @@ export const pages = [
   },
   {
     slug: 'แท็กซี่รับส่งสัตว์เลี้ยงอุบล',
+    image: 'taxi-at-home',
     group: 'service',
     title: 'แท็กซี่รับส่งสัตว์เลี้ยง อุบล พาน้องหมาแมวไปหาหมอ 24 ชม.',
     h1: 'แท็กซี่รับส่งสัตว์เลี้ยง อุบลราชธานี',
@@ -626,6 +632,7 @@ function province(p) {
   return {
     slug: p.slug,
     legacy: !!p.legacy,
+    image: p.image,
     group: 'province',
     title: isLegacyStyle
       ? `แท็กซี่${p.dest} เหมารถ ${p.dest}-อุบล ไป-กลับ 24 ชม. | โทร 063-429-2554`
@@ -659,6 +666,7 @@ function district(p) {
   return {
     slug: p.slug,
     legacy: !!p.legacy,
+    image: p.image,
     group: 'district',
     title: `แท็กซี่${p.dest} เรียกรถ 24 ชม. ไปสนามบินอุบล ตัวเมือง | โทร 063-429-2554`,
     h1: `แท็กซี่${p.dest} อุบลราชธานี`,

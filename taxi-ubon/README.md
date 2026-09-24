@@ -11,7 +11,16 @@ taxi-ubon/
   static/              ← CSS, favicon, og.png, _headers, _redirects
   scripts/serve.mjs    ← preview ในเครื่อง: node scripts/serve.mjs → http://localhost:8788
   scripts/make-images.mjs ← สร้าง og.png / apple-touch-icon.png ใหม่ (ต้องมี playwright)
+  photos-src/          ← รูปต้นฉบับ
+  static/img/          ← รูป WebP ที่ย่อแล้ว 480/800/1200px (สร้างโดย scripts/optimize-images.mjs)
+  content/images.json  ← ขนาดรูป (สร้างอัตโนมัติ ใช้ตอน build)
 ```
+
+### เพิ่ม/เปลี่ยนรูป
+1. วางไฟล์ .jpg ใน `photos-src/` (ตั้งชื่อภาษาอังกฤษ เช่น `airport-pickup.jpg`)
+2. `npm i --no-save sharp && node scripts/optimize-images.mjs` → ได้ WebP หลายขนาด (ลบ EXIF/GPS ออกให้แล้ว)
+3. เพิ่มคำอธิบายรูป (alt) ใน `photos` ใน `build.mjs` แล้วใส่ `image: 'airport-pickup'` ในหน้าที่ต้องการใน `content/pages.mjs`
+   (ถ้าไม่ใส่ จะใช้รูปตามกลุ่มหน้าจาก `groupPhoto`)
 
 ## Deploy บน Cloudflare Pages
 
@@ -68,7 +77,7 @@ taxi-ubon/
 - **ราคา:** เว็บยังไม่แสดงราคาตายตัว (ตาราง "สอบถามราคา") — ถ้ามีราคาเริ่มต้นที่ยืนยันได้ ให้ใส่ใน `content/pages.mjs`
   ราคาเป็นปัจจัยที่คนค้นหาอยากเห็นมาก (เช่น "แท็กซี่อุบล-ขอนแก่น ราคา")
 - **ระยะทาง/เวลา** เป็นค่าประมาณ ตรวจทานให้ตรงกับที่วิ่งจริง
-- **รูปจริง** ของรถและคนขับ (ใส่ใน `static/` แล้วอ้างอิงในเนื้อหา) ช่วยเรื่องความน่าเชื่อถือ
+- **รูปเพิ่ม:** รูปที่สนามบินอุบล สถานีรถไฟ และสถานที่ท่องเที่ยวจริง จะช่วยให้หน้าเฉพาะเรื่องดูน่าเชื่อถือขึ้น
 - **Google Business Profile:** ตั้งชื่อ/เบอร์/ที่อยู่ให้ตรงกับเว็บ และใส่ลิงก์เว็บ
 - เบอร์ 083-682-7699 (จากเว็บ simdif เดิม) ไม่ได้ใช้ในเว็บนี้ ถ้ายังใช้อยู่ให้เพิ่มใน `site.config.mjs`
 

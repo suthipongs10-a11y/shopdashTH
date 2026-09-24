@@ -6,6 +6,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { site } from './site.config.mjs';
 import { pages } from './content/pages.mjs';
+const images = JSON.parse(readFileSync(new URL('./content/images.json', import.meta.url), 'utf8'));
 
 const root = dirname(fileURLToPath(import.meta.url));
 const out = join(root, 'dist');
@@ -21,6 +22,48 @@ const bySlug = new Map(pages.map((p) => [p.slug, p]));
 // Short labels for nav/link cards.
 const shortName = (p) =>
   ({ '': 'หน้าแรก', about: 'เกี่ยวกับเรา', contact: 'ติดต่อเรา' })[p.slug] ?? p.slug.replace(/-/g, ' – ');
+
+// ───────── photos (pre-optimized by scripts/optimize-images.mjs) ─────────
+const photos = {
+  'taxi-at-home': 'แท็กซี่อุบลคนบ้านเฮา รถโตโยต้าสีแดง-เหลือง จอดรับผู้โดยสารถึงหน้าบ้าน',
+  'driver-luggage-1': 'คนขับแท็กซี่อุบลช่วยยกกระเป๋าเดินทางให้ผู้โดยสาร',
+  'driver-luggage-2': 'คนขับแท็กซี่รับผู้โดยสารพร้อมกระเป๋าหน้าบ้าน ก่อนไปสนามบินอุบล',
+  'driver-with-customer': 'คนขับแท็กซี่อุบลกับลูกค้าชาวต่างชาติ',
+  'taxi-side': 'รถแท็กซี่อุบลคนบ้านเฮา ทะเบียน ทข-571 อบ.',
+};
+// Default photo per page group; a page can override with `image`.
+const groupPhoto = { airport: 'driver-luggage-2', province: 'taxi-side', district: 'taxi-at-home', service: 'driver-luggage-1', core: 'taxi-at-home' };
+
+function img(name, { sizes = '100vw', eager = false, cls = '' } = {}) {
+  const m = images[name];
+  if (!m) throw new Error(`unknown photo: ${name}`);
+  const largest = m.widths[m.widths.length - 1];
+  const srcset = m.widths.map((w) => `/img/${name}-${w}.webp ${w}w`).join(', ');
+  return `<img${cls ? ` class="${cls}"` : ''} src="/img/${name}-${m.widths[0]}.webp" srcset="${srcset}" sizes="${sizes}" width="${largest}" height="${Math.round((m.height * largest) / m.width)}" alt="${esc(photos[name])}"${
+    eager ? ' fetchpriority="high"' : ' loading="lazy"'
+  } decoding="async">`;
+}
+
+// Photo + caption band shown on inner pages.
+function photoBand(p) {
+  const main = p.image ?? groupPhoto[p.group];
+  const second = main === 'driver-with-customer' ? 'driver-luggage-1' : 'driver-with-customer';
+  return `<section class="photo-band">
+    <figure class="pb-main">${img(main, { sizes: '(min-width:960px) 560px, 100vw' })}<figcaption>${esc(photos[main])}</figcaption></figure>
+    <div class="pb-side">
+      <figure>${img(second, { sizes: '(min-width:960px) 280px, 50vw' })}</figure>
+      <div class="pb-quote"><b>${esc(site.tagline)}</b><span>คนขับท้องถิ่นอุบลฯ ประสบการณ์ ${site.yearsExperience}+ ปี ช่วยยกกระเป๋า รับถึงหน้าบ้าน</span></div>
+    </div>
+  </section>`;
+}
+
+function gallery() {
+  const items = ['driver-luggage-1', 'driver-with-customer', 'taxi-side', 'driver-luggage-2'];
+  return `<section class="block"><h2>ภาพบริการจริงจากลูกค้าของเรา</h2>
+    <div class="gallery">${items
+      .map((n, i) => `<figure class="g${i + 1}">${img(n, { sizes: '(min-width:960px) 300px, 50vw' })}<figcaption>${esc(photos[n])}</figcaption></figure>`)
+      .join('')}</div></section>`;
+}
 
 // Cache-busted CSS file name.
 const css = readFileSync(join(root, 'static/assets/site.css'), 'utf8');
@@ -130,7 +173,7 @@ const businessLd = {
   name: site.name,
   url: site.origin + '/',
   telephone: site.phoneE164,
-  image: `${site.origin}/og.png`,
+  image: [`${site.origin}/og.png`, ...['taxi-at-home', 'taxi-side', 'driver-with-customer'].map((n) => `${site.origin}/img/${n}-${images[n].widths.at(-1)}.webp`)],
   priceRange: '฿฿',
   slogan: site.tagline,
   address: {
@@ -276,7 +319,7 @@ function layout(p, main, crumbs) {
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="${cssHref}">
+<link rel="stylesheet" href="${cssHref}">${p.slug === '' ? `\n<link rel="preload" as="image" href="/img/taxi-at-home-480.webp" imagesrcset="/img/taxi-at-home-480.webp 480w, /img/taxi-at-home-765.webp 765w" imagesizes="(min-width:900px) 420px, 100vw" fetchpriority="high">` : ''}
 ${jsonLd(p, crumbs)}
 </head>
 <body>
@@ -307,7 +350,10 @@ function renderPage(p) {
   ${factsCard(p.facts) || trustCard()}
 </div></section>
 <div class="wrap content">
-  ${(p.sections ?? []).map(section).join('')}
+  ${(p.sections ?? []).slice(0, 1).map(section).join('')}
+  ${photoBand(p)}
+  ${(p.sections ?? []).slice(1).map(section).join('')}
+  ${p.slug === 'about' ? gallery() : ''}
   ${p.distanceTable ? distanceTable() : ''}
   ${hubList(p)}
   ${p.slug === 'contact' ? contactBlock() : ''}
@@ -352,7 +398,11 @@ function renderHome(p) {
     ${ctaButtons(true)}
     <ul class="pills" aria-label="จุดเด่น"><li>24 ชม.</li><li>${site.yearsExperience}+ ปี</li><li>ทุกอำเภอ</li><li>ทั่วไทย</li></ul>
   </div>
-  ${trustCard()}
+  <figure class="hero-photo">
+    ${img('taxi-at-home', { sizes: '(min-width:900px) 420px, 100vw', eager: true })}
+    <figcaption class="badge badge-top">${icon('clock')}<span><b>24 ชม.</b> ทุกวัน</span></figcaption>
+    <div class="badge badge-bottom">${icon('shield')}<span><b>${site.yearsExperience}+ ปี</b> คนขับท้องถิ่น</span></div>
+  </figure>
 </div></section>
 
 <div class="wrap content">
@@ -377,6 +427,8 @@ function renderHome(p) {
       .map(([i, t, d]) => `<div class="card why"><span class="card-icon">${icon(i)}</span><h3>${t}</h3><p>${d}</p></div>`)
       .join('')}</div>
   </section>
+
+  ${gallery()}
 
   <section class="block">
     <h2>เหมารถต่างจังหวัด จากอุบลราชธานี</h2>

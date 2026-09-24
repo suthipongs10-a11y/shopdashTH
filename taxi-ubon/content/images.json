@@ -1,0 +1,45 @@
+{
+  "driver-luggage-1": {
+    "width": 1137,
+    "height": 1439,
+    "widths": [
+      480,
+      800,
+      1137
+    ]
+  },
+  "driver-luggage-2": {
+    "width": 1137,
+    "height": 1439,
+    "widths": [
+      480,
+      800,
+      1137
+    ]
+  },
+  "driver-with-customer": {
+    "width": 1108,
+    "height": 1477,
+    "widths": [
+      480,
+      800,
+      1108
+    ]
+  },
+  "taxi-at-home": {
+    "width": 765,
+    "height": 960,
+    "widths": [
+      480,
+      765
+    ]
+  },
+  "taxi-side": {
+    "width": 720,
+    "height": 960,
+    "widths": [
+      480,
+      720
+    ]
+  }
+}
