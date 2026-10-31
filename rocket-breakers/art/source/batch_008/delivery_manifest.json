@@ -1,0 +1,410 @@
+[
+  {
+    "filename": "rb_enemy_e05_000.png",
+    "enemy_id": "E05",
+    "name": "Mine Skiff",
+    "role": "minelayer",
+    "move": "side_entry",
+    "attack": "delayed_mine",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      187,
+      155,
+      1067,
+      1057
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "de6ab55e91a8848395106202005d7f579b5b68dcff9cffa91d98f79c96c75eec"
+  },
+  {
+    "filename": "rb_enemy_e06_000.png",
+    "enemy_id": "E06",
+    "name": "Cable Cutter",
+    "role": "cutter",
+    "move": "flank",
+    "attack": "telegraphed_slash",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      279,
+      153,
+      912,
+      1101
+    ],
+    "edge_alpha_max": 0,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "3bcd76b168b8b6deadabcf7b33b6a8a2546520587e3f158db7eb8276250b481e"
+  },
+  {
+    "filename": "rb_enemy_e07_000.png",
+    "enemy_id": "E07",
+    "name": "Ash Bomber",
+    "role": "bomber",
+    "move": "cross",
+    "attack": "lob_pool",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      43,
+      240,
+      1212,
+      978
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "04e70e3fe183c0b74ae78dfc4c0db418411327f7009fc2e2e94b7805aedf27db"
+  },
+  {
+    "filename": "rb_enemy_e08_000.png",
+    "enemy_id": "E08",
+    "name": "Furnace Drone",
+    "role": "thermal",
+    "move": "advance",
+    "attack": "flame_cone",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      178,
+      169,
+      1076,
+      1057
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "ee155732be6db3dcd2e94b75b71ed5561045f9c75d9ef153eec734d074e399fa"
+  },
+  {
+    "filename": "rb_enemy_e09_000.png",
+    "enemy_id": "E09",
+    "name": "Ion Skater",
+    "role": "ion",
+    "move": "sine",
+    "attack": "status_bolt",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      247,
+      90,
+      1007,
+      1133
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "fb355b7861c7230e5ed3dd99eea829d0b2bb2f9584709755f1e617475cdeea92"
+  },
+  {
+    "filename": "rb_enemy_e10_000.png",
+    "enemy_id": "E10",
+    "name": "Storm Pylon",
+    "role": "turret",
+    "move": "stationary",
+    "attack": "chain_arc",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      132,
+      151,
+      1122,
+      1103
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "40bccc143d9b9944854cd29b0e736ee6369acdf141b817c2c979ecd4ad06edaa"
+  },
+  {
+    "filename": "rb_enemy_e11_000.png",
+    "enemy_id": "E11",
+    "name": "Root Healer",
+    "role": "healer",
+    "move": "backline",
+    "attack": "heal_tether",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      224,
+      184,
+      1030,
+      1072
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "2dd95d0d0c34a0437252ec04f54b2bca5728e0fc86212198b0ae0db3beb25cd8"
+  },
+  {
+    "filename": "rb_enemy_e12_000.png",
+    "enemy_id": "E12",
+    "name": "Thorn Swarm",
+    "role": "swarm",
+    "move": "arc",
+    "attack": "fan",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      275,
+      165,
+      979,
+      1019
+    ],
+    "edge_alpha_max": 0,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "a91b4f453f2e8e153caea2bd0cdaa25853f5cdcdb6e17d31e51010604595e972"
+  },
+  {
+    "filename": "rb_enemy_e13_000.png",
+    "enemy_id": "E13",
+    "name": "Prism Sentry",
+    "role": "beam",
+    "move": "stationary",
+    "attack": "segmented_beam",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      79,
+      118,
+      1175,
+      1104
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "2435594dc6ab05aee3947663e55e9ba2f8678d8bc48e464df76bd8d9440cf386"
+  },
+  {
+    "filename": "rb_enemy_e14_000.png",
+    "enemy_id": "E14",
+    "name": "Ice Diver",
+    "role": "charger",
+    "move": "dive",
+    "attack": "warned_charge",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      259,
+      69,
+      995,
+      1184
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "7843e9f97a622299328058db4fff407e5501ba5dbd57786834dfe0a2f31f6221"
+  },
+  {
+    "filename": "rb_enemy_e15_000.png",
+    "enemy_id": "E15",
+    "name": "Drill Diver",
+    "role": "drill",
+    "move": "burrow",
+    "attack": "contact_tool",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      305,
+      85,
+      950,
+      1146
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "fa8253ff1bdd08158f78c2155fac3230a1f5ff4ac667ed6757cb0473a741509e"
+  },
+  {
+    "filename": "rb_enemy_e16_000.png",
+    "enemy_id": "E16",
+    "name": "Sand Mortar",
+    "role": "artillery",
+    "move": "slow_line",
+    "attack": "lob_pool",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      86,
+      114,
+      1168,
+      1054
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "628fad0fddc89df8e5dd369d0e7487f4613ec4e74267a34e98cb2ce55b115f6c"
+  }
+]

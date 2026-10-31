@@ -62,3 +62,4 @@ Append implementation decisions with consequences and whether baseline documenta
 | 2026-10-31 | Claw tools are exempt from muzzle blocking; auto-fit ranks spots with a clear line of fire (and not blocking other guns) first | On the starter grid W021's only two legal spots sit behind a gun; it would never fire |
 | 2026-10-31 | Dock: "hold full — scrap 1 old item" button (never a boss signature) | A full hold could otherwise force scrapping the boss part |
 | 2026-10-31 | P01-03 is now playable; with P01-02 still "coming soon" the unlock chain is P01-01 → P01-03 → (P01-04/05 bridged) → P01-06 | Same unlock-bridge rule |
+| 2026-10-31 | BATCH_008 enemies E05–E16 imported as approved (sector 2+ content) | Integrated when each enemy's behaviour is built |

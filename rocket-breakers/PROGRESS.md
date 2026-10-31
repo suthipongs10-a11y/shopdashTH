@@ -100,3 +100,6 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - Auto-fit prefers clear firing lines; claw tools exempt from blocking; dock can free a hold slot.
 - Tests: 77 (new: crab joint window, named-hit counting, sever → W021, claw grab, P01-03 bot run).
   Browser capture `e2e/capture-crab.mjs`, no console errors.
+
+## Done (2026-10-31, BATCH_008 art)
+- Enemies E05–E16 imported as approved (sector 2+). QA: `art/source/batch_008/QA_REPORT.md`.

@@ -1,7 +1,7 @@
 # Next actions
 
 1. Owner: play P01-01 and P01-06 on a phone; note pacing (too long/short?), E02 volleys, fuel hauler clarity.
-2. Owner: BATCH_009 then 008 (request zips in `art/requests/batch_zips/`).
+2. Owner: BATCH_009 (E17–E24, includes E21 Loot Snatcher for P01-02/04/05).
 3. Owner: play P01-03 (Rivet Crab) — is the claw sweep readable/fair? Fight length (~15–20 s for a perfect bot)?
 3b. Next: E21 Loot Snatcher (needs BATCH_009 art) for P01-02/04/05; supply-node art request; A01 ability (B01 unlock).
 4. M2 stage 3: P01-02 escort + marked ambushers; P01-04 salvage carriers; P01-05 HZ01 wreck drift + hazard nodes.
