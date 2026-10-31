@@ -487,14 +487,19 @@ export class Renderer {
       const p = lerp(pk.prev, pk.pos, alpha);
       const y = p.y + Math.sin(this.time * 4 + pk.pos.x) * 4;
       const col = ROLE_COLOR[ROLE[pk.defId] ?? "resource"];
-      g.fillStyle = "rgba(4,10,20,0.85)"; g.beginPath(); g.arc(p.x, y, 24, 0, Math.PI * 2); g.fill();
-      g.strokeStyle = col; g.lineWidth = 4; g.beginPath(); g.arc(p.x, y, 24, 0, Math.PI * 2); g.stroke();
-      g.fillStyle = col; g.font = "700 20px RB Thai, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
-      g.fillText(PICKUP_GLYPH[pk.defId] ?? "?", p.x, y + 1); g.textBaseline = "alphabetic";
+      // Role-coloured ring + the pickup's own icon (BATCH_002); glyph fallback until art loads.
+      g.fillStyle = "rgba(4,10,20,0.8)"; g.beginPath(); g.arc(p.x, y, 31, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.arc(p.x, y, 31, 0, Math.PI * 2); g.stroke();
+      const icon = sprite(`pickup_${pk.defId.toLowerCase()}`);
+      if (icon) drawAt(g, icon, p.x, y, ...visCenter(icon), 52 / Math.max(visW(icon), visH(icon)));
+      else {
+        g.fillStyle = col; g.font = "700 20px RB Thai, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+        g.fillText(PICKUP_GLYPH[pk.defId] ?? "?", p.x, y + 1); g.textBaseline = "alphabetic";
+      }
       if (pk.life <= 5) {
         // Last 5 s: steady countdown ring (no blinking, safe for reduced-flash mode).
         g.strokeStyle = "#fff"; g.lineWidth = 3;
-        g.beginPath(); g.arc(p.x, y, 30, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (pk.life / 5)); g.stroke();
+        g.beginPath(); g.arc(p.x, y, 36, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (pk.life / 5)); g.stroke();
       }
     }
   }

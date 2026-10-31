@@ -34,7 +34,8 @@ describe("assets", () => {
   it("parses the manifest and marks unintegrated art as placeholder", () => {
     const r = new AssetResolver();
     expect(r.errors).toEqual([]);
-    expect(r.rows.size).toBe(386);
+    expect(r.rows.size).toBe(386 + 12); // handoff manifest + 12 expansion pickup icons (BATCH_002)
+    expect(r.resolve("pickup_pu01")).toMatchObject({ status: "integrated", placeholder: false });
     expect(r.resolve("hull_H02")).toMatchObject({ status: "planned", placeholder: true });
     expect(r.resolve("nope").placeholder).toBe(true);
     // BATCH_001 delivered art is integrated with a runtime path

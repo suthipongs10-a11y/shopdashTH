@@ -1,0 +1,285 @@
+{
+  "batch": "BATCH_002",
+  "source_url": "https://github.com/suthipongs10-a11y/shopdashTH/raw/claude/stoic-feynman-gzeg3r/rocket-breakers/art/requests/batch_zips/RB_BATCH_002_REQUEST.zip",
+  "source_zip_sha256": "32f2293c603d77ec5c13b24573aceb85e774fbcfa1d8e4678f57ce5d1e92315a",
+  "files": [
+    {
+      "asset_id": "pickup_pu01",
+      "file": "rb_pickup_pu01_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5995,
+      "visible_bbox_alpha_gt16": [
+        77,
+        225,
+        1177,
+        1030
+      ],
+      "sha256": "6714494f7ea7b77a942477d868eca158d899ad99438b29daaac9040c909d99d9",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu02",
+      "file": "rb_pickup_pu02_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.6318,
+      "visible_bbox_alpha_gt16": [
+        308,
+        148,
+        971,
+        1105
+      ],
+      "sha256": "c9e05693441dfee35e60f6759125f697da174d21fb0ef62e861f2ed2bce66ebe",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu03",
+      "file": "rb_pickup_pu03_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.4375,
+      "visible_bbox_alpha_gt16": [
+        111,
+        169,
+        1166,
+        1038
+      ],
+      "sha256": "c67a46bf486d1a46a28cf845cea76f0925f27941ca8d63ab0f80518d4bf80947",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu04",
+      "file": "rb_pickup_pu04_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5829,
+      "visible_bbox_alpha_gt16": [
+        183,
+        186,
+        1089,
+        1067
+      ],
+      "sha256": "6304480da35c71b8e1aa06744cae052c8de1af457b59a4c0f0177b871f7efa4a",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu05",
+      "file": "rb_pickup_pu05_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5325,
+      "visible_bbox_alpha_gt16": [
+        175,
+        185,
+        1069,
+        1051
+      ],
+      "sha256": "b596c738b5655a55dc0d1211ecfa454b1eb3da1b2379920e989edb42cf5a21f9",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu06",
+      "file": "rb_pickup_pu06_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5449,
+      "visible_bbox_alpha_gt16": [
+        124,
+        176,
+        1161,
+        1111
+      ],
+      "sha256": "b092613d41aa9470e19d9535f1d95eb67273f8dba11a2f5f84821fec772b5a78",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu07",
+      "file": "rb_pickup_pu07_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.4997,
+      "visible_bbox_alpha_gt16": [
+        151,
+        146,
+        1169,
+        1064
+      ],
+      "sha256": "8894ebe58c4ef851dce4579bd9a38c60d60867be00c3b07a3c28fe87bceec286",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu08",
+      "file": "rb_pickup_pu08_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5485,
+      "visible_bbox_alpha_gt16": [
+        214,
+        190,
+        1039,
+        1126
+      ],
+      "sha256": "0ccf3e2163d95a8ff0abd9e491648e9c2ba8b6ab560b7f1d1d9730390d33d10b",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu09",
+      "file": "rb_pickup_pu09_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5522,
+      "visible_bbox_alpha_gt16": [
+        114,
+        243,
+        1142,
+        1029
+      ],
+      "sha256": "65cb0f39814bf484a147cd7d8020ae7f28a7a56d64e80322157bc86cba9b43ff",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu10",
+      "file": "rb_pickup_pu10_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.6795,
+      "visible_bbox_alpha_gt16": [
+        136,
+        273,
+        1143,
+        1022
+      ],
+      "sha256": "24a759f3e39bd9291a9a84c8ab0c143b0c44f8312b632f0f73fa53997ee12ee7",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu11",
+      "file": "rb_pickup_pu11_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "transparent_fraction": 0.547,
+      "visible_bbox_alpha_gt16": [
+        186,
+        195,
+        1112,
+        1051
+      ],
+      "sha256": "d7054bb166f1d6c8272ec32b477ed14aa3465f5cfa3b54fbae51021a1b684a73",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "pickup_pu12",
+      "file": "rb_pickup_pu12_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5406,
+      "visible_bbox_alpha_gt16": [
+        138,
+        222,
+        1161,
+        1042
+      ],
+      "sha256": "435a620db57178908a282fce01b93d69d133e89f340d63edaf7b1ffa723d76d2",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    }
+  ],
+  "engine_tested": false,
+  "generator": "ChatGPT built-in imagegen"
+}

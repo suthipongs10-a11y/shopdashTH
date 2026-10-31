@@ -1,0 +1,8 @@
+{
+  "id": "pickup_pu07",
+  "filename": "rb_pickup_pu07_000.png",
+  "requested_canvas": "512x512",
+  "prompt": "Original ROCKET BREAKERS power-up pickup icon. MAGNET: orange horseshoe magnet with floating nuts. Single isolated object, front three-quarter view, glowing gold accent, crisp silhouette readable at 48 px, upper-left light, premium 2.5D render, no text, no label. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge. (Style reference: powerups_board.)",
+  "actual_prompt": "Original ROCKET BREAKERS power-up pickup icon. MAGNET: orange horseshoe magnet with floating nuts. Single isolated object, front three-quarter view, glowing gold accent, crisp silhouette readable at 48 px, upper-left light, premium 2.5D render, no text, no label. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge. (Style reference: powerups_board.)\nDelivery constraints: target SQUARE512x512pixelcanvas or closest square possible. Exactly one isolated pickup icon design centered in square, all glow and particles fit inside central70% with generous truly transparent margins. Use reference only for design style; no board, no captions, no extra pickups. ",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-d1ab1b1f-d154-47b4-a2af-d6510b8d537e.png"
+}

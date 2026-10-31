@@ -385,3 +385,15 @@ ui_codex,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_fusion_core,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_extraction,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 concept_vfx_concepts,concept,original,1,opaque,generated_unchecked,art/concepts/vfx_concepts.png,M0,ChatGPT imagegen concept; not production sprite,
+pickup_pu01,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu01.webp
+pickup_pu02,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu02.webp
+pickup_pu03,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu03.webp
+pickup_pu04,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu04.webp
+pickup_pu05,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu05.webp
+pickup_pu06,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu06.webp
+pickup_pu07,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu07.webp
+pickup_pu08,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu08.webp
+pickup_pu09,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu09.webp
+pickup_pu10,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu10.webp
+pickup_pu11,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu11.webp
+pickup_pu12,pickup_icon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_002); source in art/source/batch_002,assets/sprites/pickup_pu12.webp

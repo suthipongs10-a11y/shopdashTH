@@ -37,7 +37,14 @@ RULES = {
     "boss_B02_armor": (180, "center", None),
     "boss_B02_signature_mount": (420, "socket_bottom", None),
     "fx_tractor_mote": (96, "center", None),
+    **{f"pickup_pu{i:02d}": (128, "center", None) for i in range(1, 13)},
 }
+# Expansion assets that are not rows of the handoff manifest yet.
+EXTRA_CATEGORY = {"pickup_pu": ("pickup_icon", "512x512", "alpha", "M1")}
+
+
+def fname(f):
+    return f.get("filename") or f["file"]  # delivery manifests have used both keys
 
 
 def visible_bbox(im):
@@ -65,7 +72,7 @@ def main(delivery: Path, batch: str):
         rule = RULES.get(aid)
         if not rule or not rule[2]:
             continue
-        bb = visible_bbox(Image.open(delivery / f["filename"]).convert("RGBA"))
+        bb = visible_bbox(Image.open(delivery / fname(f)).convert("RGBA"))
         g = groups.setdefault(rule[2], list(bb))
         groups[rule[2]] = [min(g[0], bb[0]), min(g[1], bb[1]), max(g[2], bb[2]), max(g[3], bb[3])]
     imported = {}
@@ -74,7 +81,7 @@ def main(delivery: Path, batch: str):
             print(f"skip {aid}: no import rule")
             continue
         size, pivot_rule, group = RULES[aid]
-        src = delivery / f["filename"]
+        src = delivery / fname(f)
         sha = hashlib.sha256(src.read_bytes()).hexdigest()
         if sha != f["sha256"]:
             raise SystemExit(f"checksum mismatch for {src.name}")
@@ -95,7 +102,7 @@ def main(delivery: Path, batch: str):
         if aid.startswith("weapon_") or aid.endswith("signature_mount"):
             anchors = {"muzzle": [round((vis[0] + vis[2]) / 2, 1), round(vis[1], 1)], "socket": [round((vis[0] + vis[2]) / 2, 1), round(vis[3], 1)]}
         sidecar = {
-            "asset_id": aid, "source_filename": f"art/source/{batch.lower()}/{f['filename']}", "source_sha256": sha,
+            "asset_id": aid, "source_filename": f"art/source/{batch.lower()}/{fname(f)}", "source_sha256": sha,
             "canvas_size": [W, H], "trim_rect": list(crop), "runtime_size": [w, h], "scale": round(k, 5),
             "visible_rect": [round(v, 1) for v in vis], "pivot_px": [round(pivot[0], 1), round(pivot[1], 1)],
             "attachment_anchors": anchors, "blend_mode": f.get("blend", "alpha"), "color_space": "sRGB",
@@ -111,6 +118,13 @@ def main(delivery: Path, batch: str):
     fields = list(rows[0].keys())
     if "runtime_path" not in fields:
         fields.append("runtime_path")
+    known = {r["asset_id"] for r in rows}
+    for aid in imported:
+        if aid not in known:
+            cat = next((v for k, v in EXTRA_CATEGORY.items() if aid.startswith(k)), None)
+            if cat:
+                rows.append({"asset_id": aid, "category": cat[0], "source_size": cat[1], "frame_count": "1", "blend_mode": cat[2],
+                             "status": "planned", "reference_path": "", "milestone": cat[3], "provenance": "", "runtime_path": ""})
     for r in rows:
         r.setdefault("runtime_path", "")
         if r["asset_id"] in imported:

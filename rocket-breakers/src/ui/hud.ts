@@ -8,6 +8,7 @@ import { t } from "../core/i18n";
 import { C } from "./renderer";
 import type { Vec } from "../core/geometry";
 import { pickupDef } from "../combat/powerups";
+import { drawAt, sprite, visCenter, visH, visW } from "./sprites";
 
 export type HudAction = "dash" | "overdrive" | "ability" | "tractor" | "pause";
 export interface HudButton { action: HudAction; c: Vec; r: number }
@@ -89,15 +90,18 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
 // Active timed buffs stay visible (compact chips with remaining seconds).
 function drawBuffs(g: CanvasRenderingContext2D, w: CombatWorld, y: number): void {
   let x = 20;
-  const chips: [string, number, number][] = [];
-  for (const [id, left] of w.buffs.remaining) chips.push([t(`powerups.${id}.name`), left, pickupDef(id).duration_sec]);
-  if (w.overshield > 0) chips.push([`+${Math.ceil(w.overshield)} ${t("hud.overshield")}`, w.overshieldLeft, 10]);
-  for (const [label, left, max] of chips) {
+  const chips: [string, number, number, string][] = [];
+  for (const [id, left] of w.buffs.remaining) chips.push([t(`powerups.${id}.name`), left, pickupDef(id).duration_sec, id]);
+  if (w.overshield > 0) chips.push([`+${Math.ceil(w.overshield)} ${t("hud.overshield")}`, w.overshieldLeft, 10, "PU05"]);
+  for (const [label, left, max, id] of chips) {
     g.font = "700 16px RB Thai, sans-serif";
-    const tw = Math.min(170, g.measureText(label).width) + 56;
+    const icon = sprite(`pickup_${id.toLowerCase()}`);
+    const pad = icon ? 30 : 8;
+    const tw = Math.min(170, g.measureText(label).width) + 48 + pad;
     g.fillStyle = "rgba(4,10,20,0.75)"; g.fillRect(x, y, tw, 30);
     g.fillStyle = "rgba(255,215,106,0.35)"; g.fillRect(x, y + 26, tw * (left / max), 4);
-    g.fillStyle = C.text; g.textAlign = "left"; g.fillText(label, x + 8, y + 21, 170);
+    if (icon) drawAt(g, icon, x + 15, y + 14, ...visCenter(icon), 24 / Math.max(visW(icon), visH(icon)));
+    g.fillStyle = C.text; g.textAlign = "left"; g.fillText(label, x + pad, y + 21, 170);
     g.fillStyle = C.gold; g.textAlign = "right"; g.fillText(`${Math.ceil(left)}s`, x + tw - 6, y + 21);
     x += tw + 8;
     if (x > 420) break; // stay clear of the tractor button

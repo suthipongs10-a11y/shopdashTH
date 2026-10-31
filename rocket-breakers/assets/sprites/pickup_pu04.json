@@ -1,0 +1,36 @@
+{
+  "asset_id": "pickup_pu04",
+  "source_filename": "art/source/batch_002/rb_pickup_pu04_000.png",
+  "source_sha256": "6304480da35c71b8e1aa06744cae052c8de1af457b59a4c0f0177b871f7efa4a",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    162,
+    166,
+    1109,
+    1086
+  ],
+  "runtime_size": [
+    128,
+    124
+  ],
+  "scale": 0.13516,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    123.3
+  ],
+  "pivot_px": [
+    64.0,
+    62.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_002",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

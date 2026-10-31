@@ -1,0 +1,8 @@
+{
+  "id": "pickup_pu11",
+  "filename": "rb_pickup_pu11_000.png",
+  "requested_canvas": "512x512",
+  "prompt": "Original ROCKET BREAKERS power-up pickup icon. FUSION CORE: violet energy orb inside rotating rings. Single isolated object, front three-quarter view, glowing gold accent, crisp silhouette readable at 48 px, upper-left light, premium 2.5D render, no text, no label. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge. (Style reference: powerups_board.)",
+  "actual_prompt": "Original ROCKET BREAKERS power-up pickup icon. FUSION CORE: violet energy orb inside rotating rings. Single isolated object, front three-quarter view, glowing gold accent, crisp silhouette readable at 48 px, upper-left light, premium 2.5D render, no text, no label. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge. (Style reference: powerups_board.)\nDelivery constraints: target SQUARE512x512pixelcanvas or closest square possible. Exactly one isolated pickup icon design centered in square, all glow and particles fit inside central70% with generous truly transparent margins. Use reference only for design style; no board, no captions, no extra pickups. ",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-854479dd-0e25-4da2-9fd3-9e67db234f50.png"
+}
