@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "design_counts": {
+    "sectors": 8,
+    "missions": 48,
+    "hulls": 12,
+    "weapons": 36,
+    "abilities": 12,
+    "utilities": 12,
+    "bosses": 16,
+    "enemies": 24,
+    "hazards": 8,
+    "fusions": 8
+  },
+  "campaign_stars": 144,
+  "asset_manifest_rows": 386,
+  "concept_images": 4,
+  "note": "Data/package integrity only; gameplay is not yet implemented or playtested."
+}
