@@ -1,0 +1,302 @@
+[
+  {
+    "filename": "rb_ui_dash_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      207,
+      397,
+      1047,
+      861
+    ],
+    "edge_alpha_max": 1,
+    "sha256": "b255cb66a08e1cf4fbb25fe8dea7c1b4744c9fd5ed1452baf8261e351672cc8f",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_overdrive_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      164,
+      294,
+      1091,
+      961
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "4338aa34e0cf4b4412674e561b32a2408902362c49f8f06b7091bcdf6e9ee645",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_tractor_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      152,
+      178,
+      1104,
+      1079
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "bc7f4e30896b48783ff600f707a0d86e2d13e7a5c6319d3697b65a62fb384d7f",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_lock_joint_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      233,
+      245,
+      1021,
+      1017
+    ],
+    "edge_alpha_max": 1,
+    "sha256": "69a558ad3732cd8c13000bbcf1715c965888e6f232ae04d51a47f37853b1febd",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_locked_armor_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      254,
+      213,
+      1000,
+      1044
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "5269b437eec3abe9b8077570949d2c665d8f99ffe793379985049bdf79c85f57",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_heat_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      410,
+      246,
+      937,
+      1009
+    ],
+    "edge_alpha_max": 1,
+    "sha256": "d1b1385eda45546d37b53cc7929a1cc006d2fc5705dc9d61d7dfdb268e1184c0",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_energy_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      388,
+      213,
+      866,
+      1000
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "e5feff0de31a3248dff7a514b805d1299077201b17ea6c05e13665ad6e33e4b9",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_cargo_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      305,
+      180,
+      950,
+      1073
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "2bcf0857e0e9b4900445fe97f17235ffe4530f8141f1f637dbc7afde0a20f37f",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_repair_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      194,
+      211,
+      1060,
+      1035
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "5414ae3adfe961c3fe3aec3863ad21d0a85da9014cd7af5aaa387e1b44b68427",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_pause_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      346,
+      299,
+      907,
+      951
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "011d1413a0fef0d9ac7c6ee7b96d40e8069b688d8de9170e72a118bc19f9de65",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_play_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      371,
+      336,
+      884,
+      918
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "b32a26f350d2527c16b9f1c52cade2b28313d8d77e13aed66394d27eb954e20c",
+    "status": "awaiting_in_game_HUD_QA"
+  },
+  {
+    "filename": "rb_ui_settings_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      230,
+      233,
+      1025,
+      1015
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "66cc5356fe1e0f95011b2c2a3e5190027364d16680bab221558721acaf929111",
+    "status": "awaiting_in_game_HUD_QA"
+  }
+]

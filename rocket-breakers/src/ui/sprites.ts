@@ -39,6 +39,12 @@ export function preloadSprites(): void {
   }
 }
 
+// Data URL of a sprite for DOM <img> use (menus).
+export function spriteUrl(id: string): string | null {
+  const key = Object.keys(URLS).find((k) => k.endsWith(`/${id}.webp`));
+  return key ? URLS[key] : null;
+}
+
 export const visW = (s: Sprite) => s.meta.visible_rect[2] - s.meta.visible_rect[0];
 export const visH = (s: Sprite) => s.meta.visible_rect[3] - s.meta.visible_rect[1];
 

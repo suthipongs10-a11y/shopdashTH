@@ -58,7 +58,7 @@ export class DockPanel {
       r.append(fitBtn);
       const row = el("div", "row");
       const scrapBtn = button(this.scrapArmed ? t("dock.scrap_confirm_tap") : t("dock.scrap"), () => this.scrap(), "btn small");
-      row.append(button(t("dock.stow", { n: w.hold.length, cap: w.holdCapacity }), () => this.stow(), "btn small"), scrapBtn);
+      row.append(button(t("dock.stow", { n: w.hold.length, cap: w.holdCapacity }), () => this.stow(), "btn small", "ui_cargo"), scrapBtn);
       if (this.scrapArmed) r.append(el("div", "err", t("dock.scrap_confirm")));
       r.append(row);
     } else {

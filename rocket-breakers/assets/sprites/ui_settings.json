@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_settings",
+  "source_filename": "art/source/batch_005/rb_ui_settings_000.png",
+  "source_sha256": "66cc5356fe1e0f95011b2c2a3e5190027364d16680bab221558721acaf929111",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    222,
+    223,
+    1034,
+    1023
+  ],
+  "runtime_size": [
+    128,
+    126
+  ],
+  "scale": 0.15764,
+  "visible_rect": [
+    1.3,
+    1.3,
+    126.7,
+    124.8
+  ],
+  "pivot_px": [
+    64.0,
+    63.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

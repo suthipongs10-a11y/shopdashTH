@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_pause",
+  "source_filename": "art/source/batch_005/rb_ui_pause_000.png",
+  "source_sha256": "011d1413a0fef0d9ac7c6ee7b96d40e8069b688d8de9170e72a118bc19f9de65",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    338,
+    289,
+    916,
+    959
+  ],
+  "runtime_size": [
+    110,
+    128
+  ],
+  "scale": 0.19104,
+  "visible_rect": [
+    1.5,
+    1.5,
+    108.9,
+    126.5
+  ],
+  "pivot_px": [
+    55.0,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

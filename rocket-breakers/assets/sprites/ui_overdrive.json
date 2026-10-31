@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_overdrive",
+  "source_filename": "art/source/batch_005/rb_ui_overdrive_000.png",
+  "source_sha256": "4338aa34e0cf4b4412674e561b32a2408902362c49f8f06b7091bcdf6e9ee645",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    155,
+    284,
+    1099,
+    970
+  ],
+  "runtime_size": [
+    128,
+    93
+  ],
+  "scale": 0.13559,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    91.9
+  ],
+  "pivot_px": [
+    64.0,
+    46.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

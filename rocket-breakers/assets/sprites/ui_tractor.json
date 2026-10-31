@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_tractor",
+  "source_filename": "art/source/batch_005/rb_ui_tractor_000.png",
+  "source_sha256": "bc7f4e30896b48783ff600f707a0d86e2d13e7a5c6319d3697b65a62fb384d7f",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    143,
+    170,
+    1112,
+    1087
+  ],
+  "runtime_size": [
+    128,
+    121
+  ],
+  "scale": 0.13209,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    120.1
+  ],
+  "pivot_px": [
+    64.0,
+    60.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

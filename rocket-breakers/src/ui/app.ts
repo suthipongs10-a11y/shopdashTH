@@ -13,7 +13,7 @@ import { sfx } from "../audio/sfx";
 import { Renderer } from "./renderer";
 import { drawHud, hitTest, layoutButtons, type HudAction, type HudButton, type Insets } from "./hud";
 import { DockPanel } from "./dock";
-import { preloadSprites } from "./sprites";
+import { preloadSprites, spriteUrl } from "./sprites";
 
 interface Screen { update?(dt: number): void; draw?(g: CanvasRenderingContext2D): void; dispose?(): void; onHidden?(): void }
 
@@ -35,8 +35,15 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls = "", text
   return e;
 }
 
-export function button(label: string, onClick: () => void, cls = "btn"): HTMLButtonElement {
+export function button(label: string, onClick: () => void, cls = "btn", icon?: string): HTMLButtonElement {
   const b = el("button", cls, label);
+  const url = icon ? spriteUrl(icon) : null;
+  if (url) {
+    const img = el("img", "ico");
+    img.src = url;
+    img.alt = "";
+    b.prepend(img);
+  }
   b.addEventListener("click", () => { sfx.play("ui"); onClick(); });
   return b;
 }
@@ -137,9 +144,9 @@ export class App {
     card.append(statRow(t("title.credits"), this.profile.credits), statRow(t("title.scrap"), this.profile.scrap),
       statRow(t("title.clears"), `${rec?.clears ?? 0} / ${rec?.attempts ?? 0}`));
     s.append(card);
-    s.append(button(t("title.start"), () => this.startMission(), "btn primary"));
+    s.append(button(t("title.start"), () => this.startMission(), "btn primary", "ui_play"));
     const row = el("div", "row");
-    row.append(button(t("title.howto"), () => this.showHowTo(), "btn small"), button(t("title.settings"), () => this.showSettings(() => this.showTitle()), "btn small"));
+    row.append(button(t("title.howto"), () => this.showHowTo(), "btn small"), button(t("title.settings"), () => this.showSettings(() => this.showTitle()), "btn small", "ui_settings"));
     s.append(row);
     s.append(button(t("title.language"), () => { this.setLocale(i18n.locale === "th" ? "en" : "th"); this.showTitle(); }, "btn small"));
     if (this.loadNote) s.append(el("div", "dim", this.loadNote));
@@ -447,8 +454,8 @@ export class CombatScreen implements Screen {
     if (!v) return;
     const o = el("div", "screen overlay");
     o.append(el("h2", "", t("pause.title")),
-      button(t("pause.resume"), () => this.setPaused(false), "btn primary"),
-      button(t("title.settings"), () => { o.remove(); this.app.showSettings(() => { this.applySettings(); this.setPaused(true); }, true); }, "btn"),
+      button(t("pause.resume"), () => this.setPaused(false), "btn primary", "ui_play"),
+      button(t("title.settings"), () => { o.remove(); this.app.showSettings(() => { this.applySettings(); this.setPaused(true); }, true); }, "btn", "ui_settings"),
       button(t("pause.quit"), () => this.app.showTitle(), "btn"),
       el("div", "dim", t("pause.quit_note")));
     this.pauseEl = o;

@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_cargo",
+  "source_filename": "art/source/batch_005/rb_ui_cargo_000.png",
+  "source_sha256": "2bcf0857e0e9b4900445fe97f17235ffe4530f8141f1f637dbc7afde0a20f37f",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    297,
+    172,
+    958,
+    1081
+  ],
+  "runtime_size": [
+    93,
+    128
+  ],
+  "scale": 0.14081,
+  "visible_rect": [
+    1.1,
+    1.1,
+    92.0,
+    126.9
+  ],
+  "pivot_px": [
+    46.5,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

@@ -362,23 +362,23 @@ fx_frost_shard,fx,512x512,1,alpha,planned,,M5,ChatGPT raster art requested,
 fx_gravity_ring,fx,512x512,1,additive,planned,,M5,ChatGPT raster art requested,
 fx_tractor_mote,fx,512x512,1,additive,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/fx_tractor_mote.webp
 fx_shockwave_ring,fx,512x512,1,additive,planned,,M5,ChatGPT raster art requested,
-ui_dash,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_overdrive,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_tractor,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_lock_joint,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_locked_armor,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
+ui_dash,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_dash.webp
+ui_overdrive,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_overdrive.webp
+ui_tractor,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_tractor.webp
+ui_lock_joint,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_lock_joint.webp
+ui_locked_armor,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_locked_armor.webp
 ui_star_full,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_star_empty,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_credits,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_scrap,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_blueprint,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_heat,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_energy,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_cargo,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_repair,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_settings,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_pause,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-ui_play,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
+ui_heat,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_heat.webp
+ui_energy,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_energy.webp
+ui_cargo,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_cargo.webp
+ui_repair,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_repair.webp
+ui_settings,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_settings.webp
+ui_pause,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_pause.webp
+ui_play,ui_icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_005); source in art/source/batch_005,assets/sprites/ui_play.webp
 ui_hangar,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_galaxy,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 ui_codex,ui_icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,

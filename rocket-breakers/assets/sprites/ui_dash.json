@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_dash",
+  "source_filename": "art/source/batch_005/rb_ui_dash_000.png",
+  "source_sha256": "b255cb66a08e1cf4fbb25fe8dea7c1b4744c9fd5ed1452baf8261e351672cc8f",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    199,
+    388,
+    1055,
+    870
+  ],
+  "runtime_size": [
+    128,
+    72
+  ],
+  "scale": 0.14953,
+  "visible_rect": [
+    1.2,
+    1.2,
+    126.8,
+    70.9
+  ],
+  "pivot_px": [
+    64.0,
+    36.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

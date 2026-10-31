@@ -42,17 +42,17 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
   const top = insets.top;
   g.fillStyle = "rgba(4,10,20,0.78)"; g.fillRect(0, 0, 720, top + TOP_H);
   g.fillStyle = "#2b6f86"; g.fillRect(0, top + TOP_H, 720, 2);
-  bar(g, 20, top + 12, 320, t("hud.hp"), w.hp / w.hpMax, C.hp);
-  bar(g, 20, top + 48, 320, t("hud.shield"), w.shield / w.shieldMax, C.shield);
-  bar(g, 370, top + 12, 330, t("hud.energy"), w.weapons.energy / w.weapons.energyCapacity, C.cyan);
-  bar(g, 370, top + 48, 330, w.overdriveLeft > 0 ? t("hud.overdrive_on") : t("hud.overdrive"), w.overdriveLeft > 0 ? w.overdriveLeft / 5 : w.overdriveCharge / 100, w.overdriveLeft > 0 ? C.gold : C.orange);
+  bar(g, 20, top + 12, 320, t("hud.hp"), w.hp / w.hpMax, C.hp, 12, "ui_repair");
+  bar(g, 20, top + 48, 320, t("hud.shield"), w.shield / w.shieldMax, C.shield, 12, "ui_locked_armor");
+  bar(g, 370, top + 12, 330, t("hud.energy"), w.weapons.energy / w.weapons.energyCapacity, C.cyan, 12, "ui_energy");
+  bar(g, 370, top + 48, 330, w.overdriveLeft > 0 ? t("hud.overdrive_on") : t("hud.overdrive"), w.overdriveLeft > 0 ? w.overdriveLeft / 5 : w.overdriveCharge / 100, w.overdriveLeft > 0 ? C.gold : C.orange, 12, "ui_overdrive");
   // per-module heat
   const mounts = w.weapons.mounts;
   const colW = 680 / Math.max(1, mounts.length);
   mounts.forEach((m, i) => {
     const name = t(`weapons.${m.module.weapon.id}.name`);
     const label = m.locked ? `${name} · ${t("hud.overheated")}` : m.blocked ? `${name} · ${t("hud.blocked")}` : name;
-    bar(g, 20 + i * colW, top + 84, colW - 16, label, m.heat / HEAT_MAX, m.locked ? C.red : C.heat, 8);
+    bar(g, 20 + i * colW, top + 84, colW - 16, label, m.heat / HEAT_MAX, m.locked ? C.red : C.heat, 8, "ui_heat");
   });
   // boss
   const b = w.boss;
@@ -72,7 +72,9 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
       const col = b.jointExposed ? C.amber : soon ? C.gold : C.dim;
       // Same row as the boss name, right-aligned, so hints below never cover it.
       g.font = "700 18px RB Thai, sans-serif"; g.textAlign = "right";
-      g.fillStyle = col; g.fillText(label, 622, y + 16, 320);
+      g.fillStyle = col; g.fillText(label, 622, y + 16, 300);
+      const ico = sprite(b.jointExposed || soon ? "ui_lock_joint" : "ui_locked_armor");
+      if (ico) { const tw = Math.min(300, g.measureText(label).width); drawAt(g, ico, 622 - tw - 14, y + 10, ...visCenter(ico), 20 / Math.max(visW(ico), visH(ico))); }
       if (b.jointExposed) { g.fillStyle = C.amber; g.fillRect(20, y + 37, 600 * (left / 2.5), 4); }
     }
   } else {
@@ -108,9 +110,11 @@ function drawBuffs(g: CanvasRenderingContext2D, w: CombatWorld, y: number): void
   }
 }
 
-function bar(g: CanvasRenderingContext2D, x: number, y: number, width: number, label: string, frac: number, color: string, h = 12): void {
+function bar(g: CanvasRenderingContext2D, x: number, y: number, width: number, label: string, frac: number, color: string, h = 12, icon?: string): void {
+  const ico = icon ? sprite(icon) : null;
+  if (ico) drawAt(g, ico, x + 8, y + 7, ...visCenter(ico), 16 / Math.max(visW(ico), visH(ico)));
   g.fillStyle = C.dim; g.font = "17px RB Thai, sans-serif"; g.textAlign = "left";
-  g.fillText(label, x, y + 12);
+  g.fillText(label, x + (ico ? 20 : 0), y + 12);
   g.fillStyle = "rgba(255,255,255,0.08)"; g.fillRect(x, y + 17, width, h);
   g.fillStyle = color; g.fillRect(x, y + 17, width * Math.max(0, Math.min(1, frac)), h);
 }
@@ -132,6 +136,8 @@ function drawButton(g: CanvasRenderingContext2D, b: HudButton, w: CombatWorld, p
     }
     case "pause": label = "II"; break;
   }
+  const iconId = ({ dash: "ui_dash", overdrive: "ui_overdrive", tractor: w.tow?.towing ? "ui_cargo" : "ui_tractor", pause: "ui_pause" } as Partial<Record<HudAction, string>>)[b.action];
+  const icon = iconId ? sprite(iconId) : null;
   const { x, y } = b.c;
   const glow = b.action === "tractor" && !w.tow?.towing ? 0.5 + 0.5 * Math.sin(time * 8) : 0;
   g.fillStyle = pressed ? "rgba(57,225,255,0.3)" : "rgba(4,10,20,0.72)";
@@ -144,7 +150,19 @@ function drawButton(g: CanvasRenderingContext2D, b: HudButton, w: CombatWorld, p
   g.lineWidth = b.action === "tractor" ? 4 + glow * 3 : 3;
   g.beginPath(); g.arc(x, y, b.r, 0, Math.PI * 2); g.stroke();
   g.fillStyle = ready || b.action === "pause" || b.action === "tractor" ? C.text : C.dim;
-  g.font = `700 ${b.r > 60 ? 26 : b.r > 40 ? 20 : 22}px RB Thai, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
-  g.fillText(label, x, y, b.r * 1.8);
+  g.textAlign = "center"; g.textBaseline = "middle";
+  if (icon) {
+    // BATCH_005 icon on top, short label underneath (pause shows the icon alone).
+    const lit = ready || b.action === "pause" || b.action === "tractor";
+    const sz = b.action === "pause" ? b.r * 1.0 : b.r * 0.95;
+    drawAt(g, icon, x, b.action === "pause" ? y : y - b.r * 0.18, ...visCenter(icon), sz / Math.max(visW(icon), visH(icon)), 0, lit ? 1 : 0.45);
+    if (b.action !== "pause") {
+      g.font = `700 ${b.r > 60 ? 19 : 15}px RB Thai, sans-serif`;
+      g.fillText(label, x, y + b.r * 0.55, b.r * 1.6);
+    }
+  } else {
+    g.font = `700 ${b.r > 60 ? 26 : b.r > 40 ? 20 : 22}px RB Thai, sans-serif`;
+    g.fillText(label, x, y, b.r * 1.8);
+  }
   g.textBaseline = "alphabetic";
 }

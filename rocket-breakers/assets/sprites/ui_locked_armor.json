@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_locked_armor",
+  "source_filename": "art/source/batch_005/rb_ui_locked_armor_000.png",
+  "source_sha256": "5269b437eec3abe9b8077570949d2c665d8f99ffe793379985049bdf79c85f57",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    244,
+    205,
+    1010,
+    1052
+  ],
+  "runtime_size": [
+    116,
+    128
+  ],
+  "scale": 0.15112,
+  "visible_rect": [
+    1.2,
+    1.2,
+    114.6,
+    126.8
+  ],
+  "pivot_px": [
+    58.0,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

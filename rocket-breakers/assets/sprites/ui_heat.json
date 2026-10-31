@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_heat",
+  "source_filename": "art/source/batch_005/rb_ui_heat_000.png",
+  "source_sha256": "d1b1385eda45546d37b53cc7929a1cc006d2fc5705dc9d61d7dfdb268e1184c0",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    402,
+    237,
+    945,
+    1017
+  ],
+  "runtime_size": [
+    89,
+    128
+  ],
+  "scale": 0.1641,
+  "visible_rect": [
+    1.3,
+    1.3,
+    87.8,
+    126.7
+  ],
+  "pivot_px": [
+    44.5,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

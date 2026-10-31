@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_repair",
+  "source_filename": "art/source/batch_005/rb_ui_repair_000.png",
+  "source_sha256": "5414ae3adfe961c3fe3aec3863ad21d0a85da9014cd7af5aaa387e1b44b68427",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    186,
+    202,
+    1069,
+    1043
+  ],
+  "runtime_size": [
+    128,
+    122
+  ],
+  "scale": 0.14496,
+  "visible_rect": [
+    1.2,
+    1.2,
+    126.8,
+    120.8
+  ],
+  "pivot_px": [
+    64.0,
+    61.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

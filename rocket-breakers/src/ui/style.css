@@ -30,6 +30,7 @@ p, li { font-size: 26px; line-height: 1.55; margin: 0; color: var(--text); }
 .btn { width: 100%; min-height: 96px; border-radius: 18px; border: 2px solid var(--edge); background: var(--panel); color: var(--text); font: 700 32px var(--font); cursor: pointer; padding: 12px 20px; }
 .btn.primary { border-color: var(--orange); background: linear-gradient(#f2862a, #c95a08); color: #fff; }
 .btn.small { min-height: 72px; font-size: 26px; }
+.btn img.ico { height: 1.15em; width: auto; vertical-align: -0.22em; margin-right: 12px; }
 .btn:active { transform: translateY(2px); }
 .btn:disabled { opacity: 0.4; }
 .row { display: flex; gap: 16px; width: 100%; }

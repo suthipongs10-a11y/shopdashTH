@@ -50,6 +50,8 @@ RULES = {
     "fx_joint_break": (256, "center", "fx_joint_break"),
     "fx_detach_burst": (256, "center", "fx_detach_burst"),
     "fx_shield_hit": (256, "center", "fx_shield_hit"),
+    **{f"ui_{n}": (128, "center", None) for n in ["dash", "overdrive", "tractor", "lock_joint", "locked_armor", "heat", "energy",
+                                                  "cargo", "repair", "pause", "play", "settings"]},
     "utility_T001": (128, "socket_bottom", None),
     "utility_T006": (128, "socket_bottom", None),
     "boss_B02_joint": (160, "center", None),
@@ -110,6 +112,16 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
     for p in delivery.iterdir():
         if p.is_file():
             shutil.copy2(p, src_dir / p.name)
+    # Delivery manifests have varied: {"files": [...]} or a bare list; asset_id may be
+    # missing, in which case it comes from the file name (rb_<asset>_<frame>.png).
+    raw = manifest if isinstance(manifest, list) else manifest["files"]
+    known_ids = {r["asset_id"].lower(): r["asset_id"] for r in csv.DictReader((ROOT / "art/asset_manifest.csv").open(encoding="utf-8"))}
+    for f in raw:
+        if not f.get("asset_id"):
+            stem = re.sub(r"^rb_|_\d{3}\.png$", "", fname(f))
+            f["asset_id"] = known_ids.get(stem, stem)
+    if isinstance(manifest, list):
+        manifest = {"files": raw}
     entries = []
     for f in manifest["files"]:
         if not (delivery / fname(f)).exists():

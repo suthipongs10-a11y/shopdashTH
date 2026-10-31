@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_play",
+  "source_filename": "art/source/batch_005/rb_ui_play_000.png",
+  "source_sha256": "b32a26f350d2527c16b9f1c52cade2b28313d8d77e13aed66394d27eb954e20c",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    363,
+    328,
+    892,
+    926
+  ],
+  "runtime_size": [
+    113,
+    128
+  ],
+  "scale": 0.21405,
+  "visible_rect": [
+    1.7,
+    1.7,
+    111.5,
+    126.3
+  ],
+  "pivot_px": [
+    56.5,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_005",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}
