@@ -1,0 +1,36 @@
+{
+  "asset_id": "hull_H01",
+  "source_filename": "art/source/batch_001/rb_hull_h01_000.png",
+  "source_sha256": "6eb4f56492acb2be02b199bad21e3c3abfd34d0855616226d8faea8590f1199f",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    134,
+    136,
+    1119,
+    1228
+  ],
+  "runtime_size": [
+    289,
+    320
+  ],
+  "scale": 0.29304,
+  "visible_rect": [
+    2.3,
+    2.3,
+    286.3,
+    275.2
+  ],
+  "pivot_px": [
+    144.5,
+    160.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_001",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

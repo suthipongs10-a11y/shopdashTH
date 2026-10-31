@@ -10,6 +10,8 @@ import { partWorldPos, type Part } from "../combat/parts";
 import { DEG, lerp, type Vec } from "../core/geometry";
 import { PICKUP_WARN_SEC } from "../salvage/salvage";
 import { ROLE } from "../combat/powerups";
+import { TAIL_LEN } from "../combat/boss";
+import { drawAt, sprite, visCenter, visH, visW } from "./sprites";
 import { t } from "../core/i18n";
 import explosionUrl from "../../assets/fx/fx_explosion_256.png";
 import shieldUrl from "../../assets/fx/fx_shield_256.png";
@@ -24,6 +26,8 @@ function tex(url: string): HTMLImageElement | null {
   return img;
 }
 const TEX = { explosion: tex(explosionUrl), shield: tex(shieldUrl), plasma: tex(plasmaUrl) };
+// Where the core art is centred relative to the boss origin so its tail socket lands on the joint.
+const BOSS_ART_OFFSET = { x: 0, y: 6 };
 const ROLE_COLOR = { offense: "#ff8a1f", survival: "#58e0a0", resource: "#ffd76a" };
 const PICKUP_GLYPH: Record<string, string> = { PU01: "3×", PU02: "L", PU03: "M", PU04: "Z", PU05: "S", PU06: "+", PU07: "U", PU08: "❄", PU09: "OD", PU10: "D", PU11: "F", PU12: "$" };
 
@@ -242,7 +246,57 @@ export class Renderer {
     }
   }
 
+  // Integrated BATCH_001 art drawn nose-up as delivered: the art's tail socket sits on
+  // the gameplay joint; the tail piece rotates about it; ring (open) or armour (closed) on top.
+  private drawBossSprites(w: CombatWorld, alpha: number): boolean {
+    const b = w.boss!;
+    const core = sprite("boss_B02_core"), tail = sprite("boss_B02_signature_mount");
+    const ring = sprite("boss_B02_joint"), plate = sprite("boss_B02_armor");
+    if (!core || !tail || !ring || !plate) return false;
+    const g = this.ctx;
+    const p = this.pos(b.e, alpha);
+    const kCore = 340 / visW(core);
+    const [cx, cy] = visCenter(core);
+    drawAt(g, core, p.x + BOSS_ART_OFFSET.x, p.y + BOSS_ART_OFFSET.y, cx, cy, kCore, 0, 1, b.core.flash > 0);
+    for (const side of [-1, 1] as const) {
+      const a = b.action;
+      const warn = a?.name === "claw_fan" && ((side === -1 && a.t < 0.6) || (side === 1 && a.t > 1.2 && a.t < 1.8));
+      if (warn) {
+        const c = b.clawWorld(side);
+        g.fillStyle = `rgba(255,45,85,${0.35 + 0.25 * Math.sin(this.time * 30)})`; g.beginPath(); g.arc(c.x - b.e.pos.x + p.x, c.y - b.e.pos.y + p.y, 26, 0, Math.PI * 2); g.fill();
+      }
+    }
+    const jx = p.x + b.joint.offset.x, jy = p.y + b.joint.offset.y;
+    if (!b.signatureRemoved) {
+      const kTail = (TAIL_LEN + 22) / visH(tail);
+      const [sx, sy] = tail.meta.attachment_anchors.socket ?? tail.meta.pivot_px;
+      drawAt(g, tail, jx, jy, sx, sy, kTail, b.tailAngle() * DEG + Math.PI / 2, 1, b.tail.flash > 0);
+      if (b.jointExposed) {
+        drawAt(g, ring, jx, jy, ...visCenter(ring), 48 / visW(ring), 0, 1, b.joint.flash > 0);
+        this.jointIcon(jx, jy, 20, false, true);
+      } else {
+        drawAt(g, plate, jx, jy, ...visCenter(plate), 54 / visW(plate));
+        this.shieldIcon(jx, jy, 9);
+      }
+      const pts = (b.tail.shape as { points: Vec[] }).points;
+      const st = pts[pts.length - 1];
+      const frac = b.tail.integrity / b.tail.integrityMax;
+      if (frac < 1) {
+        const bx = p.x + st.x, by = p.y + st.y + 26;
+        g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(bx - 26, by, 52, 7);
+        g.fillStyle = frac >= 0.35 ? C.cyan : C.red; g.fillRect(bx - 26, by, 52 * Math.max(0, frac), 7);
+        g.fillStyle = "#fff"; g.fillRect(bx - 26 + 52 * 0.35, by - 2, 2, 11);
+      }
+    } else {
+      g.fillStyle = "#1a1c22"; g.beginPath(); g.arc(jx, jy, 14, 0, Math.PI * 2); g.fill();
+      g.fillStyle = C.orange; g.beginPath(); g.arc(jx, jy, 5 + Math.sin(this.time * 20) * 2, 0, Math.PI * 2); g.fill();
+    }
+    if (b.inTransition && !b.entering) { g.strokeStyle = `rgba(255,45,85,${0.4 + Math.sin(this.time * 12) * 0.3})`; g.lineWidth = 4; g.beginPath(); g.arc(p.x, p.y, 100, 0, Math.PI * 2); g.stroke(); }
+    return true;
+  }
+
   private drawBoss(w: CombatWorld, alpha: number): void {
+    if (this.drawBossSprites(w, alpha)) return;
     const g = this.ctx;
     const b = w.boss!;
     const p = this.pos(b.e, alpha);
@@ -471,18 +525,28 @@ export class Renderer {
         g.beginPath(); g.moveTo(ship.x, ship.y + 16);
         g.quadraticCurveTo((ship.x + p.x) / 2 + sag * 0.3, (ship.y + p.y) / 2 + sag, p.x, p.y);
         g.stroke();
+        const mote = sprite("fx_tractor_mote");
+        const dir = Math.atan2(p.y - ship.y - 16, p.x - ship.x);
         for (let k = 0; k < 4; k++) {
           const t = (this.time * 1.6 + k / 4) % 1;
-          g.fillStyle = "#bff6ff"; g.beginPath(); g.arc(ship.x + (p.x - ship.x) * t, ship.y + 16 + (p.y - ship.y - 16) * t, 2.5, 0, Math.PI * 2); g.fill();
+          const mx = ship.x + (p.x - ship.x) * t, my = ship.y + 16 + (p.y - ship.y - 16) * t;
+          if (mote) drawAt(g, mote, mx, my, ...visCenter(mote), 20 / visW(mote), dir + Math.PI / 4, 0.9, false, true);
+          else { g.fillStyle = "#bff6ff"; g.beginPath(); g.arc(mx, my, 2.5, 0, Math.PI * 2); g.fill(); }
         }
       }
-      // part silhouette (W022 tail segment stack or generic module)
-      g.save(); g.translate(p.x, p.y); g.rotate(towed ? 0 : this.time * 0.8);
+      // part silhouette: boss tail art for the signature, the module's own art for owner drops
       const signature = it.sourceEncounter !== "player";
-      g.fillStyle = signature ? C.graphite : C.charcoal;
-      for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(0, -14 + k * 14, 11 - k, 0, Math.PI * 2); g.fill(); }
-      g.fillStyle = signature ? C.violet : C.orange; g.beginPath(); g.arc(0, 18, 5, 0, Math.PI * 2); g.fill();
-      g.restore();
+      const art = signature ? sprite("boss_B02_signature_mount") : sprite(`weapon_${it.templateId}`);
+      const rot = towed ? Math.atan2(ship.y - p.y, ship.x - p.x) + Math.PI / 2 + Math.PI : this.time * 0.8;
+      if (art) {
+        drawAt(g, art, p.x, p.y, ...visCenter(art), (signature ? 88 : 46) / visH(art), rot, 1, it.invuln > 0 && Math.sin(this.time * 20) > 0);
+      } else {
+        g.save(); g.translate(p.x, p.y); g.rotate(towed ? 0 : this.time * 0.8);
+        g.fillStyle = signature ? C.graphite : C.charcoal;
+        for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(0, -14 + k * 14, 11 - k, 0, Math.PI * 2); g.fill(); }
+        g.fillStyle = signature ? C.violet : C.orange; g.beginPath(); g.arc(0, 18, 5, 0, Math.PI * 2); g.fill();
+        g.restore();
+      }
       // ownership bracket: cyan for intact signature, amber for neutral/owner drop
       const col = signature ? C.cyan : C.amber;
       const r = 30 + Math.sin(this.time * 6) * 2;
@@ -513,6 +577,10 @@ export class Renderer {
     const g = this.ctx;
     const m = w.motion;
     const p = lerp(m.prev, m.pos, alpha);
+    const hullArt = sprite("hull_H01");
+    if (hullArt) {
+      this.drawPlayerSprites(w, p, hullArt);
+    } else {
     if (m.dashing) for (let k = 1; k <= 3; k++) this.hull(p.x - m.dashDir.x * k * 16, p.y - m.dashDir.y * k * 16, `rgba(57,225,255,${0.25 - k * 0.06})`);
     const flame = 18 + Math.sin(this.time * 40) * 4 + (w.overdriveLeft > 0 ? 8 : 0);
     g.fillStyle = "rgba(57,225,255,0.85)";
@@ -531,11 +599,51 @@ export class Renderer {
       if (mod.weapon.id === "W022") { g.fillStyle = C.cyan; g.beginPath(); g.arc(p.x + cellToLocal(mod.cells[0]).x, p.y + cellToLocal(mod.cells[0]).y + 6, 2.5, 0, Math.PI * 2); g.fill(); }
       if (mount?.blocked) { g.fillStyle = C.red; g.font = "700 14px sans-serif"; g.fillText("✕", p.x + cellToLocal(mod.cells[0]).x - 4, p.y + cellToLocal(mod.cells[0]).y - 14); }
     }
+    }
     g.fillStyle = "rgba(57,225,255,0.35)"; g.beginPath(); g.arc(p.x, p.y, CORE_RADIUS, 0, Math.PI * 2); g.fill();
     g.fillStyle = C.cyan; g.beginPath(); g.arc(p.x, p.y, 6, 0, Math.PI * 2); g.fill();
     if (w.playerInvulnerable && !w.opts.invulnerable) { g.strokeStyle = "rgba(57,225,255,0.9)"; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 48, 0, Math.PI * 2); g.stroke(); }
     if (w.overshield > 0) { g.strokeStyle = "rgba(255,215,106,0.7)"; g.lineWidth = 3; g.beginPath(); g.arc(p.x, p.y, 60, 0, Math.PI * 2); g.stroke(); }
     if (w.shield > 0) { g.strokeStyle = `rgba(88,166,255,${0.15 + 0.35 * (w.shield / w.shieldMax)})`; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 54, 0, Math.PI * 2); g.stroke(); }
+  }
+
+  // Integrated SPARROW hull + engine glow (shared crop, so the glow stays on the nozzles)
+  // and weapon module art fitted to each module's grid footprint.
+  private drawPlayerSprites(w: CombatWorld, p: Vec, hullArt: NonNullable<ReturnType<typeof sprite>>): void {
+    const g = this.ctx;
+    const m = w.motion;
+    const k = 100 / visW(hullArt);
+    const [hx, hy] = visCenter(hullArt);
+    const cy = p.y - 2;
+    const lean = Math.max(-0.12, Math.min(0.12, m.vel.x / 3000));
+    if (m.dashing) for (let i = 1; i <= 3; i++) drawAt(g, hullArt, p.x - m.dashDir.x * i * 16, cy - m.dashDir.y * i * 16, hx, hy, k, lean, 0.22 - i * 0.05);
+    const glow = sprite("hull_H01_engine_glow");
+    if (glow) {
+      const pulse = 0.75 + 0.25 * Math.sin(this.time * 40) + (w.overdriveLeft > 0 ? 0.35 : 0);
+      drawAt(g, glow, p.x, cy, hx, hy, k * (1 + (w.overdriveLeft > 0 ? 0.04 : 0)), lean, Math.min(1, pulse), false, true);
+    }
+    drawAt(g, hullArt, p.x, cy, hx, hy, k, lean);
+    for (const mod of w.assembly.modules) {
+      const mount = w.weapons.mounts.find((x) => x.module === mod);
+      const art = sprite(`weapon_${mod.weapon.id}`);
+      const xs = mod.cells.map((c) => cellToLocal(c).x), ys = mod.cells.map((c) => cellToLocal(c).y);
+      const bx = (Math.min(...xs) + Math.max(...xs)) / 2, by = (Math.min(...ys) + Math.max(...ys)) / 2;
+      const bw = Math.max(...xs) - Math.min(...xs) + 22, bh = Math.max(...ys) - Math.min(...ys) + 22;
+      if (art) {
+        const ka = Math.min((bw * 1.2) / visW(art), (bh * 1.15) / visH(art));
+        drawAt(g, art, p.x + bx, p.y + by, ...visCenter(art), ka);
+      } else {
+        g.fillStyle = MODULE_COLOR[mod.weapon.id] ?? C.charcoal; g.fillRect(p.x + bx - bw / 2 + 3, p.y + by - bh / 2 + 2, bw - 6, bh - 4);
+      }
+      const heat = (mount?.heat ?? 0) / 100;
+      if (heat > 0.35) {
+        g.save(); g.globalCompositeOperation = "lighter";
+        g.fillStyle = `rgba(255,120,30,${(heat - 0.35) * 0.9})`;
+        g.beginPath(); g.arc(p.x + bx, p.y + by - bh / 2 + 4, 7, 0, Math.PI * 2); g.fill(); g.restore();
+      }
+      if (mount?.locked) { g.strokeStyle = C.red; g.lineWidth = 2; g.strokeRect(p.x + bx - bw / 2, p.y + by - bh / 2, bw, bh); }
+      if (mount?.blocked) { g.fillStyle = C.red; g.font = "700 14px sans-serif"; g.fillText("✕", p.x + bx - 4, p.y + by - bh / 2 - 4); }
+    }
   }
 
   private hull(x: number, y: number, color: string): void {

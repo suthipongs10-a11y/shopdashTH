@@ -1,0 +1,36 @@
+{
+  "asset_id": "boss_B02_armor",
+  "source_filename": "art/source/batch_001/rb_boss_b02_armor_000.png",
+  "source_sha256": "eafe93707347318ef8fd2575c08c7263e1b9f4da621c4733ce6241a3977391d5",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    162,
+    159,
+    1091,
+    1095
+  ],
+  "runtime_size": [
+    179,
+    180
+  ],
+  "scale": 0.19231,
+  "visible_rect": [
+    1.5,
+    1.5,
+    177.1,
+    178.5
+  ],
+  "pivot_px": [
+    89.5,
+    90.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_001",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

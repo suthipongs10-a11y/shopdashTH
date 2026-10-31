@@ -670,7 +670,7 @@ export class CombatWorld {
     const b = this.boss;
     if (!b || !b.e.alive) return;
     for (const ev of b.afterDamage()) {
-      const at = { x: b.e.pos.x + 88, y: b.e.pos.y - 40 };
+      const at = { x: b.e.pos.x + b.joint.offset.x, y: b.e.pos.y + b.joint.offset.y };
       if (ev === "sever_intact" || ev === "sever_scrap" || ev === "tail_destroyed") {
         this.severed.push(b.row.id);
         if (this.hitstopCd <= 0) { this.hitstop = HITSTOP_SEVER_TICKS; this.hitstopCd = HITSTOP_COOLDOWN; }
@@ -895,7 +895,7 @@ export class CombatWorld {
     }
   }
 
-  private maxPenetration(): number {
+  maxPenetration(): number {
     let worst = 0;
     for (const e of this.allEnemies()) for (const part of e.parts) {
       if (!e.alive || !part.active) continue;

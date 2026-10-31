@@ -23,6 +23,7 @@ OUT = ROOT / "art/requests/chatgpt_pack"
 CAT = json.loads((ROOT / "data/catalog.json").read_text(encoding="utf-8"))
 PU = json.loads((ROOT / "data/powerups.json").read_text(encoding="utf-8"))
 MANIFEST = list(csv.DictReader((ROOT / "art/asset_manifest.csv").open(encoding="utf-8")))
+MANIFEST_STATUS = {r["asset_id"]: r["status"] for r in MANIFEST}
 IDX = {g: {r["id"]: r for r in CAT[g]} for g in ["hulls", "weapons", "utilities", "abilities", "fusions", "enemies", "bosses", "hazards", "sectors"]}
 
 STYLE = (
@@ -405,7 +406,9 @@ def build(out_dir: Path):
     for n, (title, items, refs) in enumerate(plan, 1):
         (out_dir / "batches" / f"BATCH_{n:03d}.md").write_text(render_batch(n, title, items, refs), encoding="utf-8")
         for e in items:
-            rows.append([f"BATCH_{n:03d}", e["id"], e["category"], e["canvas"], e["frames"], e["blend"], e["milestone"], e["files"][0], "requested"])
+            status = MANIFEST_STATUS.get(e["id"], "requested")
+            rows.append([f"BATCH_{n:03d}", e["id"], e["category"], e["canvas"], e["frames"], e["blend"], e["milestone"], e["files"][0],
+                         status if status in ("integrated", "approved", "generated_unchecked") else "requested"])
     with (out_dir / "ASSET_CHECKLIST.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["batch", "asset_id", "category", "canvas", "frames", "blend", "milestone", "first_file", "status"])

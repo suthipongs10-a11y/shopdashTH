@@ -28,10 +28,10 @@ function botInput(w: CombatWorld, log: { tailActionsAfterSever: number; plasmaSh
   if (!b.signatureRemoved) {
     if (b.jointExposed) {
       w.lock = { enemyId: b.e.id, partId: "tail_joint" };
-      return { move: steer(w, { x: b.e.pos.x + 88, y: 820 }), fire: true };
+      return { move: steer(w, { x: b.e.pos.x + b.joint.offset.x, y: 820 }), fire: true };
     }
     // Hold fire while waiting so the tail stays intact (reckless fire scraps it).
-    return { move: steer(w, { x: b.e.pos.x + 88, y: 820 }), fire: false };
+    return { move: steer(w, { x: b.e.pos.x + b.joint.offset.x, y: 820 }), fire: false };
   }
   w.lock = { enemyId: b.e.id, partId: "core" };
   return { move: steer(w, { x: b.e.pos.x - 30, y: 860 }), fire: true };

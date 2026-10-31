@@ -1,0 +1,280 @@
+{
+  "batch": "BATCH_001",
+  "asset_count": 10,
+  "generator": "ChatGPT built-in imagegen",
+  "requested_source": "ROCKET_BREAKERS_ART_REQUESTS.zip",
+  "source_request_library_id": "libfile_bf96b9eadd40819194006c9ae29fcde4",
+  "files": [
+    {
+      "asset_id": "hull_H01",
+      "filename": "rb_hull_h01_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.7342,
+      "visible_bbox_alpha_gt16": [
+        142,
+        144,
+        1111,
+        1075
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "6eb4f56492acb2be02b199bad21e3c3abfd34d0855616226d8faea8590f1199f",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "reactor/core centre at (512,560); nose near y=174; hull inside x 204..819, y 163..860",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "hull_H01_engine_glow",
+      "filename": "rb_hull_h01_engine_glow_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        253
+      ],
+      "fully_transparent_fraction": 0.951,
+      "visible_bbox_alpha_gt16": [
+        423,
+        958,
+        836,
+        1206
+      ],
+      "max_border_alpha": 0,
+      "edge_note": "outer border transparent",
+      "sha256": "87bcef457ba0d30de3a7b9bdc94461946387e8d8391cbcf2957183c746c560e5",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "reactor/core centre at (512,560); nose near y=174; hull inside x 204..819, y 163..860",
+      "blend": "additive"
+    },
+    {
+      "asset_id": "weapon_W001",
+      "filename": "rb_weapon_w001_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.7381,
+      "visible_bbox_alpha_gt16": [
+        287,
+        225,
+        967,
+        1033
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "b47d288f21475356c3d3e520da7142528ff24cce13974fc0d12e0c5b6150878b",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "muzzle (256,87); attachment socket (256,419); object inside 81..430",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "weapon_W008",
+      "filename": "rb_weapon_w008_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.867,
+      "visible_bbox_alpha_gt16": [
+        475,
+        183,
+        781,
+        1086
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "082550ba3bc3220dc7560756b12b632aa28253b1c86697f5cb4ec62df22ff1c3",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "muzzle (256,87); attachment socket (256,419); object inside 81..430",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "weapon_W022",
+      "filename": "rb_weapon_w022_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.8846,
+      "visible_bbox_alpha_gt16": [
+        524,
+        168,
+        834,
+        1059
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "21ea155aebf0182d26216956e8be4bfeb718349ca8bf72ed964c3475fcc7dbc3",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "muzzle (256,87); attachment socket (256,419); object inside 81..430",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "boss_B02_core",
+      "filename": "rb_boss_b02_core_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.6032,
+      "visible_bbox_alpha_gt16": [
+        71,
+        137,
+        1184,
+        1146
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "88515fe75e819d2bdc777dfb4584222697983cec169f65c3a838c60307c65b29",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "core centre (512,512); leave socket for the segmented plasma tail with violet emitter stinger",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "boss_B02_joint",
+      "filename": "rb_boss_b02_joint_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.7473,
+      "visible_bbox_alpha_gt16": [
+        201,
+        203,
+        1054,
+        1049
+      ],
+      "max_border_alpha": 0,
+      "edge_note": "outer border transparent",
+      "sha256": "905553071018137de75e3f3bc41825650f16dc36d468cabda26c46e3c0efe3e0",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "pivot (512,512)",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "boss_B02_signature_mount",
+      "filename": "rb_boss_b02_signature_mount_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.8669,
+      "visible_bbox_alpha_gt16": [
+        506,
+        162,
+        852,
+        1116
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "0d776b63b0c2364245dbcfb097fe1cee068ac1e451ae281cd76c99960f1c70b4",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "socket end at (512,870)",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "boss_B02_armor",
+      "filename": "rb_boss_b02_armor_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "fully_transparent_fraction": 0.6317,
+      "visible_bbox_alpha_gt16": [
+        171,
+        168,
+        1083,
+        1086
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "eafe93707347318ef8fd2575c08c7263e1b9f4da621c4733ce6241a3977391d5",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "pivot (512,512) = joint centre",
+      "blend": "alpha"
+    },
+    {
+      "asset_id": "fx_tractor_mote",
+      "filename": "rb_fx_tractor_mote_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        253
+      ],
+      "fully_transparent_fraction": 0.8194,
+      "visible_bbox_alpha_gt16": [
+        405,
+        341,
+        954,
+        955
+      ],
+      "max_border_alpha": 1,
+      "edge_note": "low-alpha edge cleanup needs import QA",
+      "sha256": "7fb571c7a19fb218761580d77999db3490c0fc963e8ffb039b39bad8984f34a2",
+      "status": "generated_awaiting_engine_QA",
+      "anchor_status": "requested coordinates not pixel-verified",
+      "requested_layout": "pivot (256,256)",
+      "blend": "additive"
+    }
+  ],
+  "implemented_or_engine_tested": false
+}

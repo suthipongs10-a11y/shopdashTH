@@ -1,0 +1,72 @@
+[
+  {
+    "id": "hull_H01",
+    "filename": "rb_hull_h01_000.png",
+    "requested_canvas": "1024x1024",
+    "layout": "reactor/core centre at (512,560); nose near y=174; hull inside x 204..819, y 163..860",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Player palette: ivory and charcoal plates with orange accents, cyan energy core and cyan ownership lights. Spaceship hull: SPARROW starter fighter: compact balanced body, swept wings, twin engines, cyan canopy (see modular_ships reference, top-left ship). BARE hull only: no guns, no missiles, no engine flame (weapons are separate modules). Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "hull_H01_engine_glow",
+    "filename": "rb_hull_h01_engine_glow_000.png",
+    "requested_canvas": "1024x1024",
+    "layout": "reactor/core centre at (512,560); nose near y=174; hull inside x 204..819, y 163..860",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Engine glow overlay for the H01 hull: ONLY the cyan engine light/plume coming out of the engine nozzles of the neutral image, soft feathered glow, no ship body. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene."
+  },
+  {
+    "id": "weapon_W001",
+    "filename": "rb_weapon_w001_000.png",
+    "requested_canvas": "512x512",
+    "layout": "muzzle (256,87); attachment socket (256,419); object inside 81..430",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Detachable ship weapon module 'Needle Cannon' (straight_burst attack): brass/gold kinetic barrel, gold-white muzzle accent; small single-cell module (square-ish). Muzzle at the top, flat attachment socket at the bottom centre. No muzzle flash, no projectile. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "weapon_W008",
+    "filename": "rb_weapon_w008_000.png",
+    "requested_canvas": "512x512",
+    "layout": "muzzle (256,87); attachment socket (256,419); object inside 81..430",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Detachable ship weapon module 'Pulse Laser' (pulse_beam attack): slim emitter with a cyan lens (beam weapon, cyan core / white centre); slim module two cells tall (2:1 tall). Muzzle at the top, flat attachment socket at the bottom centre. No muzzle flash, no projectile. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "weapon_W022",
+    "filename": "rb_weapon_w022_000.png",
+    "requested_canvas": "512x512",
+    "layout": "muzzle (256,87); attachment socket (256,419); object inside 81..430",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Detachable ship weapon module 'Scorpion Tail' (curved_plasma attack): violet plasma emitter bulb with purple glow; slim module two cells tall (2:1 tall). This is the player-normalized STOLEN version of the Scorpion Reclaimer's segmented plasma tail with violet emitter stinger: keep the boss part's recognizable shape and accent colour, graphite boss plates, plus one small cyan player ownership light. Compact, not the giant boss-size part. Muzzle at the top, flat attachment socket at the bottom centre. No muzzle flash, no projectile. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "boss_B02_core",
+    "filename": "rb_boss_b02_core_000.png",
+    "requested_canvas": "1024x1024",
+    "layout": "core centre (512,512); leave socket for the segmented plasma tail with violet emitter stinger",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Hostile palette: dark graphite armour with red and magenta warning lights and telegraph accents. Boss Scorpion Reclaimer from Graveyard Belt. Main body: mechanical scorpion: torso and legs. Do NOT include the detachable segmented plasma tail with violet emitter stinger — leave a clear mechanical socket where it attaches. Body only. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "boss_B02_joint",
+    "filename": "rb_boss_b02_joint_000.png",
+    "requested_canvas": "1024x1024",
+    "layout": "pivot (512,512)",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Hostile palette: dark graphite armour with red and magenta warning lights and telegraph accents. Boss Scorpion Reclaimer from Graveyard Belt. Circular hinge coupling that links the segmented plasma tail with violet emitter stinger to the body: machined metal outer ring and a glowing AMBER inner ring (weak point). Separate object, no surrounding body. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "boss_B02_signature_mount",
+    "filename": "rb_boss_b02_signature_mount_000.png",
+    "requested_canvas": "1024x1024",
+    "layout": "socket end at (512,870)",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Hostile palette: dark graphite armour with red and magenta warning lights and telegraph accents. Boss Scorpion Reclaimer from Graveyard Belt. The detachable segmented plasma tail with violet emitter stinger, isolated, at boss scale, exactly as it looks when attached (its socket end at the bottom of the image). This is the part players shoot off and steal. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "boss_B02_armor",
+    "filename": "rb_boss_b02_armor_000.png",
+    "requested_canvas": "1024x1024",
+    "layout": "pivot (512,512) = joint centre",
+    "prompt": "Original ROCKET BREAKERS game art. Premium 2.5D rendered sprite, strict top-down orthographic camera, nose/front pointing UP (top of image), consistent light from the upper-left, machined ceramic and steel materials with restrained wear, chunky readable silhouette that still reads at small phone size. NOT pixel art, no text, no letters, no logos, no watermark, no UI frame, no floor or cast shadow, no scene. Hostile palette: dark graphite armour with red and magenta warning lights and telegraph accents. Boss Scorpion Reclaimer from Graveyard Belt. Armour plate that closes over the segmented plasma tail with violet emitter stinger joint: thick curved graphite plate with a CLOSED shield look, separate object. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge."
+  },
+  {
+    "id": "fx_tractor_mote",
+    "filename": "rb_fx_tractor_mote_000.png",
+    "requested_canvas": "512x512",
+    "layout": "pivot (256,256)",
+    "prompt": "Original game VFX texture: one cyan soft energy streak/mote with bright core (repeated along a tow cable). Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene."
+  }
+]

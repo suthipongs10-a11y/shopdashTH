@@ -38,9 +38,18 @@ export const CHARGE_SEC = 0.45;
 export const CHARGE_SPEED = 600;
 export const CONTACT_DAMAGE = 20;
 
-const JOINT_OFFSET: Vec = { x: 88, y: -40 };
-const TAIL_HANG: Vec[] = [{ x: 112, y: -8 }, { x: 128, y: 34 }, { x: 122, y: 78 }];
-const TAIL_LIFT: Vec[] = [{ x: 108, y: -80 }, { x: 88, y: -114 }, { x: 56, y: -130 }];
+// Geometry matches the BATCH_001 art drawn nose-up: head and pincers at the top,
+// tail socket at the rear facing the player. The joint is exposed from below only
+// while the tail is curled up over the back (vent); otherwise the tail hangs in front of it.
+const JOINT_OFFSET: Vec = { x: 0, y: 62 };
+// The tail is a rigid segmented piece rotating about the joint (matches the
+// tail sprite): hanging forward-right in front of the joint, lifted behind it to vent.
+export const TAIL_LEN = 123;
+const TAIL_HANG_DEG = 80;
+const TAIL_LIFT_DEG = -100;
+const TAIL_SEGMENTS = [0.33, 0.66, 0.95];
+const tailPoints = (deg: number): Vec[] =>
+  TAIL_SEGMENTS.map((f) => ({ x: JOINT_OFFSET.x + Math.cos(deg * DEG) * TAIL_LEN * f, y: JOINT_OFFSET.y + Math.sin(deg * DEG) * TAIL_LEN * f }));
 const TAIL_ACTIONS: ActionName[] = ["tail_sweep", "tail_vent"];
 
 export class ScorpionBoss {
@@ -66,20 +75,29 @@ export class ScorpionBoss {
   ringFlip = 1;
 
   constructor(readonly row: BossRow, runId: string, private em: Emitter, private rng: Rng) {
-    this.core = makePart({ id: "core", kind: "core", shape: { type: "circle", r: 62 }, hp: row.core_hp, selectable: true });
-    const clawL = makePart({ id: "claw_l", kind: "armor", shape: { type: "circle", r: 32 }, offset: { x: -130, y: 58 }, hp: 1, invulnerable: true });
-    const clawR = makePart({ id: "claw_r", kind: "armor", shape: { type: "circle", r: 32 }, offset: { x: 130, y: 58 }, hp: 1, invulnerable: true });
+    this.core = makePart({ id: "core", kind: "core", shape: { type: "circle", r: 58 }, offset: { x: 0, y: -22 }, hp: row.core_hp, selectable: true });
+    const clawL = makePart({ id: "claw_l", kind: "armor", shape: { type: "circle", r: 34 }, offset: { x: -112, y: -112 }, hp: 1, invulnerable: true });
+    const clawR = makePart({ id: "claw_r", kind: "armor", shape: { type: "circle", r: 34 }, offset: { x: 112, y: -112 }, hp: 1, invulnerable: true });
+    const legL = makePart({ id: "legs_l", kind: "armor", shape: { type: "circle", r: 34 }, offset: { x: -128, y: 12 }, hp: 1, invulnerable: true });
+    const legR = makePart({ id: "legs_r", kind: "armor", shape: { type: "circle", r: 34 }, offset: { x: 128, y: 12 }, hp: 1, invulnerable: true });
+    const rearL = makePart({ id: "rear_legs_l", kind: "armor", shape: { type: "circle", r: 26 }, offset: { x: -104, y: 92 }, hp: 1, invulnerable: true });
+    const rearR = makePart({ id: "rear_legs_r", kind: "armor", shape: { type: "circle", r: 26 }, offset: { x: 104, y: 92 }, hp: 1, invulnerable: true });
     this.joint = makePart({ id: "tail_joint", kind: "joint", shape: { type: "circle", r: 18 }, offset: { ...JOINT_OFFSET }, hp: row.joint_hp, active: false });
     this.plate = makePart({ id: "tail_plate", kind: "armor", shape: { type: "rect", hw: 24, hh: 22 }, offset: { ...JOINT_OFFSET }, hp: 1, invulnerable: true });
-    this.tail = makePart({ id: "tail", kind: "module", shape: { type: "chain", r: 17, points: TAIL_HANG.map((p) => ({ ...p })) },
+    this.tail = makePart({ id: "tail", kind: "module", shape: { type: "chain", r: 17, points: tailPoints(TAIL_HANG_DEG) },
       integrity: row.signature_module_integrity, selectable: true });
     this.e = {
       id: `boss:${row.id}`, defId: row.id, role: "boss", pos: { x: 360, y: -170 }, prev: { x: 360, y: -170 },
-      parts: [this.core, clawL, clawR, this.plate, this.joint, this.tail], alive: true, armor: row.armor, age: 0,
+      parts: [this.core, clawL, clawR, legL, legR, rearL, rearR, this.plate, this.joint, this.tail], alive: true, armor: row.armor, age: 0,
       fireTimer: 0, burstLeft: 0, burstTimer: 0, telegraph: 0, charge: 0, credits: 120, scrap: 20, score: 5000,
       spawnIndex: 0, dir: 1, baseY: 250, tag: "boss", leftArena: false,
     };
     this.item = makeItem(`${runId}:${row.id}:tail`, row.signature_weapon_id, row.id, "tail", row.signature_module_integrity, 7);
+  }
+
+  // Current tail direction from the joint, in degrees (renderer aligns the sprite to it).
+  tailAngle(): number {
+    return TAIL_HANG_DEG + (TAIL_LIFT_DEG - TAIL_HANG_DEG) * this.tailPose;
   }
 
   get inTransition(): boolean { return this.transition > 0 || this.entering; }
@@ -93,7 +111,7 @@ export class ScorpionBoss {
   }
 
   clawWorld(side: -1 | 1): Vec {
-    return { x: this.e.pos.x + 130 * side, y: this.e.pos.y + 74 };
+    return { x: this.e.pos.x + 118 * side, y: this.e.pos.y - 140 }; // pincer tips
   }
 
   loop(): ActionName[] {
@@ -136,7 +154,8 @@ export class ScorpionBoss {
     const target = a?.name === "tail_vent" && a.t > 0.15 && a.t < a.dur - 0.2 ? 1 : 0;
     this.tailPose += Math.sign(target - this.tailPose) * Math.min(Math.abs(target - this.tailPose), dt / 0.3);
     const pts = (this.tail.shape as { points: Vec[] }).points;
-    for (let i = 0; i < pts.length; i++) pts[i] = lerp(TAIL_HANG[i], TAIL_LIFT[i], this.tailPose);
+    const next = tailPoints(this.tailAngle());
+    for (let i = 0; i < pts.length; i++) pts[i] = next[i];
     const exposed = !this.signatureRemoved && this.tailPose > 0.95 && this.action?.name === "tail_vent";
     if (exposed !== this.joint.active && !this.signatureRemoved) {
       this.joint.active = exposed;

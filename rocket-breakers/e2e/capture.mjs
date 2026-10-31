@@ -39,7 +39,7 @@ const bot = `(() => {
       else if (!b || !b.e.alive) inp = { move: steer({ x: w.enemies[0]?.pos.x ?? 360, y: 860 }), fire: true };
       else if (c && (c.state === "detached_intact" || c.state === "acquiring")) inp = { move: steer({ x: c.pos.x, y: c.pos.y + 90 }), tractorHeld: true, fire: true };
       else if (w.enemies.length) inp = { move: steer({ x: w.enemies[0].pos.x, y: 900 }), fire: true };
-      else if (!b.signatureRemoved) { if (b.jointExposed) w.lock = { enemyId: b.e.id, partId: "tail_joint" }; inp = { move: steer({ x: b.e.pos.x + 88, y: 820 }), fire: b.jointExposed }; }
+      else if (!b.signatureRemoved) { if (b.jointExposed) w.lock = { enemyId: b.e.id, partId: "tail_joint" }; inp = { move: steer({ x: b.e.pos.x + b.joint.offset.x, y: 820 }), fire: b.jointExposed }; }
       else { w.lock = { enemyId: b.e.id, partId: "core" }; inp = { move: steer({ x: b.e.pos.x - 30, y: 860 }), fire: true }; }
       w.step(inp);
     }

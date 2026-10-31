@@ -1,0 +1,36 @@
+{
+  "asset_id": "boss_B02_joint",
+  "source_filename": "art/source/batch_001/rb_boss_b02_joint_000.png",
+  "source_sha256": "905553071018137de75e3f3bc41825650f16dc36d468cabda26c46e3c0efe3e0",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    192,
+    194,
+    1064,
+    1058
+  ],
+  "runtime_size": [
+    160,
+    159
+  ],
+  "scale": 0.18349,
+  "visible_rect": [
+    1.5,
+    1.5,
+    158.5,
+    157.1
+  ],
+  "pivot_px": [
+    80.0,
+    79.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_001",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

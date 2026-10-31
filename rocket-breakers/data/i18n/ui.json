@@ -44,8 +44,8 @@
     "en": "This browser can't store saves — progress is lost when the page closes"
   },
   "title.build_note": {
-    "th": "M1 ด่านทดลอง · ภาพทั้งหมดเป็นภาพชั่วคราว · เสียงสังเคราะห์ชั่วคราว",
-    "en": "M1 test slice · all art is placeholder · prototype synthesized audio"
+    "th": "M1 ด่านทดลอง · ภาพชุดแรกใส่แล้ว (ยาน ปืน บอส) ที่เหลือยังเป็นภาพชั่วคราว · เสียงสังเคราะห์ชั่วคราว",
+    "en": "M1 test slice · first art batch in (ship, guns, boss); the rest is placeholder · prototype audio"
   },
   "howto.title": {
     "th": "วิธีเล่น",
@@ -204,8 +204,8 @@
     "en": "Score"
   },
   "hud.placeholder": {
-    "th": "ภาพชั่วคราว",
-    "en": "placeholder art"
+    "th": "ภาพบางส่วนยังชั่วคราว",
+    "en": "some art is placeholder"
   },
   "hint.intro": {
     "th": "ลากนิ้วเพื่อบิน ปืนยิงเอง — แตะศัตรูเพื่อล็อกเป้า",

@@ -35,9 +35,11 @@ describe("assets", () => {
     const r = new AssetResolver();
     expect(r.errors).toEqual([]);
     expect(r.rows.size).toBe(386);
-    expect(r.resolve("hull_H01")).toMatchObject({ status: "planned", placeholder: true });
+    expect(r.resolve("hull_H02")).toMatchObject({ status: "planned", placeholder: true });
     expect(r.resolve("nope").placeholder).toBe(true);
-    expect(r.missingForRelease(["hull_H01"])).toEqual(["hull_H01"]);
+    // BATCH_001 delivered art is integrated with a runtime path
+    expect(r.resolve("hull_H01")).toMatchObject({ status: "integrated", path: "assets/sprites/hull_H01.webp", placeholder: false });
+    expect(r.missingForRelease(["hull_H01", "hull_H02"])).toEqual(["hull_H02"]);
   });
   it("handles quoted CSV fields", () => {
     expect(parseCsv('a,b\n"x, y","say ""hi"""\n')).toEqual([["a", "b"], ["x, y", 'say "hi"']]);
