@@ -120,7 +120,9 @@ describe("P01-03 playthrough (M2 stage 2 gate)", () => {
       if (w.dock) {
         const it = w.dockItem()!;
         const origin = w.assembly.suggestOrigins(w.dockWeapon()!)[0];
-        if (origin && !w.dockFit(origin)) { if (it.templateId === "W021") fittedW021 = true; } else w.dockStow();
+        // keep the grid free for the boss claw: fit only the signature, stow (or scrap) ordinary drops
+        if (it.templateId === "W021" && origin && !w.dockFit(origin)) fittedW021 = true;
+        else if (w.dockStow()) w.dockScrap();
         w.endDock();
         continue;
       }

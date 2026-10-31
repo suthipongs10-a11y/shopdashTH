@@ -7,6 +7,7 @@ import { applySettlement, computeSettlement } from "../src/campaign/settlement";
 import { missionUnlocked, researchPool } from "../src/campaign/progress";
 import { defaultProfile } from "../src/save/profile";
 import { makeDirected, updateEnemy, VOLLEY_WARN } from "../src/combat/enemies";
+import { ARSENAL_POOL } from "../src/combat/world";
 import { BulletPool } from "../src/combat/bullets";
 import type { CombatWorld, TickInput } from "../src/combat/world";
 import type { Enemy } from "../src/combat/enemies";
@@ -83,7 +84,7 @@ describe("new enemies", () => {
     const item = w.items.find((i) => i.sourceEncounter === "E04")!;
     expect(item.state).toBe("detached_intact");
     expect(item.integrity).toBe(60);
-    expect(["W001", "W008"]).toContain(item.templateId);
+    expect(ARSENAL_POOL).toContain(item.templateId);
   });
 
   it("E04 tank kill sets off a fuel blast that hurts nearby enemies and leaves no part", () => {
@@ -184,7 +185,7 @@ describe("P01-01 playthrough (M2 stage 1 gate)", () => {
       if (w.dock) {
         docks++;
         const origin = w.assembly.suggestOrigins(w.dockWeapon()!)[0];
-        if (!origin || w.dockFit(origin)) w.dockStow();
+        if (!origin || w.dockFit(origin)) { if (w.dockStow()) { w.dockScrapHold(); if (w.dockStow()) w.dockScrap(); } }
         w.endDock();
         continue;
       }

@@ -850,5 +850,17 @@
   "brief.wreck_tip": {
     "th": "ซากลอย: บังกระสุนทั้งของเราและศัตรู ชนแล้วโดนดันและเสียเลือดนิดหน่อย — ยิงเครื่องปล่อยซากด้านบนทิ้งก่อน",
     "en": "Wreck drift: blocks both your shots and theirs; touching it shoves you and stings — shoot the launchers up top first"
+  },
+  "fx.swapped": {
+    "th": "เปลี่ยนเป็น {name}!",
+    "en": "Swapped in {name}!"
+  },
+  "hint.quick_weapon_drop": {
+    "th": "ศัตรูทิ้งอาวุธไว้! เข้าใกล้แล้วแตะ \"ดึงเข้ายาน\" เพื่อใช้ทันที",
+    "en": "An enemy dropped a weapon! Fly close and tap \"Grab\" to use it now"
+  },
+  "hint.elite": {
+    "th": "ยานหัวหน้า (วงทอง)! ทนกว่า ยิงกระสุนเป็นวง — มีช่องว่างให้หลบ ทำลายแล้วได้อาวุธแน่นอน",
+    "en": "Elite (gold ring)! Tougher and fires a bullet ring — slip through the gap. Always drops a weapon"
   }
 }

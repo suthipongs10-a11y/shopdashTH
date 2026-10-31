@@ -3,7 +3,7 @@
 // damage resolution lives in the world. Campaign waves move along authored paths
 // (MissionDirector); the SLICE-01 test mission keeps its original movement.
 import { makePart, type Part } from "./parts";
-import { aimed, fan, straight, type Emitter } from "./patterns";
+import { aimed, fan, ringGap, straight, type Emitter } from "./patterns";
 import type { EnemyRow } from "../core/types";
 import type { Vec } from "../core/geometry";
 
@@ -40,7 +40,11 @@ export interface Enemy {
   aim: Vec | null;     // aimed volley target, sampled when the warning starts
   // Loot Snatcher (E21) state, driven by the world (it needs the salvage list).
   steal?: { target: string | null; beam: number; carrying: string | null; idle: number };
-  holdAtEnd?: boolean; // stay at the last waypoint instead of leaving (hazard nodes)
+  holdAtEnd?: boolean;
+  // Status effects from player weapons (seconds left): chill slows movement, ion slows firing, burn ticks damage.
+  status?: { chill: number; ion: number; burn: number };
+  // Elite (one per second wave pass): tougher, gold-marked, extra ring attack, sure weapon drop.
+  elite?: { ring: number }; // stay at the last waypoint instead of leaving (hazard nodes)
 }
 
 export const coreOf = (e: Enemy): Part => e.parts.find((p) => p.kind === "core")!;
@@ -89,6 +93,12 @@ export const SUPPLY_ROW: EnemyRow = {
 };
 
 // Campaign enemy built from its catalog row; colliders are sized to the BATCH_003 art.
+export function makeElite(e: Enemy): void {
+  for (const p of e.parts) if (p.kind === "core") { p.hp *= ELITE_HP_MUL; p.hpMax = p.hp; }
+  e.score *= 3; e.charge *= 2; e.credits *= 2;
+  e.elite = { ring: 1.6 + e.spawnIndex * 0.2 };
+}
+
 export function makeDirected(id: string, row: EnemyRow, spec: SpawnSpec, tag: string): Enemy {
   const start = spec.path[0];
   const dir = spec.path.length > 1 && spec.path[1].x < start.x ? -1 : 1;
@@ -146,15 +156,31 @@ export function makeDirected(id: string, row: EnemyRow, spec: SpawnSpec, tag: st
 }
 
 const SCOUT_TELEGRAPH = 0.4;
+export const ELITE_HP_MUL = 2.5;
+export const ELITE_RING_EVERY = 3.4;
+export const ELITE_RING_WARN = 0.6;
+export const CHILL_SLOW = 0.5; // frost: half movement speed
+export const ION_SLOW = 0.5;   // ion: half firing cadence
 export const VOLLEY_WARN = 0.4;
 export const VOLLEY_SHOTS = 3;
 export const VOLLEY_GAP = 0.12;
 export const VOLLEY_EVERY = 2;
 
+// Elite ring: 12-way burst with a 3-slot gap toward the player, after a 0.6 s warning.
+function eliteRing(e: Enemy, dt: number, em: Emitter, target: Vec): void {
+  const el = e.elite!;
+  const onScreen = e.pos.x > 40 && e.pos.x < 680 && e.pos.y > 140 && e.pos.y < 900;
+  el.ring -= dt * (e.status && e.status.ion > 0 ? ION_SLOW : 1);
+  if (el.ring <= 0) {
+    el.ring = ELITE_RING_EVERY;
+    if (onScreen) ringGap(em, { ...e.pos }, Math.atan2(target.y - e.pos.y, target.x - e.pos.x) / (Math.PI / 180), 12, 3, 170, 6, 9);
+  }
+}
+
 // Follow the path along a base track; the visible position adds the wobble.
 function followPath(e: Enemy, dt: number): void {
   const path = e.path!;
-  let budget = e.speed * dt;
+  let budget = e.speed * dt * (e.status && e.status.chill > 0 ? CHILL_SLOW : 1);
   let p = e.track;
   while (budget > 0 && e.pathI < path.length) {
     const to = path[e.pathI];
@@ -184,21 +210,22 @@ export function updateEnemy(e: Enemy, dt: number, em: Emitter, target: Vec = { x
     return;
   }
   if (e.role === "scout") {
-    e.pos.x += e.dir * 120 * dt;
+    e.pos.x += e.dir * 120 * dt * (e.status && e.status.chill > 0 ? CHILL_SLOW : 1);
     e.pos.y = e.baseY + 22 * e.age + Math.sin(e.age * 2.2 + e.spawnIndex) * 46;
   } else if (e.role === "shield") {
-    e.pos.x += e.dir * 55 * dt;
+    e.pos.x += e.dir * 55 * dt * (e.status && e.status.chill > 0 ? CHILL_SLOW : 1);
   }
   if (e.pos.x < -140 || e.pos.x > 860 || e.pos.y > 1360) { e.leftArena = true; return; }
   updateFire(e, dt, em, target);
 }
 
 function updateFire(e: Enemy, dt: number, em: Emitter, target: Vec): void {
+  if (e.elite) eliteRing(e, dt, em, target);
   const onScreen = e.pos.x > 24 && e.pos.x < 696 && e.pos.y > 30 && e.pos.y < 1000;
   if (e.role === "cargo" || e.role === "supply" || e.role === "thief" || e.role === "hazard_node") return; // no damaging attack (body contact still hurts)
   const warn = e.role === "interceptor" ? VOLLEY_WARN : SCOUT_TELEGRAPH;
   const wasWarning = e.telegraph > 0;
-  e.fireTimer -= dt;
+  e.fireTimer -= dt * (e.status && e.status.ion > 0 ? ION_SLOW : 1);
   e.telegraph = e.fireTimer <= warn && e.fireTimer > 0 && onScreen ? e.fireTimer : 0;
   // aimed_volley: the aim is sampled when the warning starts and never retargets.
   if (e.role === "interceptor" && e.telegraph > 0 && !wasWarning) e.aim = { ...target };

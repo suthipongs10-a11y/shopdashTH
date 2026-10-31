@@ -1,12 +1,15 @@
 // Pooled projectiles (TECHNICAL budgets: 300 friendly, 600 hostile). Fixed
 // capacity with a free list — no allocation during combat.
-export type BulletModel = "kinetic" | "plasma" | "hostile";
+export type BulletModel = "kinetic" | "plasma" | "hostile" | "missile" | "orb" | "disc" | "flak" | "seed" | "bolt";
 
 export interface Bullet {
   slot: number; id: number; alive: boolean; model: BulletModel;
   x: number; y: number; px: number; py: number; vx: number; vy: number;
   r: number; dmg: number; age: number; life: number;
   blast: number; homing: number; turnRate: number; grazed: boolean; hitCargo: boolean;
+  // player weapon extras (arsenal): fuse timer, wall bounces, pierce count, armour ignore,
+  // last enemy hit (pierce), split-on-fuse count, status applied on hit, weapon id
+  fuse: number; bounces: number; pierce: number; armorIgnore: number; lastHit: string; split: number; status: string; src: string;
 }
 
 export class BulletPool {
@@ -18,7 +21,8 @@ export class BulletPool {
   constructor(readonly capacity: number) {
     for (let i = 0; i < capacity; i++) {
       this.items.push({ slot: i, id: 0, alive: false, model: "kinetic", x: 0, y: 0, px: 0, py: 0, vx: 0, vy: 0,
-        r: 3, dmg: 0, age: 0, life: 6, blast: 0, homing: 0, turnRate: 0, grazed: false, hitCargo: false });
+        r: 3, dmg: 0, age: 0, life: 6, blast: 0, homing: 0, turnRate: 0, grazed: false, hitCargo: false,
+        fuse: 0, bounces: 0, pierce: 0, armorIgnore: 0, lastHit: "", split: 0, status: "", src: "" });
       this.free.push(capacity - 1 - i);
     }
   }
@@ -29,7 +33,8 @@ export class BulletPool {
     if (slot === undefined) return null;
     const b = this.items[slot];
     Object.assign(b, { id: this.nextId++, alive: true, model, x, y, px: x, py: y, vx, vy, r, dmg, age: 0, life,
-      blast: 0, homing: 0, turnRate: 0, grazed: false, hitCargo: false });
+      blast: 0, homing: 0, turnRate: 0, grazed: false, hitCargo: false,
+      fuse: 0, bounces: 0, pierce: 0, armorIgnore: 0, lastHit: "", split: 0, status: "", src: "" });
     this.active++;
     return b;
   }

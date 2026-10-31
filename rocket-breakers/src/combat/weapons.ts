@@ -19,6 +19,7 @@ export interface Mount {
   lockTime: number;
   blocked: boolean;
   shotIndex: number;
+  spool: number;      // 0..1, gatling spin-up
 }
 
 export class WeaponScheduler {
@@ -31,7 +32,7 @@ export class WeaponScheduler {
   sync(modules: FittedModule[]): void {
     const keep = new Map(this.mounts.map((m) => [m.module.instanceId, m]));
     this.mounts = modules.map((module) => keep.get(module.instanceId) ??
-      { module, cooldown: 0, heat: 0, locked: false, lockTime: 0, blocked: false, shotIndex: 0 });
+      { module, cooldown: 0, heat: 0, locked: false, lockTime: 0, blocked: false, shotIndex: 0, spool: 0 });
   }
 
   // Mounts run in list order: earlier (primary) guns get power first, later guns
@@ -42,11 +43,15 @@ export class WeaponScheduler {
       const w = m.module.weapon;
       const firing = fireHeld && !m.locked && !m.blocked && !m.module.disabled;
       m.cooldown -= dt;
+      // spool_gatling (W005): fire rate ramps from 30% to full over spool_sec while firing
+      const spoolSec = w.attack_model === "spool_gatling" ? (w.special_params.spool_sec ?? 1.2) : 0;
+      if (spoolSec) m.spool = Math.max(0, Math.min(1, m.spool + (firing ? dt : -2 * dt) / spoolSec));
+      const rateMul = spoolSec ? 0.3 + 0.7 * m.spool : 1;
       if (firing && m.cooldown <= 0) {
         if (this.energy >= w.energy_per_trigger) {
           this.energy -= w.energy_per_trigger;
           m.heat += w.heat_per_trigger * (overdrive ? OD_HEAT : 1);
-          m.cooldown += 1 / (w.trigger_rate * (overdrive ? OD_FIRE_RATE : 1));
+          m.cooldown += 1 / (w.trigger_rate * rateMul * (overdrive ? OD_FIRE_RATE : 1));
           m.shotIndex++;
           fired.push(m);
           if (m.heat >= HEAT_MAX) { m.heat = HEAT_MAX; m.locked = true; m.lockTime = 0; }

@@ -125,3 +125,12 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - Hazard nodes (wreck launchers) as P01-05 objective actors; HUD counter; briefing tip.
 - P01-05 playable: Star B destroy 3 launchers, Star C no hazard hits.
 - Tests: 93 (new: wreck cover, contact push + hazard count, node stop, P01-05 stars, P01-05 bot run).
+
+## Done (2026-10-31, owner feedback: arsenal, drops, elites)
+- 17 more guns from the catalog (W002–W020): scatter fan, rail lance, ricochet disc, gatling rotor, burst repeater,
+  flak, prism splitter, sweep cutter, seeker missiles, cluster rack, torpedo drill, plasma globe, arc fork lightning,
+  ion needle, frost shard, flame ribbon, gravity seed, wasp drones. Statuses: chill / ion / burn.
+- Enemies drop weapons often; picking one up fits it at once (oldest module swapped out when full).
+- Fixed: auto-fire wrecked the boss tail/claw before the joint opened (stray hits 25%, no splash, entry-safe).
+- Elites with ring attacks and sure drops; campaign bosses ×1.4 HP.
+- Tests: 118 (new: every weapon damages a target, gatling spool, rail pierce, arc chain, statuses, gravity, cluster split).

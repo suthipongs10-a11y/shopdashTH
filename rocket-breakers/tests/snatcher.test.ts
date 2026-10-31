@@ -91,7 +91,7 @@ describe("P01-04 playthrough (M2 stage 3 gate)", () => {
   it("brings home at least 2 intact parts despite the snatchers", () => {
     const w = world({ missionId: "P01-04", runId: "hunt1", invulnerable: true });
     for (let i = 0; i < 60 * 420 && w.status === "running"; i++) {
-      if (w.dock) { const o = w.assembly.suggestOrigins(w.dockWeapon()!)[0]; if (!o || w.dockFit(o)) w.dockStow(); w.endDock(); continue; }
+      if (w.dock) { const o = w.assembly.suggestOrigins(w.dockWeapon()!)[0]; if (!o || w.dockFit(o)) { if (w.dockStow()) { w.dockScrapHold(); if (w.dockStow()) w.dockScrap(); } } w.endDock(); continue; }
       w.step(bot(w));
     }
     expect(w.status).toBe("victory");

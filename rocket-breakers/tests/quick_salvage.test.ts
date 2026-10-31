@@ -32,24 +32,38 @@ describe("quick salvage", () => {
     expect(w.dock).toBeNull();
   });
 
-  it("no room on the hull and a full hold: the part becomes armour but still counts as secured", () => {
+  it("hull full: the newest gun swaps in for the oldest ordinary module", () => {
     const w = world({ missionId: "P01-01", salvageMode: "quick", invulnerable: true });
     quiet(w);
     const p = w.motion.pos;
-    let n = 0;
-    // fill the hull, then the hold
-    for (let k = 0; k < 12; k++) {
-      const it = loose(w, "W001", { x: p.x, y: p.y - 60 }, `q:${k}`);
+    let swapped = false;
+    for (let k = 0; k < 12 && !swapped; k++) {
+      const it = loose(w, "W002", { x: p.x, y: p.y - 60 }, `q:${k}`);
+      w.events.length = 0;
       w.step({ move: { x: 0, y: 0 }, tractorTap: true, fire: false });
       for (let i = 0; i < 30 && it.state === "acquiring"; i++) w.step({ move: { x: 0, y: 0 }, fire: false });
-      n++;
-      if (w.events.some((e) => e.type === "fitted" && e.value === 2)) break;
+      swapped = w.events.some((e) => e.type === "fitted" && e.value === 3);
+      if (swapped) expect(it.state).toBe("fitted_run");
     }
+    expect(swapped).toBe(true);
+  });
+
+  it("only boss signatures fitted and no room at all: the part becomes armour", () => {
+    const w = world({ missionId: "P01-01", salvageMode: "quick", invulnerable: true });
+    quiet(w);
+    const sig = catalog.weapon("W022");
+    for (const m of [...w.assembly.modules]) w.assembly.remove(m.instanceId);
+    for (let k = 0; k < 20; k++) { const o = w.assembly.suggestOrigins(sig)[0]; if (!o || w.assembly.place(sig, o, `sig${k}`)) break; }
+    w.refreshAssembly();
+    while (w.hold.length < w.holdCapacity) w.hold.push({ item: makeItem(`h${w.hold.length}`, "W001", "E04", "module", 60, 3), module: null });
+    const p = w.motion.pos;
+    const it = loose(w, "W011", { x: p.x, y: p.y - 60 }); // 4-cell launcher: cannot fit anywhere
+    expect(w.assembly.suggestOrigins(catalog.weapon("W011")).length).toBe(0);
+    w.step({ move: { x: 0, y: 0 }, tractorTap: true, fire: false });
+    for (let i = 0; i < 30 && it.state === "acquiring"; i++) w.step({ move: { x: 0, y: 0 }, fire: false });
     expect(w.events.some((e) => e.type === "fitted" && e.value === 2)).toBe(true);
     expect(w.overshield).toBeGreaterThan(0);
     expect(w.overshield).toBeLessThanOrEqual(ARMOR_OVERSHIELD);
-    expect(w.hold.length).toBe(w.holdCapacity);
-    expect(n).toBeGreaterThan(3);
   });
 });
 

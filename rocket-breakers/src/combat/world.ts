@@ -10,13 +10,14 @@ import type { MissionRow, WeaponRow } from "../core/types";
 import { Assembly, TILE, cellToLocal, reachesAround, type FittedModule } from "../ships/assembly";
 import { PlayerMotion } from "../ships/motion";
 import { BulletPool, type Bullet } from "./bullets";
-import { coreOf, HAZARD_NODE_ROW, makeBarge, makeDirected, makeScout, SUPPLY_ROW, updateEnemy, type Enemy } from "./enemies";
+import { coreOf, HAZARD_NODE_ROW, makeBarge, makeDirected, makeElite, makeScout, SUPPLY_ROW, updateEnemy, type Enemy } from "./enemies";
 import { formationSpawns, hazardNodeSpawn, MissionDirector, supplySpawn } from "../campaign/missionDirector";
 import { evaluateStars, type ObjectiveStats } from "../campaign/stars";
 import { firstPartHit, makePart, partContains, partEntryT, partWorldPos, PRIORITY, type Part } from "./parts";
 import type { Emitter } from "./patterns";
 import { SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
 import { CrabBoss } from "./crab";
+import { fireArsenal, onArsenalHit, updateArsenal, type Arc, type Channel, type GravityField } from "./arsenal";
 import { WeaponScheduler, type Mount } from "./weapons";
 import { ageLoose, isIntact, makeItem, transition, PICKUP_INVULN_SEC, type SalvageItem } from "../salvage/salvage";
 import type { RunResult, SecuredItem } from "../campaign/settlement";
@@ -77,6 +78,20 @@ export const WRECK_DAMAGE = 5;             // per contact tick (counted as hazar
 export const WRECK_HIT_COOLDOWN = 1.0;
 export const HAZARD_NODE_LIFE = 30;        // then it retreats if not destroyed
 export const WRECK_AMBIENT_EVERY = 5.5;    // the belt drifts on its own all mission; nodes add more
+// In-run weapon salvage (owner: "more guns, more stealing"): every research weapon can drop.
+export const ARSENAL_POOL = ["W002", "W003", "W004", "W005", "W006", "W007", "W009", "W010", "W011", "W012", "W013", "W014", "W015", "W016", "W017", "W018", "W019", "W020"];
+// Enemy → what its wreck can yield, and the drop chance.
+export const ENEMY_DROPS: Record<string, { chance: number; pool: string[] }> = {
+  E01: { chance: 0.08, pool: ARSENAL_POOL },
+  E02: { chance: 0.3, pool: ["W006", "W016", "W011", "W005"] },
+  E03: { chance: 1, pool: ["W002", "W007", "W004", "W013"] },
+  E21: { chance: 0.35, pool: ["W020", "W019", "W015", "W012"] },
+  SUPPLY: { chance: 1, pool: ARSENAL_POOL },
+  HZNODE: { chance: 1, pool: ARSENAL_POOL },
+};
+export const MAX_LOOSE_DROPS = 3;
+export const CAMPAIGN_BOSS_HP = 1.4;
+export const MODULE_STRAY_MUL = 0.25; // un-locked hits on a boss signature part // bosses must outlast a ship full of salvaged guns
 export const SNATCH_BEAM_SEC = 2.0;    // E21 tractor time before it steals a part (shoot it first)
 export const SNATCH_RANGE = 170;
 export const SNATCH_SPEED = 150;
@@ -106,7 +121,7 @@ export interface WorldOptions {
   invulnerable?: boolean; // test/dev only: player takes no damage
   startAt?: "intro" | "boss";
   missionId?: string;       // catalog mission; omitted or "SLICE-01" = the fixed test mission
-  researchPool?: string[];  // weapons an E04 cargo module can contain (unlocked research)
+  researchPool?: string[];  // weapons an E04 cargo module can contain (default: the whole research arsenal)
   // "quick" (owner request, default in the app): tap Tractor near a loose part and it flies in
   // and fits itself at once (no cable, no dock). "classic": hold-to-tow + safe dock fitting.
   salvageMode?: "quick" | "classic";
@@ -156,7 +171,10 @@ export class CombatWorld {
   items: SalvageItem[] = [];
   tow: { itemId: string; progress: number; overLength: number; towing: boolean; releaseArmed: number } | null = null;
   dock: { itemId: string } | null = null;
-  beams: { from: Vec; to: Vec; ttl: number }[] = [];
+  beams: { from: Vec; to: Vec; ttl: number; color?: string; width?: number }[] = [];
+  channels: Channel[] = [];      // lasting weapon effects (sweep beam, flame, rail charge)
+  fields: GravityField[] = [];   // W019 gravity fields
+  arcs: Arc[] = [];              // W015 lightning (render only)
   blasts: { pos: Vec; r: number; ttl: number }[] = [];
   events: GameEvent[] = [];
   hints: string[] = [];
@@ -345,6 +363,7 @@ export class CombatWorld {
     this.steerPlasma();
     this.friendly.move(DT);
     this.hostile.move(DT);
+    updateArsenal(this);
     // collision + damage
     this.resolveFriendly();
     this.resolveHostile();
@@ -405,7 +424,7 @@ export class CombatWorld {
   }
 
   private spawnBoss(id = "B02"): void {
-    const row = this.catalog.boss(id);
+    const row = this.mission ? { ...this.catalog.boss(id), core_hp: Math.round(this.catalog.boss(id).core_hp * CAMPAIGN_BOSS_HP) } : this.catalog.boss(id);
     this.boss = id === "B01" ? new CrabBoss(row, this.runId, this.em, this.rng) : new ScorpionBoss(row, this.runId, this.em, this.rng);
     this.items.push(this.boss.item);
     this.phase = "boss";
@@ -441,7 +460,13 @@ export class CombatWorld {
       if (ev.kind === "wave") {
         const row = this.catalog.enemy(ev.wave.enemy_id!);
         const tag = `wave${ev.index + 1}`;
-        for (const spec of formationSpawns(ev.wave, row)) this.enemies.push(makeDirected(this.spawnId("e"), row, spec, tag));
+        const specs = formationSpawns(ev.wave, row);
+        specs.forEach((spec, k) => {
+          const e = makeDirected(this.spawnId("e"), row, spec, tag);
+          // second pass: the middle ship of the formation is an elite (not haulers/snatchers)
+          if (ev.pulse === 1 && k === Math.floor(specs.length / 2) && row.id !== "E04" && row.id !== "E21") { makeElite(e); this.hint("hint.elite"); }
+          this.enemies.push(e);
+        });
         if (row.id === "E03") this.hint("hint.flank");
         if (row.id === "E04") this.hint("hint.hauler");
         if (row.id === "E02") this.hint("hint.interceptor");
@@ -603,7 +628,7 @@ export class CombatWorld {
     }
   }
 
-  private muzzleWorld(m: Mount): Vec {
+  muzzleWorld(m: Mount): Vec {
     const l = this.assembly.muzzleLocal(m.module);
     return { x: this.motion.pos.x + l.x, y: this.motion.pos.y + l.y };
   }
@@ -626,6 +651,7 @@ export class CombatWorld {
     const { angle } = this.aimAngle(m);
     this.events.push({ type: "muzzle", pos: from, family: w.family, tag: w.id });
     const sp = w.special_params;
+    if (fireArsenal(this, m, from, angle)) return;
     if (w.attack_model === "pulse_beam") {
       const laser = this.buffs.has("PU02") ? 1.15 : 1; // PU02 laser core: +15% damage and range
       const range = (sp.range ?? 600) * laser;
@@ -664,6 +690,41 @@ export class CombatWorld {
         }
       }
     }
+  }
+
+  // Instant beam along `angle` (stops at the first enemy part or wreck). Used by split/sweep beams.
+  beamShot(from: Vec, angle: number, range: number, dmg: number, color: string, continuous = false): void {
+    const to = { x: from.x + Math.cos(angle * DEG) * range, y: from.y + Math.sin(angle * DEG) * range };
+    let hit = this.firstEnemyHit(from, to, 0);
+    const wt = this.wrecks.length ? this.wreckHitT(from, to, 0) : -1;
+    if (wt >= 0 && (!hit || wt < hit.t)) hit = null;
+    const tEnd = hit ? hit.t : wt >= 0 ? wt : 1;
+    const end = { x: from.x + (to.x - from.x) * tEnd, y: from.y + (to.y - from.y) * tEnd };
+    if (hit) this.damagePart(hit.enemy, hit.part, dmg, end);
+    this.beams.push({ from, to: end, ttl: continuous ? DT * 1.5 : 0.09, color, width: continuous ? 6 : 3 });
+  }
+
+  // Charged rail slug: hits up to `maxHits` enemies along a long line (stops at wrecks).
+  railShot(from: Vec, angle: number, dmg: number, maxHits: number): void {
+    const to = { x: from.x + Math.cos(angle * DEG) * 950, y: from.y + Math.sin(angle * DEG) * 950 };
+    const wt = this.wrecks.length ? this.wreckHitT(from, to, 0) : -1;
+    const hits: { enemy: Enemy; part: Part; t: number }[] = [];
+    for (const e of this.allEnemies()) {
+      if (!e.alive) continue;
+      const h = firstPartHit(e.parts, e.pos, from, to, 4);
+      if (h && (wt < 0 || h.t < wt)) hits.push({ enemy: e, part: h.part, t: h.t });
+    }
+    hits.sort((a, b) => a.t - b.t);
+    for (const h of hits.slice(0, maxHits)) this.damagePart(h.enemy, h.part, dmg, { x: from.x + (to.x - from.x) * h.t, y: from.y + (to.y - from.y) * h.t });
+    const tEnd = wt >= 0 ? wt : 1;
+    this.beams.push({ from, to: { x: from.x + (to.x - from.x) * tEnd, y: from.y + (to.y - from.y) * tEnd }, ttl: 0.18, color: "#fff4c2", width: 9 });
+    this.motion.pos = { x: this.motion.pos.x, y: Math.min(this.motion.bounds.y1, this.motion.pos.y + 6) }; // small recoil
+  }
+
+  // W020 drone positions orbiting the ship.
+  dronePos(k: number, n: number): Vec {
+    const a = this.tick * DT * 2.2 + (k * Math.PI * 2) / n;
+    return { x: this.motion.pos.x + Math.cos(a) * 80, y: this.motion.pos.y + Math.sin(a) * 80 };
   }
 
   // W021 Rivet Claw (stolen from B01): catches one small hostile bullet in front and
@@ -729,7 +790,7 @@ export class CombatWorld {
   }
 
   // ---------------------------------------------------------------- damage
-  private firstEnemyHit(a: Vec, b: Vec, pad: number): { enemy: Enemy; part: Part; t: number } | null {
+  firstEnemyHit(a: Vec, b: Vec, pad: number): { enemy: Enemy; part: Part; t: number } | null {
     let best: { enemy: Enemy; part: Part; t: number } | null = null;
     for (const e of this.allEnemies()) {
       if (!e.alive) continue;
@@ -748,7 +809,11 @@ export class CombatWorld {
       const hit = hit0;
       if (!hit) continue;
       const at = { x: b.px + (b.x - b.px) * hit.t, y: b.py + (b.y - b.py) * hit.t };
-      this.damagePart(hit.enemy, hit.part, b.dmg, at);
+      if (hit.enemy.id === b.lastHit) continue; // piercing shot already passed this one
+      if (b.model === "seed") { b.fuse = 1e-6; continue; } // gravity seed opens on contact
+      this.damagePart(hit.enemy, hit.part, b.dmg, at, b.armorIgnore);
+      if (b.src) onArsenalHit(this, b, hit.enemy);
+      if (b.pierce > 0) { b.pierce--; b.lastHit = hit.enemy.id; if (b.blast > 0) this.blast(at, b.blast, b.dmg, hit.enemy.id); continue; }
       if (b.blast > 0) this.blast(at, b.blast, b.dmg, hit.enemy.id);
       this.plasmaTargets.delete(b.id);
       this.friendly.kill(b);
@@ -756,7 +821,7 @@ export class CombatWorld {
   }
 
   // One hit per entity per blast; the nearest part of each other entity in range.
-  private blast(at: Vec, r: number, dmg: number, directId: string): void {
+  blast(at: Vec, r: number, dmg: number, directId: string): void {
     this.blasts.push({ pos: at, r, ttl: 0.3 });
     this.events.push({ type: "blast", pos: at, value: r });
     for (const e of this.allEnemies()) {
@@ -764,7 +829,7 @@ export class CombatWorld {
       let best: Part | null = null;
       let bestD = Infinity;
       for (const p of e.parts) {
-        if (!p.active) continue;
+        if (!p.active || p.kind === "module") continue; // splash never wrecks salvage: only direct hits do
         const d = dist(partWorldPos(p, e.pos), at);
         if (d < bestD) { bestD = d; best = p; }
       }
@@ -772,10 +837,10 @@ export class CombatWorld {
     }
   }
 
-  damagePart(e: Enemy, part: Part, dmg: number, at: Vec): void {
+  damagePart(e: Enemy, part: Part, dmg: number, at: Vec, armorIgnore = 0): void {
     part.flash = 0.08;
     const core = coreOf(e);
-    const armorMul = 100 / (100 + clamp(e.armor, 0, 200));
+    const armorMul = 100 / (100 + clamp(e.armor * (1 - armorIgnore), 0, 200));
     switch (part.kind) {
       case "armor":
         if (part.invulnerable) { this.events.push({ type: "deflect", pos: at }); return; }
@@ -796,14 +861,19 @@ export class CombatWorld {
           }
         }
         break;
-      case "module":
-        part.integrity -= dmg;
+      case "module": {
+        // Boss salvage: auto-fire must not wreck it by accident. Untouchable while the boss
+        // enters or changes phase; stray hits deal 25% unless the player locked onto it.
+        if (e.role === "boss" && this.boss?.inTransition) { this.events.push({ type: "deflect", pos: at }); return; }
+        const locked = this.lock?.enemyId === e.id && this.lock.partId === part.id;
+        part.integrity -= e.role === "boss" && !locked ? dmg * MODULE_STRAY_MUL : dmg;
         core.hp -= dmg * CORE_SPILL_MAX * armorMul;
         if (e.role === "boss" && !this.boss!.signatureRemoved) {
           const pre = this.boss!.hintPrefix; // hint.tail_* / hint.claw_*
           this.hint(part.integrity / part.integrityMax < 0.35 ? `hint.${pre}_critical` : `hint.${pre}_damaged`);
         }
         break;
+      }
       case "core":
         core.hp -= dmg * armorMul;
         break;
@@ -815,7 +885,7 @@ export class CombatWorld {
   private freeCargo(e: Enemy, at: Vec): void {
     if (this.cargoFreed.has(e.id)) return;
     this.cargoFreed.add(e.id);
-    const pool = (this.opts.researchPool ?? ["W001", "W008"]).filter((id) => this.catalog.row("weapons", id));
+    const pool = (this.opts.researchPool ?? ARSENAL_POOL).filter((id) => this.catalog.row("weapons", id));
     const template = pool[Math.floor(this.rng.next() * pool.length)] ?? "W001";
     const w = this.catalog.weapon(template);
     const item = makeItem(`${this.runId}:${e.id}:cargo`, template, e.defId, "module", CARGO_INTEGRITY, w.mass);
@@ -828,6 +898,25 @@ export class CombatWorld {
     this.events.push({ type: "sever", pos: at, tag: "cargo" });
     this.hint(this.quickSalvage ? "hint.quick_cargo_freed" : "hint.cargo_freed");
     this.killEnemy(e);
+  }
+
+  // Weapon parts from wrecks: the more dangerous the enemy, the likelier and better the drop.
+  private enemyDrop(e: Enemy): void {
+    const rule = e.elite ? { chance: 1, pool: ARSENAL_POOL } : ENEMY_DROPS[e.defId];
+    if (!rule || (e.role === "thief" && e.steal?.carrying)) return;
+    const loose = this.items.filter((i) => i.state === "detached_intact" && i.sourceEncounter !== "player").length;
+    if (loose >= MAX_LOOSE_DROPS || this.rng.next() >= rule.chance) return;
+    const template = rule.pool[Math.floor(this.rng.next() * rule.pool.length)];
+    const w = this.catalog.weapon(template);
+    const item = makeItem(`${this.runId}:${e.id}:drop`, template, e.defId, "module", CARGO_INTEGRITY, w.mass);
+    transition(item, "detached_intact", `drop:${item.instanceId}`, this.tick);
+    item.pos = { x: clamp(e.pos.x, 40, 680), y: clamp(e.pos.y, 160, 900) };
+    item.prev = { ...item.pos };
+    item.vel = { x: 0, y: 45 };
+    item.invuln = PICKUP_INVULN_SEC;
+    this.items.push(item);
+    this.events.push({ type: "sever", pos: { ...item.pos }, tag: "drop" });
+    this.hint(this.quickSalvage ? "hint.quick_weapon_drop" : "hint.cargo_freed");
   }
 
   // Shooting a hauler's fuel tanks sets off an environmental blast (no intact loot).
@@ -844,6 +933,7 @@ export class CombatWorld {
     e.alive = false;
     this.events.push({ type: "kill", pos: { ...e.pos }, tag: e.role });
     if (!credit) return;
+    this.enemyDrop(e);
     if (e.role === "supply") this.supplyDestroyed++;
     if (e.role === "hazard_node") { this.hazardNodesDestroyed++; this.hint("hint.hazard_node_down"); }
     if (e.steal?.carrying) { // a shot-down snatcher drops what it carried
@@ -1350,6 +1440,23 @@ export class CombatWorld {
       this.events.push({ type: "fitted", pos: { ...this.motion.pos }, tag: it.templateId, value: 0 });
       return;
     }
+    // Hull full: swap out the oldest ordinary module so the new gun can be tried at once
+    // (boss signatures are kept). The removed one goes to the hold if there is room.
+    const sigs = new Set(this.catalog.raw.bosses.map((b) => b.signature_weapon_id));
+    for (const old of this.assembly.modules.filter((m) => !sigs.has(m.weapon.id))) {
+      const removed = this.assembly.remove(old.instanceId)!;
+      const o = this.assembly.suggestOrigins(w)[0];
+      if (o && !this.assembly.place(w, o, it.instanceId)) {
+        if (this.hold.length < this.holdCapacity) {
+          this.hold.push({ item: makeItem(`${this.runId}:swap:${removed.instanceId}`, removed.weapon.id, "player", "module", removed.integrityMax, removed.weapon.mass), module: removed });
+        } else this.combatScrap += Math.floor(removed.weapon.mass * 2);
+        this.afterFit(it);
+        this.events.push({ type: "fitted", pos: { ...this.motion.pos }, tag: it.templateId, value: 3 });
+        return;
+      }
+      this.assembly.modules.push(removed); // didn't help: put it back
+    }
+    this.refreshAssembly();
     if (this.hold.length < this.holdCapacity) {
       transition(it, "stowed_run", `qstow:${tx}`, this.tick);
       this.hold.push({ item: it, module: null });

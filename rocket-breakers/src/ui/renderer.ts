@@ -151,7 +151,7 @@ export class Renderer {
       case "fitted": { // quick salvage result
         const name = t(`weapons.${e.tag}.name`);
         ring(20, 220, e.value === 2 ? C.gold : C.cyan, 0.5, 5); burst(20, e.value === 2 ? C.gold : C.cyan, 220);
-        text(t(e.value === 0 ? "fx.fitted" : e.value === 1 ? "fx.stowed" : "fx.armor", { name }), e.value === 2 ? C.gold : C.cyan);
+        text(t(e.value === 0 ? "fx.fitted" : e.value === 1 ? "fx.stowed" : e.value === 3 ? "fx.swapped" : "fx.armor", { name }), e.value === 2 ? C.gold : C.cyan);
         this.addShake(2, s);
         break;
       }
@@ -330,7 +330,13 @@ export class Renderer {
         g.beginPath(); g.moveTo(p.x, p.y + 20); g.lineTo(e.aim.x, e.aim.y); g.stroke(); g.setLineDash([]);
       }
     }
-    if (art) drawAt(g, art, p.x, p.y, ...visCenter(art), look.size / Math.max(visW(art), visH(art)), Math.PI, 1, flash);
+    if (e.elite) { // gold elite marker + ring warning
+      const warn = e.elite.ring < 0.6;
+      g.strokeStyle = warn ? `rgba(255,45,85,${0.5 + 0.5 * Math.sin(this.time * 30)})` : `rgba(255,215,106,${0.55 + 0.25 * Math.sin(this.time * 5)})`;
+      g.lineWidth = warn ? 5 : 3;
+      g.beginPath(); g.arc(p.x, p.y, look.size * 0.75, 0, Math.PI * 2); g.stroke();
+    }
+    if (art) drawAt(g, art, p.x, p.y, ...visCenter(art), (look.size * (e.elite ? 1.25 : 1)) / Math.max(visW(art), visH(art)), Math.PI, 1, flash);
     else {
       g.save(); g.translate(p.x, p.y);
       g.fillStyle = flash ? "#fff" : C.graphite; g.strokeStyle = C.red; g.lineWidth = 2;
@@ -357,6 +363,8 @@ export class Renderer {
         this.hpBar(p.x - 18, p.y - 62, 36, engine.hp / engine.hpMax, C.gold);
       }
       this.hpBar(p.x - 64, p.y + 32, 128, core.hp / core.hpMax, C.orange);
+    } else if (e.elite) {
+      this.hpBar(p.x - 30, p.y - look.size * 0.8, 60, core.hp / core.hpMax, C.gold);
     } else if (e.role === "interceptor" && core.hp < core.hpMax) {
       this.hpBar(p.x - 22, p.y - 36, 44, core.hp / core.hpMax);
     }
@@ -743,6 +751,39 @@ export class Renderer {
         g.fillStyle = C.violet; g.beginPath(); g.arc(x, y, 8, 0, Math.PI * 2); g.fill();
         g.strokeStyle = C.cyan; g.lineWidth = 2; g.stroke(); // friendly rim, distinct from hostile magenta
         g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill();
+      } else if (b.model === "missile") {
+        // missile body + flame trail (cluster carriers are fatter; torpedoes longer)
+        const sp = Math.hypot(b.vx, b.vy) || 1, ux = b.vx / sp, uy = b.vy / sp;
+        const len = b.pierce > 0 ? 20 : b.split > 0 ? 16 : 12;
+        g.strokeStyle = `rgba(255,138,31,${0.5 + 0.3 * Math.sin(this.time * 40 + b.id)})`; g.lineWidth = b.r; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x - ux * (len + 14), y - uy * (len + 14)); g.lineTo(x - ux * len * 0.5, y - uy * len * 0.5); g.stroke();
+        g.strokeStyle = b.pierce > 0 ? "#cfd8dc" : "#f2f2f2"; g.lineWidth = b.r * 1.1;
+        g.beginPath(); g.moveTo(x - ux * len, y - uy * len); g.lineTo(x, y); g.stroke();
+        g.fillStyle = b.pierce > 0 ? C.cyan : C.red; g.beginPath(); g.arc(x, y, b.r * 0.55, 0, Math.PI * 2); g.fill();
+      } else if (b.model === "orb") {
+        const pulse = 1 + 0.15 * Math.sin(this.time * 18 + b.id);
+        g.save(); g.globalCompositeOperation = "lighter";
+        g.fillStyle = "rgba(176,107,255,0.35)"; g.beginPath(); g.arc(x, y, b.r * 2 * pulse, 0, Math.PI * 2); g.fill();
+        g.fillStyle = "rgba(220,180,255,0.9)"; g.beginPath(); g.arc(x, y, b.r * pulse, 0, Math.PI * 2); g.fill();
+        g.restore();
+      } else if (b.model === "disc") {
+        g.save(); g.translate(x, y); g.rotate(this.time * 20);
+        g.fillStyle = C.gold; g.beginPath(); g.arc(0, 0, b.r, 0, Math.PI * 2); g.fill();
+        g.fillStyle = C.charcoal; g.fillRect(-b.r, -1.5, b.r * 2, 3);
+        g.restore();
+      } else if (b.model === "flak") {
+        g.fillStyle = C.orange; g.beginPath(); g.arc(x, y, b.r, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = `rgba(255,215,106,${0.4 + 0.6 * (1 - Math.max(0, b.fuse) / 0.5)})`; g.lineWidth = 2;
+        g.beginPath(); g.arc(x, y, b.r + 4, 0, Math.PI * 2); g.stroke();
+      } else if (b.model === "seed") {
+        g.fillStyle = "#3a1d63"; g.beginPath(); g.arc(x, y, b.r, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = C.violet; g.lineWidth = 2; g.beginPath(); g.arc(x, y, b.r + 3 + Math.sin(this.time * 20) * 2, 0, Math.PI * 2); g.stroke();
+      } else if (b.model === "bolt") {
+        const sp = Math.hypot(b.vx, b.vy) || 1;
+        const col = b.status === "chill" ? "#bff3ff" : "#8fb8ff";
+        g.strokeStyle = col; g.lineWidth = 4; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x - (b.vx / sp) * 18, y - (b.vy / sp) * 18); g.lineTo(x, y); g.stroke();
+        g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.fill();
       } else {
         const sp = Math.hypot(b.vx, b.vy) || 1;
         g.strokeStyle = C.gold; g.lineWidth = 4; g.lineCap = "round";
@@ -750,9 +791,62 @@ export class Renderer {
       }
     }
     for (const bm of w.beams) {
-      g.strokeStyle = "rgba(57,225,255,0.8)"; g.lineWidth = 7;
+      g.strokeStyle = bm.color ? bm.color : "rgba(57,225,255,0.8)"; g.globalAlpha = bm.color ? 0.85 : 1; g.lineWidth = (bm.width ?? 3) + 4;
       g.beginPath(); g.moveTo(bm.from.x, bm.from.y); g.lineTo(bm.to.x, bm.to.y); g.stroke();
-      g.strokeStyle = "#fff"; g.lineWidth = 2; g.stroke();
+      g.globalAlpha = 1; g.strokeStyle = "#fff"; g.lineWidth = Math.max(2, (bm.width ?? 3) - 2); g.stroke();
+    }
+    this.drawArsenalFx(w);
+  }
+
+  // Lightning arcs, gravity fields, flame cones, rail charge lines and orbiting drones.
+  private drawArsenalFx(w: CombatWorld): void {
+    const g = this.ctx;
+    for (const a of w.arcs) {
+      g.strokeStyle = a.color; g.lineWidth = 3; g.globalAlpha = Math.min(1, a.ttl * 8);
+      g.beginPath();
+      a.pts.forEach((p, i) => {
+        if (i === 0) { g.moveTo(p.x, p.y); return; }
+        const q = a.pts[i - 1];
+        for (let k = 1; k <= 4; k++) { // jagged
+          const t = k / 4, j = k < 4 ? (this.rand() - 0.5) * 18 : 0;
+          g.lineTo(q.x + (p.x - q.x) * t + j, q.y + (p.y - q.y) * t + j);
+        }
+      });
+      g.stroke(); g.globalAlpha = 1;
+    }
+    for (const f of w.fields) {
+      const k = 1 - f.t / f.dur;
+      g.save(); g.translate(f.pos.x, f.pos.y);
+      g.fillStyle = `rgba(80,30,140,${0.25 * k + 0.1})`; g.beginPath(); g.arc(0, 0, f.r, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = `rgba(176,107,255,${0.7 * k + 0.2})`; g.lineWidth = 3;
+      for (let i = 0; i < 3; i++) { g.beginPath(); g.arc(0, 0, f.r * (0.35 + 0.3 * i), this.time * (3 - i) + i, this.time * (3 - i) + i + Math.PI * 1.2); g.stroke(); }
+      g.restore();
+    }
+    for (const c of w.channels) {
+      if (c.kind === "flame") {
+        const range = c.weapon.special_params.range ?? 220;
+        for (let i = 0; i < 8; i++) {
+          const d = this.rand() * range, a = (c.angle + (this.rand() - 0.5) * 40) * DEG;
+          const r = 6 + (d / range) * 16;
+          g.fillStyle = `rgba(255,${120 + Math.floor(this.rand() * 100)},40,${0.6 - (d / range) * 0.4})`;
+          g.beginPath(); g.arc(c.from.x + Math.cos(a) * d, c.from.y + Math.sin(a) * d, r, 0, Math.PI * 2); g.fill();
+        }
+      } else if (c.kind === "rail") {
+        const k = c.t / c.dur;
+        g.strokeStyle = `rgba(255,244,194,${0.25 + 0.5 * k})`; g.lineWidth = 1 + 3 * k; g.setLineDash([10, 8]);
+        g.beginPath(); g.moveTo(c.from.x, c.from.y); g.lineTo(c.from.x + Math.cos(c.angle * DEG) * 900, c.from.y + Math.sin(c.angle * DEG) * 900); g.stroke();
+        g.setLineDash([]);
+      }
+    }
+    const drones = w.weapons.mounts.filter((m) => m.module.weapon.attack_model === "orbit_drone");
+    if (drones.length) {
+      const n = drones[0].module.weapon.special_params.drone_count ?? 2;
+      for (let k = 0; k < n; k++) {
+        const d = w.dronePos(k, n);
+        g.fillStyle = C.graphite; g.beginPath(); g.moveTo(d.x, d.y - 9); g.lineTo(d.x + 8, d.y + 6); g.lineTo(d.x - 8, d.y + 6); g.closePath(); g.fill();
+        g.strokeStyle = C.gold; g.lineWidth = 2; g.stroke();
+        g.fillStyle = C.cyan; g.beginPath(); g.arc(d.x, d.y, 2.5, 0, Math.PI * 2); g.fill();
+      }
     }
   }
 

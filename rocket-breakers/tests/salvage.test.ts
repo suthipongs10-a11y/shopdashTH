@@ -49,6 +49,11 @@ describe("selective dismantling (B02)", () => {
     const w = world({ invulnerable: true, startAt: "boss" });
     toBossFight(w);
     const b = w.boss!;
+    // stray hits only chip it (25%)...
+    for (let i = 0; i < 20; i++) w.damagePart(b.e, b.tail, 8, b.stingerWorld());
+    expect(b.tail.integrity).toBeGreaterThan(b.tail.integrityMax * 0.5);
+    // ...but deliberately locking and firing on the tail body still destroys the loot
+    w.lock = { enemyId: b.e.id, partId: b.tail.id };
     for (let i = 0; i < 20; i++) w.damagePart(b.e, b.tail, 8, b.stingerWorld());
     w.step(idle);
     expect(b.item.state).toBe("destroyed_scrap");
