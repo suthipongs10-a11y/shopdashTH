@@ -31,6 +31,6 @@
   "blend_mode": "alpha",
   "color_space": "sRGB",
   "provenance": "ChatGPT built-in imagegen via owner, BATCH_003",
-  "status": "approved",
-  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build (M2 stage 1)"
 }

@@ -8,12 +8,13 @@ import { limitLength, type Vec } from "../core/geometry";
 import { CombatWorld, type GameEvent } from "../combat/world";
 import { computeSettlement, recoverPending, settle, type Settlement } from "../campaign/settlement";
 import { LoadStatus, MemoryStore, SaveRepository, type KeyValueStore } from "../save/saveRepository";
-import type { Profile } from "../save/profile";
+import { totalStars, type Profile } from "../save/profile";
 import { sfx } from "../audio/sfx";
 import { Renderer } from "./renderer";
 import { drawHud, hitTest, layoutButtons, type HudAction, type HudButton, type Insets } from "./hud";
 import { DockPanel } from "./dock";
 import { preloadSprites, spriteUrl } from "./sprites";
+import { researchPool, resultStars, showSectorMap } from "./campaign";
 
 interface Screen { update?(dt: number): void; draw?(g: CanvasRenderingContext2D): void; dispose?(): void; onHidden?(): void }
 
@@ -140,11 +141,10 @@ export class App {
     for (let i = 0; i < 3; i++) fr.append(el("i", i < frag ? "on" : ""));
     fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3`));
     card.append(el("div", "dim", t("title.blueprint")), fr);
-    const rec = this.profile.test_records["SLICE-01"];
     card.append(statRow(t("title.credits"), this.profile.credits), statRow(t("title.scrap"), this.profile.scrap),
-      statRow(t("title.clears"), `${rec?.clears ?? 0} / ${rec?.attempts ?? 0}`));
+      statRow(t("title.stars"), `${totalStars(this.profile)} / ${this.catalog.campaignStarSlots()}`));
     s.append(card);
-    s.append(button(t("title.start"), () => this.startMission(), "btn primary", "ui_play"));
+    s.append(button(t("title.campaign"), () => showSectorMap(this), "btn primary", "ui_play"));
     const row = el("div", "row");
     row.append(button(t("title.howto"), () => this.showHowTo(), "btn small"), button(t("title.settings"), () => this.showSettings(() => this.showTitle()), "btn small", "ui_settings"));
     s.append(row);
@@ -248,32 +248,39 @@ export class App {
     this.ui.append(o);
   }
 
-  startMission(): void {
+  startMission(missionId: string): void {
     this.profile.run_counter += 1; // run ids are never reused
     this.save();
-    this.show(() => new CombatScreen(this, this.profile.run_counter));
+    this.show(() => new CombatScreen(this, this.profile.run_counter, missionId));
   }
 
-  showResults(world: CombatWorld, s: Settlement): void {
+  // `before`: the mission's stars before this run (to separate new / previous / missed).
+  showResults(world: CombatWorld, s: Settlement, before?: readonly boolean[]): void {
     const r = world.result!;
     const o = el("div", "screen overlay");
     o.append(el("h2", "", r.victory ? t("results.victory") : t("results.defeat")));
+    if (world.mission) o.append(el("div", "dim", t(`missions.${world.mission.id}.name`)));
     const card = el("div", "card");
-    const stolen = r.stolen.includes("B02");
-    card.append(el("p", "", stolen ? t("results.stolen") : r.severed.includes("B02") ? t("results.severed_lost") : t("results.not_stolen")));
-    const frag = this.profile.blueprint_fragments.W022 ?? 0;
-    const fr = el("div", "frag");
-    fr.append(el("span", "", `${t("weapons.W022.name")} `));
-    for (let i = 0; i < 3; i++) fr.append(el("i", i < frag ? "on" : ""));
-    fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3 ${s.fragments.W022 ? "+1" : ""}`));
-    card.append(fr);
-    if (s.fallbackFragments.length) card.append(el("div", "dim", t("results.fallback")));
-    if (frag >= 3) card.append(el("div", "tag", t("results.blueprint_ready")));
+    if (world.mission) card.append(resultStars(world.mission, before, r.victory ? r.stars ?? null : null));
+    if (!r.victory && world.mission) card.append(el("div", "dim", t("results.stars_need_clear")));
+    if (world.boss) {
+      const stolen = r.stolen.includes("B02");
+      card.append(el("p", "", stolen ? t("results.stolen") : r.severed.includes("B02") ? t("results.severed_lost") : t("results.not_stolen")));
+      const frag = this.profile.blueprint_fragments.W022 ?? 0;
+      const fr = el("div", "frag");
+      fr.append(el("span", "", `${t("weapons.W022.name")} `));
+      for (let i = 0; i < 3; i++) fr.append(el("i", i < frag ? "on" : ""));
+      fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3 ${s.fragments.W022 ? "+1" : ""}`));
+      card.append(fr);
+      if (s.fallbackFragments.length) card.append(el("div", "dim", t("results.fallback")));
+      if (frag >= 3) card.append(el("div", "tag", t("results.blueprint_ready")));
+    }
+    for (const [id, n] of Object.entries(s.research)) card.append(el("div", "tag", t("results.research", { name: t(`weapons.${id}.name`), n })));
     card.append(statRow(t("results.credits"), `+${s.credits}${s.firstClear ? ` (${t("results.first_clear")})` : ""}`),
       statRow(t("results.scrap"), `+${s.scrap}`), statRow(t("results.score"), r.score));
     o.append(card);
     const row = el("div", "row");
-    row.append(button(t("results.again"), () => this.startMission(), "btn primary"), button(t("results.title"), () => this.showTitle(), "btn"));
+    row.append(button(t("results.again"), () => this.startMission(r.missionId), "btn primary"), button(t("results.map"), () => showSectorMap(this), "btn"));
     o.append(row);
     this.ui.append(o);
   }
@@ -321,6 +328,7 @@ export class CombatScreen implements Screen {
   private hintTimer = 0;
   private dock: DockPanel | null = null;
   private endTimer = -1;
+  private finished = false;
   private pauseEl: HTMLElement | null = null;
   private now = 0;
   private off: (() => void)[] = [];
@@ -329,9 +337,10 @@ export class CombatScreen implements Screen {
   private tutorialShown = new Set<string>();
   private tutorialOn: boolean;
 
-  constructor(private app: App, runNumber: number) {
+  constructor(private app: App, runNumber: number, missionId: string) {
     const st = app.profile.settings;
-    this.world = new CombatWorld(app.catalog, { seed: 1000 + runNumber * 7919, runId: `run${runNumber}`, autoLock: st.autoLock, autoTractor: st.autoTractor });
+    this.world = new CombatWorld(app.catalog, { seed: 1000 + runNumber * 7919, runId: `run${runNumber}`, autoLock: st.autoLock, autoTractor: st.autoTractor,
+      missionId, researchPool: researchPool(app.catalog, app.profile) });
     this.renderer = new Renderer(app.g);
     this.buttons = layoutButtons(app.insets, st.handedness);
     this.hintEl = el("div", "hidden");
@@ -456,7 +465,7 @@ export class CombatScreen implements Screen {
     o.append(el("h2", "", t("pause.title")),
       button(t("pause.resume"), () => this.setPaused(false), "btn primary", "ui_play"),
       button(t("title.settings"), () => { o.remove(); this.app.showSettings(() => { this.applySettings(); this.setPaused(true); }, true); }, "btn", "ui_settings"),
-      button(t("pause.quit"), () => this.app.showTitle(), "btn"),
+      button(t("pause.quit"), () => showSectorMap(this.app), "btn"),
       el("div", "dim", t("pause.quit_note")));
     this.pauseEl = o;
     this.app.ui.append(o);
@@ -494,10 +503,11 @@ export class CombatScreen implements Screen {
       sfx.play("secured");
       this.dock = new DockPanel(this.app, w, () => { this.dock = null; });
     }
-    if (w.status !== "running") {
+    // Results open exactly once (the timer used to re-arm after finishing).
+    if (w.status !== "running" && !this.finished) {
       if (this.endTimer < 0) this.endTimer = 1.4;
       this.endTimer -= dt;
-      if (this.endTimer <= 0 && this.endTimer > -1) { this.endTimer = -99; this.finish(); }
+      if (this.endTimer <= 0) { this.finished = true; this.finish(); }
     }
   }
 
@@ -547,10 +557,11 @@ export class CombatScreen implements Screen {
   private finish(): void {
     const app = this.app;
     const r = this.world.result!;
-    const s = computeSettlement(app.profile, r, (id) => app.catalog.boss(id).signature_weapon_id);
+    const before = app.profile.mission_records[r.missionId]?.stars.slice();
+    const s = computeSettlement(app.profile, r, (id) => app.catalog.row<{ signature_weapon_id: string }>("bosses", id)?.signature_weapon_id ?? "");
     settle(app.profile, s, (p) => app.repo.save(p));
     this.hintEl.className = "hidden";
-    app.showResults(this.world, s);
+    app.showResults(this.world, s, before);
   }
 
   draw(g: CanvasRenderingContext2D): void {

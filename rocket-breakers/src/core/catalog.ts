@@ -1,7 +1,7 @@
 // Loads and validates data/catalog.json: counts, unique IDs, every cross-reference
 // and starter-loadout legality. Invalid catalogs never reach gameplay.
 import rawJson from "../../data/catalog.json";
-import type { BossRow, CatalogRaw, EnemyRow, HullRow, UtilityRow, WeaponRow } from "./types";
+import type { BossRow, CatalogRaw, EnemyRow, HullRow, UtilityRow, WeaponRow, MissionRow } from "./types";
 
 export const SUPPORTED_SCHEMA = 1;
 export const EXPECTED_COUNTS: Record<string, number> = {
@@ -32,6 +32,7 @@ export class Catalog {
   utility(id: string): UtilityRow { return this.must<UtilityRow>("utilities", id); }
   boss(id: string): BossRow { return this.must<BossRow>("bosses", id); }
   enemy(id: string): EnemyRow { return this.must<EnemyRow>("enemies", id); }
+  mission(id: string): MissionRow { return this.must<MissionRow>("missions", id); }
 
   campaignStarSlots(): number {
     return this.raw.missions.reduce((n, m) => n + m.star_objectives.length, 0);

@@ -38,7 +38,8 @@ export class DockPanel {
     r.replaceChildren();
     r.append(el("h2", "", t("dock.title")), el("div", "dim", t("dock.subtitle")));
     const info = el("div", "card");
-    const src = item.sourceEncounter === "player" ? t("dock.own_module") : t(`bosses.${item.sourceEncounter}.name`);
+    const src = item.sourceEncounter === "player" ? t("dock.own_module")
+      : w.catalog.row("bosses", item.sourceEncounter) ? t(`bosses.${item.sourceEncounter}.name`) : t(`enemies.${item.sourceEncounter}.name`);
     info.append(el("p", "", `${t(`weapons.${weapon.id}.name`)} · ${src}`),
       el("div", "dim", t("dock.part_info", { mass: weapon.mass, cells: weapon.footprint.length, dmg: weapon.damage, rate: weapon.trigger_rate })));
     r.append(info);

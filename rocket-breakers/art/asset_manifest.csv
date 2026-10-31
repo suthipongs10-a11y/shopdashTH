@@ -203,9 +203,9 @@ fusion_F06,fusion,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 fusion_F07,fusion,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 fusion_F08,fusion,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 enemy_E01,enemy,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/enemy_E01.webp
-enemy_E02,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/enemy_E02.webp
+enemy_E02,enemy,512x512,1,alpha,integrated,,M3,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/enemy_E02.webp
 enemy_E03,enemy,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/enemy_E03.webp
-enemy_E04,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/enemy_E04.webp
+enemy_E04,enemy,512x512,1,alpha,integrated,,M3,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/enemy_E04.webp
 enemy_E05,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 enemy_E06,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 enemy_E07,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,

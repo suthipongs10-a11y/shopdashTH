@@ -28,6 +28,13 @@ function tex(url: string): HTMLImageElement | null {
 const TEX = { explosion: tex(explosionUrl), shield: tex(shieldUrl), plasma: tex(plasmaUrl) };
 // Where the core art is centred relative to the boss origin so its tail socket lands on the joint.
 const BOSS_ART_OFFSET = { x: 0, y: 6 };
+// Per-enemy drawing: sprite id, drawn size (largest side, px) and warning-light spot.
+const ENEMY_LOOK: Record<string, { art: string; size: number; warnY: number; warnR: number }> = {
+  E01: { art: "enemy_E01", size: 56, warnY: 24, warnR: 9 },
+  E02: { art: "enemy_E02", size: 62, warnY: 26, warnR: 9 },
+  E03: { art: "enemy_E03", size: 108, warnY: 46, warnR: 14 },
+  E04: { art: "enemy_E04", size: 134, warnY: 0, warnR: 0 },
+};
 const ROLE_COLOR = { offense: "#ff8a1f", survival: "#58e0a0", resource: "#ffd76a" };
 const PICKUP_GLYPH: Record<string, string> = { PU01: "3×", PU02: "L", PU03: "M", PU04: "Z", PU05: "S", PU06: "+", PU07: "U", PU08: "❄", PU09: "OD", PU10: "D", PU11: "F", PU12: "$" };
 
@@ -111,7 +118,14 @@ export class Renderer {
         if (e.tag === "shield") { card(TEX.explosion, 170 / 2, 0.55, true); anim("fx_explosion_small", [0, 6, 11], K12, 170, 0.5); }
         else if (!anim("fx_explosion_small", [0, 6, 11], K12, 120, 0.45)) card(TEX.explosion, 70 / 2 + 10, 0.3, false);
         this.addShake(e.tag === "shield" ? 4 : 2, s); break;
-      case "blast": ring(8, (e.value ?? 45) * 3, C.violet, 0.3, 4); burst(10, C.violet, 200); break;
+      case "blast":
+        if (e.tag === "fuel") {
+          // fuel explosion: big orange ring sized to the real blast radius
+          ring(20, (e.value ?? 110) * 2.6, C.orange, 0.45, 6); burst(30, C.amber, 320, 3);
+          if (!anim("fx_explosion_small", [0, 6, 11], K12, (e.value ?? 110) * 1.8, 0.5)) card(TEX.explosion, e.value ?? 110, 0.5, true);
+          this.addShake(6, s); this.addFlash(0.15, s);
+        } else { ring(8, (e.value ?? 45) * 3, C.violet, 0.3, 4); burst(10, C.violet, 200); }
+        break;
       case "joint_break": anim("fx_joint_break", [0, 4, 7], K8, 110, 0.32); burst(14, C.gold, 300, 3); ring(6, 180, C.gold, 0.3, 4); this.addShake(3, s); break;
       case "sever": anim("fx_detach_burst", [0, 4, 7], K8, 150, 0.34); burst(20, C.cyan, 320, 3); ring(10, 240, C.cyan, 0.5, 5); this.addShake(6, s); this.addFlash(0.25, s); break;
       case "scrap": burst(16, C.dim, 200, 3); break;
@@ -269,52 +283,66 @@ export class Renderer {
     const p = this.pos(e, alpha);
     const core = coreOf(e);
     const flash = core.flash > 0;
+    if (e.role === "supply") { this.drawSupply(e, p, flash); return; }
     // BATCH_003 art: sources are nose-up, enemies fly toward the player, so rotate 180°.
-    const art = sprite(e.role === "scout" ? "enemy_E01" : "enemy_E03");
-    if (art) {
-      if (e.telegraph > 0) {
-        g.fillStyle = `rgba(255,45,85,${0.45 + 0.45 * Math.sin(this.time * 40)})`;
-        g.beginPath(); g.arc(p.x, p.y + (e.role === "scout" ? 24 : 46), e.role === "scout" ? 9 : 14, 0, Math.PI * 2); g.fill();
+    const look = ENEMY_LOOK[e.defId] ?? ENEMY_LOOK.E01;
+    const art = sprite(look.art);
+    if (e.telegraph > 0) {
+      g.fillStyle = `rgba(255,45,85,${0.45 + 0.45 * Math.sin(this.time * 40)})`;
+      g.beginPath(); g.arc(p.x, p.y + look.warnY, look.warnR, 0, Math.PI * 2); g.fill();
+      // aimed volley: show the locked aim line during the warning
+      if (e.role === "interceptor" && e.aim) {
+        g.strokeStyle = "rgba(255,45,85,0.45)"; g.lineWidth = 2; g.setLineDash([8, 8]);
+        g.beginPath(); g.moveTo(p.x, p.y + 20); g.lineTo(e.aim.x, e.aim.y); g.stroke(); g.setLineDash([]);
       }
-      const size = e.role === "scout" ? 56 : 108;
-      drawAt(g, art, p.x, p.y, ...visCenter(art), size / Math.max(visW(art), visH(art)), Math.PI, 1, flash);
-      if (e.role !== "scout") {
-        const shield = e.parts.find((x) => x.id === "shield")!;
-        const joint = e.parts.find((x) => x.id === "joint")!;
-        if (shield.active) {
-          g.fillStyle = shield.flash > 0 ? "rgba(255,255,255,0.8)" : "rgba(255,59,212,0.45)";
-          g.fillRect(p.x - 40, p.y + 35, 80, 12);
-          this.shieldIcon(p.x, p.y + 41, 7);
-        }
-        if (joint.active) this.jointIcon(p.x + joint.offset.x, p.y + joint.offset.y, 11, joint.flash > 0);
-        this.hpBar(p.x - 40, p.y - 58, 80, core.hp / core.hpMax);
-      }
-      return;
     }
-    if (e.role === "scout") {
+    if (art) drawAt(g, art, p.x, p.y, ...visCenter(art), look.size / Math.max(visW(art), visH(art)), Math.PI, 1, flash);
+    else {
       g.save(); g.translate(p.x, p.y);
-      if (e.telegraph > 0) { g.fillStyle = `rgba(255,45,85,${0.5 + 0.5 * Math.sin(this.time * 40)})`; g.beginPath(); g.arc(0, 20, 9, 0, Math.PI * 2); g.fill(); }
-      g.fillStyle = flash ? "#fff" : C.graphite;
-      g.beginPath(); g.moveTo(0, 22); g.lineTo(18, -10); g.lineTo(8, -16); g.lineTo(-8, -16); g.lineTo(-18, -10); g.closePath(); g.fill();
-      g.strokeStyle = C.red; g.lineWidth = 2; g.stroke();
-      g.fillStyle = C.magenta; g.beginPath(); g.arc(0, 0, 4, 0, Math.PI * 2); g.fill();
+      g.fillStyle = flash ? "#fff" : C.graphite; g.strokeStyle = C.red; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(0, look.size * 0.4); g.lineTo(look.size * 0.35, -look.size * 0.2); g.lineTo(-look.size * 0.35, -look.size * 0.2); g.closePath(); g.fill(); g.stroke();
       g.restore();
-    } else {
+    }
+    if (e.role === "shield") {
       const shield = e.parts.find((x) => x.id === "shield")!;
       const joint = e.parts.find((x) => x.id === "joint")!;
-      g.save(); g.translate(p.x, p.y);
-      if (e.telegraph > 0) { g.fillStyle = `rgba(255,45,85,${0.4 + 0.4 * Math.sin(this.time * 40)})`; g.fillRect(-30, 30, 60, 8); }
-      g.fillStyle = flash ? "#fff" : C.graphite; g.fillRect(-40, -20, 80, 40);
-      g.strokeStyle = C.red; g.lineWidth = 2; g.strokeRect(-40, -20, 80, 40);
-      g.fillStyle = C.graphiteLight; g.fillRect(-28, -12, 56, 10);
       if (shield.active) {
-        g.fillStyle = shield.flash > 0 ? "#fff" : "rgba(255,59,212,0.55)"; g.fillRect(-44, 21, 88, 12);
-        this.shieldIcon(0, 27, 7);
+        g.fillStyle = shield.flash > 0 ? "rgba(255,255,255,0.8)" : "rgba(255,59,212,0.45)";
+        g.fillRect(p.x - 40, p.y + 35, 80, 12);
+        this.shieldIcon(p.x, p.y + 41, 7);
       }
-      if (joint.active) this.jointIcon(joint.offset.x, joint.offset.y, 11, joint.flash > 0);
-      g.restore();
-      this.hpBar(p.x - 40, p.y - 34, 80, core.hp / core.hpMax);
+      if (joint.active) this.jointIcon(p.x + joint.offset.x, p.y + joint.offset.y, 11, joint.flash > 0);
+      this.hpBar(p.x - 40, p.y - 58, 80, core.hp / core.hpMax);
+    } else if (e.role === "cargo") {
+      // Engine block = joint (free the cargo), tanks = fuel (explodes).
+      const engine = e.parts.find((x) => x.id === "engine")!;
+      if (engine.active) {
+        g.strokeStyle = engine.flash > 0 ? "#fff" : "rgba(255,215,106,0.75)"; g.lineWidth = 2; g.setLineDash([5, 5]);
+        g.strokeRect(p.x - 15, p.y - 42, 30, 84); g.setLineDash([]);
+        this.jointIcon(p.x, p.y - 30, 10, engine.flash > 0);
+        this.hpBar(p.x - 18, p.y - 62, 36, engine.hp / engine.hpMax, C.gold);
+      }
+      this.hpBar(p.x - 64, p.y + 32, 128, core.hp / core.hpMax, C.orange);
+    } else if (e.role === "interceptor" && core.hp < core.hpMax) {
+      this.hpBar(p.x - 22, p.y - 36, 44, core.hp / core.hpMax);
     }
+  }
+
+  // Supply node (no final art yet): a marked container crate drifting down.
+  private drawSupply(e: Enemy, p: Vec, flash: boolean): void {
+    const g = this.ctx;
+    const core = coreOf(e);
+    const pulse = 0.5 + 0.5 * Math.sin(this.time * 5);
+    g.save(); g.translate(p.x, p.y);
+    g.strokeStyle = `rgba(255,176,32,${0.35 + pulse * 0.4})`; g.lineWidth = 3;
+    g.beginPath(); g.arc(0, 0, 44 + pulse * 4, 0, Math.PI * 2); g.stroke();
+    g.rotate(Math.sin(this.time * 0.8) * 0.15);
+    g.fillStyle = flash ? "#fff" : C.graphite; g.fillRect(-30, -30, 60, 60);
+    g.strokeStyle = C.amber; g.lineWidth = 3; g.strokeRect(-30, -30, 60, 60);
+    g.fillStyle = C.graphiteLight; g.fillRect(-22, -6, 44, 12);
+    g.fillStyle = C.amber; g.fillRect(-4, -22, 8, 44);
+    g.restore();
+    this.hpBar(p.x - 30, p.y - 44, 60, core.hp / core.hpMax, C.amber);
   }
 
   // Integrated BATCH_001 art drawn nose-up as delivered: the art's tail socket sits on
@@ -781,10 +809,10 @@ export class Renderer {
     g.beginPath(); g.moveTo(x, y - s); g.lineTo(x + s, y - s * 0.5); g.lineTo(x + s * 0.7, y + s * 0.6); g.lineTo(x, y + s); g.lineTo(x - s * 0.7, y + s * 0.6); g.lineTo(x - s, y - s * 0.5); g.closePath(); g.fill();
   }
 
-  private hpBar(x: number, y: number, w: number, frac: number): void {
+  private hpBar(x: number, y: number, w: number, frac: number, color: string = C.red): void {
     const g = this.ctx;
     g.fillStyle = "rgba(0,0,0,0.5)"; g.fillRect(x, y, w, 5);
-    g.fillStyle = C.red; g.fillRect(x, y, w * Math.max(0, frac), 5);
+    g.fillStyle = color; g.fillRect(x, y, w * Math.max(0, frac), 5);
   }
 }
 

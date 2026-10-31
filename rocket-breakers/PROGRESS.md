@@ -1,6 +1,6 @@
 # Progress
 
-Status: **M1 salvage slice playable in the browser (web build)** + expansion 1.1 power-ups (8 of 12).
+Status: **M2 stage 1 — campaign map + P01-01 and P01-06 playable** (web build) + expansion 1.1 power-ups (8 of 12).
 Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31)
@@ -65,3 +65,16 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - Hold swap UI (replace an installed module at the dock) not built; stow/scrap/fit only.
 - No mid-run save/resume; Story/Veteran difficulty not implemented.
 - Fusion names lack Thai in catalog.
+
+## Done (2026-10-31, M2 stage 1)
+- Campaign: sector map for P01 (6 nodes, sequential unlock, star pips), briefing (3 star objectives, enemies,
+  reward), results with new / previous / missed stars, `mission_records` OR-merge, catalog-baseline rewards.
+- `MissionDirector` drives missions from catalog waves (formations, entry sides, delays, encounter wave); each wave
+  plays twice (mirrored second pass) — see DECISIONS.
+- New enemies: E02 Needle Interceptor (aimed volley with aim line), E04 Fuel Hauler (shoot engine → intact research
+  module to tow/fit; shoot tanks → fuel blast). Supply nodes for P01-01 Star B.
+- Playable: P01-01 (all 3 stars earnable), P01-06 (B02 from catalog waves; Star B secure W022; Star C interrupt not yet).
+  P01-02..05 shown as "coming soon".
+- Tests: 72 (new: director, formations, E02/E04, stars, settlement merge, unlocks, P01-01 bot playthrough with 3 stars).
+  Browser capture `e2e/capture-campaign.mjs`: map → briefing → combat → dock → results → map, no console errors.
+- Fixed: results screen could open twice.

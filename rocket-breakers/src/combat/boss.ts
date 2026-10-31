@@ -91,6 +91,7 @@ export class ScorpionBoss {
       parts: [this.core, clawL, clawR, legL, legR, rearL, rearR, this.plate, this.joint, this.tail], alive: true, armor: row.armor, age: 0,
       fireTimer: 0, burstLeft: 0, burstTimer: 0, telegraph: 0, charge: 0, credits: 120, scrap: 20, score: 5000,
       spawnIndex: 0, dir: 1, baseY: 250, tag: "boss", leftArena: false,
+      path: null, pathI: 0, track: { x: 360, y: -170 }, speed: 0, wobble: 0, wobblePhase: 0, aim: null,
     };
     this.item = makeItem(`${runId}:${row.id}:tail`, row.signature_weapon_id, row.id, "tail", row.signature_module_integrity, 7);
   }

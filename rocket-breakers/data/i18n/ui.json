@@ -23,10 +23,6 @@
     "th": "ผ่านด่าน / เล่นทั้งหมด",
     "en": "Clears / attempts"
   },
-  "title.start": {
-    "th": "เริ่มภารกิจทดลอง: ขโมยหางแมงป่อง",
-    "en": "Start test mission: steal the Scorpion Tail"
-  },
   "title.howto": {
     "th": "วิธีเล่น",
     "en": "How to play"
@@ -44,8 +40,8 @@
     "en": "This browser can't store saves — progress is lost when the page closes"
   },
   "title.build_note": {
-    "th": "M1 ด่านทดลอง · ภาพชุดแรกใส่แล้ว (ยาน ปืน บอส) ที่เหลือยังเป็นภาพชั่วคราว · เสียงสังเคราะห์ชั่วคราว",
-    "en": "M1 test slice · first art batch in (ship, guns, boss); the rest is placeholder · prototype audio"
+    "th": "M2 ขั้นที่ 1 · เขตสุสานยาน: เล่นได้ด่าน 1 และ 6 · ภาพบางส่วนยังชั่วคราว · เสียงสังเคราะห์ชั่วคราว",
+    "en": "M2 stage 1 · Graveyard Belt: missions 1 and 6 playable · some art is placeholder · prototype audio"
   },
   "howto.title": {
     "th": "วิธีเล่น",
@@ -526,5 +522,177 @@
   "settings.touch_sensitivity": {
     "th": "ความไวการลากนิ้ว",
     "en": "Drag sensitivity"
+  },
+  "title.campaign": {
+    "th": "แคมเปญ: เขตสุสานยาน",
+    "en": "Campaign: Graveyard Belt"
+  },
+  "title.stars": {
+    "th": "ดาวแคมเปญ",
+    "en": "Campaign stars"
+  },
+  "map.subtitle": {
+    "th": "เลือกด่าน — ดาวรวม {stars}",
+    "en": "Choose a mission — {stars} stars total"
+  },
+  "map.locked": {
+    "th": "ล็อกอยู่ — ผ่านด่านก่อนหน้าก่อน",
+    "en": "Locked — clear the previous mission"
+  },
+  "map.soon": {
+    "th": "เร็ว ๆ นี้",
+    "en": "Coming soon"
+  },
+  "role.approach": {
+    "th": "บุกเข้าเขต",
+    "en": "Approach"
+  },
+  "role.escort": {
+    "th": "คุ้มกัน",
+    "en": "Escort"
+  },
+  "role.mini_boss": {
+    "th": "มินิบอส",
+    "en": "Mini-boss"
+  },
+  "role.salvage_hunt": {
+    "th": "ล่าชิ้นส่วน",
+    "en": "Salvage hunt"
+  },
+  "role.hazard_gauntlet": {
+    "th": "ฝ่าเขตอันตราย",
+    "en": "Hazard gauntlet"
+  },
+  "role.boss": {
+    "th": "บอสประจำเขต",
+    "en": "Sector boss"
+  },
+  "brief.stars": {
+    "th": "ดาว 3 ดวง (ได้ถาวร เก็บสะสมข้ามรอบได้)",
+    "en": "3 stars (permanent, can be earned across runs)"
+  },
+  "brief.not_yet": {
+    "th": "(ยังเก็บไม่ได้ในเวอร์ชันนี้)",
+    "en": "(not available in this build yet)"
+  },
+  "brief.enemies": {
+    "th": "ศัตรูที่จะเจอ",
+    "en": "Enemies"
+  },
+  "brief.rewards": {
+    "th": "รางวัลเมื่อผ่าน: {credits} เครดิต · {scrap} เศษเหล็ก ขึ้นไป",
+    "en": "Clear reward: {credits} credits · {scrap}+ scrap"
+  },
+  "brief.hauler_tip": {
+    "th": "เรือถังเชื้อเพลิง: ยิงเครื่องยนต์ตรงกลาง (กรอบเหลือง) เพื่อได้อาวุธสมบูรณ์ — ยิงถังข้างจะระเบิด",
+    "en": "Fuel Hauler: shoot the engine block (yellow frame) for an intact weapon — hitting the tanks makes it explode"
+  },
+  "brief.launch": {
+    "th": "ออกบิน",
+    "en": "Launch"
+  },
+  "obj.clear_mission": {
+    "th": "ทำภารกิจให้สำเร็จ",
+    "en": "Clear the mission"
+  },
+  "obj.destroy_supply_nodes": {
+    "th": "ทำลายจุดส่งกำลังให้ครบ {n} จุด (กล่องสีส้มที่ลอยลงมา)",
+    "en": "Destroy all {n} supply nodes (orange crates drifting down)"
+  },
+  "obj.core_damage_at_most": {
+    "th": "รับความเสียหายที่แกนยานรวมไม่เกิน {n} (โล่ไม่นับ)",
+    "en": "Take at most {n} core damage (shield hits don't count)"
+  },
+  "obj.secure_signature": {
+    "th": "ยึด {target} แบบสมบูรณ์แล้วนำกลับ",
+    "en": "Secure {target} intact and bring it home"
+  },
+  "obj.escort_hp_at_least_pct": {
+    "th": "คุ้มกันเป้าหมายให้เหลือ HP อย่างน้อย {n}%",
+    "en": "Keep the escort above {n}% HP"
+  },
+  "obj.destroy_marked_ambushers": {
+    "th": "กำจัดชุดซุ่มโจมตีที่ทำเครื่องหมายครบ {n} ชุด",
+    "en": "Destroy all {n} marked ambush groups"
+  },
+  "obj.avoid_named_attack_hits": {
+    "th": "ไม่โดนท่าโจมตีเอกลักษณ์ของมินิบอสเลย",
+    "en": "Never get hit by the mini-boss's signature attack"
+  },
+  "obj.secure_intact_parts": {
+    "th": "นำชิ้นส่วนสมบูรณ์กลับ {n} ชิ้น",
+    "en": "Bring home {n} intact parts"
+  },
+  "obj.cargo_destroyed_at_most": {
+    "th": "ไม่มีชิ้นส่วนที่เริ่มลากแล้วถูกทำลาย",
+    "en": "Lose no part once you start towing it"
+  },
+  "obj.disable_hazard_nodes": {
+    "th": "ปิดเครื่องกำเนิดอันตรายครบ {n} จุด",
+    "en": "Disable all {n} hazard nodes"
+  },
+  "obj.hazard_damage_at_most": {
+    "th": "ไม่รับความเสียหายจากเขตอันตราย",
+    "en": "Take no hazard damage"
+  },
+  "obj.interrupt_boss_charge": {
+    "th": "ยิงจุดขัดจังหวะระหว่างบอสชาร์จท่าให้สำเร็จ {n} ครั้ง",
+    "en": "Interrupt the boss's charge attack {n} times"
+  },
+  "results.star_new": {
+    "th": "ได้ใหม่!",
+    "en": "New!"
+  },
+  "results.star_had": {
+    "th": "ได้แล้ว",
+    "en": "Earned before"
+  },
+  "results.star_missed": {
+    "th": "ยังไม่ได้",
+    "en": "Missed"
+  },
+  "results.stars_need_clear": {
+    "th": "ดาวจะนับเมื่อผ่านภารกิจเท่านั้น",
+    "en": "Stars only count on a successful clear"
+  },
+  "results.research": {
+    "th": "ได้ข้อมูลวิจัย {name} +{n}",
+    "en": "Research data: {name} +{n}"
+  },
+  "results.map": {
+    "th": "แผนที่",
+    "en": "Map"
+  },
+  "hud.wave": {
+    "th": "คลื่น {n}/{total}",
+    "en": "Wave {n}/{total}"
+  },
+  "hud.supply": {
+    "th": "จุดส่งกำลัง {n}/{total}",
+    "en": "Supply {n}/{total}"
+  },
+  "hint.hauler": {
+    "th": "เรือถังเชื้อเพลิง: ยิงเครื่องยนต์กรอบเหลืองตรงกลาง = ได้อาวุธ, ยิงถังข้าง = ระเบิด!",
+    "en": "Fuel Hauler: hit the yellow engine block for a weapon — the tanks explode!"
+  },
+  "hint.interceptor": {
+    "th": "สกัดเข็มเล็งก่อนยิง — เห็นเส้นประแดงแล้วขยับหลบ",
+    "en": "Needle Interceptors aim first — move when you see the red dashed line"
+  },
+  "hint.supply": {
+    "th": "จุดส่งกำลังลอยมา! ยิงทิ้งก่อนมันหลุดจอ (เพื่อดาว)",
+    "en": "Supply node incoming! Destroy it before it drifts away (star objective)"
+  },
+  "hint.cargo_freed": {
+    "th": "เครื่องยนต์พัง! ชิ้นส่วนหลุดสมบูรณ์ — กด \"ดึง\" ค้างเพื่อลาก",
+    "en": "Engine down! The cargo module is free — hold \"Tow\" to grab it"
+  },
+  "hint.fuel_blast": {
+    "th": "ถังเชื้อเพลิงระเบิด! ระเบิดโดนศัตรูรอบ ๆ แต่ไม่ได้ชิ้นส่วน",
+    "en": "Fuel tank blast! It hits nearby enemies but leaves no part"
+  },
+  "hint.outro_salvage": {
+    "th": "ยังมีชิ้นส่วนลอยอยู่ — ลากมาก่อนภารกิจจบ",
+    "en": "A part is still floating — tow it before the mission ends"
   }
 }

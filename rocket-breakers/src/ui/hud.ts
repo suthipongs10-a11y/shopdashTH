@@ -83,8 +83,19 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
   }
   drawBuffs(g, w, 1280 - insets.bottom - 236); // bottom-left, above the thumb buttons and below the flight area
   if (!(b && b.e.alive && !b.entering)) {
-    g.fillStyle = "rgba(255,215,106,0.85)"; g.font = "16px RB Thai, sans-serif"; g.textAlign = "right";
-    g.fillText(t("hud.placeholder"), 620, top + TOP_H + 30);
+    g.textAlign = "right";
+    const d = w.director;
+    if (d) {
+      // Campaign objective line: wave progress and the visible side objective.
+      const wave = Math.max(1, Math.min(d.index + 1, d.waves.length));
+      let line = t("hud.wave", { n: wave, total: d.waves.length });
+      if (w.supplyTotal) line += ` · ${t("hud.supply", { n: w.supplyDestroyed, total: w.supplyTotal })}`;
+      g.fillStyle = C.gold; g.font = "700 18px RB Thai, sans-serif";
+      g.fillText(line, 620, top + TOP_H + 30, 380);
+    } else {
+      g.fillStyle = "rgba(255,215,106,0.85)"; g.font = "16px RB Thai, sans-serif";
+      g.fillText(t("hud.placeholder"), 620, top + TOP_H + 30);
+    }
   }
   for (const btn of buttons) drawButton(g, btn, w, pressed.has(btn.action), time);
 }

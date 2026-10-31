@@ -6,11 +6,13 @@ import type { Catalog } from "../core/catalog";
 import { DT } from "../core/frameDriver";
 import { DEG, clamp, dist, pointSegmentDistance, type Vec } from "../core/geometry";
 import { Rng } from "../core/rng";
-import type { WeaponRow } from "../core/types";
+import type { MissionRow, WeaponRow } from "../core/types";
 import { Assembly, TILE, cellToLocal, type FittedModule } from "../ships/assembly";
 import { PlayerMotion } from "../ships/motion";
 import { BulletPool, type Bullet } from "./bullets";
-import { coreOf, makeBarge, makeScout, updateEnemy, type Enemy } from "./enemies";
+import { coreOf, makeBarge, makeDirected, makeScout, SUPPLY_ROW, updateEnemy, type Enemy } from "./enemies";
+import { formationSpawns, MissionDirector, supplySpawn } from "../campaign/missionDirector";
+import { evaluateStars, type ObjectiveStats } from "../campaign/stars";
 import { firstPartHit, partContains, partWorldPos, PRIORITY, type Part } from "./parts";
 import type { Emitter } from "./patterns";
 import { SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
@@ -56,6 +58,12 @@ export const HITSTOP_ELITE_TICKS = 2;   // 0.035 s
 export const HITSTOP_COOLDOWN = 0.5;
 export const LOW_HP_AID_FRAC = 0.3;
 export const LOW_HP_AID_COOLDOWN = 60;
+export const CARGO_INTEGRITY = 60;     // E04 cargo module freed by breaking the engine
+export const FUEL_BLAST_RADIUS = 110;
+export const FUEL_BLAST_DAMAGE = 40;   // to other enemies
+export const FUEL_BLAST_PLAYER = 15;   // environmental blast also hurts the ship
+export const OUTRO_MIN_SEC = 1.5;
+export const OUTRO_SALVAGE_WAIT = 10;  // wait for a loose intact part before ending
 
 export interface TickInput {
   move: Vec;
@@ -78,6 +86,8 @@ export interface WorldOptions {
   autoTractor?: boolean;
   invulnerable?: boolean; // test/dev only: player takes no damage
   startAt?: "intro" | "boss";
+  missionId?: string;       // catalog mission; omitted or "SLICE-01" = the fixed test mission
+  researchPool?: string[];  // weapons an E04 cargo module can contain (unlocked research)
 }
 
 interface Lock { enemyId: string; partId: string }
@@ -122,7 +132,13 @@ export class CombatWorld {
   private plasmaTargets = new Map<number, Lock>();
   private contactCd = 0;
   // mission
-  phase: "intro" | "wave1" | "wave2" | "boss_entry" | "boss" | "outro" = "intro";
+  phase: "intro" | "wave1" | "wave2" | "waves" | "boss_entry" | "boss" | "outro" = "intro";
+  readonly mission: MissionRow | null;
+  readonly director: MissionDirector | null;
+  supplyDestroyed = 0;
+  supplyTotal = 0;
+  private outroTimer = 0;
+  private cargoFreed = new Set<string>();
   phaseTimer = 2.5;
   reinforcementsSpawned = false;
   severed: string[] = [];
@@ -153,7 +169,10 @@ export class CombatWorld {
   private bossDeadAt = -1;
 
   constructor(readonly catalog: Catalog, readonly opts: WorldOptions = {}) {
-    this.rng = new Rng(opts.seed ?? 20261031);
+    this.mission = opts.missionId && opts.missionId !== "SLICE-01" ? catalog.mission(opts.missionId) : null;
+    this.director = this.mission ? new MissionDirector(this.mission) : null;
+    this.supplyTotal = this.director?.actors.supply_nodes ?? 0;
+    this.rng = new Rng(opts.seed ?? this.mission?.seed ?? 20261031);
     this.runId = opts.runId ?? "run1";
     const hull = catalog.hull("H01");
     this.assembly = Assembly.fromStarter(hull, catalog);
@@ -167,7 +186,8 @@ export class CombatWorld {
     this.weapons.energyRegen = hull.energy_regen;
     this.em = { hostile: this.hostile, speedMul: 1, damageMul: 1 };
     this.refreshAssembly();
-    if (opts.startAt === "boss") { this.phase = "boss_entry"; this.phaseTimer = 0; }
+    if (this.director) this.phase = "waves";
+    else if (opts.startAt === "boss") { this.phase = "boss_entry"; this.phaseTimer = 0; }
   }
 
   // ---------------------------------------------------------------- queries
@@ -256,7 +276,7 @@ export class CombatWorld {
       this.events.push({ type: "dash", pos: { ...this.motion.pos } });
       if (this.tow && !this.tow.towing) this.tow = null; // dash cancels acquiring
     }
-    for (const e of this.enemies) updateEnemy(e, DT, this.em);
+    for (const e of this.enemies) updateEnemy(e, DT, this.em, this.motion.pos);
     this.enemies = this.enemies.filter((e) => !e.leftArena);
     if (this.boss?.e.alive) this.boss.update(DT, this.motion.pos);
     this.resolveBodyContact();
@@ -297,6 +317,7 @@ export class CombatWorld {
   private spawnId(prefix: string): string { return `${prefix}${this.nextEnemy++}`; }
 
   private updateMission(): void {
+    if (this.director) { this.updateDirected(); return; }
     this.phaseTimer -= DT;
     const minorsAlive = this.enemies.length > 0;
     // Safe dock opens once the current micro-wave is clear while towing a part.
@@ -324,28 +345,70 @@ export class CombatWorld {
         if (!minorsAlive) { this.phase = "boss_entry"; this.phaseTimer = 2; }
         break;
       case "boss_entry":
-        if (this.phaseTimer <= 0 && !this.boss) {
-          this.boss = new ScorpionBoss(this.catalog.boss("B02"), this.runId, this.em, this.rng);
-          this.items.push(this.boss.item);
-          this.phase = "boss";
-          this.hint("hint.boss");
-        }
+        if (this.phaseTimer <= 0 && !this.boss) this.spawnBoss();
         break;
-      case "boss": {
-        const b = this.boss!;
-        if (b.lull && !minorsAlive) {
-          const st = b.item.state;
-          if (st !== "detached_intact" && st !== "acquiring" && st !== "towed") b.endLull();
-        }
-        if (!b.e.alive) {
-          if (this.bossDeadAt < 0) this.bossDeadAt = this.tick;
-          for (const e of this.enemies) this.killEnemy(e, false);
-          this.enemies = [];
-          const secs = (this.tick - this.bossDeadAt) * DT;
-          if ((this.hostile.active === 0 && secs > 1) || secs > 5) this.finish(true);
-        }
+      case "boss":
+        this.updateBossPhase(minorsAlive);
         break;
+    }
+  }
+
+  private spawnBoss(): void {
+    this.boss = new ScorpionBoss(this.catalog.boss("B02"), this.runId, this.em, this.rng);
+    this.items.push(this.boss.item);
+    this.phase = "boss";
+    this.hint("hint.boss");
+  }
+
+  private updateBossPhase(minorsAlive: boolean): void {
+    const b = this.boss!;
+    if (b.lull && !minorsAlive) {
+      const st = b.item.state;
+      if (st !== "detached_intact" && st !== "acquiring" && st !== "towed") b.endLull();
+    }
+    if (!b.e.alive) {
+      if (this.bossDeadAt < 0) this.bossDeadAt = this.tick;
+      for (const e of this.enemies) this.killEnemy(e, false);
+      this.enemies = [];
+      const secs = (this.tick - this.bossDeadAt) * DT;
+      if ((this.hostile.active === 0 && secs > 1) || secs > 5) this.finish(true);
+    }
+  }
+
+  // Catalog-driven mission flow (M2): waves, supply nodes, encounter, outro.
+  private updateDirected(): void {
+    const d = this.director!;
+    const waveAlive = this.enemies.some((e) => e.role !== "supply");
+    const towed = this.tow?.towing ? this.towedItem : null;
+    if (towed && !waveAlive && !this.dock && (!this.boss || this.boss.lull || !this.boss.e.alive)) {
+      this.startDock(towed);
+      return;
+    }
+    const bossActive = !!this.boss && this.boss.e.alive;
+    for (const ev of d.tick(DT, !waveAlive, bossActive)) {
+      if (ev.kind === "wave") {
+        const row = this.catalog.enemy(ev.wave.enemy_id!);
+        const tag = `wave${ev.index + 1}`;
+        for (const spec of formationSpawns(ev.wave, row)) this.enemies.push(makeDirected(this.spawnId("e"), row, spec, tag));
+        if (row.id === "E03") this.hint("hint.flank");
+        if (row.id === "E04") this.hint("hint.hauler");
+        if (row.id === "E02") this.hint("hint.interceptor");
+      } else if (ev.kind === "supply") {
+        this.enemies.push(makeDirected(this.spawnId("s"), SUPPLY_ROW, supplySpawn(this.rng, ev.index), "supply"));
+        this.hint("hint.supply");
+      } else if (ev.kind === "encounter") {
+        this.spawnBoss();
+      } else if (ev.kind === "complete" && !this.boss) {
+        this.phase = "outro";
+        this.outroTimer = 0;
       }
+    }
+    if (this.phase === "boss") this.updateBossPhase(waveAlive);
+    else if (this.phase === "outro") {
+      this.outroTimer += DT;
+      const loose = this.items.some((i) => i.sourceEncounter !== "player" && (i.state === "detached_intact" || i.state === "acquiring"));
+      if (loose) this.hint("hint.outro_salvage");
+      if (this.outroTimer >= OUTRO_MIN_SEC && this.hostile.active === 0 && (!loose || this.outroTimer >= OUTRO_SALVAGE_WAIT)) this.finish(true);
     }
   }
 
@@ -505,6 +568,7 @@ export class CombatWorld {
           part.active = false;
           part.selectable = false;
           this.events.push({ type: "joint_break", pos: at, tag: part.id });
+          if (e.role === "cargo") this.freeCargo(e, at);
           if (e.role === "shield") {
             const shield = e.parts.find((p) => p.id === "shield");
             if (shield) shield.active = false;
@@ -526,11 +590,41 @@ export class CombatWorld {
     this.events.push({ type: "hit", pos: at, tag: part.kind });
   }
 
+  // E04 engine broken: the hauler stops and its cargo module floats free intact.
+  private freeCargo(e: Enemy, at: Vec): void {
+    if (this.cargoFreed.has(e.id)) return;
+    this.cargoFreed.add(e.id);
+    const pool = (this.opts.researchPool ?? ["W001", "W008"]).filter((id) => this.catalog.row("weapons", id));
+    const template = pool[Math.floor(this.rng.next() * pool.length)] ?? "W001";
+    const w = this.catalog.weapon(template);
+    const item = makeItem(`${this.runId}:${e.id}:cargo`, template, e.defId, "module", CARGO_INTEGRITY, w.mass);
+    transition(item, "detached_intact", `free:${item.instanceId}`, this.tick);
+    item.pos = { x: clamp(e.pos.x, 40, 680), y: clamp(e.pos.y, 140, 900) };
+    item.prev = { ...item.pos };
+    item.vel = { x: 0, y: 50 };
+    item.invuln = PICKUP_INVULN_SEC;
+    this.items.push(item);
+    this.events.push({ type: "sever", pos: at, tag: "cargo" });
+    this.hint("hint.cargo_freed");
+    this.killEnemy(e);
+  }
+
+  // Shooting a hauler's fuel tanks sets off an environmental blast (no intact loot).
+  private fuelBlast(e: Enemy): void {
+    const at = { ...e.pos };
+    this.blast(at, FUEL_BLAST_RADIUS, FUEL_BLAST_DAMAGE, e.id);
+    this.events.push({ type: "blast", pos: at, value: FUEL_BLAST_RADIUS, tag: "fuel" });
+    if (dist(at, this.motion.pos) <= FUEL_BLAST_RADIUS + CORE_RADIUS) this.applyPlayerHit(FUEL_BLAST_PLAYER, "core", { ...this.motion.pos });
+    this.hint("hint.fuel_blast");
+  }
+
   private killEnemy(e: Enemy, credit = true): void {
     if (!e.alive) return;
     e.alive = false;
     this.events.push({ type: "kill", pos: { ...e.pos }, tag: e.role });
     if (!credit) return;
+    if (e.role === "supply") this.supplyDestroyed++;
+    if (e.role === "cargo" && !this.cargoFreed.has(e.id)) this.fuelBlast(e);
     this.kills++;
     this.score += e.score;
     this.combatCredits += e.credits;
@@ -607,7 +701,7 @@ export class CombatWorld {
       this.authored.offense = true;
       this.spawnPickup(this.pickupCompatible("PU01") ? "PU01" : "PU09", { x: clamp(me.x, 120, 600), y: 260 });
     }
-    if (!this.authored.defense && (this.phase === "boss_entry" || this.phase === "boss")) {
+    if (!this.authored.defense && (this.phase === "boss_entry" || this.phase === "boss" || (this.director?.index ?? 0) >= 2)) {
       this.authored.defense = true;
       this.spawnPickup("PU05", { x: clamp(me.x, 120, 600), y: 300 });
     }
@@ -1112,8 +1206,13 @@ export class CombatWorld {
         secured.push(entry);
       } else unbanked.push(entry);
     }
+    const mid = this.mission?.id ?? "SLICE-01";
+    const m = /^P(\d+)-(\d+)$/.exec(mid);
+    const stats: ObjectiveStats = { supplyDestroyed: this.supplyDestroyed, coreDamage: this.coreDamageTaken,
+      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0 };
     this.result = {
-      runId: this.runId, missionId: "SLICE-01", sector: 1, missionIndex: 6, victory, score: this.score,
+      runId: this.runId, missionId: mid, sector: m ? +m[1] : 1, missionIndex: m ? +m[2] : 6, victory, score: this.score,
+      stats, stars: this.mission ? evaluateStars(this.mission, stats, victory) : null,
       combatCredits: this.combatCredits, combatScrap: this.combatScrap, secured, unbanked,
       severed: [...new Set(this.severed)], stolen: [...new Set(this.stolen)],
       encounterIds: victory && this.boss ? [this.boss.row.id] : [],
