@@ -17,6 +17,8 @@ import { firstPartHit, makePart, partContains, partEntryT, partWorldPos, PRIORIT
 import type { Emitter } from "./patterns";
 import { SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
 import { CrabBoss } from "./crab";
+import { rollChoices, SurvivalDirector, SURVIVAL_ID, xpToNext, type Choice } from "./survival";
+import { NO_MODS, type ShipMods } from "../campaign/upgrades";
 import { fireArsenal, onArsenalHit, updateArsenal, type Arc, type Channel, type GravityField } from "./arsenal";
 import { WeaponScheduler, type Mount } from "./weapons";
 import { ageLoose, isIntact, makeItem, transition, PICKUP_INVULN_SEC, type SalvageItem } from "../salvage/salvage";
@@ -91,7 +93,8 @@ export const ENEMY_DROPS: Record<string, { chance: number; pool: string[] }> = {
 };
 export const MAX_LOOSE_DROPS = 3;
 export const CAMPAIGN_BOSS_HP = 1.4;
-export const MODULE_STRAY_MUL = 0.25; // un-locked hits on a boss signature part // bosses must outlast a ship full of salvaged guns
+export const MODULE_STRAY_MUL = 0.25;
+export const MODULE_LV_INTEGRITY = 40; // un-locked hits on a boss signature part // bosses must outlast a ship full of salvaged guns
 export const SNATCH_BEAM_SEC = 2.0;    // E21 tractor time before it steals a part (shoot it first)
 export const SNATCH_RANGE = 170;
 export const SNATCH_SPEED = 150;
@@ -125,6 +128,8 @@ export interface WorldOptions {
   // "quick" (owner request, default in the app): tap Tractor near a loose part and it flies in
   // and fits itself at once (no cable, no dock). "classic": hold-to-tow + safe dock fitting.
   salvageMode?: "quick" | "classic";
+  mode?: "campaign" | "survival"; // survival: endless waves, XP level-ups, bosses on a timer
+  mods?: ShipMods;                // hangar upgrades + extra starting gun
 }
 
 interface Lock { enemyId: string; partId: string }
@@ -159,6 +164,15 @@ export class CombatWorld {
   namedAttackHits = 0;
   cargoDestroyed = 0;
   magnet: { itemId: string } | null = null;
+  // survival / run upgrades
+  readonly survival: SurvivalDirector | null;
+  xp = 0;
+  level = 1;
+  levelUp: Choice[] | null = null;   // pending pick (sim paused while set)
+  private pendingLevels = 0;
+  damageMul = 1;
+  pullMul = 1;
+  defeatedBosses: string[] = [];
   wrecks: { id: number; pos: Vec; prev: Vec; rot: number; spin: number }[] = [];
   hazardNodesDestroyed = 0;
   hazardNodesTotal = 0;
@@ -225,6 +239,7 @@ export class CombatWorld {
     this.hazardNodesTotal = this.director?.actors.hazard_nodes ?? 0;
     this.rng = new Rng(opts.seed ?? this.mission?.seed ?? 20261031);
     this.runId = opts.runId ?? "run1";
+    this.survival = opts.mode === "survival" ? new SurvivalDirector(this.rng) : null;
     const hull = catalog.hull("H01");
     this.assembly = Assembly.fromStarter(hull, catalog);
     this.hp = this.hpMax = hull.hp;
@@ -236,8 +251,22 @@ export class CombatWorld {
     this.weapons.energyCapacity = this.weapons.energy = hull.reactor_capacity;
     this.weapons.energyRegen = hull.energy_regen;
     this.em = { hostile: this.hostile, speedMul: 1, damageMul: 1 };
+    // hangar upgrades
+    const mods = opts.mods ?? NO_MODS;
+    this.hp = this.hpMax = hull.hp + mods.hpBonus;
+    this.shield = this.shieldMax = hull.shield + mods.shieldBonus;
+    this.weapons.energyRegen = hull.energy_regen * mods.regenMul;
+    this.weapons.rateMul = mods.rateMul;
+    this.motion.baseSpeed = hull.base_speed * mods.speedMul;
+    this.damageMul = mods.damageMul;
+    this.pullMul = mods.pullMul;
+    if (mods.extraWeapon && catalog.row("weapons", mods.extraWeapon)) {
+      const w = catalog.weapon(mods.extraWeapon);
+      const o = this.assembly.suggestOrigins(w)[0];
+      if (o) this.assembly.place(w, o, `${this.runId}:loadout`);
+    }
     this.refreshAssembly();
-    if (this.director) this.phase = "waves";
+    if (this.director || this.survival) this.phase = "waves";
     else if (opts.startAt === "boss") { this.phase = "boss_entry"; this.phaseTimer = 0; }
   }
 
@@ -288,7 +317,7 @@ export class CombatWorld {
   // Quick salvage: nearest loose part within range, any direction.
   quickCandidate(): SalvageItem | null {
     let best: SalvageItem | null = null;
-    let bestD = QUICK_PULL_RANGE;
+    let bestD = QUICK_PULL_RANGE * this.pullMul;
     for (const it of this.items) {
       if ((it.state !== "detached_intact" && it.state !== "owner_drop") || it.heldBy) continue;
       const d = dist(it.pos, this.motion.pos);
@@ -329,7 +358,7 @@ export class CombatWorld {
 
   // ---------------------------------------------------------------- tick
   step(input: TickInput): void {
-    if (this.status !== "running" || this.dock) return;
+    if (this.status !== "running" || this.dock || this.levelUp) return;
     // Hitstop freezes the whole simulation, timers included.
     if (this.hitstop > 0) { this.hitstop--; return; }
     this.tick++;
@@ -387,6 +416,7 @@ export class CombatWorld {
   private spawnId(prefix: string): string { return `${prefix}${this.nextEnemy++}`; }
 
   private updateMission(): void {
+    if (this.survival) { this.updateSurvival(); return; }
     if (this.director) { this.updateDirected(); return; }
     this.phaseTimer -= DT;
     const minorsAlive = this.enemies.length > 0;
@@ -423,8 +453,8 @@ export class CombatWorld {
     }
   }
 
-  private spawnBoss(id = "B02"): void {
-    const row = this.mission ? { ...this.catalog.boss(id), core_hp: Math.round(this.catalog.boss(id).core_hp * CAMPAIGN_BOSS_HP) } : this.catalog.boss(id);
+  private spawnBoss(id = "B02", hpMul = this.mission ? CAMPAIGN_BOSS_HP : 1): void {
+    const row = hpMul !== 1 ? { ...this.catalog.boss(id), core_hp: Math.round(this.catalog.boss(id).core_hp * hpMul) } : this.catalog.boss(id);
     this.boss = id === "B01" ? new CrabBoss(row, this.runId, this.em, this.rng) : new ScorpionBoss(row, this.runId, this.em, this.rng);
     this.items.push(this.boss.item);
     this.phase = "boss";
@@ -439,11 +469,83 @@ export class CombatWorld {
     }
     if (!b.e.alive) {
       if (this.bossDeadAt < 0) this.bossDeadAt = this.tick;
+      if (this.survival) { // the run goes on: clear the arena slot for the next boss
+        if ((this.tick - this.bossDeadAt) * DT > 2) {
+          this.defeatedBosses.push(b.row.id);
+          this.boss = null; this.bossDeadAt = -1; this.reinforcementsSpawned = false; this.phase = "waves";
+        }
+        return;
+      }
       for (const e of this.enemies) this.killEnemy(e, false);
       this.enemies = [];
       const secs = (this.tick - this.bossDeadAt) * DT;
       if ((this.hostile.active === 0 && secs > 1) || secs > 5) this.finish(true);
     }
+  }
+
+  // Survival: escalating waves + timed bosses; enemies toughen with the difficulty level.
+  private updateSurvival(): void {
+    const sv = this.survival!;
+    for (const ev of sv.tick(DT, !!this.boss, this.enemies.length)) {
+      if (ev.kind === "wave") {
+        const row = this.catalog.enemy(ev.wave.enemy_id!);
+        const specs = formationSpawns(ev.wave, row);
+        const hpMul = 1 + 0.12 * sv.level;
+        specs.forEach((spec, k) => {
+          const e = makeDirected(this.spawnId("e"), row, spec, "wave1");
+          for (const p of e.parts) if (p.kind === "core") { p.hp *= hpMul; p.hpMax = p.hp; }
+          if (ev.elite && k === Math.floor(specs.length / 2)) makeElite(e);
+          this.enemies.push(e);
+        });
+      } else if (ev.kind === "boss" && !this.boss) {
+        this.spawnBoss(ev.id, 1 + 0.35 * ev.cycle + 0.05 * sv.level);
+        this.hint("hint.survival_boss");
+      }
+    }
+    // the post-sever lull ends once the boss's own escort is gone (survival waves keep coming)
+    if (this.boss) this.updateBossPhase(this.enemies.some((e) => e.tag === "reinforcement"));
+  }
+
+  // XP from kills; each level offers a pick of three (the sim pauses until chosen).
+  private gainXp(n: number): void {
+    if (!this.survival) return;
+    this.xp += n;
+    while (this.xp >= xpToNext(this.level)) { this.xp -= xpToNext(this.level); this.level++; this.pendingLevels++; }
+    if (this.pendingLevels > 0 && !this.levelUp) this.offerLevelUp();
+  }
+
+  private offerLevelUp(): void {
+    this.pendingLevels--;
+    this.levelUp = rollChoices(this.rng, this.assembly.modules.map((m) => m.weapon.id));
+  }
+
+  chooseLevelUp(i: number): boolean {
+    const c = this.levelUp?.[i];
+    if (!c) return false;
+    if (c.kind === "weapon") {
+      const w = this.catalog.weapon(c.id);
+      const it = makeItem(`${this.runId}:lv${this.level}:${c.id}:${this.tick}`, c.id, "player", "module", MODULE_LV_INTEGRITY, w.mass);
+      transition(it, "detached_intact", `lv:${it.instanceId}`, this.tick);
+      transition(it, "acquiring", `lva:${it.instanceId}`, this.tick);
+      it.pos = { ...this.motion.pos };
+      this.items.push(it);
+      this.attachQuick(it);
+    } else {
+      switch (c.id) {
+        case "damage": this.damageMul *= 1.12; break;
+        case "rate": this.weapons.rateMul *= 1.1; break;
+        case "hp": this.hpMax += 25; this.hp = Math.min(this.hpMax, this.hp + 25); break;
+        case "shield": this.shieldMax += 15; this.shield = this.shieldMax; break;
+        case "speed": this.motion.baseSpeed *= 1.08; break;
+        case "repair": this.hp = Math.min(this.hpMax, this.hp + this.hpMax * 0.5); break;
+        case "overdrive": this.overdriveCharge = 100; break;
+      }
+      this.events.push({ type: "fitted", pos: { ...this.motion.pos }, tag: c.id, value: 4 });
+    }
+    this.levelUp = null;
+    if (this.pendingLevels > 0) this.offerLevelUp();
+    this.grace = Math.max(this.grace, 0.6); // a breath after the pause
+    return true;
   }
 
   // Catalog-driven mission flow (M2): waves, supply nodes, encounter, outro.
@@ -840,6 +942,7 @@ export class CombatWorld {
   damagePart(e: Enemy, part: Part, dmg: number, at: Vec, armorIgnore = 0): void {
     part.flash = 0.08;
     const core = coreOf(e);
+    dmg *= this.damageMul; // hangar + survival damage upgrades
     const armorMul = 100 / (100 + clamp(e.armor * (1 - armorIgnore), 0, 200));
     switch (part.kind) {
       case "armor":
@@ -933,6 +1036,7 @@ export class CombatWorld {
     e.alive = false;
     this.events.push({ type: "kill", pos: { ...e.pos }, tag: e.role });
     if (!credit) return;
+    this.gainXp((this.catalog.row<{ xp: number }>("enemies", e.defId)?.xp ?? 10) * (e.elite ? 3 : 1));
     this.enemyDrop(e);
     if (e.role === "supply") this.supplyDestroyed++;
     if (e.role === "hazard_node") { this.hazardNodesDestroyed++; this.hint("hint.hazard_node_down"); }
@@ -1098,6 +1202,7 @@ export class CombatWorld {
         // Core death auto-scraps a still-attached signature part: no loot for blasting the core.
         if (b.item.state === "attached" || b.item.state === "exposed") transition(b.item, "destroyed_scrap", `coredeath:${b.item.instanceId}`, this.tick);
         this.events.push({ type: "boss_dead", pos: { ...b.e.pos } });
+        this.gainXp(150);
       }
     }
   }
@@ -1539,10 +1644,11 @@ export class CombatWorld {
     }
     transition(it, "fitted_run", `fit:${it.instanceId}:${this.tick}`, this.tick);
     this.refreshAssembly();
-    if (it.sourceEncounter !== "player" && it.templateId === this.boss?.row.signature_weapon_id) {
+    const srcBoss = this.catalog.row<{ signature_weapon_id: string }>("bosses", it.sourceEncounter);
+    if (srcBoss && it.templateId === srcBoss.signature_weapon_id) {
       this.stolen.push(it.sourceEncounter);
       this.score += 3000;
-      this.hint(this.boss?.hintPrefix === "claw" ? "hint.claw_stolen" : "hint.stolen");
+      this.hint(it.sourceEncounter === "B01" ? "hint.claw_stolen" : "hint.stolen");
     }
   }
 
@@ -1620,12 +1726,12 @@ export class CombatWorld {
         scrapValue: this.catalog.weapon(it.templateId).fabrication_scrap };
       const eligible = it.state === "fitted_run" || it.state === "stowed_run" || it.state === "towed" || it.state === "secured_run";
       if (!eligible) continue;
-      if (victory) {
+      if (victory || this.survival) { // survival ends in death but keeps what was fitted/stowed
         transition(it, "banked", `bank:${it.instanceId}`, this.tick);
         secured.push(entry);
       } else unbanked.push(entry);
     }
-    const mid = this.mission?.id ?? "SLICE-01";
+    const mid = this.survival ? SURVIVAL_ID : this.mission?.id ?? "SLICE-01";
     const m = /^P(\d+)-(\d+)$/.exec(mid);
     const stats: ObjectiveStats = { supplyDestroyed: this.supplyDestroyed, coreDamage: this.coreDamageTaken,
       securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0, namedAttackHits: this.namedAttackHits, cargoDestroyed: this.cargoDestroyed,
@@ -1635,7 +1741,8 @@ export class CombatWorld {
       stats, stars: this.mission ? evaluateStars(this.mission, stats, victory) : null,
       combatCredits: this.combatCredits, combatScrap: this.combatScrap, secured, unbanked,
       severed: [...new Set(this.severed)], stolen: [...new Set(this.stolen)],
-      encounterIds: victory && this.boss ? [this.boss.row.id] : [],
+      encounterIds: this.survival ? [...this.defeatedBosses] : victory && this.boss ? [this.boss.row.id] : [],
+      survival: this.survival ? { sec: Math.floor(this.survival.t), level: this.level, kills: this.kills } : undefined,
     };
   }
 

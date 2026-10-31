@@ -29,6 +29,9 @@ export interface Profile {
   applied_settlements: string[];
   pending_settlement: unknown;
   run_counter: number;
+  upgrades?: Record<string, number>;   // hangar levels (absent in old saves = none)
+  equipped_weapon?: string | null;     // extra gun the ship launches with
+  survival_best?: number;              // best survival time (s)
   [unknownKey: string]: unknown;
 }
 

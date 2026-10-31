@@ -15,6 +15,9 @@ import { drawHud, hitTest, layoutButtons, type HudAction, type HudButton, type I
 import { DockPanel } from "./dock";
 import { preloadSprites, spriteUrl } from "./sprites";
 import { researchPool, resultStars, showSectorMap } from "./campaign";
+import { showHangar } from "./hangar";
+import { shipMods } from "../campaign/upgrades";
+import { SURVIVAL_ID } from "../combat/survival";
 
 interface Screen { update?(dt: number): void; draw?(g: CanvasRenderingContext2D): void; dispose?(): void; onHidden?(): void }
 
@@ -147,6 +150,10 @@ export class App {
       statRow(t("title.stars"), `${totalStars(this.profile)} / ${this.catalog.campaignStarSlots()}`, "ui_star_full"));
     s.append(card);
     s.append(button(t("title.campaign"), () => showSectorMap(this), "btn primary", "ui_galaxy"));
+    const modes = el("div", "row");
+    modes.append(button(t("title.survival"), () => this.startMission(SURVIVAL_ID), "btn", "ui_overdrive"), button(t("title.hangar"), () => showHangar(this), "btn", "ui_hangar"));
+    s.append(modes);
+    if (this.profile.survival_best) s.append(el("div", "dim", t("title.survival_best", { t: fmtTime(this.profile.survival_best) })));
     const row = el("div", "row");
     row.append(button(t("title.howto"), () => this.showHowTo(), "btn small"), button(t("title.settings"), () => this.showSettings(() => this.showTitle()), "btn small", "ui_settings"));
     s.append(row);
@@ -251,6 +258,26 @@ export class App {
     this.ui.append(o);
   }
 
+  showSurvivalResults(world: CombatWorld, s: Settlement): void {
+    const r = world.result!;
+    const sv = r.survival!;
+    const o = el("div", "screen overlay");
+    o.append(el("h2", "", t("survival.over")));
+    const card = el("div", "card");
+    const best = (this.profile.survival_best ?? 0) <= sv.sec;
+    card.append(statRow(t("survival.time"), fmtTime(sv.sec)), statRow(t("survival.level"), sv.level), statRow(t("survival.kills"), sv.kills));
+    if (best) card.append(el("div", "tag", t("survival.new_best")));
+    else card.append(el("div", "dim", t("title.survival_best", { t: fmtTime(this.profile.survival_best ?? 0) })));
+    for (const id of Object.keys(s.fragments)) card.append(el("div", "tag", t("survival.fragment", { name: t(`weapons.${id}.name`) })));
+    for (const [id, n] of Object.entries(s.research)) card.append(el("div", "tag", t("results.research", { name: t(`weapons.${id}.name`), n })));
+    card.append(statRow(t("results.credits"), `+${s.credits}`, "ui_credits"), statRow(t("results.scrap"), `+${s.scrap}`, "ui_scrap"));
+    o.append(card, el("div", "dim", t("survival.hangar_tip")));
+    const row = el("div", "row");
+    row.append(button(t("results.again"), () => this.startMission(SURVIVAL_ID), "btn primary"), button(t("title.hangar"), () => showHangar(this), "btn"));
+    o.append(row, button(t("results.title"), () => this.showTitle(), "btn small"));
+    this.ui.append(o);
+  }
+
   startMission(missionId: string): void {
     this.profile.run_counter += 1; // run ids are never reused
     this.save();
@@ -260,6 +287,7 @@ export class App {
   // `before`: the mission's stars before this run (to separate new / previous / missed).
   showResults(world: CombatWorld, s: Settlement, before?: readonly boolean[]): void {
     const r = world.result!;
+    if (r.survival) { this.showSurvivalResults(world, s); return; }
     const o = el("div", "screen overlay");
     o.append(el("h2", "", r.victory ? t("results.victory") : t("results.defeat")));
     if (world.mission) o.append(el("div", "dim", t(`missions.${world.mission.id}.name`)));
@@ -303,6 +331,10 @@ export function icon(id: string, cls = "ico"): HTMLImageElement | null {
   return img;
 }
 
+export function fmtTime(sec: number): string {
+  return `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
+}
+
 function statRow(label: string, value: string | number, iconId?: string): HTMLElement {
   const d = el("div", "stat");
   const l = el("span", "", label);
@@ -328,6 +360,7 @@ const KEYS_MOVE: Record<string, Vec> = {
   KeyA: { x: -1, y: 0 }, ArrowLeft: { x: -1, y: 0 }, KeyD: { x: 1, y: 0 }, ArrowRight: { x: 1, y: 0 },
 };
 // (relative drag is applied 1:1 per tick — see PlayerMotion.step `direct`)
+const LV_ICON: Record<string, string> = { damage: "ui_overdrive", rate: "ui_heat", hp: "ui_repair", shield: "ui_locked_armor", speed: "ui_dash", repair: "ui_repair", overdrive: "ui_energy" };
 const TAP_MAX_SEC = 0.25;
 const TAP_MAX_PX = 16;
 
@@ -348,6 +381,7 @@ export class CombatScreen implements Screen {
   private hintTimer = 0;
   private dock: DockPanel | null = null;
   private endTimer = -1;
+  private levelEl: HTMLElement | null = null;
   private finished = false;
   private pauseEl: HTMLElement | null = null;
   private now = 0;
@@ -360,7 +394,9 @@ export class CombatScreen implements Screen {
   constructor(private app: App, runNumber: number, missionId: string) {
     const st = app.profile.settings;
     this.world = new CombatWorld(app.catalog, { seed: 1000 + runNumber * 7919, runId: `run${runNumber}`, autoLock: st.autoLock, autoTractor: st.autoTractor,
-      missionId, researchPool: researchPool(app.catalog, app.profile), salvageMode: st.classicSalvage ? "classic" : "quick" });
+      missionId: missionId === SURVIVAL_ID ? undefined : missionId, mode: missionId === SURVIVAL_ID ? "survival" : "campaign",
+      salvageMode: st.classicSalvage ? "classic" : "quick", mods: shipMods(app.profile) });
+    void researchPool;
     this.renderer = new Renderer(app.g);
     this.buttons = layoutButtons(app.insets, st.handedness);
     this.hintEl = el("div", "hidden");
@@ -382,7 +418,7 @@ export class CombatScreen implements Screen {
     this.tutorialOn = true; // decided per boss once it appears (until that boss's first steal)
   }
 
-  dispose(): void { for (const f of this.off) f(); this.dock?.close(); this.callout?.remove(); }
+  dispose(): void { for (const f of this.off) f(); this.dock?.close(); this.callout?.remove(); this.levelEl?.remove(); }
   onHidden(): void { this.setPaused(true); }
 
   // ---------------------------------------------------------- input
@@ -472,7 +508,7 @@ export class CombatScreen implements Screen {
   }
 
   setPaused(v: boolean): void {
-    if (this.world.status !== "running" || this.dock || this.callout) v = false;
+    if (this.world.status !== "running" || this.dock || this.callout || this.world.levelUp) v = false;
     this.paused = v;
     this.driver.paused = v;
     this.drag = null;
@@ -485,7 +521,7 @@ export class CombatScreen implements Screen {
     o.append(el("h2", "", t("pause.title")),
       button(t("pause.resume"), () => this.setPaused(false), "btn primary", "ui_play"),
       button(t("title.settings"), () => { o.remove(); this.app.showSettings(() => { this.applySettings(); this.setPaused(true); }, true); }, "btn", "ui_settings"),
-      button(t("pause.quit"), () => showSectorMap(this.app), "btn"),
+      button(t("pause.quit"), () => (this.world.survival ? this.app.showTitle() : showSectorMap(this.app)), "btn"),
       el("div", "dim", t("pause.quit_note")));
     this.pauseEl = o;
     this.app.ui.append(o);
@@ -504,7 +540,7 @@ export class CombatScreen implements Screen {
     this.now += dt;
     const w = this.world;
     const pad = this.pollPad();
-    const running = w.status === "running" && !w.dock && !this.paused && !this.callout;
+    const running = w.status === "running" && !w.dock && !w.levelUp && !this.paused && !this.callout;
     this.driver.paused = !running;
     const ticks = this.driver.advance(dt);
     for (let i = 0; i < ticks; i++) {
@@ -519,6 +555,7 @@ export class CombatScreen implements Screen {
     this.renderer.update(running ? dt : 0);
     this.updateHints(dt);
     this.checkTutorial();
+    if (w.levelUp && !this.levelEl) this.showLevelUp();
     if (w.dock && !this.dock) {
       sfx.play("secured");
       this.dock = new DockPanel(this.app, w, () => { this.dock = null; });
@@ -529,6 +566,33 @@ export class CombatScreen implements Screen {
       this.endTimer -= dt;
       if (this.endTimer <= 0) { this.finished = true; this.finish(); }
     }
+  }
+
+  // Survival level-up: three cards, the sim waits until one is picked.
+  private showLevelUp(): void {
+    const w = this.world;
+    this.drag = null;
+    this.pointerButtons.clear();
+    const o = el("div", "screen overlay levelup");
+    o.append(el("h2", "", t("survival.level_up", { n: w.level })), el("div", "dim", t("survival.pick")));
+    w.levelUp!.forEach((c, i) => {
+      const b = el("button", "pick");
+      const ico = c.kind === "weapon" ? spriteUrl(`weapon_${c.id}_icon`) ?? spriteUrl("ui_cargo") : spriteUrl(LV_ICON[c.id] ?? "ui_repair");
+      if (ico) { const img = el("img", "ico"); img.src = ico; img.alt = ""; b.append(img); }
+      const txt = el("span", "body");
+      if (c.kind === "weapon") txt.append(el("b", "", t(`weapons.${c.id}.name`)), el("small", "", t(`wdesc.${w.catalog.weapon(c.id).attack_model}`)));
+      else txt.append(el("b", "", t(`lvl.${c.id}`)), el("small", "", t(`lvl.${c.id}_desc`)));
+      b.append(txt);
+      b.addEventListener("click", () => {
+        sfx.play("secured");
+        w.chooseLevelUp(i);
+        o.remove();
+        this.levelEl = null;
+      });
+      o.append(b);
+    });
+    this.levelEl = o;
+    this.app.ui.append(o);
   }
 
   private checkTutorial(): void {

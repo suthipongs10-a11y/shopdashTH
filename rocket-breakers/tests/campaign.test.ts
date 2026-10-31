@@ -23,8 +23,8 @@ describe("mission director", () => {
     for (let i = 0; i < 60 * 60 && !d.done; i++) {
       for (const ev of d.tick(DT, true, false)) seen.push(ev.kind === "wave" ? ev.wave.enemy_id! : ev.kind);
     }
-    // every catalog wave plays twice (second pass mirrored)
-    expect(seen).toEqual(["E01", "supply", "E01", "E02", "supply", "E02", "E03", "supply", "E03", "E04", "E04", "complete"]);
+    // every catalog wave plays three times (second pass mirrored)
+    expect(seen).toEqual(["E01", "supply", "E01", "E01", "E02", "supply", "E02", "E02", "E03", "supply", "E03", "E03", "E04", "E04", "E04", "complete"]);
   });
 
   it("waits for the previous wave to clear", () => {

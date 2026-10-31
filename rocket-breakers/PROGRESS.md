@@ -134,3 +134,12 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - Fixed: auto-fire wrecked the boss tail/claw before the joint opened (stray hits 25%, no splash, entry-safe).
 - Elites with ring attacks and sure drops; campaign bosses ×1.4 HP.
 - Tests: 118 (new: every weapon damages a target, gatling spool, rail pierce, arc chain, statuses, gravity, cluster split).
+
+## Done (2026-10-31, owner: "not fun / ends too fast" → A + B)
+- B: Survival mode (title → "โหมดเอาตัวรอด"): endless escalating waves, elites, bosses on a timer (steal their
+  weapons), XP level-ups with pick-1-of-3 cards (new guns or stat boosts), best time, credits payout.
+- A: Hangar (title → "โรงเก็บยาน"): 7 permanent upgrades for credits; choose an extra gun to launch with (researched
+  weapons / completed boss blueprints). Applies to campaign and survival.
+- Campaign missions longer (3 passes per wave).
+- Tests: 124 (new: hangar buy/apply/limits, launch guns, level-up choices, survival run with picks + boss + settlement,
+  survival is beatable-but-ends). Capture `e2e/capture-survival.mjs`, no console errors.

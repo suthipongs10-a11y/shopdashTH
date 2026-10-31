@@ -140,7 +140,7 @@ export function supplySpawn(rng: Rng, index: number): SpawnSpec {
 // Each catalog combat wave plays as PULSES passes; later passes mirror the entry
 // side (DECISIONS: catalog waves are unplaytested seeds and ran far below
 // duration_target_sec with one pass).
-export const PULSES = 2;
+export const PULSES = 3; // owner: missions ended too fast
 export const PULSE_DELAY = 1.5;
 
 export function mirrorWave(w: WaveDef): WaveDef {

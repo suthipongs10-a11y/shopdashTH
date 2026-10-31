@@ -21,6 +21,7 @@ export interface RunResult {
   encounterIds: string[];      // bosses defeated
   stats?: ObjectiveStats;      // objective counters (campaign missions)
   stars?: [boolean, boolean, boolean] | null; // stars earned this run (null for the test mission)
+  survival?: { sec: number; level: number; kills: number };
 }
 
 export interface Settlement {
@@ -36,6 +37,7 @@ export interface Settlement {
   score: number;
   stars: [boolean, boolean, boolean] | null;      // earned this run
   research: Record<string, number>;              // intact non-signature modules secured → research progress
+  survivalSec?: number;
 }
 
 const MAX_APPLIED = 100;
@@ -45,6 +47,7 @@ export function baselineRewards(sector: number, mission: number): { credits: num
 }
 
 export function computeSettlement(p: Profile, r: RunResult, signatureOf: (bossId: string) => string): Settlement {
+  if (r.survival) return survivalSettlement(p, r, signatureOf);
   const base = baselineRewards(r.sector, r.missionIndex);
   const firstClear = r.victory && !(p.test_records[r.missionId]?.clears) && !(p.mission_records[r.missionId]?.stars[0]);
   let credits: number;
@@ -89,6 +92,27 @@ export function computeSettlement(p: Profile, r: RunResult, signatureOf: (bossId
     missionId: r.missionId, victory: r.victory, score: r.score, stars: r.victory ? r.stars ?? null : null, research };
 }
 
+// Survival pays by time survived + combat earnings; secured parts still research/fragment.
+function survivalSettlement(p: Profile, r: RunResult, signatureOf: (bossId: string) => string): Settlement {
+  const sv = r.survival!;
+  const fragments: Record<string, number> = {};
+  const research: Record<string, number> = {};
+  for (const it of r.secured) {
+    if (!it.intact) continue;
+    if (signatureOf(it.source) === it.templateId) fragments[it.templateId] = 1;
+    else if (it.source !== "player") research[it.templateId] = (research[it.templateId] ?? 0) + 1;
+  }
+  const archive: Settlement["archive"] = {};
+  for (const bossId of new Set([...r.severed, ...r.encounterIds])) {
+    const prev = p.boss_archive[bossId] ?? { severed: 0, stolen: 0, cleared: false };
+    archive[bossId] = { severed: prev.severed + (r.severed.includes(bossId) ? 1 : 0), stolen: prev.stolen + (r.stolen.includes(bossId) ? 1 : 0),
+      cleared: prev.cleared || r.encounterIds.includes(bossId) };
+  }
+  return { id: `${p.profile_id}/${r.runId}/0`, credits: Math.floor(r.combatCredits * 0.5 + sv.sec * 1.5), scrap: r.combatScrap,
+    fragments, fallbackFragments: [], archive, firstClear: false, missionId: r.missionId, victory: false, score: r.score,
+    stars: null, research, survivalSec: sv.sec };
+}
+
 // Applies a settlement exactly once. Returns false when it was already applied.
 export function applySettlement(p: Profile, s: Settlement): boolean {
   if (p.applied_settlements.includes(s.id)) {
@@ -100,6 +124,7 @@ export function applySettlement(p: Profile, s: Settlement): boolean {
   for (const [id, n] of Object.entries(s.fragments)) p.blueprint_fragments[id] = (p.blueprint_fragments[id] ?? 0) + n;
   for (const [id, a] of Object.entries(s.archive)) p.boss_archive[id] = a;
   for (const [id, n] of Object.entries(s.research ?? {})) p.weapon_research[id] = (p.weapon_research[id] ?? 0) + n;
+  if (s.survivalSec !== undefined) p.survival_best = Math.max(p.survival_best ?? 0, s.survivalSec);
   if (s.stars) {
     const old = p.mission_records[s.missionId];
     p.mission_records[s.missionId] = { stars: mergeStars(old?.stars, s.stars), best_score: Math.max(old?.best_score ?? 0, s.score), difficulty_records: old?.difficulty_records ?? {} };

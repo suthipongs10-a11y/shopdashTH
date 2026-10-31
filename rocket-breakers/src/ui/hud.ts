@@ -89,7 +89,15 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
   if (!(b && b.e.alive && !b.entering)) {
     g.textAlign = "right";
     const d = w.director;
-    if (d) {
+    if (w.survival) {
+      // survival: time, level and XP bar
+      const sec = Math.floor(w.survival.t);
+      g.fillStyle = C.gold; g.font = "700 20px RB Thai, sans-serif";
+      g.fillText(`${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")} · ${t("hud.level", { n: w.level })}`, 610, top + TOP_H + 30, 360);
+      const need = 30 + w.level * 22;
+      g.fillStyle = "rgba(255,255,255,0.1)"; g.fillRect(250, top + TOP_H + 40, 360, 6);
+      g.fillStyle = C.cyan; g.fillRect(250, top + TOP_H + 40, 360 * Math.min(1, w.xp / need), 6);
+    } else if (d) {
       // Campaign objective line: wave progress and the visible side objective.
       const wave = Math.max(1, Math.min(d.index + 1, d.waves.length));
       let line = t("hud.wave", { n: wave, total: d.waves.length });

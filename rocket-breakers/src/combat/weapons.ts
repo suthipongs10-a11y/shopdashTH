@@ -28,6 +28,7 @@ export class WeaponScheduler {
   energyCapacity = 100;
   energyRegen = 14;
   coolingMul = 1; // PU08 coolant
+  rateMul = 1;    // hangar "ammo feed" / survival fire-rate picks
 
   sync(modules: FittedModule[]): void {
     const keep = new Map(this.mounts.map((m) => [m.module.instanceId, m]));
@@ -51,7 +52,7 @@ export class WeaponScheduler {
         if (this.energy >= w.energy_per_trigger) {
           this.energy -= w.energy_per_trigger;
           m.heat += w.heat_per_trigger * (overdrive ? OD_HEAT : 1);
-          m.cooldown += 1 / (w.trigger_rate * rateMul * (overdrive ? OD_FIRE_RATE : 1));
+          m.cooldown += 1 / (w.trigger_rate * rateMul * this.rateMul * (overdrive ? OD_FIRE_RATE : 1));
           m.shotIndex++;
           fired.push(m);
           if (m.heat >= HEAT_MAX) { m.heat = HEAT_MAX; m.locked = true; m.lockTime = 0; }

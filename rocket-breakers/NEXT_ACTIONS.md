@@ -1,6 +1,6 @@
 # Next actions
 
-1. Owner: replay — which new guns feel best/worst? Still too easy? Elites readable?
+1. Owner: try Survival + Hangar. Is Survival more fun than the campaign? That decides where effort goes next.
 1b. Owner: BATCH_018 + 019 (weapon module art W002–W027) so salvaged guns look right on the ship.
 2. Owner: an escort-ship art request for P01-02 (I'll prepare it) — last missing P01 mission.
 3. Owner: play P01-03 (Rivet Crab) — is the claw sweep readable/fair? Fight length (~15–20 s for a perfect bot)?

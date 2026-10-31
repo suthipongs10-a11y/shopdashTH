@@ -151,7 +151,8 @@ export class Renderer {
       case "fitted": { // quick salvage result
         const name = t(`weapons.${e.tag}.name`);
         ring(20, 220, e.value === 2 ? C.gold : C.cyan, 0.5, 5); burst(20, e.value === 2 ? C.gold : C.cyan, 220);
-        text(t(e.value === 0 ? "fx.fitted" : e.value === 1 ? "fx.stowed" : e.value === 3 ? "fx.swapped" : "fx.armor", { name }), e.value === 2 ? C.gold : C.cyan);
+        if (e.value === 4) text(t(`lvl.${e.tag}`), C.gold); // survival stat pick
+        else text(t(e.value === 0 ? "fx.fitted" : e.value === 1 ? "fx.stowed" : e.value === 3 ? "fx.swapped" : "fx.armor", { name }), e.value === 2 ? C.gold : C.cyan);
         this.addShake(2, s);
         break;
       }

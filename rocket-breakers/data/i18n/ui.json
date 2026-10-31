@@ -40,8 +40,8 @@
     "en": "This browser can't store saves — progress is lost when the page closes"
   },
   "title.build_note": {
-    "th": "M2 ขั้นที่ 1 · เขตสุสานยาน: เล่นได้ด่าน 1 และ 6 · ภาพบางส่วนยังชั่วคราว · เสียงสังเคราะห์ชั่วคราว",
-    "en": "M2 stage 1 · Graveyard Belt: missions 1 and 6 playable · some art is placeholder · prototype audio"
+    "th": "เวอร์ชันทดลอง · แคมเปญเขตสุสานยาน 5 ด่าน · โหมดเอาตัวรอด · โรงเก็บยาน · ภาพบางส่วนยังชั่วคราว",
+    "en": "Test build · Graveyard Belt campaign (5 missions) · Survival · Hangar · some art is placeholder"
   },
   "howto.title": {
     "th": "วิธีเล่น",
@@ -862,5 +862,225 @@
   "hint.elite": {
     "th": "ยานหัวหน้า (วงทอง)! ทนกว่า ยิงกระสุนเป็นวง — มีช่องว่างให้หลบ ทำลายแล้วได้อาวุธแน่นอน",
     "en": "Elite (gold ring)! Tougher and fires a bullet ring — slip through the gap. Always drops a weapon"
+  },
+  "title.survival": {
+    "th": "โหมดเอาตัวรอด",
+    "en": "Survival"
+  },
+  "title.hangar": {
+    "th": "โรงเก็บยาน",
+    "en": "Hangar"
+  },
+  "title.survival_best": {
+    "th": "สถิติเอาตัวรอดดีสุด {t}",
+    "en": "Best survival {t}"
+  },
+  "hud.level": {
+    "th": "เลเวล {n}",
+    "en": "Lv {n}"
+  },
+  "hint.survival_boss": {
+    "th": "บอสมาแล้ว! ขโมยอาวุธมันได้เหมือนในแคมเปญ",
+    "en": "Boss incoming! Steal its weapon just like in the campaign"
+  },
+  "survival.over": {
+    "th": "ยานถูกทำลาย",
+    "en": "Ship destroyed"
+  },
+  "survival.time": {
+    "th": "เวลาที่รอด",
+    "en": "Survived"
+  },
+  "survival.level": {
+    "th": "เลเวล",
+    "en": "Level"
+  },
+  "survival.kills": {
+    "th": "ทำลายศัตรู",
+    "en": "Kills"
+  },
+  "survival.new_best": {
+    "th": "สถิติใหม่!",
+    "en": "New best!"
+  },
+  "survival.fragment": {
+    "th": "ได้ชิ้นส่วนพิมพ์เขียว {name} +1",
+    "en": "Blueprint fragment {name} +1"
+  },
+  "survival.hangar_tip": {
+    "th": "เอาเครดิตไปอัปเกรดยานที่ \"โรงเก็บยาน\" แล้วกลับมารอดให้นานขึ้น",
+    "en": "Spend credits in the Hangar, then come back and last longer"
+  },
+  "survival.level_up": {
+    "th": "เลเวล {n}!",
+    "en": "Level {n}!"
+  },
+  "survival.pick": {
+    "th": "เลือก 1 อย่าง",
+    "en": "Pick one"
+  },
+  "lvl.damage": {
+    "th": "ความแรง +12%",
+    "en": "Damage +12%"
+  },
+  "lvl.damage_desc": {
+    "th": "ทุกปืนแรงขึ้น",
+    "en": "All guns hit harder"
+  },
+  "lvl.rate": {
+    "th": "ยิงเร็ว +10%",
+    "en": "Fire rate +10%"
+  },
+  "lvl.rate_desc": {
+    "th": "ทุกปืนยิงถี่ขึ้น",
+    "en": "All guns fire faster"
+  },
+  "lvl.hp": {
+    "th": "ตัวยาน +25",
+    "en": "Hull +25"
+  },
+  "lvl.hp_desc": {
+    "th": "พลังชีวิตสูงสุดเพิ่ม และซ่อม 25",
+    "en": "More max HP and repair 25"
+  },
+  "lvl.shield": {
+    "th": "โล่ +15",
+    "en": "Shield +15"
+  },
+  "lvl.shield_desc": {
+    "th": "โล่สูงสุดเพิ่มและเติมเต็ม",
+    "en": "Bigger shield, refilled"
+  },
+  "lvl.speed": {
+    "th": "ความเร็ว +8%",
+    "en": "Speed +8%"
+  },
+  "lvl.speed_desc": {
+    "th": "บินหลบได้คล่องขึ้น",
+    "en": "Dodge more easily"
+  },
+  "lvl.repair": {
+    "th": "ซ่อมยาน 50%",
+    "en": "Repair 50%"
+  },
+  "lvl.repair_desc": {
+    "th": "ฟื้นพลังชีวิตครึ่งหลอด",
+    "en": "Restore half your HP"
+  },
+  "lvl.overdrive": {
+    "th": "โอเวอร์ไดรฟ์เต็ม",
+    "en": "Full Overdrive"
+  },
+  "lvl.overdrive_desc": {
+    "th": "พร้อมกดใช้ทันที",
+    "en": "Ready to fire now"
+  },
+  "wdesc.fan": {
+    "th": "ยิงกระจาย 5 นัด",
+    "en": "5-shot spread"
+  },
+  "wdesc.charge_rail": {
+    "th": "ชาร์จแล้วยิงทะลุหลายตัว",
+    "en": "Charges, then pierces a line"
+  },
+  "wdesc.ricochet": {
+    "th": "จานเด้งขอบจอ",
+    "en": "Disc that bounces off the walls"
+  },
+  "wdesc.spool_gatling": {
+    "th": "ยิงยิ่งนานยิ่งเร็ว",
+    "en": "Spins up to a torrent"
+  },
+  "wdesc.straight_burst": {
+    "th": "ยิงชุดละ 3 นัด",
+    "en": "3-round bursts"
+  },
+  "wdesc.timed_flak": {
+    "th": "ระเบิดกลางอากาศ",
+    "en": "Bursts in mid-air"
+  },
+  "wdesc.split_beam": {
+    "th": "เลเซอร์แยก 3 ลำ",
+    "en": "Three-way laser"
+  },
+  "wdesc.sweep_beam": {
+    "th": "เลเซอร์กวาดเป็นวง",
+    "en": "Sweeping laser"
+  },
+  "wdesc.bounded_homing": {
+    "th": "จรวดนำวิถี",
+    "en": "Homing missiles"
+  },
+  "wdesc.cluster": {
+    "th": "จรวดแตก 4 ลูกไล่เป้า",
+    "en": "Splits into 4 seekers"
+  },
+  "wdesc.armor_piercer": {
+    "th": "ตอร์ปิโดทะลุเกราะ",
+    "en": "Armour-piercing torpedo"
+  },
+  "wdesc.slow_orb": {
+    "th": "ลูกพลาสมาระเบิดใหญ่",
+    "en": "Big exploding plasma orb"
+  },
+  "wdesc.chain_arc": {
+    "th": "สายฟ้ากระโดดต่อหลายตัว",
+    "en": "Lightning that chains"
+  },
+  "wdesc.status_bolt": {
+    "th": "ทำให้ศัตรูช้าลง",
+    "en": "Slows enemies down"
+  },
+  "wdesc.flame_cone": {
+    "th": "พ่นไฟระยะใกล้ ติดไฟ",
+    "en": "Close-range flamethrower"
+  },
+  "wdesc.gravity_field": {
+    "th": "หลุมดูดศัตรูมารวมกัน",
+    "en": "Gravity well that pulls enemies"
+  },
+  "wdesc.orbit_drone": {
+    "th": "โดรน 2 ตัวช่วยยิง",
+    "en": "Two helper drones"
+  },
+  "hangar.title": {
+    "th": "โรงเก็บยาน",
+    "en": "Hangar"
+  },
+  "hangar.max": {
+    "th": "เต็มแล้ว",
+    "en": "MAX"
+  },
+  "hangar.bought": {
+    "th": "อัปเกรดแล้ว!",
+    "en": "Upgraded!"
+  },
+  "hangar.error.credits": {
+    "th": "เครดิตไม่พอ",
+    "en": "Not enough credits"
+  },
+  "hangar.error.max": {
+    "th": "อัปเกรดเต็มแล้ว",
+    "en": "Already maxed"
+  },
+  "hangar.error.unknown": {
+    "th": "ไม่พบอัปเกรดนี้",
+    "en": "Unknown upgrade"
+  },
+  "hangar.loadout": {
+    "th": "ปืนเสริมตอนออกบิน",
+    "en": "Extra gun at launch"
+  },
+  "hangar.loadout_none": {
+    "th": "ยังไม่มี — นำชิ้นส่วนอาวุธกลับมาจากภารกิจ หรือเก็บพิมพ์เขียวบอสให้ครบ 3 ชิ้น",
+    "en": "None yet — bring a weapon part home, or complete a boss blueprint (3 fragments)"
+  },
+  "hangar.loadout_off": {
+    "th": "ไม่ติด",
+    "en": "None"
+  },
+  "hangar.tip": {
+    "th": "อัปเกรดใช้ได้ทั้งแคมเปญและโหมดเอาตัวรอด",
+    "en": "Upgrades apply to the campaign and Survival"
   }
 }

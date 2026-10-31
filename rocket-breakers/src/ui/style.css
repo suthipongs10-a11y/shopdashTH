@@ -108,3 +108,29 @@ ol.objectives li.got { color: var(--gold); }
 .rstar.had img.star { opacity: 0.85; }
 h2.maptitle img.ico { height: 1em; width: auto; vertical-align: -0.12em; margin-right: 12px; }
 .dock p.wname img.ico { height: 56px; width: auto; vertical-align: middle; margin-right: 12px; }
+
+/* ---- survival level-up + hangar ---- */
+.levelup .pick { display: flex; align-items: center; gap: 18px; width: 100%; min-height: 120px; padding: 16px 20px; border-radius: 18px;
+  border: 3px solid var(--gold); background: var(--panel); color: var(--text); font: 400 24px var(--font); text-align: left; cursor: pointer; }
+.levelup .pick img.ico { width: 72px; height: 72px; object-fit: contain; flex: none; }
+.levelup .pick .body { display: flex; flex-direction: column; gap: 4px; }
+.levelup .pick b { font-size: 30px; color: var(--gold); }
+.levelup .pick small { font-size: 21px; color: var(--dim); }
+.levelup .pick:active { transform: translateY(2px); }
+.screen.hangar { padding-top: 80px; gap: 14px; }
+.hangar h2 img.ico { height: 1em; width: auto; vertical-align: -0.12em; margin-right: 12px; }
+.wallet { font-size: 30px; display: flex; align-items: center; gap: 10px; }
+.wallet img.ico { height: 36px; } .wallet b { color: var(--gold); }
+.upgrades { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.upg { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border: 2px solid var(--edge); border-radius: 16px; background: var(--panel); }
+.upg .body { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.upg .body b { font-size: 26px; } .upg .body small { font-size: 19px; color: var(--dim); }
+.upg .pips i { width: 22px; height: 10px; border-radius: 3px; clip-path: none; background: #24414d; }
+.upg .pips i.on { background: var(--cyan); }
+.upg .buy { width: auto; min-width: 150px; flex: none; }
+.loadout { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { min-height: 60px; padding: 8px 16px; border-radius: 30px; border: 2px solid var(--edge); background: #0c1d2b; color: var(--text); font: 600 21px var(--font); cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); }
+.chip img.ico { height: 32px; vertical-align: middle; margin-right: 8px; }
+.err { color: var(--red); font-size: 22px; text-align: center; }
+.screen.hangar, .screen.map { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
