@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PlayerMotion } from "../src/ships/motion";
+import { ACCEL, PlayerMotion, SPEED_SCALE, TOUCH_SPEED_MULT } from "../src/ships/motion";
 import { Assembly } from "../src/ships/assembly";
 import { WeaponScheduler, HEAT_MIN_LOCK_SEC, HEAT_UNLOCK } from "../src/combat/weapons";
 import { DT } from "../src/core/frameDriver";
@@ -10,22 +10,38 @@ const motion = () => Object.assign(new PlayerMotion(), { fittedMass: 7, bounds: 
 describe("movement", () => {
   it("uses the single effective-speed formula with a 55% floor", () => {
     const m = motion();
-    expect(m.effectiveSpeed()).toBeCloseTo(337.5);
+    const base = 360 * SPEED_SCALE; // playtest tuning on top of the catalog base speed
+    expect(m.effectiveSpeed()).toBeCloseTo(base * 0.9375);
     m.towing = true; m.cargoMass = 20;
-    expect(m.effectiveSpeed()).toBeCloseTo(360 * 0.5875);
+    expect(m.effectiveSpeed()).toBeCloseTo(base * 0.5875);
     m.fittedMass = 28;
-    expect(m.effectiveSpeed()).toBeCloseTo(360 * 0.55);
+    expect(m.effectiveSpeed()).toBeCloseTo(base * 0.55);
   });
   it("accelerates, caps diagonal speed and clamps the whole assembly", () => {
     const m = motion();
     m.step({ x: 1, y: 0 }, false, DT);
-    expect(m.vel.x).toBeCloseTo(30);
+    expect(m.vel.x).toBeCloseTo(ACCEL * DT);
     for (let i = 0; i < 600; i++) m.step({ x: -1, y: -1 }, false, DT);
     expect(Math.hypot(m.vel.x, m.vel.y)).toBeLessThanOrEqual(m.effectiveSpeed() + 1e-6);
     m.halfWidth = 33;
     for (let i = 0; i < 300; i++) m.step({ x: -1, y: 0 }, false, DT);
     expect(m.pos.x).toBeCloseTo(33);
   });
+  it("touch drag moves the ship 1:1 immediately, capped by effective speed", () => {
+    const m = motion();
+    const x0 = m.pos.x;
+    m.step({ x: 0, y: 0 }, false, DT, { x: 12, y: 0 });
+    expect(m.pos.x - x0).toBeCloseTo(12); // no acceleration lag
+    m.step({ x: 0, y: 0 }, false, DT, { x: 0, y: 0 });
+    expect(m.vel.x).toBe(0); // finger still -> ship stops
+    const cap = m.effectiveSpeed() * TOUCH_SPEED_MULT * DT;
+    const x1 = m.pos.x;
+    m.step({ x: 0, y: 0 }, false, DT, { x: -500, y: 0 });
+    expect(x1 - m.pos.x).toBeCloseTo(cap);
+    m.towing = true; m.cargoMass = 20; // heavier build -> lower cap
+    expect(m.effectiveSpeed() * TOUCH_SPEED_MULT * DT).toBeLessThan(cap);
+  });
+
   it("dash grants 0.18 s invulnerability and a 2.5 s cooldown", () => {
     const m = motion();
     m.step({ x: 1, y: 0 }, true, DT);

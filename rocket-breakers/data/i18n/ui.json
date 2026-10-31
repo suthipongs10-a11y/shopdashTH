@@ -522,5 +522,9 @@
   "dock.fitted_detail": {
     "th": "ติดตั้งแล้ว! หางพลาสมาจะยิงเองอัตโนมัติ กระสุนโค้งหาจุดอ่อนให้",
     "en": "Fitted! The plasma tail fires on its own and curves toward weak points"
+  },
+  "settings.touch_sensitivity": {
+    "th": "ความไวการลากนิ้ว",
+    "en": "Drag sensitivity"
   }
 }

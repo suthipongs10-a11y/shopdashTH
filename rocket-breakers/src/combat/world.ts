@@ -59,6 +59,7 @@ export const LOW_HP_AID_COOLDOWN = 60;
 
 export interface TickInput {
   move: Vec;
+  drag?: Vec; // relative touch drag: displacement this tick (applied directly, capped)
   dash?: boolean;
   overdrive?: boolean;
   tractorHeld?: boolean;
@@ -251,7 +252,7 @@ export class CombatWorld {
     // movement
     this.motion.towing = !!this.tow?.towing;
     this.motion.cargoMass = this.towedItem?.mass ?? 0;
-    if (this.motion.step(input.move, !!input.dash, DT)) {
+    if (this.motion.step(input.move, !!input.dash, DT, input.drag)) {
       this.events.push({ type: "dash", pos: { ...this.motion.pos } });
       if (this.tow && !this.tow.towing) this.tow = null; // dash cancels acquiring
     }

@@ -1,13 +1,18 @@
 // Arcade player movement (SYSTEMS §1) and dash (AGENTS §11). Pure state + step.
 import { clamp, limitLength, len, type Vec } from "../core/geometry";
 
-export const ACCEL = 1800;
-export const DECEL = 2200;
+// Owner playtest (2026-10-31): SYSTEMS values (1800/2200, catalog speed) felt sluggish
+// on phones. Tuned here; catalog base_speed is unchanged. See docs/DECISIONS.md.
+export const ACCEL = 4800;
+export const DECEL = 6000;
+export const SPEED_SCALE = 1.4;
+// Finger-follow cap for relative touch drag, as a multiple of effective speed.
+export const TOUCH_SPEED_MULT = 3;
 export const DASH_BURST_SEC = 0.25;
 export const DASH_INVULN_SEC = 0.18;
 export const DASH_COOLDOWN_SEC = 2.5;
 // Burst speed multiplier — not specified in SYSTEMS; see docs/DECISIONS.md.
-export const DASH_SPEED_MULT = 2.2;
+export const DASH_SPEED_MULT = 1.8;
 export const MAX_HALF_WIDTH = 94;
 const RECENT_MOVE_SEC = 0.3;
 
@@ -37,7 +42,7 @@ export class PlayerMotion {
 
   // Single formula from SYSTEMS §1; the clamp is the final limit.
   effectiveSpeed(): number {
-    return this.baseSpeed * clamp(1 - (0.25 * this.fittedMass) / this.massCap - this.towPenalty(), 0.55, 1);
+    return this.baseSpeed * SPEED_SCALE * clamp(1 - (0.25 * this.fittedMass) / this.massCap - this.towPenalty(), 0.55, 1);
   }
 
   get dashing(): boolean { return this.dashLeft > 0; }
@@ -51,23 +56,29 @@ export class PlayerMotion {
     return true;
   }
 
-  step(moveInput: Vec, dashPressed: boolean, dt: number): boolean {
+  // `direct` = relative touch drag: displacement for this tick, applied immediately
+  // (no acceleration lag), capped at TOUCH_SPEED_MULT × effective speed.
+  step(moveInput: Vec, dashPressed: boolean, dt: number, direct?: Vec): boolean {
     this.prev = { ...this.pos };
     const input = limitLength(moveInput, 1);
-    const l = len(input);
-    if (l > 0.2) {
-      this.lastMoveDir = { x: input.x / l, y: input.y / l };
+    const raw = direct ?? input;
+    const l = len(raw);
+    if (l > (direct ? 0.5 : 0.2)) {
+      this.lastMoveDir = { x: raw.x / l, y: raw.y / l };
       this.lastMoveAge = 0;
     } else this.lastMoveAge += dt;
     const dashed = dashPressed && this.tryDash();
     if (this.dashing) {
-      const s = this.baseSpeed * DASH_SPEED_MULT;
+      const s = this.baseSpeed * SPEED_SCALE * DASH_SPEED_MULT;
       this.vel = { x: this.dashDir.x * s, y: this.dashDir.y * s };
       this.dashLeft = Math.max(this.dashLeft - dt, 0);
       if (!this.dashing) {
         const e = this.effectiveSpeed();
         this.vel = { x: this.dashDir.x * e, y: this.dashDir.y * e };
       }
+    } else if (direct) {
+      const d = limitLength(direct, this.effectiveSpeed() * TOUCH_SPEED_MULT * dt);
+      this.vel = { x: d.x / dt, y: d.y / dt };
     } else {
       const e = this.effectiveSpeed();
       const target = { x: input.x * e, y: input.y * e };

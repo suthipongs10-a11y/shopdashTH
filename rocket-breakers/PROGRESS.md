@@ -41,8 +41,12 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - Graveyard Belt background (3 scrolling layers, far layer made tileable) and keyframe effects for explosions,
   bullet impacts, joint breaks and severs. fx_shield_hit arrived in PART_06 and is in. QA: `art/source/batch_004/QA_REPORT.md`.
 
+## Done (2026-10-31, controls)
+- Owner feedback "controls too slow": touch drag now follows the finger 1:1 with no lag (measured 262/262 px in
+  Chromium), faster keyboard/gamepad response, speed ×1.4, drag-sensitivity slider in Settings.
+
 ## Verification
-- `npm test` → **56 passed** (adds body-contact tests): catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
+- `npm test` → **57 passed** (body contact, direct touch drag): catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
   dash, fire rate/Overdrive, heat lock, fitting errors, salvage transitions, 35% vs 34.99%, sever+core-death,
   phase/sever same tick, tail attacks gone after theft, tow snap rules, dock no-loss, one-damage-per-bullet, shield,
   settlement worked examples 1–2 + defeat + crash injection, save recovery/migration/future/import/quota, determinism at

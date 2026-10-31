@@ -1,7 +1,8 @@
 // App shell: boot services, scale the 720×1280 logical stage, run the frame loop
 // and switch between screens. Menus are DOM (good Thai text layout); combat is canvas.
 import { loadCatalog, type Catalog } from "../core/catalog";
-import { FrameDriver } from "../core/frameDriver";
+import { DT, FrameDriver } from "../core/frameDriver";
+import { TOUCH_SPEED_MULT } from "../ships/motion";
 import { I18n, i18n, setI18n, t } from "../core/i18n";
 import { limitLength, type Vec } from "../core/geometry";
 import { CombatWorld, type GameEvent } from "../combat/world";
@@ -172,10 +173,10 @@ export class App {
       row.append(el("span", "", label), input);
       return row;
     };
-    const slider = (label: string, value: number, set: (v: number) => void) => {
+    const slider = (label: string, value: number, set: (v: number) => void, min = 0, max = 1) => {
       const row = el("label", "toggle");
       const input = el("input");
-      input.type = "range"; input.min = "0"; input.max = "1"; input.step = "0.1"; input.value = String(value);
+      input.type = "range"; input.min = String(min); input.max = String(max); input.step = "0.1"; input.value = String(value);
       input.addEventListener("change", () => { set(Number(input.value)); this.save(); });
       row.append(el("span", "", label), input);
       return row;
@@ -187,6 +188,7 @@ export class App {
       toggle(t("settings.photosensitive"), st.photosensitive, (v) => (st.photosensitive = v)),
       slider(t("settings.sound"), st.sound, (v) => { st.sound = v; sfx.volume = v; }),
       slider(t("settings.shake"), st.shake, (v) => (st.shake = v)),
+      slider(t("settings.touch_sensitivity"), st.touchSensitivity ?? 1, (v) => (st.touchSensitivity = v), 0.5, 2),
     );
     s.append(card);
     if (!overlay) {
@@ -291,7 +293,7 @@ const KEYS_MOVE: Record<string, Vec> = {
   KeyW: { x: 0, y: -1 }, ArrowUp: { x: 0, y: -1 }, KeyS: { x: 0, y: 1 }, ArrowDown: { x: 0, y: 1 },
   KeyA: { x: -1, y: 0 }, ArrowLeft: { x: -1, y: 0 }, KeyD: { x: 1, y: 0 }, ArrowRight: { x: 1, y: 0 },
 };
-const DRAG_RESPONSE_PX = 36;
+// (relative drag is applied 1:1 per tick — see PlayerMotion.step `direct`)
 const TAP_MAX_SEC = 0.25;
 const TAP_MAX_PX = 16;
 
@@ -302,7 +304,7 @@ export class CombatScreen implements Screen {
   buttons: HudButton[];
   paused = false;
   private keys = new Set<string>();
-  private drag: { id: number; target: Vec; start: Vec; last: Vec; t0: number } | null = null;
+  private drag: { id: number; accum: Vec; start: Vec; last: Vec; t0: number } | null = null;
   private pointerButtons = new Map<number, HudAction>();
   private pending = { dash: false, overdrive: false, tractorTap: false };
   private keyTractor = false;
@@ -359,18 +361,17 @@ export class CombatScreen implements Screen {
       this.trigger(action);
       return;
     }
-    if (!this.drag) this.drag = { id: e.pointerId, target: { ...this.world.motion.pos }, start: p, last: p, t0: this.now };
+    if (!this.drag) this.drag = { id: e.pointerId, accum: { x: 0, y: 0 }, start: p, last: p, t0: this.now };
   }
 
   private pointerMove(e: PointerEvent): void {
     if (!this.drag || e.pointerId !== this.drag.id) return;
     // Relative drag from position deltas (movementX is unreliable for touch pointers).
     const p = this.app.toLogical(e.clientX, e.clientY);
-    const b = this.world.motion.bounds;
-    this.drag.target = {
-      x: Math.max(b.x0, Math.min(b.x1, this.drag.target.x + p.x - this.drag.last.x)),
-      y: Math.max(b.y0, Math.min(b.y1, this.drag.target.y + p.y - this.drag.last.y)),
-    };
+    const k = this.app.profile.settings.touchSensitivity ?? 1;
+    this.drag.accum = { x: this.drag.accum.x + (p.x - this.drag.last.x) * k, y: this.drag.accum.y + (p.y - this.drag.last.y) * k };
+    // Never let a backlog build up (e.g. while pushing into a wall): keep at most ~0.25 s of travel.
+    this.drag.accum = limitLength(this.drag.accum, 260);
     this.drag.last = p;
   }
 
@@ -421,11 +422,17 @@ export class CombatScreen implements Screen {
     for (const code of this.keys) { const d = KEYS_MOVE[code]; if (d) k = { x: k.x + d.x, y: k.y + d.y }; }
     if (k.x || k.y) return limitLength(k, 1);
     if (pad.x || pad.y) return limitLength(pad, 1);
-    if (this.drag) {
-      const p = this.world.motion.pos;
-      return limitLength({ x: (this.drag.target.x - p.x) / DRAG_RESPONSE_PX, y: (this.drag.target.y - p.y) / DRAG_RESPONSE_PX }, 1);
-    }
     return { x: 0, y: 0 };
+  }
+
+  // Relative drag for one tick: the finger's movement since the last tick, up to the
+  // ship's touch speed cap; anything beyond carries to the next tick so the ship catches up.
+  private consumeDrag(): Vec | undefined {
+    if (!this.drag || this.keys.size) return undefined;
+    const cap = this.world.motion.effectiveSpeed() * TOUCH_SPEED_MULT * DT;
+    const step = limitLength(this.drag.accum, cap);
+    this.drag.accum = { x: this.drag.accum.x - step.x, y: this.drag.accum.y - step.y };
+    return step;
   }
 
   setPaused(v: boolean): void {
@@ -466,7 +473,7 @@ export class CombatScreen implements Screen {
     const ticks = this.driver.advance(dt);
     for (let i = 0; i < ticks; i++) {
       const held = [...this.pointerButtons.values()].includes("tractor") || this.keyTractor || pad.tractor;
-      w.step({ move: this.moveInput(pad.move), dash: this.pending.dash, overdrive: this.pending.overdrive,
+      w.step({ move: this.moveInput(pad.move), drag: this.consumeDrag(), dash: this.pending.dash, overdrive: this.pending.overdrive,
         tractorHeld: held, tractorTap: this.pending.tractorTap, fire: true });
       this.pending = { dash: false, overdrive: false, tractorTap: false };
     }
