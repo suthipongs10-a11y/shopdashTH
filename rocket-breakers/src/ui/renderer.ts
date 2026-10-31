@@ -12,6 +12,7 @@ import { PICKUP_WARN_SEC } from "../salvage/salvage";
 import { ROLE } from "../combat/powerups";
 import { TAIL_LEN, ScorpionBoss } from "../combat/boss";
 import { CLAW_LEN, CRAB_TELEGRAPH, CrabBoss } from "../combat/crab";
+import { SNATCH_BEAM_SEC } from "../combat/world";
 import { drawAt, preloadSprites, sprite, visCenter, visH, visW } from "./sprites";
 import { t } from "../core/i18n";
 import explosionUrl from "../../assets/fx/fx_explosion_256.png";
@@ -37,6 +38,7 @@ const ENEMY_LOOK: Record<string, { art: string; size: number; warnY: number; war
   E02: { art: "enemy_E02", size: 62, warnY: 26, warnR: 9 },
   E03: { art: "enemy_E03", size: 108, warnY: 46, warnR: 14 },
   E04: { art: "enemy_E04", size: 134, warnY: 0, warnR: 0 },
+  E21: { art: "enemy_E21", size: 74, warnY: 0, warnR: 0 },
 };
 const ROLE_COLOR = { offense: "#ff8a1f", survival: "#58e0a0", resource: "#ffd76a" };
 const PICKUP_GLYPH: Record<string, string> = { PU01: "3×", PU02: "L", PU03: "M", PU04: "Z", PU05: "S", PU06: "+", PU07: "U", PU08: "❄", PU09: "OD", PU10: "D", PU11: "F", PU12: "$" };
@@ -194,6 +196,7 @@ export class Renderer {
     this.drawBackground();
     this.drawFiringLane(w, alpha);
     for (const e of w.enemies) this.drawEnemy(e, alpha);
+    this.drawSnatchBeams(w, alpha);
     if (w.boss && (w.boss.e.alive || w.status === "running")) this.drawBoss(w, alpha);
     this.drawFriendly(w, alpha);
     this.drawPickups(w, alpha);
@@ -347,6 +350,31 @@ export class Renderer {
       this.hpBar(p.x - 64, p.y + 32, 128, core.hp / core.hpMax, C.orange);
     } else if (e.role === "interceptor" && core.hp < core.hpMax) {
       this.hpBar(p.x - 22, p.y - 36, 44, core.hp / core.hpMax);
+    }
+  }
+
+  // E21 tractor beams: magenta line + progress ring on the targeted part (shoot it before the ring fills).
+  private drawSnatchBeams(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    for (const e of w.enemies) {
+      const st = e.steal;
+      if (!st || !e.alive) continue;
+      const p = this.pos(e, alpha);
+      const id = st.carrying ?? st.target;
+      const it = id ? w.items.find((i) => i.instanceId === id) : null;
+      if (!it) continue;
+      const ip = lerp(it.prev, it.pos, alpha);
+      if (st.carrying) {
+        g.strokeStyle = "rgba(255,59,212,0.8)"; g.lineWidth = 3;
+        g.beginPath(); g.moveTo(p.x, p.y + 14); g.lineTo(ip.x, ip.y); g.stroke();
+        continue;
+      }
+      if (st.beam <= 0) continue;
+      const k = Math.min(1, st.beam / SNATCH_BEAM_SEC);
+      g.strokeStyle = `rgba(255,59,212,${0.35 + 0.4 * Math.sin(this.time * 30) ** 2})`; g.lineWidth = 4 + 4 * k; g.setLineDash([10, 6]);
+      g.beginPath(); g.moveTo(p.x, p.y + 20); g.lineTo(ip.x, ip.y); g.stroke(); g.setLineDash([]);
+      g.strokeStyle = C.magenta; g.lineWidth = 5;
+      g.beginPath(); g.arc(ip.x, ip.y, 44, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * k); g.stroke();
     }
   }
 

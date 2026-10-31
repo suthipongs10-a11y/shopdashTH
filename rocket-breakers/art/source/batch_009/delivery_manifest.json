@@ -1,0 +1,274 @@
+[
+  {
+    "filename": "rb_enemy_e17_000.png",
+    "enemy_id": "E17",
+    "name": "Gravity Anchor",
+    "role": "gravity",
+    "move": "stationary",
+    "attack": "gravity_field",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      144,
+      49,
+      1110,
+      1175
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "69046935cfddd5c9cfa43cd3b090ea93dbaff98c2a6bd29c9225f2cfd39e64be"
+  },
+  {
+    "filename": "rb_enemy_e18_000.png",
+    "enemy_id": "E18",
+    "name": "Orbit Guard",
+    "role": "orbiter",
+    "move": "orbit",
+    "attack": "spiral",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      117,
+      128,
+      1138,
+      1092
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "b5ad5c13d55d0d9fc40f4d3c76a258c75c837f18223729fd11f836850262aac3"
+  },
+  {
+    "filename": "rb_enemy_e19_000.png",
+    "enemy_id": "E19",
+    "name": "Mirror Decoy",
+    "role": "decoy",
+    "move": "mirror",
+    "attack": "delayed_echo",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      178,
+      106,
+      1076,
+      1140
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "227aed2b87ca38a33321fc7ae5fb4b70b13148428f3272eddfb834033c5e381c"
+  },
+  {
+    "filename": "rb_enemy_e20_000.png",
+    "enemy_id": "E20",
+    "name": "Citadel Guard",
+    "role": "elite",
+    "move": "advance",
+    "attack": "aimed_volley",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      100,
+      67,
+      1154,
+      1174
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "0380ddc8eb7c6687d0cc8d310f3ac4f609f0f9bd41de14d2ba16f1b788fa3930"
+  },
+  {
+    "filename": "rb_enemy_e21_000.png",
+    "enemy_id": "E21",
+    "name": "Loot Snatcher",
+    "role": "salvage_thief",
+    "move": "flank",
+    "attack": "tractor_attempt",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      143,
+      99,
+      1071,
+      1100
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "8e422ad7ff303d6d1ab16badadf88cc1f82cf9dd86a8853a88ff6f2bff4a48fd"
+  },
+  {
+    "filename": "rb_enemy_e22_000.png",
+    "enemy_id": "E22",
+    "name": "Missile Frigate",
+    "role": "missile",
+    "move": "slow_line",
+    "attack": "bounded_homing",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      165,
+      87,
+      1089,
+      1165
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "8a4dc3b0ab31fdb4912c053c148822cbe8c5ce1f7c0f9950284bed4253954ef6"
+  },
+  {
+    "filename": "rb_enemy_e23_000.png",
+    "enemy_id": "E23",
+    "name": "Beam Cutter",
+    "role": "beam",
+    "move": "cross",
+    "attack": "telegraphed_sweep",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      81,
+      161,
+      1171,
+      1072
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "136203de99826ea00a989fb9081eb99422c7bd19a29dc441cda13b2f5ae3387f"
+  },
+  {
+    "filename": "rb_enemy_e24_000.png",
+    "enemy_id": "E24",
+    "name": "Armor Carrier",
+    "role": "carrier",
+    "move": "backline",
+    "attack": "spawn_scout",
+    "requested_size": [
+      512,
+      512
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      113,
+      60,
+      1142,
+      1166
+    ],
+    "edge_alpha_max": 1,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "awaiting_in_game_scale_hitbox_QA",
+    "sha256": "5d96673ed105c95cb9876a0bc9ecc3fe3e6cb06a0169c52acc947aa373dc70a0"
+  }
+]

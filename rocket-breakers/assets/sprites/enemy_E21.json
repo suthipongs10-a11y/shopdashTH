@@ -1,0 +1,36 @@
+{
+  "asset_id": "enemy_E21",
+  "source_filename": "art/source/batch_009/rb_enemy_e21_000.png",
+  "source_sha256": "8e422ad7ff303d6d1ab16badadf88cc1f82cf9dd86a8853a88ff6f2bff4a48fd",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    135,
+    91,
+    1079,
+    1108
+  ],
+  "runtime_size": [
+    204,
+    220
+  ],
+  "scale": 0.21632,
+  "visible_rect": [
+    1.7,
+    1.7,
+    202.5,
+    218.3
+  ],
+  "pivot_px": [
+    102.0,
+    110.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_009",
+  "status": "integrated",
+  "notes": "verified visually in the web build (P01-04)"
+}

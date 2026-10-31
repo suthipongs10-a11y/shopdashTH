@@ -1,6 +1,6 @@
 # Progress
 
-Status: **M2 stage 2 — P01-01, P01-03 (Rivet Crab) and P01-06 playable** (web build) + expansion 1.1 power-ups (8 of 12).
+Status: **M2 stage 3 — P01-01, P01-03, P01-04 and P01-06 playable** (web build) + expansion 1.1 power-ups (8 of 12).
 Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31)
@@ -103,3 +103,11 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31, BATCH_008 art)
 - Enemies E05–E16 imported as approved (sector 2+). QA: `art/source/batch_008/QA_REPORT.md`.
+
+## Done (2026-10-31, BATCH_009 art + M2 stage 3 — Salvage Hunt)
+- Enemies E17–E24 imported (E21 integrated, others approved). QA: `art/source/batch_009/QA_REPORT.md`.
+- E21 Loot Snatcher: hovers over a loose or towed part, 2 s pink tractor beam with progress ring, steals it
+  (breaks the player's tow); shot down → drops the part; escapes → part dropped at the top edge (never erased).
+- P01-04 playable: Star B bring home 2 intact parts, Star C no towed part destroyed. Salvage carriers = the
+  mission's E04 haulers.
+- Tests: 82 (new: snatch/escape/drop, steal from tow, P01-04 stars, P01-04 bot run). Capture `e2e/capture-snatcher.mjs`.

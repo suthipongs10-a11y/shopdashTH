@@ -64,6 +64,10 @@ export const FUEL_BLAST_RADIUS = 110;
 export const FUEL_BLAST_DAMAGE = 40;   // to other enemies
 export const FUEL_BLAST_PLAYER = 15;   // environmental blast also hurts the ship
 export const OUTRO_MIN_SEC = 1.5;
+export const SNATCH_BEAM_SEC = 2.0;    // E21 tractor time before it steals a part (shoot it first)
+export const SNATCH_RANGE = 170;
+export const SNATCH_SPEED = 150;
+export const SNATCH_MIN_Y = 270;       // below the top HUD and hint strip
 export const OUTRO_SALVAGE_WAIT = 10;  // wait for a loose intact part before ending
 
 export interface TickInput {
@@ -120,7 +124,8 @@ export class CombatWorld {
   // world
   enemies: Enemy[] = [];
   boss: ScorpionBoss | CrabBoss | null = null;
-  namedAttackHits = 0; // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
+  namedAttackHits = 0;
+  cargoDestroyed = 0;  // parts destroyed after the player started towing them (Star C P01-04) // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
   friendly = new BulletPool(300);
   hostile = new BulletPool(600);
   items: SalvageItem[] = [];
@@ -223,6 +228,7 @@ export class CombatWorld {
     let bestD = Infinity;
     for (const it of this.items) {
       if (it.state !== "detached_intact" && it.state !== "owner_drop" && it.state !== "acquiring") continue;
+      if (it.heldBy) continue; // carried off by a Loot Snatcher: shoot it down first
       const d = dist(it.pos, this.motion.pos);
       if (d > TRACTOR_RANGE) continue;
       const ang = Math.abs(Math.atan2(it.pos.x - this.motion.pos.x, -(it.pos.y - this.motion.pos.y))) / DEG;
@@ -280,6 +286,7 @@ export class CombatWorld {
     }
     for (const e of this.enemies) updateEnemy(e, DT, this.em, this.motion.pos);
     this.enemies = this.enemies.filter((e) => !e.leftArena);
+    this.updateThieves();
     if (this.boss?.e.alive) this.boss.update(DT, this.motion.pos);
     this.resolveBodyContact();
     if (input.overdrive && this.overdriveCharge >= 100 && this.overdriveLeft <= 0) {
@@ -396,6 +403,7 @@ export class CombatWorld {
         if (row.id === "E03") this.hint("hint.flank");
         if (row.id === "E04") this.hint("hint.hauler");
         if (row.id === "E02") this.hint("hint.interceptor");
+        if (row.id === "E21") this.hint("hint.snatcher_wave");
       } else if (ev.kind === "supply") {
         this.enemies.push(makeDirected(this.spawnId("s"), SUPPLY_ROW, supplySpawn(this.rng, ev.index), "supply"));
         this.hint("hint.supply");
@@ -412,6 +420,70 @@ export class CombatWorld {
       const loose = this.items.some((i) => i.sourceEncounter !== "player" && (i.state === "detached_intact" || i.state === "acquiring"));
       if (loose) this.hint("hint.outro_salvage");
       if (this.outroTimer >= OUTRO_MIN_SEC && this.hostile.active === 0 && (!loose || this.outroTimer >= OUTRO_SALVAGE_WAIT)) this.finish(true);
+    }
+  }
+
+  // ---------------------------------------------------------------- loot snatchers
+  // E21 hovers over a loose or towed part and tractors it for 2 s; finishing the beam
+  // steals it (breaking the player's tow). Killing it drops the part; escaping drops
+  // it at the top edge — stolen loot is never erased (ATTACK_LIBRARY), its timer runs on.
+  private updateThieves(): void {
+    for (const e of this.enemies) {
+      const st = e.steal;
+      if (!st || !e.alive) continue;
+      if (st.carrying) {
+        const it = this.items.find((i) => i.instanceId === st.carrying);
+        if (!it || it.heldBy !== e.id || (it.state !== "detached_intact" && it.state !== "owner_drop")) { st.carrying = null; continue; }
+        e.path = null;
+        e.pos = { x: e.pos.x + Math.sign(360 - e.pos.x) * 30 * DT, y: e.pos.y - 110 * DT };
+        it.prev = { ...it.pos };
+        it.pos = { x: e.pos.x, y: e.pos.y + 34 };
+        it.vel = { x: 0, y: 0 };
+        if (e.pos.y < -50) {
+          it.heldBy = null;
+          it.pos = { x: clamp(it.pos.x, 60, 660), y: 150 };
+          it.prev = { ...it.pos };
+          it.vel = { x: 0, y: 45 };
+          e.alive = false; // gone, no credit
+          this.hint("hint.snatch_escape");
+        }
+        continue;
+      }
+      const valid = (i: SalvageItem) => !i.heldBy && (i.state === "detached_intact" || i.state === "owner_drop" || i.state === "towed" || i.state === "acquiring");
+      let target = st.target ? this.items.find((i) => i.instanceId === st.target && valid(i)) ?? null : null;
+      if (!target) {
+        let bestD = Infinity;
+        for (const it of this.items) {
+          if (!valid(it) || it.pos.y < 100) continue;
+          const d = dist(it.pos, e.pos);
+          if (d < bestD) { bestD = d; target = it; }
+        }
+        st.target = target?.instanceId ?? null;
+        st.beam = 0;
+        if (target) this.hint("hint.snatcher");
+      }
+      if (!target) {
+        if (!e.path) { e.path = [{ ...e.pos }, { x: e.pos.x, y: -90 }]; e.pathI = 1; e.track = { ...e.pos }; e.speed = SNATCH_SPEED; }
+        continue;
+      }
+      e.path = null;
+      // Hover above the part but never under the top HUD / hint strip (must stay visible and shootable).
+      const want = { x: clamp(target.pos.x + (target.pos.y - 130 < SNATCH_MIN_Y ? (target.pos.x < 360 ? 90 : -90) : 0), 60, 660), y: Math.max(SNATCH_MIN_Y, target.pos.y - 130) };
+      const d = dist(want, e.pos);
+      const stepLen = Math.min(d, SNATCH_SPEED * DT);
+      if (d > 0.5) e.pos = { x: e.pos.x + ((want.x - e.pos.x) / d) * stepLen, y: e.pos.y + ((want.y - e.pos.y) / d) * stepLen };
+      if (dist(target.pos, e.pos) <= SNATCH_RANGE) st.beam += DT;
+      else st.beam = Math.max(0, st.beam - DT);
+      if (st.beam >= SNATCH_BEAM_SEC) {
+        if (this.tow?.itemId === target.instanceId) this.tow = null;
+        if (target.state === "towed" || target.state === "acquiring") transition(target, "detached_intact", `snatch:${target.instanceId}:${this.tick}`, this.tick);
+        target.heldBy = e.id;
+        st.carrying = target.instanceId;
+        st.target = null;
+        st.beam = 0;
+        this.events.push({ type: "snap", pos: { ...target.pos }, tag: "snatch" });
+        this.hint("hint.snatched");
+      }
     }
   }
 
@@ -660,6 +732,11 @@ export class CombatWorld {
     this.events.push({ type: "kill", pos: { ...e.pos }, tag: e.role });
     if (!credit) return;
     if (e.role === "supply") this.supplyDestroyed++;
+    if (e.steal?.carrying) { // a shot-down snatcher drops what it carried
+      const it = this.items.find((i) => i.instanceId === e.steal!.carrying);
+      if (it) { it.heldBy = null; it.vel = { x: 0, y: 40 }; }
+      e.steal.carrying = null;
+    }
     if (e.role === "cargo" && !this.cargoFreed.has(e.id)) this.fuelBlast(e);
     this.kills++;
     this.score += e.score;
@@ -1071,6 +1148,7 @@ export class CombatWorld {
     for (const it of this.items) {
       it.prev = { ...it.pos };
       if (it.state === "detached_intact" || it.state === "owner_drop" || it.state === "acquiring") {
+        if (it.heldBy) { if (ageLoose(it, DT, paused, this.tick)) it.heldBy = null; continue; } // a snatcher moves it
         it.pos = { x: clamp(it.pos.x + it.vel.x * DT, 30, 690), y: clamp(it.pos.y + it.vel.y * DT, 120, 1000) };
         it.vel = { x: it.vel.x * 0.985, y: it.vel.y * 0.985 };
         if (ageLoose(it, DT, paused, this.tick)) {
@@ -1134,6 +1212,7 @@ export class CombatWorld {
   }
 
   private loseCargo(it: SalvageItem, to: "damaged_scrap"): void {
+    this.cargoDestroyed++;
     transition(it, to, `cargo:${it.instanceId}:${this.tick}`, this.tick);
     this.combatScrap += 5;
     this.events.push({ type: "scrap", pos: { ...it.pos }, tag: "cargo" });
@@ -1272,7 +1351,7 @@ export class CombatWorld {
     const mid = this.mission?.id ?? "SLICE-01";
     const m = /^P(\d+)-(\d+)$/.exec(mid);
     const stats: ObjectiveStats = { supplyDestroyed: this.supplyDestroyed, coreDamage: this.coreDamageTaken,
-      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0, namedAttackHits: this.namedAttackHits };
+      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0, namedAttackHits: this.namedAttackHits, cargoDestroyed: this.cargoDestroyed };
     this.result = {
       runId: this.runId, missionId: mid, sector: m ? +m[1] : 1, missionIndex: m ? +m[2] : 6, victory, score: this.score,
       stats, stars: this.mission ? evaluateStars(this.mission, stats, victory) : null,

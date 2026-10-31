@@ -63,3 +63,5 @@ Append implementation decisions with consequences and whether baseline documenta
 | 2026-10-31 | Dock: "hold full — scrap 1 old item" button (never a boss signature) | A full hold could otherwise force scrapping the boss part |
 | 2026-10-31 | P01-03 is now playable; with P01-02 still "coming soon" the unlock chain is P01-01 → P01-03 → (P01-04/05 bridged) → P01-06 | Same unlock-bridge rule |
 | 2026-10-31 | BATCH_008 enemies E05–E16 imported as approved (sector 2+ content) | Integrated when each enemy's behaviour is built |
+| 2026-10-31 | E21 Loot Snatcher: targets the nearest loose/towed/acquiring part, hovers ≥ y 270 (visible), 2 s beam within 170 px; steal breaks the player's tow; part keeps its own timer while carried; escape drops it at the top edge | ATTACK_LIBRARY: stolen loot never erased, provenance/timer kept; counter = shoot it before the beam completes |
+| 2026-10-31 | P01-04 salvage carriers = the mission's authored E04 haulers (8 with two passes ≥ 3 required) | ATTACK_LIBRARY allows carriers as objective actors; reusing E04 keeps one readable "shoot the engine" rule |

@@ -27,7 +27,7 @@ export interface RequiredActors {
 
 // Enemy ids and encounters this build can run. A mission is playable only if all its
 // waves and required actors are supported (others show as "coming soon").
-export const SUPPORTED_ENEMIES = new Set(["E01", "E02", "E03", "E04"]);
+export const SUPPORTED_ENEMIES = new Set(["E01", "E02", "E03", "E04", "E21"]);
 export const SUPPORTED_ENCOUNTERS = new Set(["B01", "B02"]);
 
 export function missionWaves(m: MissionRow): WaveDef[] {
@@ -41,13 +41,17 @@ export function requiredActors(m: MissionRow): RequiredActors {
 
 export function missionPlayable(m: MissionRow): boolean {
   const r = requiredActors(m);
-  if (r.escort || r.marked_ambusher_groups || r.salvage_carriers || r.hazard_nodes) return false;
+  if (r.escort || r.marked_ambusher_groups || r.hazard_nodes) return false;
+  // Salvage carriers are the mission's E04 haulers (DECISIONS); enough of them must be authored.
+  const haulers = missionWaves(m).filter((w) => w.enemy_id === "E04").reduce((n, w) => n + (w.count ?? 0), 0);
+  if (r.salvage_carriers > haulers) return false;
   return missionWaves(m).every((w) => (w.encounter_id ? SUPPORTED_ENCOUNTERS.has(w.encounter_id) : SUPPORTED_ENEMIES.has(w.enemy_id ?? "")));
 }
 
 // Movement profile per catalog movement type (Standard difficulty).
 const MOVE: Record<string, { speed: number; wobble: number; lane: number }> = {
   zigzag: { speed: 120, wobble: 40, lane: 200 },
+  flank: { speed: 150, wobble: 0, lane: 240 },
   sweep: { speed: 160, wobble: 0, lane: 230 },
   slow_line: { speed: 55, wobble: 0, lane: 300 },
   cross: { speed: 75, wobble: 0, lane: 260 },
@@ -88,6 +92,11 @@ export function formationSpawns(w: WaveDef, row: EnemyRow): SpawnSpec[] {
           break;
         }
         case "slow_line": path = [start, { x, y: 300 }, { x, y: 1380 }]; break;
+        case "flank": { // loiter across the upper screen looking for loot, then leave
+          const far = x < 360 ? 620 : 100;
+          path = [start, { x, y: 230 }, { x: far, y: 270 }, { x, y: 230 }, { x: exitX, y: 200 }];
+          break;
+        }
         case "cross": path = [start, { x, y: 1380 }]; break;
         default: path = [start, { x, y: 420 + Math.abs(lat) * 0.3 }, { x: exitX, y: 640 }];
       }
@@ -105,6 +114,7 @@ export function formationSpawns(w: WaveDef, row: EnemyRow): SpawnSpec[] {
         }
         case "cross": path = [start, { x: exitX, y: y + 60 }]; break;
         case "slow_line": path = [start, { x: exitX, y }]; break;
+        case "flank": path = [start, { x: fromLeft ? 620 : 100, y }, { x: fromLeft ? 100 : 620, y: y + 50 }, { x: exitX, y: y + 20 }]; break;
         default: path = [start, { x: exitX, y: y + 120 }];
       }
     }

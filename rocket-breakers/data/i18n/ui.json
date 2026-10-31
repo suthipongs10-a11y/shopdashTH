@@ -620,8 +620,8 @@
     "en": "Never get hit by the mini-boss's signature attack"
   },
   "obj.secure_intact_parts": {
-    "th": "นำชิ้นส่วนสมบูรณ์กลับ {n} ชิ้น",
-    "en": "Bring home {n} intact parts"
+    "th": "นำชิ้นส่วนสมบูรณ์กลับ {n} ชิ้น (จากเรือถังเชื้อเพลิงหรือบอส)",
+    "en": "Bring home {n} intact parts (from fuel haulers or bosses)"
   },
   "obj.cargo_destroyed_at_most": {
     "th": "ไม่มีชิ้นส่วนที่เริ่มลากแล้วถูกทำลาย",
@@ -770,5 +770,25 @@
   "dock.slot_freed": {
     "th": "ทิ้งของเก่าแล้ว ช่องเก็บว่าง 1 ช่อง",
     "en": "Old item scrapped — 1 hold slot free"
+  },
+  "hint.snatcher_wave": {
+    "th": "ผู้ฉกชิ้นส่วนมาแล้ว! มันจะดูดชิ้นส่วนที่ลอยอยู่หรือที่เรากำลังลาก",
+    "en": "Loot Snatchers! They pull away floating parts — even the one you're towing"
+  },
+  "hint.snatcher": {
+    "th": "ผู้ฉกกำลังดูดชิ้นส่วน! ยิงมันก่อนวงสีชมพูเต็ม",
+    "en": "A snatcher is pulling a part! Shoot it before the pink ring fills"
+  },
+  "hint.snatched": {
+    "th": "ชิ้นส่วนถูกฉก! ยิงผู้ฉกให้ตก ของจะหล่นคืน",
+    "en": "Part snatched! Shoot the snatcher down and it drops the part"
+  },
+  "hint.snatch_escape": {
+    "th": "ผู้ฉกหนีไป แต่ของหล่นไว้ที่ขอบจอด้านบน",
+    "en": "The snatcher escaped — it dropped the part at the top edge"
+  },
+  "brief.snatcher_tip": {
+    "th": "ผู้ฉกชิ้นส่วน: ดูดของที่ลอยอยู่หรือที่เรากำลังลาก ยิงก่อนวงสีชมพูเต็ม ถ้าโดนฉกไปแล้ว ยิงตกของจะหล่นคืน",
+    "en": "Loot Snatcher: pulls floating or towed parts — shoot it before the pink ring fills; shoot it down and it drops the part"
   }
 }

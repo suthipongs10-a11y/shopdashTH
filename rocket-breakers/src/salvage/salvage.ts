@@ -44,6 +44,7 @@ export interface SalvageItem {
   invuln: number;
   repairedOnce: boolean;
   history: { tx: string; from: SalvageState; to: SalvageState; tick: number }[];
+  heldBy?: string | null;  // enemy id of a Loot Snatcher carrying it (still loose: its timer keeps running)
 }
 
 export function makeItem(instanceId: string, templateId: string, source: string, slot: string, integrityMax: number, mass: number): SalvageItem {

@@ -1,0 +1,36 @@
+{
+  "asset_id": "enemy_E18",
+  "source_filename": "art/source/batch_009/rb_enemy_e18_000.png",
+  "source_sha256": "b5ad5c13d55d0d9fc40f4d3c76a258c75c837f18223729fd11f836850262aac3",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    107,
+    120,
+    1147,
+    1100
+  ],
+  "runtime_size": [
+    220,
+    207
+  ],
+  "scale": 0.21154,
+  "visible_rect": [
+    1.7,
+    1.7,
+    218.3,
+    205.6
+  ],
+  "pivot_px": [
+    110.0,
+    103.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_009",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

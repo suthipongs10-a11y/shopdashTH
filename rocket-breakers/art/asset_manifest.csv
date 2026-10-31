@@ -218,14 +218,14 @@ enemy_E13,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_0
 enemy_E14,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_008); source in art/source/batch_008,assets/sprites/enemy_E14.webp
 enemy_E15,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_008); source in art/source/batch_008,assets/sprites/enemy_E15.webp
 enemy_E16,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_008); source in art/source/batch_008,assets/sprites/enemy_E16.webp
-enemy_E17,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E18,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E19,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E20,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E21,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E22,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E23,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-enemy_E24,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
+enemy_E17,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E17.webp
+enemy_E18,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E18.webp
+enemy_E19,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E19.webp
+enemy_E20,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E20.webp
+enemy_E21,enemy,512x512,1,alpha,integrated,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E21.webp
+enemy_E22,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E22.webp
+enemy_E23,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E23.webp
+enemy_E24,enemy,512x512,1,alpha,approved,,M3,ChatGPT imagegen via owner (BATCH_009); source in art/source/batch_009,assets/sprites/enemy_E24.webp
 boss_B01_core,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_core.webp
 boss_B01_armor,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_armor.webp
 boss_B01_joint,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_joint.webp

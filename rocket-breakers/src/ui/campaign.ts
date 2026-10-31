@@ -85,6 +85,7 @@ export function showBriefing(app: App, missionId: string): void {
   const r = baselineRewards(+m.id.slice(1, 3), +m.id.slice(4));
   card.append(el("div", "dim", t("brief.rewards", { credits: rec?.stars[0] ? Math.floor(r.credits * 0.6) : r.credits * 2, scrap: r.scrap })));
   if (m.waves.some((w) => (w as { enemy_id?: string }).enemy_id === "E04")) card.append(el("div", "tag", t("brief.hauler_tip")));
+  if (m.waves.some((w) => (w as { enemy_id?: string }).enemy_id === "E21")) card.append(el("div", "tag", t("brief.snatcher_tip")));
   s.append(card);
   s.append(button(t("brief.launch"), () => app.startMission(m.id), "btn primary", "ui_play"));
   s.append(button(t("common.back"), () => showSectorMap(app), "btn"));

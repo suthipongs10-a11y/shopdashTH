@@ -10,7 +10,7 @@ import type { Vec } from "../core/geometry";
 export interface Enemy {
   id: string;
   defId: string;
-  role: "scout" | "shield" | "boss" | "interceptor" | "cargo" | "supply";
+  role: "scout" | "shield" | "boss" | "interceptor" | "cargo" | "supply" | "thief";
   pos: Vec;
   prev: Vec;
   parts: Part[];
@@ -38,6 +38,8 @@ export interface Enemy {
   wobble: number;      // perpendicular sine amplitude (scouts)
   wobblePhase: number;
   aim: Vec | null;     // aimed volley target, sampled when the warning starts
+  // Loot Snatcher (E21) state, driven by the world (it needs the salvage list).
+  steal?: { target: string | null; beam: number; carrying: string | null; idle: number };
 }
 
 export const coreOf = (e: Enemy): Part => e.parts.find((p) => p.kind === "core")!;
@@ -84,7 +86,7 @@ export const SUPPLY_ROW: EnemyRow = {
 export function makeDirected(id: string, row: EnemyRow, spec: SpawnSpec, tag: string): Enemy {
   const start = spec.path[0];
   const dir = spec.path.length > 1 && spec.path[1].x < start.x ? -1 : 1;
-  const role: Enemy["role"] = ({ E01: "scout", E02: "interceptor", E03: "shield", E04: "cargo", SUPPLY: "supply" } as Record<string, Enemy["role"]>)[row.id] ?? "scout";
+  const role: Enemy["role"] = ({ E01: "scout", E02: "interceptor", E03: "shield", E04: "cargo", E21: "thief", SUPPLY: "supply" } as Record<string, Enemy["role"]>)[row.id] ?? "scout";
   const e = base(id, row, role, start, tag, spec.index, dir);
   e.path = spec.path.map((p) => ({ ...p }));
   e.pathI = 1;
@@ -116,6 +118,12 @@ export function makeDirected(id: string, row: EnemyRow, spec: SpawnSpec, tag: st
         makePart({ id: "core", kind: "core", shape: { type: "chain", r: 27, points: [{ x: -43, y: -3 }, { x: 43, y: -3 }] }, hp: row.base_hp, selectable: true }),
         makePart({ id: "engine", kind: "joint", shape: { type: "rect", hw: 15, hh: 42 }, hp: 25, selectable: true }),
       ];
+      break;
+    case "thief":
+      // Loot Snatcher: no damaging attack; tractors loose or towed salvage (2 s beam).
+      e.charge = 2; e.credits = 10; e.scrap = 1; e.score = 250; e.fireTimer = Infinity;
+      e.steal = { target: null, beam: 0, carrying: null, idle: 0 };
+      e.parts = [makePart({ id: "core", kind: "core", shape: { type: "circle", r: 24 }, hp: row.base_hp, selectable: true })];
       break;
     case "supply":
       e.charge = 2; e.credits = 10; e.scrap = 2; e.score = 250; e.fireTimer = Infinity;
@@ -174,7 +182,7 @@ export function updateEnemy(e: Enemy, dt: number, em: Emitter, target: Vec = { x
 
 function updateFire(e: Enemy, dt: number, em: Emitter, target: Vec): void {
   const onScreen = e.pos.x > 24 && e.pos.x < 696 && e.pos.y > 30 && e.pos.y < 1000;
-  if (e.role === "cargo" || e.role === "supply") return; // no damaging attack (body contact still hurts)
+  if (e.role === "cargo" || e.role === "supply" || e.role === "thief") return; // no damaging attack (body contact still hurts)
   const warn = e.role === "interceptor" ? VOLLEY_WARN : SCOUT_TELEGRAPH;
   const wasWarning = e.telegraph > 0;
   e.fireTimer -= dt;
