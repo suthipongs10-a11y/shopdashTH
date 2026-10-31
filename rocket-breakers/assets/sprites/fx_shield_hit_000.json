@@ -1,0 +1,37 @@
+{
+  "asset_id": "fx_shield_hit_000",
+  "source_filename": "art/source/batch_004/rb_fx_shield_hit_000.png",
+  "source_sha256": "5c6154a9cc35014fde22f66de88b8f078a3a0f0c34492c76946246c5962bd18b",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    250,
+    246,
+    1097,
+    1041
+  ],
+  "runtime_size": [
+    256,
+    240
+  ],
+  "scale": 0.30224,
+  "visible_rect": [
+    58.9,
+    62.3,
+    201.3,
+    185.6
+  ],
+  "pivot_px": [
+    128.0,
+    120.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build; keyframe 0 of a ?-frame effect",
+  "frame_index": 0
+}

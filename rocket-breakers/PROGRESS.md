@@ -39,7 +39,7 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31, BATCH_004 art)
 - Graveyard Belt background (3 scrolling layers, far layer made tileable) and keyframe effects for explosions,
-  bullet impacts, joint breaks and severs. fx_shield_hit not delivered yet. QA: `art/source/batch_004/QA_REPORT.md`.
+  bullet impacts, joint breaks and severs. fx_shield_hit arrived in PART_06 and is in. QA: `art/source/batch_004/QA_REPORT.md`.
 
 ## Verification
 - `npm test` → **56 passed** (adds body-contact tests): catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
@@ -53,7 +53,7 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 ## Known issues / not done
 - **No human playtest yet** — feel, difficulty and touch comfort unverified; bot runs are invulnerable.
 - Mission pacing is short (~40 s for a bot); spec targets 5–7 min boss missions → tune after playtests.
-- HUD/menu icons are still coded (BATCH_005/006 pending); fx_shield_hit frames missing from BATCH_004 delivery.
+- HUD/menu icons are still coded (BATCH_005/006 pending).
 - PU03/PU04/PU10/PU11, XP run upgrades, stars, hangar/fabrication, other 47 missions: not started (M2+).
 - Hold swap UI (replace an installed module at the dock) not built; stow/scrap/fit only.
 - No mid-run save/resume; Story/Veteran difficulty not implemented.

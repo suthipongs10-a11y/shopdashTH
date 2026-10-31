@@ -11,7 +11,7 @@ import { DEG, lerp, type Vec } from "../core/geometry";
 import { PICKUP_WARN_SEC } from "../salvage/salvage";
 import { ROLE } from "../combat/powerups";
 import { TAIL_LEN } from "../combat/boss";
-import { drawAt, sprite, visCenter, visH, visW } from "./sprites";
+import { drawAt, preloadSprites, sprite, visCenter, visH, visW } from "./sprites";
 import { t } from "../core/i18n";
 import explosionUrl from "../../assets/fx/fx_explosion_256.png";
 import shieldUrl from "../../assets/fx/fx_shield_256.png";
@@ -60,6 +60,7 @@ export class Renderer {
   private seed = 7;
 
   constructor(private ctx: CanvasRenderingContext2D) {
+    preloadSprites();
     for (let i = 0; i < 140; i++) this.stars.push({ x: this.rand() * 720, y: this.rand() * 1280, s: 0.6 + this.rand() * 1.6, layer: i % 3 });
     for (let i = 0; i < 6; i++) this.wrecks.push({ x: this.rand() * 720, y: this.rand() * 1280, w: 60 + this.rand() * 120, h: 20 + this.rand() * 40, rot: this.rand() * Math.PI, speed: 12 + this.rand() * 10 });
   }
@@ -118,7 +119,7 @@ export class Renderer {
       case "tractor_lock": ring(30, -40, C.cyan, 0.4, 3); break;
       case "snap": burst(12, C.red, 200); break;
       case "player_hit": burst(10, C.red, 200); this.addShake(5, s); this.addFlash(0.15, s); break;
-      case "shield_hit": card(TEX.shield, 56, 0.25, false, 0.8); break;
+      case "shield_hit": if (!anim("fx_shield_hit", [0, 4, 7], K8, 112, 0.25, 4)) card(TEX.shield, 56, 0.25, false, 0.8); break;
       case "pickup": {
         const role = ROLE[e.tag ?? ""] ?? "resource";
         ring(16, 160, ROLE_COLOR[role], 0.3, 4); burst(12, ROLE_COLOR[role], 180, 2.5, 0.3);

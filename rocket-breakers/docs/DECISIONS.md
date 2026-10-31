@@ -40,3 +40,4 @@ Append implementation decisions with consequences and whether baseline documenta
 | 2026-10-31 | E03 barge colliders resized to the BATCH_003 art (core 84×68, shield plate y+41 hw40, joint (∓54,-30)); scout collider r20 | Same art/hitbox agreement rule as B02 |
 | 2026-10-31 | Keyframe-only effects (start/mid/end) play as a timed cross-fade with slight scale; missing in-between frames are not synthesized | Request allowed keyframes; honest about not being a full flipbook |
 | 2026-10-31 | Opaque scrolling backgrounds get a tileable runtime copy (bottom 8% band cross-faded into the top) at import | Delivered far layer did not wrap; fix is deterministic and leaves the original untouched |
+| 2026-10-31 | All sprites are preloaded at boot (title screen) | Lazy loading meant a rare effect's first use always fell back to placeholder art |

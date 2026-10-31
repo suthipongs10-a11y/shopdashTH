@@ -350,7 +350,7 @@ fx_explosion_small,fx,512x512,12,alpha,integrated,,M5,ChatGPT imagegen via owner
 fx_explosion_large,fx,512x512,12,alpha,planned,,M5,ChatGPT raster art requested,
 fx_impact_spark,fx,512x512,8,additive,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/fx_impact_spark_000.webp
 fx_joint_break,fx,512x512,8,additive,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/fx_joint_break_000.webp
-fx_shield_hit,fx,512x512,8,additive,planned,,M5,ChatGPT raster art requested,
+fx_shield_hit,fx,512x512,8,additive,integrated,,M5,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/fx_shield_hit_000.webp
 fx_detach_burst,fx,512x512,8,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/fx_detach_burst_000.webp
 fx_fusion_flare,fx,512x512,12,additive,planned,,M5,ChatGPT raster art requested,
 fx_smoke_puff,fx,512x512,8,alpha,planned,,M5,ChatGPT raster art requested,

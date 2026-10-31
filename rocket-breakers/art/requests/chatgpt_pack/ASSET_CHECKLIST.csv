@@ -38,7 +38,7 @@ BATCH_004,fx_explosion_small,fx,512x512,12,alpha,M5,rb_fx_explosion_small_000.pn
 BATCH_004,fx_impact_spark,fx,512x512,8,additive,M1,rb_fx_impact_spark_000.png,integrated
 BATCH_004,fx_joint_break,fx,512x512,8,additive,M1,rb_fx_joint_break_000.png,integrated
 BATCH_004,fx_detach_burst,fx,512x512,8,alpha,M1,rb_fx_detach_burst_000.png,integrated
-BATCH_004,fx_shield_hit,fx,512x512,8,additive,M5,rb_fx_shield_hit_000.png,requested
+BATCH_004,fx_shield_hit,fx,512x512,8,additive,M5,rb_fx_shield_hit_000.png,integrated
 BATCH_005,ui_dash,ui_icon,512x512,1,alpha,M2,rb_ui_dash_000.png,requested
 BATCH_005,ui_overdrive,ui_icon,512x512,1,alpha,M2,rb_ui_overdrive_000.png,requested
 BATCH_005,ui_tractor,ui_icon,512x512,1,alpha,M2,rb_ui_tractor_000.png,requested

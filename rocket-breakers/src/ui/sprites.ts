@@ -30,6 +30,15 @@ export function sprite(id: string): Sprite | null {
   return s && s.img.complete && s.img.naturalWidth > 0 ? s : null;
 }
 
+// Start decoding every sprite up front: lazily creating an Image on first use meant
+// the first (often only) use of a rare effect fell back to placeholder art.
+export function preloadSprites(): void {
+  for (const k of Object.keys(URLS)) {
+    const id = k.slice(k.lastIndexOf("/") + 1, -".webp".length);
+    sprite(id);
+  }
+}
+
 export const visW = (s: Sprite) => s.meta.visible_rect[2] - s.meta.visible_rect[0];
 export const visH = (s: Sprite) => s.meta.visible_rect[3] - s.meta.visible_rect[1];
 

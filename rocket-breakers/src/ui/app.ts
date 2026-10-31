@@ -12,6 +12,7 @@ import { sfx } from "../audio/sfx";
 import { Renderer } from "./renderer";
 import { drawHud, hitTest, layoutButtons, type HudAction, type HudButton, type Insets } from "./hud";
 import { DockPanel } from "./dock";
+import { preloadSprites } from "./sprites";
 
 interface Screen { update?(dt: number): void; draw?(g: CanvasRenderingContext2D): void; dispose?(): void; onHidden?(): void }
 
@@ -572,6 +573,7 @@ export function boot(stage: HTMLElement, canvas: HTMLCanvasElement, ui: HTMLElem
     return null;
   }
   setI18n(new I18n(catalog));
+  preloadSprites(); // decode art while the title screen is up
   const { store, persistent } = safeStorage();
   const repo = new SaveRepository(store);
   const loaded = repo.load();
