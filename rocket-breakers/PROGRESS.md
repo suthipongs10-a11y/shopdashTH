@@ -1,6 +1,6 @@
 # Progress
 
-Status: **M2 stage 1 — campaign map + P01-01 and P01-06 playable** (web build) + expansion 1.1 power-ups (8 of 12).
+Status: **M2 stage 2 — P01-01, P01-03 (Rivet Crab) and P01-06 playable** (web build) + expansion 1.1 power-ups (8 of 12).
 Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31)
@@ -90,3 +90,13 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 ## Done (2026-10-31, BATCH_010 art)
 - B01 Rivet Crab and B03 boss parts imported as approved (core, overlay clipped to body, armor, joint, signature).
   QA: `art/source/batch_010/QA_REPORT.md`.
+
+## Done (2026-10-31, M2 stage 2 — Rivet Crab)
+- B01 Rivet Crab boss (BATCH_010 art, colliders laid to the art): claw sweep with sector warning, aimed rivets,
+  side dash, mine fan; joint opens 2 s after each sweep; claw loss removes the sweep and switches to lane rivets.
+- W021 Rivet Claw as a stolen weapon: catches small bullets and flings them back (cap 25), else claw strike.
+- P01-03 playable: Star B secure W021, Star C avoid claw-sweep hits (new objective support).
+- Tutorial callouts and hints worded per boss (tail vs claw); HUD boss name/joint cue generic.
+- Auto-fit prefers clear firing lines; claw tools exempt from blocking; dock can free a hold slot.
+- Tests: 77 (new: crab joint window, named-hit counting, sever → W021, claw grab, P01-03 bot run).
+  Browser capture `e2e/capture-crab.mjs`, no console errors.

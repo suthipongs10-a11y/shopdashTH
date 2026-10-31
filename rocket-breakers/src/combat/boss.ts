@@ -59,6 +59,7 @@ export class ScorpionBoss {
   readonly plate: Part;
   readonly tail: Part;
   readonly item: SalvageItem;
+  readonly hintPrefix = "tail";
   phase = 1;
   transition = 0;          // remaining phase-transition / compensation warning time
   recovery = 1.0;
@@ -285,6 +286,13 @@ export class ScorpionBoss {
     const loop = this.loop();
     return loop[this.loopIndex % loop.length];
   }
+
+  // HUD cue: the joint opens during the next/current tail vent.
+  jointSoon(): boolean {
+    return !this.jointExposed && (this.upcoming() === "tail_vent" || this.action?.name === "tail_vent");
+  }
+
+  sweepSegment(): null { return null; } // B02 damages through its sweep beam instead
 
   // Seconds the tail joint stays open, or 0.
   exposureLeft(): number {

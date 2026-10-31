@@ -65,6 +65,11 @@ export class DockPanel {
       row.append(button(t("dock.stow", { n: w.hold.length, cap: w.holdCapacity }), () => this.stow(), "btn small", "ui_cargo"), scrapBtn);
       if (this.scrapArmed) r.append(el("div", "err", t("dock.scrap_confirm")));
       r.append(row);
+      if (w.hold.length >= w.holdCapacity) {
+        const free = button(t("dock.free_slot"), () => { if (w.dockScrapHold()) { this.msg = t("dock.slot_freed"); sfx.play("ui"); } this.render(); }, "btn small");
+        free.disabled = !w.hold.some((h) => h.item.templateId !== w.boss?.row.signature_weapon_id);
+        r.append(free);
+      }
     } else {
       r.append(el("p", "", this.msg), button(t("dock.launch"), () => this.launch(), "btn primary"));
     }

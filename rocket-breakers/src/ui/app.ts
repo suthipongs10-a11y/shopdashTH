@@ -266,15 +266,17 @@ export class App {
     if (world.mission) card.append(resultStars(world.mission, before, r.victory ? r.stars ?? null : null));
     if (!r.victory && world.mission) card.append(el("div", "dim", t("results.stars_need_clear")));
     if (world.boss) {
-      const stolen = r.stolen.includes("B02");
-      card.append(el("p", "", stolen ? t("results.stolen") : r.severed.includes("B02") ? t("results.severed_lost") : t("results.not_stolen")));
-      const frag = this.profile.blueprint_fragments.W022 ?? 0;
+      const bid = world.boss.row.id, sig = world.boss.row.signature_weapon_id;
+      const pre = world.boss.hintPrefix === "tail" ? "" : "claw_"; // results.* (B02) / results.claw_* (B01)
+      const stolen = r.stolen.includes(bid);
+      card.append(el("p", "", stolen ? t(`results.${pre}stolen`) : r.severed.includes(bid) ? t(`results.${pre}severed_lost`) : t(`results.${pre}not_stolen`)));
+      const frag = this.profile.blueprint_fragments[sig] ?? 0;
       const fr = el("div", "frag");
-    const bp = icon("ui_blueprint");
-    if (bp) fr.append(bp);
-      fr.append(el("span", "", `${t("weapons.W022.name")} `));
+      const bp = icon("ui_blueprint");
+      if (bp) fr.append(bp);
+      fr.append(el("span", "", `${t(`weapons.${sig}.name`)} `));
       for (let i = 0; i < 3; i++) fr.append(el("i", i < frag ? "on" : ""));
-      fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3 ${s.fragments.W022 ? "+1" : ""}`));
+      fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3 ${s.fragments[sig] ? "+1" : ""}`));
       card.append(fr);
       if (s.fallbackFragments.length) card.append(el("div", "dim", t("results.fallback")));
       if (frag >= 3) card.append(el("div", "tag", t("results.blueprint_ready")));
@@ -376,7 +378,7 @@ export class CombatScreen implements Screen {
     on(window, "keyup", (e) => { this.keys.delete(e.code); if (e.code === "KeyE") this.keyTractor = false; });
     on(window, "blur", () => { this.keys.clear(); this.keyTractor = false; });
     this.world.hint("hint.intro");
-    this.tutorialOn = !(app.profile.boss_archive.B02?.stolen > 0);
+    this.tutorialOn = true; // decided per boss once it appears (until that boss's first steal)
   }
 
   dispose(): void { for (const f of this.off) f(); this.dock?.close(); this.callout?.remove(); }
@@ -532,9 +534,10 @@ export class CombatScreen implements Screen {
     const w = this.world;
     const b = w.boss;
     if (!this.tutorialOn || this.callout || !b || w.status !== "running") return;
+    if (this.app.profile.boss_archive[b.row.id]?.stolen > 0) { this.tutorialOn = false; return; }
     if (b.jointExposed && !this.tutorialShown.has("joint")) {
       const p = { x: b.e.pos.x + b.joint.offset.x, y: b.e.pos.y + b.joint.offset.y };
-      this.showCallout("joint", p, 46, () => { w.lock = { enemyId: b.e.id, partId: "tail_joint" }; });
+      this.showCallout("joint", p, 46, () => { w.lock = { enemyId: b.e.id, partId: b.joint.id }; });
     } else if (b.item.state === "detached_intact" && !this.tutorialShown.has("tow")) {
       this.showCallout("tow", { ...b.item.pos }, 50);
     } else if (w.tow?.towing && !this.tutorialShown.has("towing")) {
@@ -547,9 +550,11 @@ export class CombatScreen implements Screen {
     this.tutorialShown.add(kind);
     this.drag = null;
     this.pointerButtons.clear();
-    this.renderer.focus = { p: focus, r, label: kind === "towing" ? "" : t(`tut.${kind}_focus`) };
+    // tut.* texts talk about the B02 tail; tut.claw_* about the B01 claw
+    const pre = this.world.boss?.hintPrefix === "claw" ? "claw_" : "";
+    this.renderer.focus = { p: focus, r, label: kind === "towing" ? "" : t(`tut.${pre}${kind}_focus`) };
     const box = el("div", "callout");
-    box.append(el("h3", "", t(`tut.${kind}_title`)), el("p", "", t(`tut.${kind}_body`)),
+    box.append(el("h3", "", t(`tut.${pre}${kind}_title`)), el("p", "", t(`tut.${pre}${kind}_body`)),
       button(t("tut.ok"), () => { onOk?.(); box.remove(); this.callout = null; this.renderer.focus = null; }, "btn primary"));
     // keep the box away from the highlighted target
     box.style.top = focus.y < 640 ? "760px" : "300px";

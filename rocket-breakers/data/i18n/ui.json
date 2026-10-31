@@ -460,8 +460,8 @@
     "en": "Joint opening soon"
   },
   "hud.joint_closed": {
-    "th": "ข้อต่อหางปิดอยู่",
-    "en": "Tail joint closed"
+    "th": "ข้อต่อปิดอยู่",
+    "en": "Joint closed"
   },
   "tut.joint_title": {
     "th": "จุดอ่อนเปิดแล้ว!",
@@ -694,5 +694,81 @@
   "hint.outro_salvage": {
     "th": "ยังมีชิ้นส่วนลอยอยู่ — ลากมาก่อนภารกิจจบ",
     "en": "A part is still floating — tow it before the mission ends"
+  },
+  "hint.boss_b01": {
+    "th": "ปูหมุดเหล็ก! หลบก้ามหนีบ (โซนแดง) แล้วยิงข้อต่อไหล่ที่เปิด",
+    "en": "Rivet Crab! Dodge the grabbing claw (red zone), then shoot the open shoulder joint"
+  },
+  "hint.claw_damaged": {
+    "th": "ระวัง! ยิงโดนตัวก้ามทำให้ก้ามเสียหาย",
+    "en": "Careful! Hitting the claw itself damages the loot"
+  },
+  "hint.claw_critical": {
+    "th": "ก้ามเสียหายหนัก ถ้าตัดตอนนี้จะได้แค่เศษเหล็ก",
+    "en": "Claw badly damaged — severing now yields only scrap"
+  },
+  "hint.claw_tractor": {
+    "th": "ก้ามหลุดแล้ว! บินเข้าไปใกล้แล้วกด \"ดึง\" ค้างไว้",
+    "en": "Claw severed! Fly close and hold \"Tractor\""
+  },
+  "hint.claw_scrap": {
+    "th": "ก้ามพังเป็นเศษเหล็ก ปูใช้ก้ามหนีบไม่ได้แล้ว แต่ไม่ได้ของ",
+    "en": "Claw scrapped — the crab lost its grab, but you got no loot"
+  },
+  "hint.claw_stolen": {
+    "th": "ยึดก้ามยิงหมุดสำเร็จ! ก้ามจะจับกระสุนเล็กแล้วเหวี่ยงคืนให้เอง",
+    "en": "Rivet Claw stolen! It catches small bullets and flings them back"
+  },
+  "results.claw_stolen": {
+    "th": "ขโมยก้ามยิงหมุดสำเร็จ — เก็บเป็นชิ้นส่วนพิมพ์เขียวแล้ว",
+    "en": "Rivet Claw stolen — banked as a blueprint fragment"
+  },
+  "results.claw_severed_lost": {
+    "th": "ตัดก้ามได้ แต่ไม่ได้เก็บกลับมา",
+    "en": "Claw severed, but not recovered"
+  },
+  "results.claw_not_stolen": {
+    "th": "รอบนี้ยังไม่ได้ขโมยก้าม",
+    "en": "No claw stolen this run"
+  },
+  "tut.claw_joint_title": {
+    "th": "ข้อต่อไหล่เปิดแล้ว!",
+    "en": "Shoulder joint open!"
+  },
+  "tut.claw_joint_body": {
+    "th": "วงสีเหลืองคือ \"ข้อต่อก้าม\" ยิงตรงนี้ให้ก้ามหลุด\n• ไปยืนในแนวสีเขียวใต้ข้อต่อ\n• ผมล็อกเป้าที่ข้อต่อให้แล้ว\n• อย่ายิงตัวก้ามสีเทา — ก้ามจะพังเป็นเศษเหล็ก\n• ข้อต่อจะเปิดทุกครั้งหลังปูกวาดก้าม ถ้าไม่โดนก้ามกวาดจะได้ดาวด้วย",
+    "en": "The amber ring is the CLAW JOINT. Shoot it to sever the claw.\n• Stand in the green lane under it\n• I've locked onto the joint for you\n• Don't shoot the grey claw — it breaks into scrap\n• It opens after every claw sweep; dodging every sweep earns a star"
+  },
+  "tut.claw_joint_focus": {
+    "th": "ยิงตรงนี้!",
+    "en": "Shoot here!"
+  },
+  "tut.claw_tow_title": {
+    "th": "ก้ามหลุดแล้ว — ไปเก็บ!",
+    "en": "Claw severed — grab it!"
+  },
+  "tut.claw_tow_body": {
+    "th": "• บินไปใต้ก้ามที่ลอยอยู่ (ให้ก้ามอยู่ด้านหน้ายาน)\n• กดปุ่ม \"ดึง\" (ขวาล่าง) ค้างไว้จนวงเต็ม\n• ก้ามมีเวลา 40 วินาทีก่อนหายไป",
+    "en": "• Fly underneath the floating claw (keep it in front of your nose)\n• Hold the \"Tractor\" button (bottom right) until the ring fills\n• The claw disappears after 40 seconds"
+  },
+  "tut.claw_tow_focus": {
+    "th": "ก้ามที่หลุด",
+    "en": "Loose claw"
+  },
+  "tut.claw_towing_title": {
+    "th": "กำลังลากก้าม",
+    "en": "Towing the claw"
+  },
+  "tut.claw_towing_body": {
+    "th": "• ยิงศัตรูรอบนี้ให้หมด แล้วเกมจะเข้า \"จุดจอดปลอดภัย\" ให้อัตโนมัติ\n• อย่าบินห่างก้ามมากเกินไป สายจะขาด\n• กระสุนศัตรูโดนก้ามได้ — ระวังก้ามพัง",
+    "en": "• Clear this wave and the SAFE DOCK opens automatically\n• Don't fly too far from the claw or the cable snaps\n• Enemy shots can damage the claw"
+  },
+  "dock.free_slot": {
+    "th": "ช่องเก็บเต็ม — ทิ้งของเก่า 1 ชิ้นเป็นเศษเหล็ก",
+    "en": "Hold full — scrap 1 old item"
+  },
+  "dock.slot_freed": {
+    "th": "ทิ้งของเก่าแล้ว ช่องเก็บว่าง 1 ช่อง",
+    "en": "Old item scrapped — 1 hold slot free"
   }
 }

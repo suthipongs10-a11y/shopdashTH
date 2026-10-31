@@ -100,7 +100,25 @@ export class Assembly {
   suggestOrigins(w: WeaponRow): Cell[] {
     const out: Cell[] = [];
     for (let y = 6; y >= 0; y--) for (let x = 0; x < 7; x++) if (!this.canPlace(w, [x, y])) out.push([x, y]);
-    return out.sort((a, b) => b[1] - a[1] || Math.abs(a[0] - 3) - Math.abs(b[0] - 3));
+    // Spots that keep every muzzle clear come first (auto-fit must never pick a gun
+    // that is blocked or blocks another), then nose-most and centred.
+    const bad = (c: Cell) => (this.lineClear(w, c) ? 0 : 1);
+    return out.sort((a, b) => bad(a) - bad(b) || b[1] - a[1] || Math.abs(a[0] - 3) - Math.abs(b[0] - 3));
+  }
+
+  // True if a weapon placed at `origin` has a clear line ahead and doesn't sit in
+  // front of an already fitted gun's muzzle (fixed guns fire toward the nose, +y).
+  lineClear(w: WeaponRow, origin: Cell): boolean {
+    const cells = this.footprintAt(w, origin);
+    const mine = new Set(cells.map(key));
+    const front = cells.reduce((b, c) => (c[1] > b[1] ? c : b), cells[0]);
+    const occ = this.occupied();
+    if (!reachesAround(w)) for (let y = front[1] + 1; y < 7; y++) if (occ.has(key([front[0], y]))) return false;
+    for (const m of this.modules) {
+      const f = m.cells.reduce((b, c) => (c[1] > b[1] ? c : b), m.cells[0]);
+      for (let y = f[1] + 1; y < 7; y++) if (mine.has(key([f[0], y]))) return false;
+    }
+    return true;
   }
 
   halfWidth(): number {
@@ -132,3 +150,7 @@ export class Assembly {
     return true;
   }
 }
+
+// Claw tools reach around the hull (short grab, not a barrel), so a module in front
+// does not block them (DECISIONS: W021 on the starter grid).
+export const reachesAround = (w: WeaponRow): boolean => w.attack_model === "claw_grab";

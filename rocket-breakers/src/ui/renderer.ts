@@ -10,7 +10,8 @@ import { partWorldPos, type Part } from "../combat/parts";
 import { DEG, lerp, type Vec } from "../core/geometry";
 import { PICKUP_WARN_SEC } from "../salvage/salvage";
 import { ROLE } from "../combat/powerups";
-import { TAIL_LEN } from "../combat/boss";
+import { TAIL_LEN, ScorpionBoss } from "../combat/boss";
+import { CLAW_LEN, CRAB_TELEGRAPH, CrabBoss } from "../combat/crab";
 import { drawAt, preloadSprites, sprite, visCenter, visH, visW } from "./sprites";
 import { t } from "../core/i18n";
 import explosionUrl from "../../assets/fx/fx_explosion_256.png";
@@ -369,7 +370,7 @@ export class Renderer {
   // Integrated BATCH_001 art drawn nose-up as delivered: the art's tail socket sits on
   // the gameplay joint; the tail piece rotates about it; ring (open) or armour (closed) on top.
   private drawBossSprites(w: CombatWorld, alpha: number): boolean {
-    const b = w.boss!;
+    const b = w.boss as ScorpionBoss;
     const core = sprite("boss_B02_core"), tail = sprite("boss_B02_signature_mount");
     const ring = sprite("boss_B02_joint"), plate = sprite("boss_B02_armor");
     if (!core || !tail || !ring || !plate) return false;
@@ -418,10 +419,107 @@ export class Renderer {
     return true;
   }
 
+  // B01 Rivet Crab: BATCH_010 art rotated 180° (faces the player), 300 px wide;
+  // the grabbing claw (signature) is drawn from its socket along the claw angle.
+  private drawCrab(b: CrabBoss, alpha: number): void {
+    const g = this.ctx;
+    const p = this.pos(b.e, alpha);
+    const core = sprite("boss_B01_core"), claw = sprite("boss_B01_signature_mount");
+    const ring = sprite("boss_B01_joint"), plate = sprite("boss_B01_armor");
+    const jx = p.x + b.joint.offset.x, jy = p.y + b.joint.offset.y;
+    const dir = { x: Math.cos(b.clawAngle * DEG), y: Math.sin(b.clawAngle * DEG) };
+    // claw first (under the body), arm segment while lunging
+    if (!b.signatureRemoved) {
+      const base = { x: jx + dir.x * b.clawExtend, y: jy + dir.y * b.clawExtend };
+      if (b.clawExtend > 4) {
+        g.strokeStyle = C.charcoal; g.lineWidth = 16; g.lineCap = "round";
+        g.beginPath(); g.moveTo(jx, jy); g.lineTo(base.x, base.y); g.stroke();
+        g.strokeStyle = C.red; g.lineWidth = 3; g.beginPath(); g.moveTo(jx, jy); g.lineTo(base.x, base.y); g.stroke();
+      }
+      if (claw) {
+        const [sx, sy] = claw.meta.attachment_anchors.socket ?? claw.meta.pivot_px;
+        drawAt(g, claw, base.x, base.y, sx, sy, (CLAW_LEN + 14) / visH(claw), b.clawAngle * DEG + Math.PI / 2, 1, b.tail.flash > 0);
+      } else {
+        g.strokeStyle = b.tail.flash > 0 ? "#fff" : C.graphiteLight; g.lineWidth = 26; g.lineCap = "round";
+        g.beginPath(); g.moveTo(base.x, base.y); g.lineTo(base.x + dir.x * CLAW_LEN, base.y + dir.y * CLAW_LEN); g.stroke();
+      }
+    }
+    if (core) {
+      const k = 300 / visW(core);
+      drawAt(g, core, p.x, p.y, ...visCenter(core), k, Math.PI, 1, b.core.flash > 0);
+      const dmg = sprite("boss_B01_damage_overlay");
+      const worn = Math.max(0, Math.min(1, (0.85 - b.hpFrac) / 0.55));
+      if (dmg && worn > 0) drawAt(g, dmg, p.x, p.y, ...visCenter(core), k, Math.PI, worn);
+    } else {
+      g.fillStyle = b.core.flash > 0 ? "#fff" : C.graphite; g.beginPath(); g.arc(p.x, p.y + 22, 52, 0, Math.PI * 2); g.fill();
+    }
+    if (!b.signatureRemoved) {
+      if (b.jointExposed) {
+        if (ring) drawAt(g, ring, jx, jy, ...visCenter(ring), 42 / visW(ring), 0, 1, b.joint.flash > 0);
+        this.jointIcon(jx, jy, 18, false, true);
+      } else {
+        if (plate) drawAt(g, plate, jx, jy, ...visCenter(plate), 40 / visH(plate));
+        this.shieldIcon(jx, jy, 8);
+      }
+      const tip = { x: jx + dir.x * (b.clawExtend + CLAW_LEN), y: jy + dir.y * (b.clawExtend + CLAW_LEN) };
+      const frac = b.tail.integrity / b.tail.integrityMax;
+      if (frac < 1) {
+        const bx = tip.x, by = tip.y + 24;
+        g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(bx - 26, by, 52, 7);
+        g.fillStyle = frac >= 0.35 ? C.cyan : C.red; g.fillRect(bx - 26, by, 52 * Math.max(0, frac), 7);
+        g.fillStyle = "#fff"; g.fillRect(bx - 26 + 52 * 0.35, by - 2, 2, 11);
+      }
+    } else {
+      g.fillStyle = "#1a1c22"; g.beginPath(); g.arc(jx, jy, 12, 0, Math.PI * 2); g.fill();
+      g.fillStyle = C.orange; g.beginPath(); g.arc(jx, jy, 4 + Math.sin(this.time * 20) * 2, 0, Math.PI * 2); g.fill();
+    }
+    if (b.inTransition && !b.entering) { g.strokeStyle = `rgba(255,45,85,${0.4 + Math.sin(this.time * 12) * 0.3})`; g.lineWidth = 4; g.beginPath(); g.arc(p.x, p.y + 20, 110, 0, Math.PI * 2); g.stroke(); }
+  }
+
+  private drawCrabTelegraphs(b: CrabBoss, alpha: number): void {
+    const a = b.action;
+    if (!a) return;
+    const g = this.ctx;
+    const p = this.pos(b.e, alpha);
+    const warn = a.t < CRAB_TELEGRAPH;
+    const k = Math.min(1, a.t / CRAB_TELEGRAPH);
+    const pulse = 0.5 + 0.5 * Math.sin(this.time * 24);
+    if (a.name === "claw_sweep" && warn) {
+      // the sector the claw will sweep, out to its lunge reach
+      const s = { x: p.x + b.joint.offset.x, y: p.y + b.joint.offset.y };
+      const lo = Math.min(a.a0, a.a1) * DEG, hi = Math.max(a.a0, a.a1) * DEG;
+      g.fillStyle = `rgba(255,45,85,${0.12 + 0.18 * k})`;
+      g.beginPath(); g.moveTo(s.x, s.y); g.arc(s.x, s.y, a.reach + 24, lo, hi); g.closePath(); g.fill();
+      g.strokeStyle = `rgba(255,45,85,${0.5 + 0.4 * k})`; g.lineWidth = 3; g.setLineDash([12, 10]);
+      g.beginPath(); g.arc(s.x, s.y, a.reach + 24, lo, hi); g.stroke(); g.setLineDash([]);
+    } else if ((a.name === "aimed_rivets" || a.name === "mine_fan") && warn) {
+      const m = b.mouthWorld();
+      g.fillStyle = `rgba(255,45,85,${0.35 + 0.4 * pulse})`; g.beginPath(); g.arc(m.x - b.e.pos.x + p.x, m.y - b.e.pos.y + p.y, 12 + 8 * k, 0, Math.PI * 2); g.fill();
+      if (a.name === "aimed_rivets") {
+        const base = Math.atan2(a.target.y - m.y, a.target.x - m.x);
+        g.strokeStyle = "rgba(255,45,85,0.45)"; g.lineWidth = 2; g.setLineDash([6, 8]);
+        for (const off of [-12, 0, 12]) {
+          const an = base + off * DEG;
+          g.beginPath(); g.moveTo(m.x, m.y); g.lineTo(m.x + Math.cos(an) * 700, m.y + Math.sin(an) * 700); g.stroke();
+        }
+        g.setLineDash([]);
+      }
+    } else if (a.name === "side_dash" && warn) {
+      g.fillStyle = `rgba(255,45,85,${0.12 + 0.12 * pulse})`;
+      const x0 = Math.min(a.start.x, a.target.x) - 150, x1 = Math.max(a.start.x, a.target.x) + 150;
+      g.fillRect(x0, a.start.y - 90, x1 - x0, 210);
+    } else if (a.name === "aimed_volley" && a.t < 0.5) {
+      const m = b.mouthWorld();
+      g.strokeStyle = "rgba(255,45,85,0.6)"; g.lineWidth = 2; g.setLineDash([6, 8]);
+      g.beginPath(); g.moveTo(m.x, m.y); g.lineTo(a.target.x, a.target.y); g.stroke(); g.setLineDash([]);
+    }
+  }
+
   private drawBoss(w: CombatWorld, alpha: number): void {
+    if (w.boss instanceof CrabBoss) { this.drawCrab(w.boss, alpha); return; }
     if (this.drawBossSprites(w, alpha)) return;
     const g = this.ctx;
-    const b = w.boss!;
+    const b = w.boss as ScorpionBoss;
     const p = this.pos(b.e, alpha);
     g.save(); g.translate(p.x, p.y);
     // legs
@@ -502,8 +600,7 @@ export class Renderer {
   private drawFiringLane(w: CombatWorld, alpha: number): void {
     const b = w.boss;
     if (!b || !b.e.alive || b.signatureRemoved) return;
-    const soon = b.upcoming() === "tail_vent" && !b.action;
-    if (!b.jointExposed && !soon && b.action?.name !== "tail_vent") return;
+    if (!b.jointExposed && !b.jointSoon()) return;
     const g = this.ctx;
     const p = this.pos(b.e, alpha);
     const jx = p.x + b.joint.offset.x, jy = p.y + b.joint.offset.y;
@@ -522,6 +619,7 @@ export class Renderer {
   }
 
   private drawTelegraphs(w: CombatWorld, alpha: number): void {
+    if (w.boss instanceof CrabBoss) { if (w.boss.e.alive) this.drawCrabTelegraphs(w.boss, alpha); return; }
     const b = w.boss;
     if (!b || !b.e.alive || !b.action) return;
     const g = this.ctx;
@@ -663,11 +761,13 @@ export class Renderer {
         }
       }
       // part silhouette: boss tail art for the signature, the module's own art for owner drops
+      // boss signatures use their boss part art; cargo modules and owner drops their module art
       const signature = it.sourceEncounter !== "player";
-      const art = signature ? sprite("boss_B02_signature_mount") : sprite(`weapon_${it.templateId}`);
+      const bossArt = sprite(`boss_${it.sourceEncounter}_signature_mount`);
+      const art = bossArt ?? sprite(`weapon_${it.templateId}`);
       const rot = towed ? Math.atan2(ship.y - p.y, ship.x - p.x) + Math.PI / 2 + Math.PI : this.time * 0.8;
       if (art) {
-        drawAt(g, art, p.x, p.y, ...visCenter(art), (signature ? 88 : 46) / visH(art), rot, 1, it.invuln > 0 && Math.sin(this.time * 20) > 0);
+        drawAt(g, art, p.x, p.y, ...visCenter(art), (bossArt ? 88 : 46) / visH(art), rot, 1, it.invuln > 0 && Math.sin(this.time * 20) > 0);
       } else {
         g.save(); g.translate(p.x, p.y); g.rotate(towed ? 0 : this.time * 0.8);
         g.fillStyle = signature ? C.graphite : C.charcoal;

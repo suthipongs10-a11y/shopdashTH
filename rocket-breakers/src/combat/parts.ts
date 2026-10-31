@@ -24,6 +24,7 @@ export interface Part {
   invulnerable: boolean; // closed armor absorbs without damage
   selectable: boolean;  // can be target-locked right now
   flash: number;        // visual hit flash timer
+  noContact?: boolean;  // excluded from ship-vs-body contact (damages through its own attack instead)
 }
 
 export function makePart(p: Partial<Part> & Pick<Part, "id" | "kind" | "shape">): Part {

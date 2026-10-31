@@ -53,7 +53,7 @@ async function until(cond) {
     if (r !== "dock") return r;
     await page.waitForTimeout(300);
     if (!docked++) await shot("c08_dock");
-    await page.getByText(/ติดตั้งอัตโนมัติ|Auto/).first().click().catch(() => {});
+    await page.getByRole("button", { name: /ติดตั้งอัตโนมัติ|Auto-fit/ }).click().catch(() => {});
     await page.waitForTimeout(150);
     if (await page.getByText(/^ออกบิน$|^Launch$/).count() === 0) {
       await page.getByText(/เก็บเข้าช่องเก็บ|Stow/).first().click().catch(() => {});

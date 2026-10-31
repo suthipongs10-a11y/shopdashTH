@@ -7,7 +7,7 @@ import { DT } from "../core/frameDriver";
 import { DEG, clamp, dist, pointSegmentDistance, type Vec } from "../core/geometry";
 import { Rng } from "../core/rng";
 import type { MissionRow, WeaponRow } from "../core/types";
-import { Assembly, TILE, cellToLocal, type FittedModule } from "../ships/assembly";
+import { Assembly, TILE, cellToLocal, reachesAround, type FittedModule } from "../ships/assembly";
 import { PlayerMotion } from "../ships/motion";
 import { BulletPool, type Bullet } from "./bullets";
 import { coreOf, makeBarge, makeDirected, makeScout, SUPPLY_ROW, updateEnemy, type Enemy } from "./enemies";
@@ -16,6 +16,7 @@ import { evaluateStars, type ObjectiveStats } from "../campaign/stars";
 import { firstPartHit, partContains, partWorldPos, PRIORITY, type Part } from "./parts";
 import type { Emitter } from "./patterns";
 import { SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
+import { CrabBoss } from "./crab";
 import { WeaponScheduler, type Mount } from "./weapons";
 import { ageLoose, isIntact, makeItem, transition, PICKUP_INVULN_SEC, type SalvageItem } from "../salvage/salvage";
 import type { RunResult, SecuredItem } from "../campaign/settlement";
@@ -118,7 +119,8 @@ export class CombatWorld {
   holdCapacity: number;
   // world
   enemies: Enemy[] = [];
-  boss: ScorpionBoss | null = null;
+  boss: ScorpionBoss | CrabBoss | null = null;
+  namedAttackHits = 0; // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
   friendly = new BulletPool(300);
   hostile = new BulletPool(600);
   items: SalvageItem[] = [];
@@ -353,11 +355,12 @@ export class CombatWorld {
     }
   }
 
-  private spawnBoss(): void {
-    this.boss = new ScorpionBoss(this.catalog.boss("B02"), this.runId, this.em, this.rng);
+  private spawnBoss(id = "B02"): void {
+    const row = this.catalog.boss(id);
+    this.boss = id === "B01" ? new CrabBoss(row, this.runId, this.em, this.rng) : new ScorpionBoss(row, this.runId, this.em, this.rng);
     this.items.push(this.boss.item);
     this.phase = "boss";
-    this.hint("hint.boss");
+    this.hint(id === "B01" ? "hint.boss_b01" : "hint.boss");
   }
 
   private updateBossPhase(minorsAlive: boolean): void {
@@ -397,7 +400,7 @@ export class CombatWorld {
         this.enemies.push(makeDirected(this.spawnId("s"), SUPPLY_ROW, supplySpawn(this.rng, ev.index), "supply"));
         this.hint("hint.supply");
       } else if (ev.kind === "encounter") {
-        this.spawnBoss();
+        this.spawnBoss(ev.wave.encounter_id);
       } else if (ev.kind === "complete" && !this.boss) {
         this.phase = "outro";
         this.outroTimer = 0;
@@ -416,8 +419,8 @@ export class CombatWorld {
   private updateAutoLock(): void {
     const lp = this.lockedPart();
     if (this.lock && (!lp || !lp.part.active)) this.lock = null;
-    if (this.opts.autoLock && this.boss?.jointExposed && this.lock?.partId !== "tail_joint") {
-      this.lock = { enemyId: this.boss.e.id, partId: "tail_joint" };
+    if (this.opts.autoLock && this.boss?.jointExposed && this.lock?.partId !== this.boss.joint.id) {
+      this.lock = { enemyId: this.boss.e.id, partId: this.boss.joint.id };
     }
   }
 
@@ -452,6 +455,8 @@ export class CombatWorld {
       const end = hit ? { x: from.x + (to.x - from.x) * hit.t, y: from.y + (to.y - from.y) * hit.t } : to;
       if (hit) this.damagePart(hit.enemy, hit.part, w.damage * laser, end);
       this.beams.push({ from, to: end, ttl: sp.pulse_duration ?? 0.08 });
+    } else if (w.attack_model === "claw_grab") {
+      this.clawGrab(w, from, angle);
     } else if (w.attack_model === "curved_plasma") {
       const side = m.shotIndex % 2 ? 1 : -1;
       const a = (angle + (sp.curve_deg ?? 25) * side) * DEG;
@@ -477,6 +482,36 @@ export class CombatWorld {
         }
       }
     }
+  }
+
+  // W021 Rivet Claw (stolen from B01): catches one small hostile bullet in front and
+  // flings it back (damage capped 25, ATTACK_LIBRARY claw_grab); otherwise a short
+  // claw strike (35) along a 180 px reach.
+  private clawGrab(w: WeaponRow, from: Vec, angle: number): void {
+    const sp = w.special_params;
+    const range = sp.range ?? 180;
+    let best: Bullet | null = null;
+    let bestD = range * 0.6;
+    for (const b of this.hostile.items) {
+      if (!b.alive || b.r > 6) continue; // small bullets only: never beams or mines
+      const d = Math.hypot(b.x - from.x, b.y - from.y);
+      if (d < bestD && b.y < from.y + 20) { bestD = d; best = b; }
+    }
+    if (best && sp.grabs_projectile) {
+      const dmg = Math.min(25, best.dmg * 3);
+      const at = { x: best.x, y: best.y };
+      this.hostile.kill(best);
+      const a = angle * DEG;
+      this.friendly.spawn("kinetic", at.x, at.y, Math.cos(a) * 700, Math.sin(a) * 700, 5, dmg, 2);
+      this.beams.push({ from, to: at, ttl: 0.1 });
+      this.events.push({ type: "deflect", pos: at, tag: "grab" });
+      return;
+    }
+    const to = { x: from.x + Math.cos(angle * DEG) * range, y: from.y + Math.sin(angle * DEG) * range };
+    const hit = this.firstEnemyHit(from, to, 6);
+    const end = hit ? { x: from.x + (to.x - from.x) * hit.t, y: from.y + (to.y - from.y) * hit.t } : to;
+    if (hit) this.damagePart(hit.enemy, hit.part, w.damage, end);
+    this.beams.push({ from, to: end, ttl: 0.12 });
   }
 
   // Stolen tail: curved plasma that seeks enemy joints (catalog stolen_behavior).
@@ -580,7 +615,8 @@ export class CombatWorld {
         part.integrity -= dmg;
         core.hp -= dmg * CORE_SPILL_MAX * armorMul;
         if (e.role === "boss" && !this.boss!.signatureRemoved) {
-          this.hint(part.integrity / part.integrityMax < 0.35 ? "hint.tail_critical" : "hint.tail_damaged");
+          const pre = this.boss!.hintPrefix; // hint.tail_* / hint.claw_*
+          this.hint(part.integrity / part.integrityMax < 0.35 ? `hint.${pre}_critical` : `hint.${pre}_damaged`);
         }
         break;
       case "core":
@@ -707,7 +743,8 @@ export class CombatWorld {
     }
     // Boss arena rescue: one visible repair drop after the first completed tail sweep.
     const act = this.boss?.action?.name ?? null;
-    if (this.lastBossAction === "tail_sweep" && act !== "tail_sweep" && !this.authored.rescue) {
+    const named = this.lastBossAction === "tail_sweep" || this.lastBossAction === "claw_sweep";
+    if (named && act !== this.lastBossAction && !this.authored.rescue) {
       this.authored.rescue = true;
       this.spawnPickup(this.hp < this.hpMax ? "PU06" : "PU05", { x: clamp(me.x, 120, 600), y: 560 });
     }
@@ -797,12 +834,12 @@ export class CombatWorld {
       this.overdriveCharge = Math.min(100, this.overdriveCharge + SEVER_CHARGE);
       this.score += 1000;
       this.events.push({ type: "sever", pos: at, tag: "intact" });
-      this.hint("hint.tractor");
+      this.hint(b.hintPrefix === "tail" ? "hint.tractor" : "hint.claw_tractor");
     } else {
       transition(item, ev === "tail_destroyed" ? "destroyed_scrap" : "damaged_scrap", `sever:${item.instanceId}`, this.tick);
       this.combatScrap += 10;
       this.events.push({ type: "scrap", pos: at });
-      this.hint("hint.scrap");
+      this.hint(b.hintPrefix === "tail" ? "hint.scrap" : "hint.claw_scrap");
     }
     // Boss calls a small escort wave; a calmer pattern runs until it is resolved.
     if (!this.reinforcementsSpawned) {
@@ -932,6 +969,21 @@ export class CombatWorld {
   private resolveBossBeamAndContact(): void {
     const b = this.boss;
     if (!b || !b.e.alive) return;
+    // Lunging claw (B01): one hit per sweep, counted for the named-attack star.
+    const seg = b.sweepSegment();
+    if (seg && b instanceof CrabBoss && !b.sweepHit && !this.playerInvulnerable) {
+      let target: "core" | FittedModule | null = pointSegmentDistance(this.motion.pos, seg.from, seg.to) <= seg.width + CORE_RADIUS ? "core" : null;
+      let at = { ...this.motion.pos };
+      if (!target) {
+        const cell = this.moduleCells().find((c) => pointSegmentDistance(c.c, seg.from, seg.to) <= seg.width + TILE / 2 - 2);
+        if (cell) { target = cell.module; at = cell.c; }
+      }
+      if (target) {
+        b.sweepHit = true;
+        this.namedAttackHits++;
+        this.applyPlayerHit(seg.dmg, target, at);
+      }
+    }
     if (b.beamAngle !== null) {
       b.beamTick -= DT;
       if (b.beamTick <= 0) {
@@ -959,7 +1011,7 @@ export class CombatWorld {
       for (const e of this.allEnemies()) {
         if (!e.alive) continue;
         for (const part of e.parts) {
-          if (!part.active) continue;
+          if (!part.active || part.noContact) continue;
           const push = penetration(part, e.pos, m.pos, PLAYER_BODY_RADIUS);
           if (!push) continue;
           touching = true;
@@ -977,7 +1029,7 @@ export class CombatWorld {
       m.pos = { ...m.prev };
       m.vel = { x: 0, y: 0 };
       for (const e of this.allEnemies()) for (const part of e.parts) {
-        if (!e.alive || !part.active) continue;
+        if (!e.alive || !part.active || part.noContact) continue;
         const push = penetration(part, e.pos, m.pos, PLAYER_BODY_RADIUS);
         if (push) m.pos = { x: m.pos.x + push.x, y: m.pos.y + push.y };
       }
@@ -993,7 +1045,7 @@ export class CombatWorld {
   maxPenetration(): number {
     let worst = 0;
     for (const e of this.allEnemies()) for (const part of e.parts) {
-      if (!e.alive || !part.active) continue;
+      if (!e.alive || !part.active || part.noContact) continue;
       const push = penetration(part, e.pos, this.motion.pos, PLAYER_BODY_RADIUS);
       if (push) worst = Math.max(worst, Math.hypot(push.x, push.y));
     }
@@ -1133,7 +1185,7 @@ export class CombatWorld {
     if (it.sourceEncounter !== "player" && it.templateId === this.boss?.row.signature_weapon_id) {
       this.stolen.push(it.sourceEncounter);
       this.score += 3000;
-      this.hint("hint.stolen");
+      this.hint(this.boss?.hintPrefix === "claw" ? "hint.claw_stolen" : "hint.stolen");
     }
     return null;
   }
@@ -1146,6 +1198,17 @@ export class CombatWorld {
     this.hold.push({ item: it, module: null });
     if (it.sourceEncounter === this.boss?.row.id) this.stolen.push(it.sourceEncounter);
     return null;
+  }
+
+  // Free a hold slot during a dock: the oldest non-signature hold item becomes scrap,
+  // so a full hold can never force the player to scrap a boss signature.
+  dockScrapHold(): boolean {
+    const i = this.hold.findIndex((h) => h.item.templateId !== this.boss?.row.signature_weapon_id);
+    if (i < 0 || !this.dock) return false;
+    const [h] = this.hold.splice(i, 1);
+    transition(h.item, "damaged_scrap", `scraphold:${h.item.instanceId}:${this.tick}`, this.tick);
+    this.combatScrap += Math.floor(this.catalog.weapon(h.item.templateId).mass * 2);
+    return true;
   }
 
   dockScrap(): void {
@@ -1178,7 +1241,7 @@ export class CombatWorld {
         const owner = occupied.get(`${front[0]},${y}`);
         if (owner && owner !== m.module.instanceId) blocked = true;
       }
-      m.blocked = blocked;
+      m.blocked = blocked && !reachesAround(m.module.weapon);
     }
   }
 
@@ -1209,7 +1272,7 @@ export class CombatWorld {
     const mid = this.mission?.id ?? "SLICE-01";
     const m = /^P(\d+)-(\d+)$/.exec(mid);
     const stats: ObjectiveStats = { supplyDestroyed: this.supplyDestroyed, coreDamage: this.coreDamageTaken,
-      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0 };
+      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0, namedAttackHits: this.namedAttackHits };
     this.result = {
       runId: this.runId, missionId: mid, sector: m ? +m[1] : 1, missionIndex: m ? +m[2] : 6, victory, score: this.score,
       stats, stars: this.mission ? evaluateStars(this.mission, stats, victory) : null,

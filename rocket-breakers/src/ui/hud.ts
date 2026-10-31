@@ -51,7 +51,10 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
   const colW = 680 / Math.max(1, mounts.length);
   mounts.forEach((m, i) => {
     const name = t(`weapons.${m.module.weapon.id}.name`);
-    const label = m.locked ? `${name} · ${t("hud.overheated")}` : m.blocked ? `${name} · ${t("hud.blocked")}` : name;
+    // Crowded rows (4+ guns): the weapon icon identifies the gun, text shows only its status.
+    const crowded = mounts.length > 3 && !!sprite(`weapon_${m.module.weapon.id}_icon`);
+    const label = m.locked ? (crowded ? t("hud.overheated") : `${name} · ${t("hud.overheated")}`)
+      : m.blocked ? (crowded ? t("hud.blocked") : `${name} · ${t("hud.blocked")}`) : crowded ? "" : name;
     const wIcon = sprite(`weapon_${m.module.weapon.id}_icon`) ? `weapon_${m.module.weapon.id}_icon` : "ui_heat";
     bar(g, 20 + i * colW, top + 84, colW - 16, label, m.heat / HEAT_MAX, m.locked ? C.red : C.heat, 8, wIcon);
   });
@@ -60,7 +63,7 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
   if (b && b.e.alive && !b.entering) {
     const y = top + TOP_H + 14;
     g.fillStyle = C.text; g.font = "700 20px RB Thai, sans-serif"; g.textAlign = "left";
-    g.fillText(`${t("bosses.B02.name")} · ${t("hud.phase", { n: b.phase })}`, 20, y + 16);
+    g.fillText(`${t(`bosses.${b.row.id}.name`)} · ${t("hud.phase", { n: b.phase })}`, 20, y + 16);
     g.fillStyle = "rgba(0,0,0,0.5)"; g.fillRect(20, y + 24, 600, 12);
     g.fillStyle = C.red; g.fillRect(20, y + 24, 600 * Math.max(0, b.hpFrac), 12);
     g.fillStyle = "#fff";
@@ -68,7 +71,7 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
     // Tail joint state: closed / opening soon / OPEN with remaining time.
     if (!b.signatureRemoved) {
       const left = b.exposureLeft();
-      const soon = !b.jointExposed && (b.upcoming() === "tail_vent" || b.action?.name === "tail_vent");
+      const soon = b.jointSoon();
       const label = b.jointExposed ? t("hud.joint_open", { s: left.toFixed(1) }) : soon ? t("hud.joint_soon") : t("hud.joint_closed");
       const col = b.jointExposed ? C.amber : soon ? C.gold : C.dim;
       // Same row as the boss name, right-aligned, so hints below never cover it.

@@ -28,7 +28,7 @@ export interface RequiredActors {
 // Enemy ids and encounters this build can run. A mission is playable only if all its
 // waves and required actors are supported (others show as "coming soon").
 export const SUPPORTED_ENEMIES = new Set(["E01", "E02", "E03", "E04"]);
-export const SUPPORTED_ENCOUNTERS = new Set(["B02"]);
+export const SUPPORTED_ENCOUNTERS = new Set(["B01", "B02"]);
 
 export function missionWaves(m: MissionRow): WaveDef[] {
   return m.waves as unknown as WaveDef[];

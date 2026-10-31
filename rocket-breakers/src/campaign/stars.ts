@@ -7,14 +7,15 @@ export interface ObjectiveStats {
   coreDamage: number;          // after shields; repairs never undo it
   securedIntact: string[];     // template ids secured/banked intact this run
   interrupts: number;          // boss charge interrupts landed
+  namedAttackHits?: number;    // hits from the boss's signature attack
 }
 
 export function emptyStats(): ObjectiveStats {
-  return { supplyDestroyed: 0, coreDamage: 0, securedIntact: [], interrupts: 0 };
+  return { supplyDestroyed: 0, coreDamage: 0, securedIntact: [], interrupts: 0, namedAttackHits: 0 };
 }
 
 // Objective keys this build can evaluate; others are shown but cannot be earned yet.
-export const SUPPORTED_OBJECTIVES = new Set(["clear_mission", "destroy_supply_nodes", "core_damage_at_most", "secure_signature"]);
+export const SUPPORTED_OBJECTIVES = new Set(["clear_mission", "destroy_supply_nodes", "core_damage_at_most", "secure_signature", "avoid_named_attack_hits"]);
 
 export function objectiveMet(o: MissionRow["star_objectives"][number], s: ObjectiveStats, victory: boolean): boolean {
   if (!victory) return false;
@@ -22,6 +23,7 @@ export function objectiveMet(o: MissionRow["star_objectives"][number], s: Object
     case "clear_mission": return true;
     case "destroy_supply_nodes": return s.supplyDestroyed >= o.threshold;
     case "core_damage_at_most": return Math.round(s.coreDamage) <= o.threshold;
+    case "avoid_named_attack_hits": return (s.namedAttackHits ?? 0) <= o.threshold;
     case "secure_signature": return !!o.target_id && s.securedIntact.includes(o.target_id);
     default: return false;
   }
