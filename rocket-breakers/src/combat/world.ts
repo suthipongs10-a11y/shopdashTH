@@ -64,6 +64,10 @@ export const FUEL_BLAST_RADIUS = 110;
 export const FUEL_BLAST_DAMAGE = 40;   // to other enemies
 export const FUEL_BLAST_PLAYER = 15;   // environmental blast also hurts the ship
 export const OUTRO_MIN_SEC = 1.5;
+export const QUICK_PULL_RANGE = 230;   // quick salvage: any direction, generous
+export const QUICK_FLY_SPEED = 950;
+export const ARMOR_REPAIR = 25;        // part with no room on the hull becomes armour
+export const ARMOR_OVERSHIELD = 30;
 export const SNATCH_BEAM_SEC = 2.0;    // E21 tractor time before it steals a part (shoot it first)
 export const SNATCH_RANGE = 170;
 export const SNATCH_SPEED = 150;
@@ -82,6 +86,7 @@ export interface TickInput {
 
 export type GameEvent =
   | { type: "muzzle"; pos: Vec; family: string; tag?: string }
+  | { type: "fitted"; pos: Vec; tag: string; value: number } // quick salvage: 0 fitted, 1 stowed, 2 armour
   | { type: "hit" | "deflect" | "blast" | "kill" | "player_hit" | "shield_hit" | "graze" | "joint_break" | "sever" | "scrap" | "secured" | "tractor_lock" | "snap" | "overdrive" | "dash" | "phase" | "boss_dead" | "module_lost" | "pickup" | "scrap_pick" | "converted"; pos: Vec; value?: number; tag?: string };
 
 export interface WorldOptions {
@@ -93,6 +98,9 @@ export interface WorldOptions {
   startAt?: "intro" | "boss";
   missionId?: string;       // catalog mission; omitted or "SLICE-01" = the fixed test mission
   researchPool?: string[];  // weapons an E04 cargo module can contain (unlocked research)
+  // "quick" (owner request, default in the app): tap Tractor near a loose part and it flies in
+  // and fits itself at once (no cable, no dock). "classic": hold-to-tow + safe dock fitting.
+  salvageMode?: "quick" | "classic";
 }
 
 interface Lock { enemyId: string; partId: string }
@@ -125,7 +133,8 @@ export class CombatWorld {
   enemies: Enemy[] = [];
   boss: ScorpionBoss | CrabBoss | null = null;
   namedAttackHits = 0;
-  cargoDestroyed = 0;  // parts destroyed after the player started towing them (Star C P01-04) // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
+  cargoDestroyed = 0;
+  magnet: { itemId: string } | null = null; // quick salvage: part flying to the ship  // parts destroyed after the player started towing them (Star C P01-04) // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
   friendly = new BulletPool(300);
   hostile = new BulletPool(600);
   items: SalvageItem[] = [];
@@ -222,7 +231,10 @@ export class CombatWorld {
   }
 
   // Tractor eligibility: in range and inside the forward aim cone.
+  get quickSalvage(): boolean { return this.opts.salvageMode === "quick"; }
+
   tractorCandidate(): SalvageItem | null {
+    if (this.quickSalvage) return this.magnet ? null : this.quickCandidate();
     if (this.tow?.towing) return null;
     let best: SalvageItem | null = null;
     let bestD = Infinity;
@@ -234,6 +246,18 @@ export class CombatWorld {
       const ang = Math.abs(Math.atan2(it.pos.x - this.motion.pos.x, -(it.pos.y - this.motion.pos.y))) / DEG;
       if (ang > TRACTOR_CONE_DEG / 2 && d > 40) continue;
       if (d < bestD) { bestD = d; best = it; }
+    }
+    return best;
+  }
+
+  // Quick salvage: nearest loose part within range, any direction.
+  quickCandidate(): SalvageItem | null {
+    let best: SalvageItem | null = null;
+    let bestD = QUICK_PULL_RANGE;
+    for (const it of this.items) {
+      if ((it.state !== "detached_intact" && it.state !== "owner_drop") || it.heldBy) continue;
+      const d = dist(it.pos, this.motion.pos);
+      if (d <= bestD) { bestD = d; best = it; }
     }
     return best;
   }
@@ -713,7 +737,7 @@ export class CombatWorld {
     item.invuln = PICKUP_INVULN_SEC;
     this.items.push(item);
     this.events.push({ type: "sever", pos: at, tag: "cargo" });
-    this.hint("hint.cargo_freed");
+    this.hint(this.quickSalvage ? "hint.quick_cargo_freed" : "hint.cargo_freed");
     this.killEnemy(e);
   }
 
@@ -911,7 +935,7 @@ export class CombatWorld {
       this.overdriveCharge = Math.min(100, this.overdriveCharge + SEVER_CHARGE);
       this.score += 1000;
       this.events.push({ type: "sever", pos: at, tag: "intact" });
-      this.hint(b.hintPrefix === "tail" ? "hint.tractor" : "hint.claw_tractor");
+      this.hint(this.quickSalvage ? "hint.quick_pull" : b.hintPrefix === "tail" ? "hint.tractor" : "hint.claw_tractor");
     } else {
       transition(item, ev === "tail_destroyed" ? "destroyed_scrap" : "damaged_scrap", `sever:${item.instanceId}`, this.tick);
       this.combatScrap += 10;
@@ -1157,6 +1181,7 @@ export class CombatWorld {
         }
       } else it.invuln = Math.max(0, it.invuln - DT);
     }
+    if (this.quickSalvage) { this.updateQuickSalvage(input); return; }
     // tractor acquisition (hold), or auto-tractor using the same eligibility checks
     const cand = this.tractorCandidate();
     if (cand) this.hint("hint.tractor_hold");
@@ -1199,6 +1224,55 @@ export class CombatWorld {
       }
       if (this.tow) this.tow.releaseArmed = Math.max(0, this.tow.releaseArmed - DT);
     }
+  }
+
+  // Quick salvage: one tap (or auto-tractor) magnetises the part; it flies in and fits itself.
+  private updateQuickSalvage(input: TickInput): void {
+    if (this.magnet) {
+      const it = this.items.find((i) => i.instanceId === this.magnet!.itemId);
+      if (!it || it.state !== "acquiring") { this.magnet = null; return; }
+      const d = dist(it.pos, this.motion.pos);
+      const stepLen = Math.min(d, QUICK_FLY_SPEED * DT);
+      if (d > 0.5) it.pos = { x: it.pos.x + ((this.motion.pos.x - it.pos.x) / d) * stepLen, y: it.pos.y + ((this.motion.pos.y - it.pos.y) / d) * stepLen };
+      if (d <= 34) { this.magnet = null; this.attachQuick(it); }
+      return;
+    }
+    const cand = this.quickCandidate();
+    if (cand) this.hint("hint.quick_in_range");
+    const want = !!input.tractorTap || !!input.tractorHeld || !!this.opts.autoTractor;
+    if (cand && want && transition(cand, "acquiring", `qacq:${cand.instanceId}:${this.tick}`, this.tick)) {
+      cand.invuln = 1; // safe while flying in
+      this.magnet = { itemId: cand.instanceId };
+      this.events.push({ type: "tractor_lock", pos: { ...cand.pos } });
+    }
+  }
+
+  // Fit at the best legal spot (clear firing line first); else stow; else armour plating.
+  private attachQuick(it: SalvageItem): void {
+    const tx = `${it.instanceId}:${this.tick}`;
+    transition(it, "towed", `qtow:${tx}`, this.tick);
+    transition(it, "secured_run", `qsec:${tx}`, this.tick);
+    const w = this.catalog.weapon(it.templateId);
+    const origin = this.assembly.suggestOrigins(w)[0];
+    if (origin && !this.assembly.place(w, origin, it.instanceId)) {
+      this.afterFit(it);
+      this.events.push({ type: "fitted", pos: { ...this.motion.pos }, tag: it.templateId, value: 0 });
+      return;
+    }
+    if (this.hold.length < this.holdCapacity) {
+      transition(it, "stowed_run", `qstow:${tx}`, this.tick);
+      this.hold.push({ item: it, module: null });
+      if (it.sourceEncounter === this.boss?.row.id) this.stolen.push(it.sourceEncounter);
+      this.events.push({ type: "fitted", pos: { ...this.motion.pos }, tag: it.templateId, value: 1 });
+      return;
+    }
+    // No room anywhere: the part becomes armour (still counts as secured for rewards).
+    transition(it, "stowed_run", `qarmor:${tx}`, this.tick);
+    if (it.sourceEncounter === this.boss?.row.id) this.stolen.push(it.sourceEncounter);
+    this.hp = Math.min(this.hpMax, this.hp + ARMOR_REPAIR);
+    this.overshield = Math.min(ARMOR_OVERSHIELD, this.overshield + ARMOR_OVERSHIELD);
+    this.overshieldLeft = 12;
+    this.events.push({ type: "fitted", pos: { ...this.motion.pos }, tag: it.templateId, value: 2 });
   }
 
   private releaseTow(kind: "snap" | "release"): void {
@@ -1253,6 +1327,12 @@ export class CombatWorld {
       return err;
     }
     if (removed) this.hold.push({ item: makeItem(`${this.runId}:player:${removed.instanceId}`, removed.weapon.id, "player", "module", removed.integrityMax, removed.weapon.mass), module: removed });
+    this.afterFit(it);
+    return null;
+  }
+
+  // Shared by dock fitting and quick salvage: the part was just placed on the grid.
+  private afterFit(it: SalvageItem): void {
     const fitted = this.assembly.modules[this.assembly.modules.length - 1];
     // Reclaimed owner drops are repaired to 30% once per part instance per mission.
     if (it.history.some((h) => h.to === "owner_drop")) {
@@ -1266,7 +1346,6 @@ export class CombatWorld {
       this.score += 3000;
       this.hint(this.boss?.hintPrefix === "claw" ? "hint.claw_stolen" : "hint.stolen");
     }
-    return null;
   }
 
   dockStow(): string | null {

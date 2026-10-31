@@ -12,7 +12,7 @@ import { PICKUP_WARN_SEC } from "../salvage/salvage";
 import { ROLE } from "../combat/powerups";
 import { TAIL_LEN, ScorpionBoss } from "../combat/boss";
 import { CLAW_LEN, CRAB_TELEGRAPH, CrabBoss } from "../combat/crab";
-import { SNATCH_BEAM_SEC } from "../combat/world";
+import { QUICK_PULL_RANGE, SNATCH_BEAM_SEC } from "../combat/world";
 import { drawAt, preloadSprites, sprite, visCenter, visH, visW } from "./sprites";
 import { t } from "../core/i18n";
 import explosionUrl from "../../assets/fx/fx_explosion_256.png";
@@ -148,6 +148,13 @@ export class Renderer {
         break;
       }
       case "converted": text(t("hud.converted", { n: e.value ?? 10 }), C.gold); break;
+      case "fitted": { // quick salvage result
+        const name = t(`weapons.${e.tag}.name`);
+        ring(20, 220, e.value === 2 ? C.gold : C.cyan, 0.5, 5); burst(20, e.value === 2 ? C.gold : C.cyan, 220);
+        text(t(e.value === 0 ? "fx.fitted" : e.value === 1 ? "fx.stowed" : "fx.armor", { name }), e.value === 2 ? C.gold : C.cyan);
+        this.addShake(2, s);
+        break;
+      }
       case "scrap_pick": burst(2, C.gold, 60, 1.5, 0.2); break;
       case "graze": burst(1, C.cyan, 80, 1.5, 0.2); break;
       case "overdrive": ring(30, 400, C.gold, 0.5, 6); break;
@@ -816,8 +823,11 @@ export class Renderer {
           g.fillText(String(Math.ceil(it.lifetime)), p.x, p.y - 40);
         }
         const d = Math.hypot(p.x - ship.x, p.y - ship.y);
-        if (d < TRACTOR_RANGE * 1.6) {
-          g.strokeStyle = d <= TRACTOR_RANGE ? "rgba(57,225,255,0.6)" : "rgba(57,225,255,0.2)";
+        const range = w.quickSalvage ? QUICK_PULL_RANGE : TRACTOR_RANGE;
+        if (it.state === "acquiring" && w.quickSalvage) { // flying in: bright beam
+          g.strokeStyle = "rgba(57,225,255,0.85)"; g.lineWidth = 4; g.beginPath(); g.moveTo(ship.x, ship.y); g.lineTo(p.x, p.y); g.stroke();
+        } else if (d < range * 1.6) {
+          g.strokeStyle = d <= range ? "rgba(57,225,255,0.6)" : "rgba(57,225,255,0.2)";
           g.setLineDash([4, 8]); g.lineWidth = 2; g.beginPath(); g.moveTo(ship.x, ship.y - 30); g.lineTo(p.x, p.y); g.stroke(); g.setLineDash([]);
         }
         if (w.tow && w.tow.itemId === it.instanceId && !w.tow.towing) {

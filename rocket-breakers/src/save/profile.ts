@@ -6,6 +6,7 @@ export const CONTENT_VERSION = "1.0";
 export interface Settings {
   language: "th" | "en"; shake: number; flash: number; photosensitive: boolean;
   autoLock: boolean; autoTractor: boolean; handedness: "right" | "left"; sound: number; touchSensitivity: number;
+  classicSalvage?: boolean; // false/absent = quick salvage (tap to pull, auto-fit)
 }
 
 export interface BossArchive { severed: number; stolen: number; cleared: boolean }
@@ -32,7 +33,7 @@ export interface Profile {
 }
 
 export function defaultSettings(): Settings {
-  return { language: "th", shake: 1, flash: 1, photosensitive: false, autoLock: false, autoTractor: false, handedness: "right", sound: 0.7, touchSensitivity: 1.0 };
+  return { language: "th", shake: 1, flash: 1, photosensitive: false, autoLock: false, autoTractor: false, handedness: "right", sound: 0.7, touchSensitivity: 1.0, classicSalvage: false };
 }
 
 export function uuid(): string {

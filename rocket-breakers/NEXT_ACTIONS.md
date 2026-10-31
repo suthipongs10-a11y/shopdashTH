@@ -1,6 +1,6 @@
 # Next actions
 
-1. Owner: play P01-01 and P01-06 on a phone; note pacing (too long/short?), E02 volleys, fuel hauler clarity.
+1. Owner: replay with quick salvage (tap to grab). Is it fun now? Should parts fly in by just touching them (no button)?
 2. Owner: BATCH_033 (hazards, HZ01 wreck drift for P01-05) and an escort ship request for P01-02 (I'll prepare it).
 3. Owner: play P01-03 (Rivet Crab) — is the claw sweep readable/fair? Fight length (~15–20 s for a perfect bot)?
 3b. Next: P01-02 escort + marked ambushers; P01-05 HZ01 wreck drift + hazard nodes; supply-node art; A01 ability.

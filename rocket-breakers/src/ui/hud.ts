@@ -145,8 +145,8 @@ function drawButton(g: CanvasRenderingContext2D, b: HudButton, w: CombatWorld, p
     case "tractor": {
       if (!tractorVisible(w)) return;
       const towing = !!w.tow?.towing;
-      label = towing ? (w.tow!.releaseArmed > 0 ? t("hud.release_confirm") : t("hud.release")) : t("hud.tractor");
-      fill = towing ? 1 : (w.tow?.progress ?? 0) / 0.6;
+      label = w.quickSalvage ? t("hud.pull") : towing ? (w.tow!.releaseArmed > 0 ? t("hud.release_confirm") : t("hud.release")) : t("hud.tractor");
+      fill = w.quickSalvage || towing ? 1 : (w.tow?.progress ?? 0) / 0.6;
       break;
     }
     case "pause": label = "II"; break;

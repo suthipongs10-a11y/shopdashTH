@@ -111,3 +111,10 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - P01-04 playable: Star B bring home 2 intact parts, Star C no towed part destroyed. Salvage carriers = the
   mission's E04 haulers.
 - Tests: 82 (new: snatch/escape/drop, steal from tow, P01-04 stars, P01-04 bot run). Capture `e2e/capture-snatcher.mjs`.
+
+## Done (2026-10-31, owner feedback: quick salvage)
+- Owner: fitting parts was too hard and not fun. New default: fly near a loose part, tap "ดึงเข้ายาน" once → it flies
+  in and fits itself, usable at once; ship full → stowed; hold full → turns into armour. Old tow + dock flow kept as
+  a Settings option. Tutorial/hints/how-to rewritten for the tap flow.
+- Tests: 88 (new: one-tap fit, armour fallback, tap-only bot clears P01-01/03/04/06 and steals W021/W022 with no dock).
+  Browser capture `e2e/capture-quick.mjs`: real tap on the button fits the stolen tail, no console errors.

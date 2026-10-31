@@ -193,6 +193,7 @@ export class App {
     card.append(
       toggle(t("settings.auto_lock"), st.autoLock, (v) => (st.autoLock = v)),
       toggle(t("settings.auto_tractor"), st.autoTractor, (v) => (st.autoTractor = v)),
+      toggle(t("settings.classic_salvage"), !!st.classicSalvage, (v) => (st.classicSalvage = v)),
       toggle(t("settings.left_handed"), st.handedness === "left", (v) => (st.handedness = v ? "left" : "right")),
       toggle(t("settings.photosensitive"), st.photosensitive, (v) => (st.photosensitive = v)),
       slider(t("settings.sound"), st.sound, (v) => { st.sound = v; sfx.volume = v; }),
@@ -359,7 +360,7 @@ export class CombatScreen implements Screen {
   constructor(private app: App, runNumber: number, missionId: string) {
     const st = app.profile.settings;
     this.world = new CombatWorld(app.catalog, { seed: 1000 + runNumber * 7919, runId: `run${runNumber}`, autoLock: st.autoLock, autoTractor: st.autoTractor,
-      missionId, researchPool: researchPool(app.catalog, app.profile) });
+      missionId, researchPool: researchPool(app.catalog, app.profile), salvageMode: st.classicSalvage ? "classic" : "quick" });
     this.renderer = new Renderer(app.g);
     this.buttons = layoutButtons(app.insets, st.handedness);
     this.hintEl = el("div", "hidden");
@@ -540,7 +541,7 @@ export class CombatScreen implements Screen {
       this.showCallout("joint", p, 46, () => { w.lock = { enemyId: b.e.id, partId: b.joint.id }; });
     } else if (b.item.state === "detached_intact" && !this.tutorialShown.has("tow")) {
       this.showCallout("tow", { ...b.item.pos }, 50);
-    } else if (w.tow?.towing && !this.tutorialShown.has("towing")) {
+    } else if (!w.quickSalvage && w.tow?.towing && !this.tutorialShown.has("towing")) {
       const it = w.towedItem!;
       this.showCallout("towing", { ...it.pos }, 50);
     }
@@ -551,7 +552,7 @@ export class CombatScreen implements Screen {
     this.drag = null;
     this.pointerButtons.clear();
     // tut.* texts talk about the B02 tail; tut.claw_* about the B01 claw
-    const pre = this.world.boss?.hintPrefix === "claw" ? "claw_" : "";
+    const pre = kind === "tow" && this.world.quickSalvage ? "quick_" : this.world.boss?.hintPrefix === "claw" ? "claw_" : "";
     this.renderer.focus = { p: focus, r, label: kind === "towing" ? "" : t(`tut.${pre}${kind}_focus`) };
     const box = el("div", "callout");
     box.append(el("h3", "", t(`tut.${pre}${kind}_title`)), el("p", "", t(`tut.${pre}${kind}_body`)),

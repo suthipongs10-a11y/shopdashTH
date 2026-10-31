@@ -60,12 +60,12 @@
     "en": "When the Scorpion vents, its amber tail joint opens — shoot the joint. Shooting the tail body ruins it into scrap."
   },
   "howto.step4": {
-    "th": "เข้าใกล้หางที่หลุด แล้วกดปุ่ม \"ดึง\" ค้างไว้ เพื่อลากกลับมา",
-    "en": "Get close to the loose tail and hold \"Tractor\" to tow it."
+    "th": "เข้าใกล้ชิ้นส่วนที่หลุด แล้วแตะปุ่ม \"ดึงเข้ายาน\" — ชิ้นส่วนจะบินมาติดยานให้เอง",
+    "en": "Fly close to a loose part and tap \"Grab\" — it flies in and fits itself"
   },
   "howto.step5": {
-    "th": "ลากหางไว้จนกำจัดศัตรูรอบนั้นหมด จะเข้าจุดจอดปลอดภัย แล้วติดหางเข้ากับยาน",
-    "en": "Keep towing until the escort wave is cleared — the safe dock opens and you fit the tail."
+    "th": "ใช้อาวุธที่ได้ยิงได้ทันที ถ้ายานเต็ม ชิ้นส่วนจะกลายเป็นเกราะเสริม (อยากเลือกที่ติดเอง เปิดโหมดประกอบแบบเต็มในตั้งค่า)",
+    "en": "The new weapon fires at once; if the ship is full it becomes armour (turn on Classic salvage in Settings to place parts yourself)"
   },
   "howto.step6": {
     "th": "ใช้หางพลาสมาที่ขโมยมาเอาชนะบอส — บอสจะใช้ท่าหางไม่ได้อีกเลย",
@@ -790,5 +790,49 @@
   "brief.snatcher_tip": {
     "th": "ผู้ฉกชิ้นส่วน: ดูดของที่ลอยอยู่หรือที่เรากำลังลาก ยิงก่อนวงสีชมพูเต็ม ถ้าโดนฉกไปแล้ว ยิงตกของจะหล่นคืน",
     "en": "Loot Snatcher: pulls floating or towed parts — shoot it before the pink ring fills; shoot it down and it drops the part"
+  },
+  "hud.pull": {
+    "th": "ดึงเข้ายาน",
+    "en": "Grab"
+  },
+  "fx.fitted": {
+    "th": "ติดตั้ง {name}!",
+    "en": "{name} fitted!"
+  },
+  "fx.stowed": {
+    "th": "เก็บ {name} เข้าช่องเก็บ",
+    "en": "{name} stowed"
+  },
+  "fx.armor": {
+    "th": "{name} → เกราะเสริม!",
+    "en": "{name} → armour!"
+  },
+  "settings.classic_salvage": {
+    "th": "โหมดประกอบแบบเต็ม (ลากด้วยสาย + เลือกที่ติดเอง)",
+    "en": "Classic salvage (tow by cable + choose the slot)"
+  },
+  "hint.quick_pull": {
+    "th": "ชิ้นส่วนหลุดแล้ว! บินเข้าใกล้แล้วแตะปุ่ม \"ดึงเข้ายาน\"",
+    "en": "Part knocked loose! Fly close and tap \"Grab\""
+  },
+  "hint.quick_in_range": {
+    "th": "อยู่ในระยะแล้ว — แตะ \"ดึงเข้ายาน\" ชิ้นส่วนจะติดยานให้เอง",
+    "en": "In range — tap \"Grab\" and it fits itself"
+  },
+  "hint.quick_cargo_freed": {
+    "th": "เครื่องยนต์พัง! ชิ้นส่วนหลุด — เข้าใกล้แล้วแตะ \"ดึงเข้ายาน\"",
+    "en": "Engine down! Part loose — fly close and tap \"Grab\""
+  },
+  "tut.quick_tow_title": {
+    "th": "ชิ้นส่วนหลุดแล้ว — ไปเก็บ!",
+    "en": "Part loose — grab it!"
+  },
+  "tut.quick_tow_body": {
+    "th": "• บินเข้าไปใกล้ชิ้นส่วนที่ลอยอยู่\n• แตะปุ่ม \"ดึงเข้ายาน\" (ขวาล่าง) ครั้งเดียว\n• ชิ้นส่วนจะบินเข้ามาติดยานแล้วใช้ยิงได้ทันที\n• ถ้ายานเต็ม จะกลายเป็นเกราะเสริมแทน",
+    "en": "• Fly close to the floating part\n• Tap \"Grab\" (bottom right) once\n• It flies in, fits itself and fires right away\n• If the ship is full it becomes extra armour"
+  },
+  "tut.quick_tow_focus": {
+    "th": "ชิ้นส่วนที่หลุด",
+    "en": "Loose part"
   }
 }
