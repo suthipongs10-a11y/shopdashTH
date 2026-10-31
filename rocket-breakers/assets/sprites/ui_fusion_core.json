@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_fusion_core",
+  "source_filename": "art/source/batch_006/rb_ui_fusion_core_000.png",
+  "source_sha256": "8b33596a60712fecbeaf46417ed2fa99a280989a7be65eb978a6bc75cc7e7d4a",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    203,
+    185,
+    1051,
+    1042
+  ],
+  "runtime_size": [
+    127,
+    128
+  ],
+  "scale": 0.14936,
+  "visible_rect": [
+    1.2,
+    1.2,
+    125.5,
+    126.8
+  ],
+  "pivot_px": [
+    63.5,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

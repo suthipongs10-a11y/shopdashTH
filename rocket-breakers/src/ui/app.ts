@@ -137,14 +137,16 @@ export class App {
     const frag = this.profile.blueprint_fragments.W022 ?? 0;
     const card = el("div", "card");
     const fr = el("div", "frag");
+    const bp = icon("ui_blueprint");
+    if (bp) fr.append(bp);
     fr.append(el("span", "", `${t("weapons.W022.name")} `));
     for (let i = 0; i < 3; i++) fr.append(el("i", i < frag ? "on" : ""));
     fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3`));
     card.append(el("div", "dim", t("title.blueprint")), fr);
-    card.append(statRow(t("title.credits"), this.profile.credits), statRow(t("title.scrap"), this.profile.scrap),
-      statRow(t("title.stars"), `${totalStars(this.profile)} / ${this.catalog.campaignStarSlots()}`));
+    card.append(statRow(t("title.credits"), this.profile.credits, "ui_credits"), statRow(t("title.scrap"), this.profile.scrap, "ui_scrap"),
+      statRow(t("title.stars"), `${totalStars(this.profile)} / ${this.catalog.campaignStarSlots()}`, "ui_star_full"));
     s.append(card);
-    s.append(button(t("title.campaign"), () => showSectorMap(this), "btn primary", "ui_play"));
+    s.append(button(t("title.campaign"), () => showSectorMap(this), "btn primary", "ui_galaxy"));
     const row = el("div", "row");
     row.append(button(t("title.howto"), () => this.showHowTo(), "btn small"), button(t("title.settings"), () => this.showSettings(() => this.showTitle()), "btn small", "ui_settings"));
     s.append(row);
@@ -268,6 +270,8 @@ export class App {
       card.append(el("p", "", stolen ? t("results.stolen") : r.severed.includes("B02") ? t("results.severed_lost") : t("results.not_stolen")));
       const frag = this.profile.blueprint_fragments.W022 ?? 0;
       const fr = el("div", "frag");
+    const bp = icon("ui_blueprint");
+    if (bp) fr.append(bp);
       fr.append(el("span", "", `${t("weapons.W022.name")} `));
       for (let i = 0; i < 3; i++) fr.append(el("i", i < frag ? "on" : ""));
       fr.append(el("span", "dim", ` ${Math.min(frag, 3)}/3 ${s.fragments.W022 ? "+1" : ""}`));
@@ -276,8 +280,8 @@ export class App {
       if (frag >= 3) card.append(el("div", "tag", t("results.blueprint_ready")));
     }
     for (const [id, n] of Object.entries(s.research)) card.append(el("div", "tag", t("results.research", { name: t(`weapons.${id}.name`), n })));
-    card.append(statRow(t("results.credits"), `+${s.credits}${s.firstClear ? ` (${t("results.first_clear")})` : ""}`),
-      statRow(t("results.scrap"), `+${s.scrap}`), statRow(t("results.score"), r.score));
+    card.append(statRow(t("results.credits"), `+${s.credits}${s.firstClear ? ` (${t("results.first_clear")})` : ""}`, "ui_credits"),
+      statRow(t("results.scrap"), `+${s.scrap}`, "ui_scrap"), statRow(t("results.score"), r.score));
     o.append(card);
     const row = el("div", "row");
     row.append(button(t("results.again"), () => this.startMission(r.missionId), "btn primary"), button(t("results.map"), () => showSectorMap(this), "btn"));
@@ -286,9 +290,22 @@ export class App {
   }
 }
 
-function statRow(label: string, value: string | number): HTMLElement {
+// BATCH_006 menu icon as an <img>, or null while the sprite is missing.
+export function icon(id: string, cls = "ico"): HTMLImageElement | null {
+  const url = spriteUrl(id);
+  if (!url) return null;
+  const img = el("img", cls);
+  img.src = url;
+  img.alt = "";
+  return img;
+}
+
+function statRow(label: string, value: string | number, iconId?: string): HTMLElement {
   const d = el("div", "stat");
-  d.append(el("span", "", label), el("b", "", String(value)));
+  const l = el("span", "", label);
+  const ico = iconId ? icon(iconId) : null;
+  if (ico) l.prepend(ico);
+  d.append(l, el("b", "", String(value)));
   return d;
 }
 

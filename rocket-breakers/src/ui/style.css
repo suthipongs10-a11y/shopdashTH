@@ -98,3 +98,12 @@ ol.objectives li.got { color: var(--gold); }
 .rstar.had i { background: #b39a4a; }
 .rstar small { font-size: 18px; color: var(--dim); }
 .rstar.new small { color: var(--gold); font-weight: 700; }
+/* BATCH_006 menu icons */
+.stat span img.ico { height: 1.15em; width: auto; vertical-align: -0.22em; margin-right: 10px; }
+.frag img.ico { height: 40px; width: auto; }
+.pips img.star { width: 30px; height: 30px; object-fit: contain; opacity: 0.55; }
+.pips img.star.on { opacity: 1; }
+.rstar img.star { width: 38px; height: 38px; object-fit: contain; opacity: 0.5; }
+.rstar.new img.star { opacity: 1; filter: drop-shadow(0 0 8px var(--gold)); }
+.rstar.had img.star { opacity: 0.85; }
+h2.maptitle img.ico { height: 1em; width: auto; vertical-align: -0.12em; margin-right: 12px; }

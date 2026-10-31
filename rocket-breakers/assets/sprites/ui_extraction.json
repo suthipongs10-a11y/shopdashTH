@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_extraction",
+  "source_filename": "art/source/batch_006/rb_ui_extraction_000.png",
+  "source_sha256": "09bfdc0a06e01e7dc7694a8d01a73c9c9da95f2aaefc8878d81fb25fdcdc3b7c",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    194,
+    185,
+    1060,
+    1049
+  ],
+  "runtime_size": [
+    128,
+    128
+  ],
+  "scale": 0.14781,
+  "visible_rect": [
+    1.2,
+    1.2,
+    126.8,
+    126.5
+  ],
+  "pivot_px": [
+    64.0,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

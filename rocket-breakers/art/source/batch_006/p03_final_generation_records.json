@@ -1,0 +1,82 @@
+[
+  {
+    "filename": "rb_ui_star_full_000.png",
+    "prompt": "Original game HUD/menu icon: filled gold star. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. Exactly one five-point gold star, front-on, one tip straight UP.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-f8f0ab9b-5abd-428c-b9b2-4f3983f702ba.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_star_empty_000.png",
+    "prompt": "Original game HUD/menu icon: empty star outline. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. Input image is the matching full star. Keep its exact outer five-point contour, position, scale, framing and charcoal edge. Make only its inner face transparent, leaving a bold empty gold star outline. No filled center.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-c00907c1-f1ea-46f0-962a-35b52eb9b0dd.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/generated_images/exec-f8f0ab9b-5abd-428c-b9b2-4f3983f702ba.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_credits_000.png",
+    "prompt": "Original game HUD/menu icon: credit coin chip. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. One gold credit coin chip with abstract geometric center emblem, no letters or currency characters.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-4860d2ed-05c6-44f9-96e5-15a55b9c19a3.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_scrap_000.png",
+    "prompt": "Original game HUD/menu icon: pile of scrap bolts and nuts. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. A compact cluster of only THREE oversized recognizable metal fasteners: two hex nuts with holes and one bolt. Graphite steel with cyan edges and tiny orange accents. No container.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-8e520fa8-a334-4688-89ea-221e2a1ea242.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_blueprint_000.png",
+    "prompt": "Original game HUD/menu icon: blueprint fragment sheet with cyan lines. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. One dark blue torn-corner schematic sheet, broad cyan technical lines forming a simple top-down spaceship drawing, nose UP. No writing or pseudo text. Very few thick lines.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-12c69e13-8b38-4537-94a4-e94523ea8174.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_hangar_000.png",
+    "prompt": "Original game HUD/menu icon: hangar door with ship silhouette. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. Simple front-facing hangar doorway symbol framing ONE flat cyan top-down spacecraft silhouette, nose UP. No detailed interior or environment.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-2db1d322-4df2-47fb-82fe-5f619749a816.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_galaxy_000.png",
+    "prompt": "Original game HUD/menu icon: planet with orbit ring. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. One cyan planet sphere with ONE orange elliptical orbit ring, no stars or space backdrop.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-5f18242a-b3ed-4e58-a587-910648516c48.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_codex_000.png",
+    "prompt": "Original game HUD/menu icon: open data book. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. One open futuristic data book front-on, two broad cyan pages and charcoal spine, only a few abstract large geometric data lines; NO writing, glyphs or numbers.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-b72fcda3-34db-4fc2-9f1f-79f7c25ce8ce.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_fusion_core_000.png",
+    "prompt": "Original game HUD/menu icon: violet fusion core orb in rings. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. ONE violet orb held within TWO simple orbital gyroscope rings, charcoal supports and cyan edges. Violet core distinct and bold, no particles or lightning.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-6692d1e4-af4c-45f3-a7ae-b9106ab9e534.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  },
+  {
+    "filename": "rb_ui_extraction_000.png",
+    "prompt": "Original game HUD/menu icon: extraction gate / warp ring with arrow. Flat-shaded premium game UI style matching cyan/orange cockpit HUD, bold silhouette readable at 32 px, no text. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Asset type: mobile game menu icon. Requested canvas 512x512 square. Reference images are STYLE references only: match their simple broad cyan face planes, charcoal outline and restrained orange accents, shallow bevel and upper-left lighting. Preserve gold for gold star/credits and violet for fusion core. One isolated centered emblem occupying about 65 percent of canvas; generous transparent margins all sides. No decorative enclosing button, no scene, no text, no tiny circuitry, no particles, no haze. Bold simplified shapes readable at 32px. ONE cyan circular warp gate with a single broad orange arrow pointing UP through its center. Portal inside transparent except arrow. No spacecraft, no scene.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-0b635ebb-1b23-4856-923d-2f1e4dd284cd.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_006_SOURCE/RB_BATCH_006_REQUEST/references/rb_ui_settings_000.png"
+    ]
+  }
+]

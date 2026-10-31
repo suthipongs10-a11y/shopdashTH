@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_galaxy",
+  "source_filename": "art/source/batch_006/rb_ui_galaxy_000.png",
+  "source_sha256": "294d44ff87b62c2f43dc65aca2c3533420ec6cca92f1b86f8ab4c943245196c3",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    160,
+    281,
+    1116,
+    959
+  ],
+  "runtime_size": [
+    128,
+    91
+  ],
+  "scale": 0.13389,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    89.7
+  ],
+  "pivot_px": [
+    64.0,
+    45.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

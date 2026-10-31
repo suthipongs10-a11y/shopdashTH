@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_blueprint",
+  "source_filename": "art/source/batch_006/rb_ui_blueprint_000.png",
+  "source_sha256": "af7cc2ff0f46aa3625b8c0301e25956f4519070ebd9075f8218e82485d0e0446",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    211,
+    217,
+    1056,
+    1091
+  ],
+  "runtime_size": [
+    124,
+    128
+  ],
+  "scale": 0.14645,
+  "visible_rect": [
+    1.2,
+    1.2,
+    122.6,
+    126.8
+  ],
+  "pivot_px": [
+    62.0,
+    64.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

@@ -1,0 +1,382 @@
+[
+  {
+    "filename": "rb_ui_star_full_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      184,
+      195,
+      1071,
+      1012
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "b3a855e38e6970fe9dfde65221eeeeb425eef7fd789234c212b5fdcfc78b597c",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.02705749718151071,
+      "visible_center_source_px": [
+        627.5,
+        603.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_star_empty_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      128,
+      156,
+      1125,
+      1075
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "aaa12d85ce6498fe2fa7648ffdc63a6f6692e643c4097873bc4a397ad762fc23",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.024072216649949848,
+      "visible_center_source_px": [
+        626.5,
+        615.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_credits_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      230,
+      230,
+      1024,
+      1012
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "b21796a535658d7db537248aea52873fdf47027a84da714b838b2c6af67875f4",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.030226700251889168,
+      "visible_center_source_px": [
+        627.0,
+        621.0
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_scrap_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      209,
+      265,
+      1085,
+      1018
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "1fbea1d8cb329a95b617918eb0d999444d6aab4c79dcce06897bd8af04de853b",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.0273972602739726,
+      "visible_center_source_px": [
+        647.0,
+        641.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_blueprint_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      219,
+      225,
+      1048,
+      1083
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "af7cc2ff0f46aa3625b8c0301e25956f4519070ebd9075f8218e82485d0e0446",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.027972027972027972,
+      "visible_center_source_px": [
+        633.5,
+        654.0
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_hangar_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      166,
+      227,
+      1088,
+      980
+    ],
+    "edge_alpha_max": 1,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "5051345024842aaf7e91cd81ced784d1dd34b11af1cd3b153c85bdf15cdeb2de",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.026030368763557483,
+      "visible_center_source_px": [
+        627.0,
+        603.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_galaxy_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      168,
+      291,
+      1108,
+      951
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "294d44ff87b62c2f43dc65aca2c3533420ec6cca92f1b86f8ab4c943245196c3",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.02553191489361702,
+      "visible_center_source_px": [
+        638.0,
+        621.0
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_codex_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      181,
+      320,
+      1073,
+      949
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "2a8588af5b6f969985d178a8253341ac92f22f500dc785908a1bd3eace3fde9c",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.026905829596412557,
+      "visible_center_source_px": [
+        627.0,
+        634.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_fusion_core_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      211,
+      193,
+      1043,
+      1034
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "8b33596a60712fecbeaf46417ed2fa99a280989a7be65eb978a6bc75cc7e7d4a",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.028537455410225922,
+      "visible_center_source_px": [
+        627.0,
+        613.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  },
+  {
+    "filename": "rb_ui_extraction_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      202,
+      193,
+      1051,
+      1040
+    ],
+    "edge_alpha_max": 0,
+    "pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "sha256": "09bfdc0a06e01e7dc7694a8d01a73c9c9da95f2aaefc8878d81fb25fdcdc3b7c",
+    "status": "awaiting_in_game_menu_QA",
+    "suggested_fit_32px": {
+      "visible_box_target_longest_px": 24,
+      "uniform_scale": 0.028268551236749116,
+      "visible_center_source_px": [
+        626.5,
+        616.5
+      ],
+      "note": "Runtime layout suggestion only; no pixels modified. Center the visible bbox in the icon slot; test optical alignment."
+    }
+  }
+]

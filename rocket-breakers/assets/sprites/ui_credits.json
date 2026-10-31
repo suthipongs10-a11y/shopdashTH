@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_credits",
+  "source_filename": "art/source/batch_006/rb_ui_credits_000.png",
+  "source_sha256": "b21796a535658d7db537248aea52873fdf47027a84da714b838b2c6af67875f4",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    220,
+    222,
+    1034,
+    1020
+  ],
+  "runtime_size": [
+    128,
+    125
+  ],
+  "scale": 0.15725,
+  "visible_rect": [
+    1.3,
+    1.3,
+    126.7,
+    124.2
+  ],
+  "pivot_px": [
+    64.0,
+    62.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

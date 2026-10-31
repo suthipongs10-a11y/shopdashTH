@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_star_empty",
+  "source_filename": "art/source/batch_006/rb_ui_star_empty_000.png",
+  "source_sha256": "aaa12d85ce6498fe2fa7648ffdc63a6f6692e643c4097873bc4a397ad762fc23",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    120,
+    148,
+    1133,
+    1083
+  ],
+  "runtime_size": [
+    128,
+    118
+  ],
+  "scale": 0.12636,
+  "visible_rect": [
+    1.0,
+    1.0,
+    127.0,
+    117.1
+  ],
+  "pivot_px": [
+    64.0,
+    59.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

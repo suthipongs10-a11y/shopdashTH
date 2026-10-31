@@ -53,3 +53,4 @@ Append implementation decisions with consequences and whether baseline documenta
 | 2026-10-31 | Intact non-signature salvage secured on victory adds +1 `weapon_research` for that weapon | Spec says intact capture gives a baseline module; research meaning of it is not yet defined — counter only, no spend yet |
 | 2026-10-31 | Mission outro waits up to 10 s while an intact part is still floating (hint shown), then ends | AGENTS: victory auto-secures only towed/stowed parts; this gives a fair last chance without a hidden timer |
 | 2026-10-31 | Bug fix: results screen opened twice (end timer re-armed); settlement was already idempotent, but the second copy showed wrong "new star" / first-clear text | Found by the M2 browser capture |
+| 2026-10-31 | BATCH_006 menu icons: 6 used now (stars, credits, scrap, blueprint, galaxy); hangar/codex/fusion_core/extraction imported as `approved` until their screens exist | Same honesty rule as earlier batches |

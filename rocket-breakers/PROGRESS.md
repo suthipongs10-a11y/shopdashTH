@@ -78,3 +78,7 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 - Tests: 72 (new: director, formations, E02/E04, stars, settlement merge, unlocks, P01-01 bot playthrough with 3 stars).
   Browser capture `e2e/capture-campaign.mjs`: map → briefing → combat → dock → results → map, no console errors.
 - Fixed: results screen could open twice.
+
+## Done (2026-10-31, BATCH_006 art)
+- 10 menu icons delivered; stars/credits/scrap/blueprint/galaxy now on title, sector map, briefing and results.
+  Hangar/codex/fusion core/extraction imported as approved. QA: `art/source/batch_006/QA_REPORT.md`.

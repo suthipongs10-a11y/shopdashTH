@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_hangar",
+  "source_filename": "art/source/batch_006/rb_ui_hangar_000.png",
+  "source_sha256": "5051345024842aaf7e91cd81ced784d1dd34b11af1cd3b153c85bdf15cdeb2de",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    158,
+    218,
+    1096,
+    990
+  ],
+  "runtime_size": [
+    128,
+    105
+  ],
+  "scale": 0.13646,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    104.3
+  ],
+  "pivot_px": [
+    64.0,
+    52.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

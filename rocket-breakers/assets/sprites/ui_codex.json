@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_codex",
+  "source_filename": "art/source/batch_006/rb_ui_codex_000.png",
+  "source_sha256": "2a8588af5b6f969985d178a8253341ac92f22f500dc785908a1bd3eace3fde9c",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    173,
+    312,
+    1081,
+    957
+  ],
+  "runtime_size": [
+    128,
+    91
+  ],
+  "scale": 0.14097,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    89.8
+  ],
+  "pivot_px": [
+    64.0,
+    45.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

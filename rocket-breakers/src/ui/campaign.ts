@@ -9,7 +9,7 @@ import { baselineRewards } from "../campaign/settlement";
 import { i18n, t } from "../core/i18n";
 import type { Catalog } from "../core/catalog";
 export { researchPool } from "../campaign/progress";
-import { button, el, type App } from "./app";
+import { button, el, icon, type App } from "./app";
 
 export const SECTOR = "P01";
 
@@ -23,9 +23,14 @@ export function objectiveText(o: MissionRow["star_objectives"][number]): string 
   return o.description_th;
 }
 
+// Star icon (BATCH_006); CSS star shape as a fallback.
+function star(on: boolean): HTMLElement {
+  return icon(on ? "ui_star_full" : "ui_star_empty", on ? "star on" : "star") ?? el("i", on ? "on" : "");
+}
+
 function starPips(stars: readonly boolean[] | undefined, cls = "pips"): HTMLElement {
   const d = el("span", cls);
-  for (let i = 0; i < 3; i++) d.append(el("i", stars?.[i] ? "on" : ""));
+  for (let i = 0; i < 3; i++) d.append(star(!!stars?.[i]));
   return d;
 }
 
@@ -33,7 +38,10 @@ export function showSectorMap(app: App): void {
   const c = app.catalog, p = app.profile;
   app.show({ draw: (g) => mapBackground(g) });
   const s = el("div", "screen map");
-  s.append(el("h2", "", t(`sectors.${SECTOR}.name`)), el("div", "dim", t("map.subtitle", { stars: totalStars(p) })));
+  const h = el("h2", "maptitle", t(`sectors.${SECTOR}.name`));
+  const g = icon("ui_galaxy");
+  if (g) h.prepend(g);
+  s.append(h, el("div", "dim", t("map.subtitle", { stars: totalStars(p) })));
   const list = el("div", "nodes");
   sectorMissions(c).forEach((m, i) => {
     const unlocked = missionUnlocked(c, p, m);
@@ -89,7 +97,7 @@ export function resultStars(m: MissionRow, before: readonly boolean[] | undefine
   m.star_objectives.forEach((o, i) => {
     const got = !!earned?.[i], had = !!before?.[i];
     const row = el("div", `rstar ${got && !had ? "new" : had ? "had" : got ? "had" : "miss"}`);
-    row.append(el("i", ""), el("span", "", objectiveText(o)),
+    row.append(star(got || had), el("span", "", objectiveText(o)),
       el("small", "", got && !had ? t("results.star_new") : had ? t("results.star_had") : t("results.star_missed")));
     box.append(row);
   });

@@ -1,0 +1,36 @@
+{
+  "asset_id": "ui_scrap",
+  "source_filename": "art/source/batch_006/rb_ui_scrap_000.png",
+  "source_sha256": "1fbea1d8cb329a95b617918eb0d999444d6aab4c79dcce06897bd8af04de853b",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    201,
+    256,
+    1093,
+    1026
+  ],
+  "runtime_size": [
+    128,
+    110
+  ],
+  "scale": 0.1435,
+  "visible_rect": [
+    1.1,
+    1.1,
+    126.9,
+    109.3
+  ],
+  "pivot_px": [
+    64.0,
+    55.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_006",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

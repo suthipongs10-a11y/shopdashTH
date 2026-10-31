@@ -1,7 +1,7 @@
 # Next actions
 
 1. Owner: play P01-01 and P01-06 on a phone; note pacing (too long/short?), E02 volleys, fuel hauler clarity.
-2. Owner: BATCH_006 menu icons (`art/requests/batch_zips/RB_BATCH_006_REQUEST.zip`), then BATCH_007+.
+2. Owner: next art batch BATCH_007 (`art/requests/batch_zips/RB_BATCH_007_REQUEST.zip`).
 3. M2 stage 2: P01-03 B01 Rivet Crab (W021 signature) + E21 Loot Snatcher; supply-node art request.
 4. M2 stage 3: P01-02 escort + marked ambushers; P01-04 salvage carriers; P01-05 HZ01 wreck drift + hazard nodes.
 5. B02 charge-interrupt node (P01-06 Star C, ATTACK_LIBRARY: 2 windows × 1.5 s, 20 dmg).
