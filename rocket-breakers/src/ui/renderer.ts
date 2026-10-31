@@ -220,6 +220,28 @@ export class Renderer {
     const p = this.pos(e, alpha);
     const core = coreOf(e);
     const flash = core.flash > 0;
+    // BATCH_003 art: sources are nose-up, enemies fly toward the player, so rotate 180°.
+    const art = sprite(e.role === "scout" ? "enemy_E01" : "enemy_E03");
+    if (art) {
+      if (e.telegraph > 0) {
+        g.fillStyle = `rgba(255,45,85,${0.45 + 0.45 * Math.sin(this.time * 40)})`;
+        g.beginPath(); g.arc(p.x, p.y + (e.role === "scout" ? 24 : 46), e.role === "scout" ? 9 : 14, 0, Math.PI * 2); g.fill();
+      }
+      const size = e.role === "scout" ? 56 : 108;
+      drawAt(g, art, p.x, p.y, ...visCenter(art), size / Math.max(visW(art), visH(art)), Math.PI, 1, flash);
+      if (e.role !== "scout") {
+        const shield = e.parts.find((x) => x.id === "shield")!;
+        const joint = e.parts.find((x) => x.id === "joint")!;
+        if (shield.active) {
+          g.fillStyle = shield.flash > 0 ? "rgba(255,255,255,0.8)" : "rgba(255,59,212,0.45)";
+          g.fillRect(p.x - 40, p.y + 35, 80, 12);
+          this.shieldIcon(p.x, p.y + 41, 7);
+        }
+        if (joint.active) this.jointIcon(p.x + joint.offset.x, p.y + joint.offset.y, 11, joint.flash > 0);
+        this.hpBar(p.x - 40, p.y - 58, 80, core.hp / core.hpMax);
+      }
+      return;
+    }
     if (e.role === "scout") {
       g.save(); g.translate(p.x, p.y);
       if (e.telegraph > 0) { g.fillStyle = `rgba(255,45,85,${0.5 + 0.5 * Math.sin(this.time * 40)})`; g.beginPath(); g.arc(0, 20, 9, 0, Math.PI * 2); g.fill(); }
@@ -258,6 +280,9 @@ export class Renderer {
     const kCore = 340 / visW(core);
     const [cx, cy] = visCenter(core);
     drawAt(g, core, p.x + BOSS_ART_OFFSET.x, p.y + BOSS_ART_OFFSET.y, cx, cy, kCore, 0, 1, b.core.flash > 0);
+    const dmg = sprite("boss_B02_damage_overlay"); // shares the core's crop: same transform
+    const worn = Math.max(0, Math.min(1, (0.85 - b.hpFrac) / 0.55));
+    if (dmg && worn > 0) drawAt(g, dmg, p.x + BOSS_ART_OFFSET.x, p.y + BOSS_ART_OFFSET.y, cx, cy, kCore, 0, worn);
     for (const side of [-1, 1] as const) {
       const a = b.action;
       const warn = a?.name === "claw_fan" && ((side === -1 && a.t < 0.6) || (side === 1 && a.t > 1.2 && a.t < 1.8));
@@ -620,14 +645,20 @@ export class Renderer {
     const k = 100 / visW(hullArt);
     const [hx, hy] = visCenter(hullArt);
     const cy = p.y - 2;
-    const lean = Math.max(-0.12, Math.min(0.12, m.vel.x / 3000));
-    if (m.dashing) for (let i = 1; i <= 3; i++) drawAt(g, hullArt, p.x - m.dashDir.x * i * 16, cy - m.dashDir.y * i * 16, hx, hy, k, lean, 0.22 - i * 0.05);
+    // Banking frames (BATCH_003) share the hull's crop, so they swap in place.
+    const bank = m.vel.x < -110 ? sprite("hull_H01_lean_left") : m.vel.x > 110 ? sprite("hull_H01_lean_right") : null;
+    const body = bank ?? hullArt;
+    const lean = bank ? 0 : Math.max(-0.08, Math.min(0.08, m.vel.x / 3000));
+    if (m.dashing) for (let i = 1; i <= 3; i++) drawAt(g, body, p.x - m.dashDir.x * i * 16, cy - m.dashDir.y * i * 16, hx, hy, k, lean, 0.22 - i * 0.05);
     const glow = sprite("hull_H01_engine_glow");
     if (glow) {
       const pulse = 0.75 + 0.25 * Math.sin(this.time * 40) + (w.overdriveLeft > 0 ? 0.35 : 0);
       drawAt(g, glow, p.x, cy, hx, hy, k * (1 + (w.overdriveLeft > 0 ? 0.04 : 0)), lean, Math.min(1, pulse), false, true);
     }
-    drawAt(g, hullArt, p.x, cy, hx, hy, k, lean);
+    drawAt(g, body, p.x, cy, hx, hy, k, lean);
+    const dmg = sprite("hull_H01_damage_overlay");
+    const hurt = Math.max(0, Math.min(1, (0.75 - w.hp / w.hpMax) / 0.45));
+    if (dmg && hurt > 0) drawAt(g, dmg, p.x, cy, hx, hy, k, lean, hurt);
     for (const mod of w.assembly.modules) {
       const mount = w.weapons.mounts.find((x) => x.module === mod);
       const art = sprite(`weapon_${mod.weapon.id}`);

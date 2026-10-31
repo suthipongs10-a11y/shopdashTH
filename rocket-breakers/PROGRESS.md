@@ -33,6 +33,10 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 ## Done (2026-10-31, BATCH_002 art)
 - 12 power-up icons integrated (world pickups + HUD buff chips). QA: `art/source/batch_002/QA_REPORT.md`.
 
+## Done (2026-10-31, BATCH_003 art)
+- Scout + shield barge art (colliders resized to match), SPARROW banking frames, hull and boss damage overlays.
+  E02/E04/T001/T006 imported as approved (not used in the slice yet). QA: `art/source/batch_003/QA_REPORT.md`.
+
 ## Verification
 - `npm test` → **56 passed** (adds body-contact tests): catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
   dash, fire rate/Overdrive, heat lock, fitting errors, salvage transitions, 35% vs 34.99%, sever+core-death,
@@ -45,7 +49,7 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 ## Known issues / not done
 - **No human playtest yet** — feel, difficulty and touch comfort unverified; bot runs are invulnerable.
 - Mission pacing is short (~40 s for a bot); spec targets 5–7 min boss missions → tune after playtests.
-- Enemies (E01/E03), backgrounds and HUD icons are still coded placeholders (BATCH_003+ pending).
+- Backgrounds, effects and HUD icons are still coded/placeholder (BATCH_004+ pending).
 - PU03/PU04/PU10/PU11, XP run upgrades, stars, hangar/fabrication, other 47 missions: not started (M2+).
 - Hold swap UI (replace an installed module at the dock) not built; stow/scrap/fit only.
 - No mid-run save/resume; Story/Veteran difficulty not implemented.

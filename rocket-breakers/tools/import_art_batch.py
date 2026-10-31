@@ -32,7 +32,17 @@ RULES = {
     "weapon_W001": (128, "socket_bottom", None),
     "weapon_W008": (160, "socket_bottom", None),
     "weapon_W022": (160, "socket_bottom", None),
-    "boss_B02_core": (760, "center", None),
+    "hull_H01_lean_left": (320, "center", "hull_H01"),
+    "hull_H01_lean_right": (320, "center", "hull_H01"),
+    "hull_H01_damage_overlay": (320, "center", "hull_H01"),
+    "boss_B02_core": (760, "center", "boss_B02_core"),
+    "boss_B02_damage_overlay": (760, "center", "boss_B02_core"),
+    "enemy_E01": (160, "center", None),
+    "enemy_E02": (160, "center", None),
+    "enemy_E03": (220, "center", None),
+    "enemy_E04": (220, "center", None),
+    "utility_T001": (128, "socket_bottom", None),
+    "utility_T006": (128, "socket_bottom", None),
     "boss_B02_joint": (160, "center", None),
     "boss_B02_armor": (180, "center", None),
     "boss_B02_signature_mount": (420, "socket_bottom", None),
@@ -57,7 +67,7 @@ def clean(im):
     return Image.merge("RGBA", (r, g, b, a))
 
 
-def main(delivery: Path, batch: str):
+def main(delivery: Path, batch: str, approved_only=frozenset()):
     manifest = json.loads((delivery / "delivery_manifest.json").read_text(encoding="utf-8"))
     src_dir = ROOT / "art/source" / batch.lower()
     src_dir.mkdir(parents=True, exist_ok=True)
@@ -75,6 +85,14 @@ def main(delivery: Path, batch: str):
         bb = visible_bbox(Image.open(delivery / fname(f)).convert("RGBA"))
         g = groups.setdefault(rule[2], list(bb))
         groups[rule[2]] = [min(g[0], bb[0]), min(g[1], bb[1]), max(g[2], bb[2]), max(g[3], bb[3])]
+    # Overlays/states delivered after their base reuse the base's existing crop so
+    # they stay pixel-registered with the sprite already in the game.
+    fixed = {}
+    for aid in files:
+        group = RULES.get(aid, (0, 0, None))[2]
+        sc = SPRITES / f"{group}.json"
+        if group and group not in files and sc.exists():
+            fixed[group] = tuple(json.loads(sc.read_text(encoding="utf-8"))["trim_rect"])
     imported = {}
     for aid, f in files.items():
         if aid not in RULES:
@@ -89,7 +107,9 @@ def main(delivery: Path, batch: str):
         own = visible_bbox(im)
         bb = groups[group] if group else own
         W, H = im.size
-        crop = (max(0, bb[0] - PAD), max(0, bb[1] - PAD), min(W, bb[2] + PAD), min(H, bb[3] + PAD))
+        crop = fixed.get(group) or (max(0, bb[0] - PAD), max(0, bb[1] - PAD), min(W, bb[2] + PAD), min(H, bb[3] + PAD))
+        if group in fixed and not (own[0] >= crop[0] and own[1] >= crop[1] and own[2] <= crop[2] and own[3] <= crop[3]):
+            print(f"warning {aid}: visible area extends past the shared crop of {group}")
         cut = im.crop(crop)
         k = size / max(cut.size)
         out = cut.convert("RGBa").resize((max(1, round(cut.width * k)), max(1, round(cut.height * k))), Image.LANCZOS).convert("RGBA")
@@ -107,7 +127,8 @@ def main(delivery: Path, batch: str):
             "visible_rect": [round(v, 1) for v in vis], "pivot_px": [round(pivot[0], 1), round(pivot[1], 1)],
             "attachment_anchors": anchors, "blend_mode": f.get("blend", "alpha"), "color_space": "sRGB",
             "provenance": f"{manifest.get('generator', 'ChatGPT imagegen')} via owner, {batch}",
-            "status": "integrated", "notes": "anchors estimated from visible bounds; verified visually in the web build",
+            "status": "approved" if aid in approved_only else "integrated",
+            "notes": "anchors estimated from visible bounds; " + ("approved, not used by the current build yet" if aid in approved_only else "verified visually in the web build"),
         }
         (ROOT / f"assets/sprites/{aid}.json").write_text(json.dumps(sidecar, indent=2), encoding="utf-8")
         imported[aid] = rel
@@ -128,15 +149,16 @@ def main(delivery: Path, batch: str):
     for r in rows:
         r.setdefault("runtime_path", "")
         if r["asset_id"] in imported:
-            r["status"] = "integrated"
+            r["status"] = "approved" if r["asset_id"] in approved_only else "integrated"
             r["runtime_path"] = imported[r["asset_id"]]
             r["provenance"] = f"ChatGPT imagegen via owner ({batch}); source in art/source/{batch.lower()}"
     with mpath.open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
-    print(f"manifest updated: {len(imported)} rows integrated")
+    print(f"manifest updated: {len(imported) - len(approved_only & set(imported))} integrated, {len(approved_only & set(imported))} approved")
 
 
 if __name__ == "__main__":
-    main(Path(sys.argv[1]), sys.argv[2])
+    # optional 3rd arg: comma-separated ids imported but not yet used in the build (status "approved")
+    main(Path(sys.argv[1]), sys.argv[2], frozenset(sys.argv[3].split(",")) if len(sys.argv) > 3 else frozenset())

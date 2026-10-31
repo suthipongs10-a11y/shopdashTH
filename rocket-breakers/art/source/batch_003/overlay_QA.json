@@ -1,0 +1,26 @@
+[
+  {
+    "file": "rb_hull_h01_damage_overlay_000.png",
+    "actual_canvas": [
+      1254,
+      1254
+    ],
+    "alpha_gt16_coverage": 0.0564,
+    "transparent_fraction": 0.8518,
+    "same_canvas_as_reference": true,
+    "registration_status": "needs in-engine check; coverage is not exact registration",
+    "visible_overlay_outside_body_fraction": 0.0041
+  },
+  {
+    "file": "rb_boss_b02_damage_overlay_000.png",
+    "actual_canvas": [
+      1254,
+      1254
+    ],
+    "alpha_gt16_coverage": 0.1111,
+    "transparent_fraction": 0.7329,
+    "same_canvas_as_reference": true,
+    "registration_status": "needs in-engine check; coverage is not exact registration",
+    "visible_overlay_outside_body_fraction": 0.0317
+  }
+]

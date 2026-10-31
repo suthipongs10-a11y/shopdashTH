@@ -1,0 +1,239 @@
+{
+  "batch": "BATCH_003",
+  "source_url": "https://github.com/suthipongs10-a11y/shopdashTH/raw/claude/stoic-feynman-gzeg3r/rocket-breakers/art/requests/batch_zips/RB_BATCH_003_REQUEST.zip",
+  "source_zip_sha256": "4f5ef64d82f6f8a0c37579a5277ce73b067bcdf6ba5b82f9209394030f92269e",
+  "files": [
+    {
+      "asset_id": "enemy_E01",
+      "file": "rb_enemy_e01_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.8495,
+      "visible_bbox_alpha_gt16": [
+        274,
+        160,
+        980,
+        1033
+      ],
+      "sha256": "217deee2c64e0a499966f23c4cd1cab4cd9df426450cc4bd52108c4fa323d390",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "enemy_E03",
+      "file": "rb_enemy_e03_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.5692,
+      "visible_bbox_alpha_gt16": [
+        124,
+        104,
+        1131,
+        1120
+      ],
+      "sha256": "c47ea81646b3e77b669718cd2b6acf747cd7749d230870bde5369d6433565f93",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "hull_H01_lean_left",
+      "file": "rb_hull_h01_lean_left_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.7443,
+      "visible_bbox_alpha_gt16": [
+        205,
+        144,
+        1111,
+        1080
+      ],
+      "sha256": "f6413234c30c3ba94a472ad9373bf5a9678cb75ceeb94e5fd5403e5787ec3808",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "hull_H01_lean_right",
+      "file": "rb_hull_h01_lean_right_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.7364,
+      "visible_bbox_alpha_gt16": [
+        134,
+        145,
+        1110,
+        1073
+      ],
+      "sha256": "cbb64410351eae7bfed45b39f8c08378fcfac4642bbb453f627286ada88dab57",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "hull_H01_damage_overlay",
+      "file": "rb_hull_h01_damage_overlay_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.8518,
+      "visible_bbox_alpha_gt16": [
+        138,
+        159,
+        1119,
+        1071
+      ],
+      "sha256": "6fb0f281dd3c09fb79038e91db010662f6e131292f37bcb261761a3a657809be",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "boss_B02_damage_overlay",
+      "file": "rb_boss_b02_damage_overlay_000.png",
+      "requested_canvas": "1024x1024",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "transparent_fraction": 0.7329,
+      "visible_bbox_alpha_gt16": [
+        82,
+        160,
+        1174,
+        1112
+      ],
+      "sha256": "b3ca9d7e7d19922ebd4a385db0152c5e5219a5656b4fc25d697a836ba2e36d91",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "utility_T001",
+      "file": "rb_utility_t001_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.6953,
+      "visible_bbox_alpha_gt16": [
+        201,
+        244,
+        1052,
+        1024
+      ],
+      "sha256": "6ea5997a5e8fb7f9d814979ab0a6b95dad333ac6ff3aa3a4f3902c3df775bc0b",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "utility_T006",
+      "file": "rb_utility_t006_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.7782,
+      "visible_bbox_alpha_gt16": [
+        313,
+        250,
+        942,
+        997
+      ],
+      "sha256": "13b75f25df1defbd3818061a5199700a5b89048d9b122f16bc63691b22c5ce08",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "enemy_E02",
+      "file": "rb_enemy_e02_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.8004,
+      "visible_bbox_alpha_gt16": [
+        202,
+        95,
+        1052,
+        1126
+      ],
+      "sha256": "92fa6330ace214bf623a77898ea4df0b61c5f1ee083b0ae9fc9a81dc230f9753",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    },
+    {
+      "asset_id": "enemy_E04",
+      "file": "rb_enemy_e04_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_fraction": 0.6329,
+      "visible_bbox_alpha_gt16": [
+        71,
+        237,
+        1183,
+        1034
+      ],
+      "sha256": "61e0222a09f01aba32caa9dda7f4138f708cef2609a537f930efd2058ba38eb4",
+      "pivot_status": "center requested; not verified in engine",
+      "status": "generated_awaiting_engine_QA"
+    }
+  ],
+  "engine_tested": false,
+  "generator": "ChatGPT built-in imagegen"
+}

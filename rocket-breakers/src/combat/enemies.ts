@@ -43,7 +43,7 @@ function base(id: string, row: EnemyRow, role: Enemy["role"], pos: Vec, tag: str
 export function makeScout(id: string, row: EnemyRow, index: number, fromRight: boolean, tag: string, hpMul = 1): Enemy {
   const dir = fromRight ? -1 : 1;
   const e = base(id, row, "scout", { x: fromRight ? 770 + index * 55 : -50 - index * 55, y: 170 + index * 42 }, tag, index, dir);
-  e.parts = [makePart({ id: "core", kind: "core", shape: { type: "circle", r: 17 }, hp: row.base_hp * hpMul, selectable: true })];
+  e.parts = [makePart({ id: "core", kind: "core", shape: { type: "circle", r: 20 }, hp: row.base_hp * hpMul, selectable: true })];
   return e;
 }
 
@@ -52,11 +52,12 @@ export function makeBarge(id: string, row: EnemyRow, index: number, fromLeft: bo
   const e = base(id, row, "shield", { x: fromLeft ? -70 : 790, y: 300 + index * 110 }, tag, index, dir);
   e.charge = 3; e.credits = 15; e.scrap = 3; e.score = 300;
   e.parts = [
-    makePart({ id: "core", kind: "core", shape: { type: "rect", hw: 40, hh: 20 }, hp: 100 * hpMul, selectable: true }),
+    // Sized to the BATCH_003 E03 art (about 104 px square when drawn).
+    makePart({ id: "core", kind: "core", shape: { type: "rect", hw: 42, hh: 34 }, hp: 100 * hpMul, selectable: true }),
     // Frontal shield plate faces the player (down the screen).
-    makePart({ id: "shield", kind: "armor", shape: { type: "rect", hw: 44, hh: 6 }, offset: { x: 0, y: 27 }, hp: 50 }),
+    makePart({ id: "shield", kind: "armor", shape: { type: "rect", hw: 40, hh: 6 }, offset: { x: 0, y: 41 }, hp: 50 }),
     // Exposed rear-side joint: breaking it disables the shield (ATTACK_LIBRARY).
-    makePart({ id: "joint", kind: "joint", shape: { type: "circle", r: 11 }, offset: { x: 52 * dir * -1, y: -12 }, hp: 30, selectable: true }),
+    makePart({ id: "joint", kind: "joint", shape: { type: "circle", r: 11 }, offset: { x: 54 * dir * -1, y: -30 }, hp: 30, selectable: true }),
   ];
   return e;
 }

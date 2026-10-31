@@ -1,0 +1,36 @@
+{
+  "asset_id": "utility_T006",
+  "source_filename": "art/source/batch_003/rb_utility_t006_000.png",
+  "source_sha256": "13b75f25df1defbd3818061a5199700a5b89048d9b122f16bc63691b22c5ce08",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    305,
+    240,
+    952,
+    1006
+  ],
+  "runtime_size": [
+    108,
+    128
+  ],
+  "scale": 0.1671,
+  "visible_rect": [
+    1.3,
+    1.3,
+    106.8,
+    126.7
+  ],
+  "pivot_px": [
+    54.0,
+    126.7
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_003",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}
