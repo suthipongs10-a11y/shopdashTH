@@ -1,0 +1,34 @@
+{
+  "created": "2026-10-31",
+  "purpose": "concept_reference_only",
+  "files": [
+    {
+      "path": "art/concepts/salvage_sequence.png",
+      "sha256": "1dbbd60454b3f4fdf1d433c3f3ccf5e485f197c743d23d936bd5406ca59ba212",
+      "generator": "ChatGPT built-in imagegen",
+      "status": "generated_unchecked",
+      "source_file": "exec-f9b375bb-1895-478f-8ec5-46434c2bf5ea.png"
+    },
+    {
+      "path": "art/concepts/modular_ships.png",
+      "sha256": "aa8ac7a2fcc0816be3e09984e88a11cff3f67fe3ff3638d83ce829115c0d6d59",
+      "generator": "ChatGPT built-in imagegen",
+      "status": "generated_unchecked",
+      "source_file": "exec-f63530e2-4f1a-4258-930d-e2fea6277e7f.png"
+    },
+    {
+      "path": "art/concepts/galaxy_map.png",
+      "sha256": "1ab7d11bd32548bfb04af579194aff2d37448d97952d1ee857d37d9e0872811d",
+      "generator": "ChatGPT built-in imagegen",
+      "status": "generated_unchecked",
+      "source_file": "exec-4082c703-e1c0-4efe-b846-1ee22ca85a5d.png"
+    },
+    {
+      "path": "art/concepts/vfx_concepts.png",
+      "sha256": "c3b940617cd5453e919b81102e004b08a8a974fe7fa3b227b7b149dd837697c0",
+      "generator": "ChatGPT built-in imagegen",
+      "status": "generated_unchecked",
+      "source_file": "exec-99f11bf7-585c-4a28-b04c-1805847b1314.png"
+    }
+  ]
+}
