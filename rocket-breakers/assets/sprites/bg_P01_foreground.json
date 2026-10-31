@@ -1,0 +1,36 @@
+{
+  "asset_id": "bg_P01_foreground",
+  "source_filename": "art/source/batch_004/rb_bg_p01_foreground_000.png",
+  "source_sha256": "c1e585f55c5ee0525e069572f055b5c32d35c99c1490516a310c5f57a694ace4",
+  "canvas_size": [
+    1086,
+    1448
+  ],
+  "trim_rect": [
+    5,
+    100,
+    1081,
+    1343
+  ],
+  "runtime_size": [
+    1108,
+    1280
+  ],
+  "scale": 1.02977,
+  "visible_rect": [
+    8.2,
+    8.2,
+    1099.8,
+    1271.8
+  ],
+  "pivot_px": [
+    554.0,
+    640.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

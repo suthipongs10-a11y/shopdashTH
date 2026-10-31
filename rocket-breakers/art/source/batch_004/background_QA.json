@@ -1,0 +1,62 @@
+[
+  {
+    "file": "rb_bg_p01_far_000.png",
+    "actual_canvas": [
+      1086,
+      1448
+    ],
+    "top_bottom_rgb_MAE": 0.4782,
+    "top_bottom_exact_rgba_match": false,
+    "top_alpha_max": 255,
+    "bottom_alpha_max": 255,
+    "left_alpha_max": 255,
+    "right_alpha_max": 255,
+    "visible_bbox_alpha_gt16": [
+      0,
+      0,
+      1086,
+      1448
+    ],
+    "seam_status": "boundary difference; needs runtime seam blend or import preparation"
+  },
+  {
+    "file": "rb_bg_p01_foreground_000.png",
+    "actual_canvas": [
+      1086,
+      1448
+    ],
+    "top_bottom_rgb_MAE": 0.0,
+    "top_bottom_exact_rgba_match": true,
+    "top_alpha_max": 0,
+    "bottom_alpha_max": 0,
+    "left_alpha_max": 1,
+    "right_alpha_max": 0,
+    "visible_bbox_alpha_gt16": [
+      15,
+      108,
+      1072,
+      1335
+    ],
+    "seam_status": "exact rows match; visual runtime test pending"
+  },
+  {
+    "file": "rb_bg_p01_mid_000.png",
+    "actual_canvas": [
+      1087,
+      1447
+    ],
+    "top_bottom_rgb_MAE": 0.0,
+    "top_bottom_exact_rgba_match": false,
+    "top_alpha_max": 0,
+    "bottom_alpha_max": 1,
+    "left_alpha_max": 0,
+    "right_alpha_max": 0,
+    "visible_bbox_alpha_gt16": [
+      38,
+      117,
+      1054,
+      1348
+    ],
+    "seam_status": "boundary difference; needs runtime seam blend or import preparation"
+  }
+]

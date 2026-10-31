@@ -1,0 +1,11 @@
+{
+  "id": "fx_explosion_small",
+  "frame": 11,
+  "filename": "rb_fx_explosion_small_011.png",
+  "requested_canvas": "512x512",
+  "prompt": "Original game VFX texture: small ship explosion: bright core, orange fire, small metal debris. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+  "delivery_mode": "keyframes_only_as_permitted",
+  "actual_prompt": "Original game VFX texture: small ship explosion: bright core, orange fire, small metal debris. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nSpecific delivery instructions: ONE static keyframe only, not sheet or storyboard. SQUARE512x512or closest square, use exact same square canvas and center pivot as previous keyframe. END keyframe: effect nearly extinguished, no bright core, only a very faint dispersed trace/smoke and2–4dim tiny embers. Most of canvas completely transparent. Preserve center and same canvas; this is fading END, not a second bright burst. No ships, weapon parts, symbols, labels, interface or opaque background. For joint-break only sparks/chips, not a giant hinge or full firearm. For detach burst use abstract cyan bracket-like flash, no literal letters or UI frame. For shield ripple show local cyan hex patch, not entire ship. All glow fully within canvas with wide transparent padding.",
+  "reference": "/workspace/scratch/160b59ef5d6f/generated_images/exec-595c01c7-af06-4256-8056-179521c170e0.png",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-cc9ef680-9987-43f7-a434-ebf6c2f51056.png"
+}

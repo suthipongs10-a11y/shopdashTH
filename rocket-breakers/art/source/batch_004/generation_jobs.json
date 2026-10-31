@@ -1,0 +1,146 @@
+[
+  {
+    "id": "bg_P01_far",
+    "frame": 0,
+    "filename": "rb_bg_p01_far_000.png",
+    "requested_canvas": "1536x2048",
+    "prompt": "Original vertical-scrolling shoot-em-up background, portrait 1536x2048: Graveyard Belt: navy and teal space full of drifting shipwrecks and broken hull plates. FAR layer: deep space backdrop, nebula and distant planet, very low contrast and saturation so bullets stay readable. Top edge and bottom edge must tile seamlessly when stacked vertically. No ships, no characters, no bullets, no text, no UI. Background: fully opaque painted image that fills the whole canvas edge to edge.",
+    "delivery_mode": "single_layer"
+  },
+  {
+    "id": "bg_P01_mid",
+    "frame": 0,
+    "filename": "rb_bg_p01_mid_000.png",
+    "requested_canvas": "1536x2048",
+    "prompt": "Original vertical-scrolling shoot-em-up background, portrait 1536x2048: Graveyard Belt: navy and teal space full of drifting shipwrecks and broken hull plates. MID layer: mid-distance silhouettes and structures, low contrast, mostly transparent. Top edge and bottom edge must tile seamlessly when stacked vertically. No ships, no characters, no bullets, no text, no UI. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge. This is a parallax overlay layer: only foreground elements, the rest fully transparent.",
+    "delivery_mode": "single_layer"
+  },
+  {
+    "id": "bg_P01_foreground",
+    "frame": 0,
+    "filename": "rb_bg_p01_foreground_000.png",
+    "requested_canvas": "1536x2048",
+    "prompt": "Original vertical-scrolling shoot-em-up background, portrait 1536x2048: Graveyard Belt: navy and teal space full of drifting shipwrecks and broken hull plates. FOREGROUND layer: a few close debris pieces near the left and right edges only, centre clear. Top edge and bottom edge must tile seamlessly when stacked vertically. No ships, no characters, no bullets, no text, no UI. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge. This is a parallax overlay layer: only foreground elements, the rest fully transparent.",
+    "delivery_mode": "single_layer"
+  },
+  {
+    "id": "fx_explosion_small",
+    "frame": 0,
+    "filename": "rb_fx_explosion_small_000.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: small ship explosion: bright core, orange fire, small metal debris. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_explosion_small",
+    "frame": 6,
+    "filename": "rb_fx_explosion_small_006.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: small ship explosion: bright core, orange fire, small metal debris. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_explosion_small",
+    "frame": 11,
+    "filename": "rb_fx_explosion_small_011.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: small ship explosion: bright core, orange fire, small metal debris. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_impact_spark",
+    "frame": 0,
+    "filename": "rb_fx_impact_spark_000.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: kinetic impact: gold-white sparks burst. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_impact_spark",
+    "frame": 4,
+    "filename": "rb_fx_impact_spark_004.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: kinetic impact: gold-white sparks burst. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_impact_spark",
+    "frame": 7,
+    "filename": "rb_fx_impact_spark_007.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: kinetic impact: gold-white sparks burst. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_joint_break",
+    "frame": 0,
+    "filename": "rb_fx_joint_break_000.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: joint break: gold ring sparks and metal chips (no big flame). Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_joint_break",
+    "frame": 4,
+    "filename": "rb_fx_joint_break_004.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: joint break: gold ring sparks and metal chips (no big flame). Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_joint_break",
+    "frame": 7,
+    "filename": "rb_fx_joint_break_007.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: joint break: gold ring sparks and metal chips (no big flame). Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_detach_burst",
+    "frame": 0,
+    "filename": "rb_fx_detach_burst_000.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: detach burst: cyan bracket flash and small chips as a part breaks free. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_detach_burst",
+    "frame": 4,
+    "filename": "rb_fx_detach_burst_004.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: detach burst: cyan bracket flash and small chips as a part breaks free. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_detach_burst",
+    "frame": 7,
+    "filename": "rb_fx_detach_burst_007.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: detach burst: cyan bracket flash and small chips as a part breaks free. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_shield_hit",
+    "frame": 0,
+    "filename": "rb_fx_shield_hit_000.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: shield hit: localized cyan hex ripple. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_shield_hit",
+    "frame": 4,
+    "filename": "rb_fx_shield_hit_004.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: shield hit: localized cyan hex ripple. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  },
+  {
+    "id": "fx_shield_hit",
+    "frame": 7,
+    "filename": "rb_fx_shield_hit_007.png",
+    "requested_canvas": "512x512",
+    "prompt": "Original game VFX texture: shield hit: localized cyan hex ripple. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+    "delivery_mode": "keyframes_only_as_permitted"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "id": "fx_joint_break",
+  "frame": 7,
+  "filename": "rb_fx_joint_break_007.png",
+  "requested_canvas": "512x512",
+  "prompt": "Original game VFX texture: joint break: gold ring sparks and metal chips (no big flame). Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+  "delivery_mode": "keyframes_only_as_permitted",
+  "actual_prompt": "Original game VFX texture: joint break: gold ring sparks and metal chips (no big flame). Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.\nSpecific delivery instructions: ONE static keyframe only, not sheet or storyboard. SQUARE512x512or closest square, use exact same square canvas and center pivot as previous keyframe. END keyframe: effect nearly extinguished, no bright core, only a very faint dispersed trace/smoke and2–4dim tiny embers. Most of canvas completely transparent. Preserve center and same canvas; this is fading END, not a second bright burst. No ships, weapon parts, symbols, labels, interface or opaque background. For joint-break only sparks/chips, not a giant hinge or full firearm. For detach burst use abstract cyan bracket-like flash, no literal letters or UI frame. For shield ripple show local cyan hex patch, not entire ship. All glow fully within canvas with wide transparent padding.",
+  "reference": "/workspace/scratch/160b59ef5d6f/generated_images/exec-c199c87f-4adf-4c51-a21b-e19132968806.png",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-7553bfa8-20eb-4235-ac02-63837d2bafe7.png"
+}

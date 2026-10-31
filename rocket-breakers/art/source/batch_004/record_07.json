@@ -1,0 +1,11 @@
+{
+  "id": "fx_impact_spark",
+  "frame": 0,
+  "filename": "rb_fx_impact_spark_000.png",
+  "requested_canvas": "512x512",
+  "prompt": "Original game VFX texture: kinetic impact: gold-white sparks burst. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.",
+  "delivery_mode": "keyframes_only_as_permitted",
+  "actual_prompt": "Original game VFX texture: kinetic impact: gold-white sparks burst. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.\nSpecific delivery instructions: ONE static keyframe only, not sheet or storyboard. SQUARE512x512or closest square, use exact same square canvas and center pivot as previous keyframe. START keyframe: very small nascent impact at exact canvas center, visual radius only10–15%of square, weak surrounding sparks, not full-size explosion. No ships, weapon parts, symbols, labels, interface or opaque background. For joint-break only sparks/chips, not a giant hinge or full firearm. For detach burst use abstract cyan bracket-like flash, no literal letters or UI frame. For shield ripple show local cyan hex patch, not entire ship. All glow fully within canvas with wide transparent padding.",
+  "reference": "/workspace/scratch/160b59ef5d6f/RB_BATCH_004_SOURCE/RB_BATCH_004_REQUEST/references/vfx_concepts.jpg",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-8d837bec-4bcd-4856-9c63-51e329c487ac.png"
+}

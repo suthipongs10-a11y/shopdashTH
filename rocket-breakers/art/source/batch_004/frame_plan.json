@@ -1,0 +1,127 @@
+{
+  "mode": "permitted_keyframes_only",
+  "full_requested_png_count": 47,
+  "delivered_png_count": 18,
+  "missing_animation_frames": 29,
+  "effects": [
+    {
+      "asset_id": "fx_explosion_small",
+      "requested_frame_count": 12,
+      "delivered_frames": [
+        0,
+        6,
+        11
+      ],
+      "missing_frames": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10
+      ],
+      "normalized_key_times": [
+        0.0,
+        0.5455,
+        1.0
+      ],
+      "runtime_option": "crossfade key textures plus procedural particles, or request missing frames; not a validated full flipbook",
+      "fade_to_zero_at_end": true
+    },
+    {
+      "asset_id": "fx_impact_spark",
+      "requested_frame_count": 8,
+      "delivered_frames": [
+        0,
+        4,
+        7
+      ],
+      "missing_frames": [
+        1,
+        2,
+        3,
+        5,
+        6
+      ],
+      "normalized_key_times": [
+        0.0,
+        0.5714,
+        1.0
+      ],
+      "runtime_option": "crossfade key textures plus procedural particles, or request missing frames; not a validated full flipbook",
+      "fade_to_zero_at_end": true
+    },
+    {
+      "asset_id": "fx_joint_break",
+      "requested_frame_count": 8,
+      "delivered_frames": [
+        0,
+        4,
+        7
+      ],
+      "missing_frames": [
+        1,
+        2,
+        3,
+        5,
+        6
+      ],
+      "normalized_key_times": [
+        0.0,
+        0.5714,
+        1.0
+      ],
+      "runtime_option": "crossfade key textures plus procedural particles, or request missing frames; not a validated full flipbook",
+      "fade_to_zero_at_end": true
+    },
+    {
+      "asset_id": "fx_detach_burst",
+      "requested_frame_count": 8,
+      "delivered_frames": [
+        0,
+        4,
+        7
+      ],
+      "missing_frames": [
+        1,
+        2,
+        3,
+        5,
+        6
+      ],
+      "normalized_key_times": [
+        0.0,
+        0.5714,
+        1.0
+      ],
+      "runtime_option": "crossfade key textures plus procedural particles, or request missing frames; not a validated full flipbook",
+      "fade_to_zero_at_end": true
+    },
+    {
+      "asset_id": "fx_shield_hit",
+      "requested_frame_count": 8,
+      "delivered_frames": [
+        0,
+        4,
+        7
+      ],
+      "missing_frames": [
+        1,
+        2,
+        3,
+        5,
+        6
+      ],
+      "normalized_key_times": [
+        0.0,
+        0.5714,
+        1.0
+      ],
+      "runtime_option": "crossfade key textures plus procedural particles, or request missing frames; not a validated full flipbook",
+      "fade_to_zero_at_end": true
+    }
+  ]
+}

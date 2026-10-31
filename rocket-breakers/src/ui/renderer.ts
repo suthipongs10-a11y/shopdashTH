@@ -41,6 +41,7 @@ const MODULE_COLOR: Record<string, string> = { W001: "#c9a43a", W008: "#2aa7c0",
 interface Spark { p: Vec; v: Vec; life: number; max: number; color: string; size: number }
 interface Ring { p: Vec; r: number; grow: number; life: number; max: number; color: string; width: number }
 interface Card { img: HTMLImageElement; p: Vec; r0: number; r1: number; life: number; max: number; rot: number; large: boolean; alpha: number }
+interface KeyAnim { id: string; keys: number[]; frames: number[]; p: Vec; size: number; life: number; max: number; rot: number }
 interface FloatText { p: Vec; text: string; color: string; life: number }
 
 export interface RenderSettings { shake: number; flash: number; photosensitive: boolean }
@@ -50,6 +51,7 @@ export class Renderer {
   private sparks: Spark[] = [];
   private rings: Ring[] = [];
   private cards: Card[] = [];
+  private anims: KeyAnim[] = [];
   private texts: FloatText[] = [];
   private shake = 0;
   private flashA = 0;
@@ -84,6 +86,14 @@ export class Renderer {
       if (large && this.cards.filter((c) => c.large).length >= 2) return;
       this.cards.push({ img, p: { ...e.pos }, r0: r1 * 0.2, r1, life, max: life, rot: this.rand() * Math.PI * 2, large, alpha });
     };
+    // Delivered keyframes (start / middle / end) cross-faded over the effect's life.
+    const anim = (id: string, frames: number[], keys: number[], size: number, life: number, cap = 24) => {
+      if (!sprite(`${id}_${String(frames[0]).padStart(3, "0")}`)) return false;
+      if (this.anims.filter((a) => a.id === id).length >= cap) return true;
+      this.anims.push({ id, keys, frames, p: { ...e.pos }, size, life, max: life, rot: this.rand() * Math.PI * 2 });
+      return true;
+    };
+    const K8 = [0, 4 / 7, 1], K12 = [0, 6 / 11, 1];
     const text = (label: string, color: string) => {
       const same = this.texts.find((x) => x.text === label);
       if (same) { same.life = 1.1; return; } // combine duplicates
@@ -91,15 +101,18 @@ export class Renderer {
       this.texts.push({ p: { x: e.pos.x, y: e.pos.y - 30 }, text: label, color, life: 1.1 });
     };
     switch (e.type) {
-      case "hit": burst(3, e.tag === "cargo" ? C.amber : C.gold, 160, 2); break;
+      case "hit":
+        if (e.tag === "cargo" || !anim("fx_impact_spark", [0, 4, 7], K8, 44, 0.18, 14)) burst(3, e.tag === "cargo" ? C.amber : C.gold, 160, 2);
+        break;
       case "deflect": burst(3, C.dim, 140, 2); break;
       case "kill":
         burst(e.tag === "boss" ? 60 : 18, C.orange, 260, 3); ring(10, 260, C.orange, 0.4);
-        if (e.tag === "shield") card(TEX.explosion, 170 / 2, 0.55, true); else card(TEX.explosion, 70 / 2 + 10, 0.3, false);
+        if (e.tag === "shield") { card(TEX.explosion, 170 / 2, 0.55, true); anim("fx_explosion_small", [0, 6, 11], K12, 170, 0.5); }
+        else if (!anim("fx_explosion_small", [0, 6, 11], K12, 120, 0.45)) card(TEX.explosion, 70 / 2 + 10, 0.3, false);
         this.addShake(e.tag === "shield" ? 4 : 2, s); break;
       case "blast": ring(8, (e.value ?? 45) * 3, C.violet, 0.3, 4); burst(10, C.violet, 200); break;
-      case "joint_break": burst(22, C.gold, 300, 3); ring(6, 180, C.gold, 0.3, 4); this.addShake(3, s); break;
-      case "sever": burst(30, C.cyan, 320, 3); ring(10, 240, C.cyan, 0.5, 5); this.addShake(6, s); this.addFlash(0.25, s); break;
+      case "joint_break": anim("fx_joint_break", [0, 4, 7], K8, 110, 0.32); burst(14, C.gold, 300, 3); ring(6, 180, C.gold, 0.3, 4); this.addShake(3, s); break;
+      case "sever": anim("fx_detach_burst", [0, 4, 7], K8, 150, 0.34); burst(20, C.cyan, 320, 3); ring(10, 240, C.cyan, 0.5, 5); this.addShake(6, s); this.addFlash(0.25, s); break;
       case "scrap": burst(16, C.dim, 200, 3); break;
       case "secured": ring(20, 200, C.cyan, 0.6, 5); burst(24, C.cyan, 220); break;
       case "tractor_lock": ring(30, -40, C.cyan, 0.4, 3); break;
@@ -134,6 +147,8 @@ export class Renderer {
     this.sparks = this.sparks.filter((p) => p.life > 0);
     for (const r of this.rings) { r.r += r.grow * dt; r.life -= dt; }
     this.rings = this.rings.filter((r) => r.life > 0 && r.r > 0);
+    for (const a of this.anims) a.life -= dt;
+    this.anims = this.anims.filter((a) => a.life > 0);
     for (const c of this.cards) c.life -= dt;
     this.cards = this.cards.filter((c) => c.life > 0);
     for (const x of this.texts) { x.life -= dt; x.p.y -= 40 * dt; }
@@ -160,6 +175,17 @@ export class Renderer {
       g.globalAlpha = Math.max(0, r.life / r.max);
       g.strokeStyle = r.color; g.lineWidth = r.width;
       g.beginPath(); g.arc(r.p.x, r.p.y, r.r, 0, Math.PI * 2); g.stroke();
+    }
+    for (const a of this.anims) {
+      const t = 1 - a.life / a.max;
+      const seg = t < a.keys[1] ? 0 : 1;
+      const u = (t - a.keys[seg]) / (a.keys[seg + 1] - a.keys[seg]);
+      const fade = t > 0.8 ? (1 - t) / 0.2 : 1;
+      const scale = 0.9 + 0.2 * t;
+      for (const [fi, w8] of [[seg, 1 - u], [seg + 1, u]] as const) {
+        const sp = sprite(`${a.id}_${String(a.frames[fi]).padStart(3, "0")}`);
+        if (sp && w8 > 0.01) drawAt(g, sp, a.p.x, a.p.y, ...visCenter(sp), (a.size * scale) / Math.max(visW(sp), visH(sp)), a.rot, w8 * fade);
+      }
     }
     for (const c of this.cards) {
       const k = 1 - c.life / c.max;
@@ -193,7 +219,29 @@ export class Renderer {
     if (this.flashA > 0) { g.fillStyle = `rgba(255,255,255,${this.flashA})`; g.fillRect(0, 0, 720, 1280); }
   }
 
+  // BATCH_004 Graveyard Belt layers: far (opaque, tileable copy), mid and foreground
+  // (transparent edge wrecks) scroll at different speeds. All stay behind actors.
+  private drawBackgroundArt(): boolean {
+    const far = sprite("bg_P01_far");
+    if (!far) return false;
+    const g = this.ctx;
+    const layer = (id: string, speed: number, alpha: number) => {
+      const sp = sprite(id);
+      if (!sp) return;
+      const [w, h] = sp.meta.runtime_size;
+      const k = 720 / w, th = h * k;
+      const off = (this.time * speed) % th;
+      for (let y = off - th; y < 1300; y += th) drawAt(g, sp, 0, y, 0, 0, k, 0, alpha);
+    };
+    g.fillStyle = C.bg; g.fillRect(-20, -20, 760, 1320);
+    layer("bg_P01_far", 10, 1);
+    layer("bg_P01_mid", 26, 0.9);
+    layer("bg_P01_foreground", 52, 0.8);
+    return true;
+  }
+
   private drawBackground(): void {
+    if (this.drawBackgroundArt()) return;
     const g = this.ctx;
     g.fillStyle = C.bg; g.fillRect(-20, -20, 760, 1320);
     const grd = g.createRadialGradient(540, 300, 20, 540, 300, 520);

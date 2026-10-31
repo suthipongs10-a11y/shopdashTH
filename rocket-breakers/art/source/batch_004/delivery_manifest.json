@@ -1,0 +1,441 @@
+{
+  "batch": "BATCH_004",
+  "source_url": "https://github.com/suthipongs10-a11y/shopdashTH/blob/claude/stoic-feynman-gzeg3r/rocket-breakers/art/requests/batch_zips/RB_BATCH_004_REQUEST.zip",
+  "source_zip_sha256": "d5d30c23d26a5e836af57fa9e56430dd4865b65a3c01a79d46dbe8ff9c779171",
+  "generator": "ChatGPT built-in imagegen",
+  "engine_tested": false,
+  "files": [
+    {
+      "asset_id": "bg_P01_far",
+      "frame": 0,
+      "filename": "rb_bg_p01_far_000.png",
+      "requested_canvas": "1536x2048",
+      "actual_canvas": [
+        1086,
+        1448
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        0,
+        0,
+        1086,
+        1448
+      ],
+      "sha256": "5d193292831b0b44dffdd80fb64bb83d4343c3ea89ea07ca53d0d210ad1f6bf2",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "single_layer",
+      "alpha_weighted_luminance": 30807803.11
+    },
+    {
+      "asset_id": "bg_P01_mid",
+      "frame": 0,
+      "filename": "rb_bg_p01_mid_000.png",
+      "requested_canvas": "1536x2048",
+      "actual_canvas": [
+        1087,
+        1447
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        38,
+        117,
+        1054,
+        1348
+      ],
+      "sha256": "7069188091bbe99f3ff9278f49a27f640fb106296aceb870edd311d088a953db",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "single_layer",
+      "alpha_weighted_luminance": 8467125.75
+    },
+    {
+      "asset_id": "bg_P01_foreground",
+      "frame": 0,
+      "filename": "rb_bg_p01_foreground_000.png",
+      "requested_canvas": "1536x2048",
+      "actual_canvas": [
+        1086,
+        1448
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        15,
+        108,
+        1072,
+        1335
+      ],
+      "sha256": "c1e585f55c5ee0525e069572f055b5c32d35c99c1490516a310c5f57a694ace4",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "single_layer",
+      "alpha_weighted_luminance": 4138456.56
+    },
+    {
+      "asset_id": "fx_explosion_small",
+      "frame": 0,
+      "filename": "rb_fx_explosion_small_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        452,
+        472,
+        802,
+        793
+      ],
+      "sha256": "a9a47fd64680e19387454b8f1d4d29b5455fe485d3917fc1c242974b5dfebb4a",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 6378811.43
+    },
+    {
+      "asset_id": "fx_explosion_small",
+      "frame": 6,
+      "filename": "rb_fx_explosion_small_006.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        234,
+        238,
+        1023,
+        1025
+      ],
+      "sha256": "afb5ff7c55c79dced3ddb0e3a06b353085dc1c13209f52a63ff39b09730d5a11",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 35555407.89
+    },
+    {
+      "asset_id": "fx_explosion_small",
+      "frame": 11,
+      "filename": "rb_fx_explosion_small_011.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        415,
+        406,
+        852,
+        852
+      ],
+      "sha256": "290bf4cc766629dcff76560191849235147d7888b9c1ff0cc993d375485b52ab",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 1880907.96
+    },
+    {
+      "asset_id": "fx_impact_spark",
+      "frame": 0,
+      "filename": "rb_fx_impact_spark_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox_alpha_gt16": [
+        472,
+        455,
+        830,
+        851
+      ],
+      "sha256": "88803c92441c051598e64355d4ae6868473fc5013c04149efa87c77b179a25e4",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 6617547.3
+    },
+    {
+      "asset_id": "fx_impact_spark",
+      "frame": 4,
+      "filename": "rb_fx_impact_spark_004.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        210,
+        172,
+        1105,
+        1128
+      ],
+      "sha256": "e430081582b2e40cf26cb25edf59849903da03f5b71fa450aa01dd7b55c1b390",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 61487987.45
+    },
+    {
+      "asset_id": "fx_impact_spark",
+      "frame": 7,
+      "filename": "rb_fx_impact_spark_007.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        252
+      ],
+      "visible_bbox_alpha_gt16": [
+        316,
+        300,
+        996,
+        951
+      ],
+      "sha256": "8f543df7a7848e11985887e4c41ecbf62f4428ac41f0c121e392c7b0f438fcf5",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 4956288.26
+    },
+    {
+      "asset_id": "fx_joint_break",
+      "frame": 0,
+      "filename": "rb_fx_joint_break_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        435,
+        435,
+        824,
+        796
+      ],
+      "sha256": "9fbb4cdc2671b3b89c393ff1f1876cfbbc34ffa4333e0cc04b29d3e3849cac46",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 5786170.13
+    },
+    {
+      "asset_id": "fx_joint_break",
+      "frame": 4,
+      "filename": "rb_fx_joint_break_004.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        252,
+        281,
+        1035,
+        1005
+      ],
+      "sha256": "b4390835c890ab14b9140b53cd7fd0b8ae5c3072657c3ff12969d351c302e988",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 33979687.8
+    },
+    {
+      "asset_id": "fx_joint_break",
+      "frame": 7,
+      "filename": "rb_fx_joint_break_007.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        409,
+        401,
+        904,
+        905
+      ],
+      "sha256": "a157c8247a54dae217507ea9d1c000c9fbed5fc3fc192615d59d25a96c92184a",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 4695198.98
+    },
+    {
+      "asset_id": "fx_detach_burst",
+      "frame": 0,
+      "filename": "rb_fx_detach_burst_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        458,
+        447,
+        816,
+        784
+      ],
+      "sha256": "251d2f3b78b1de75cea056d3e990d92b9d07696a9147d7730d6415d78dcc035d",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 5266338.34
+    },
+    {
+      "asset_id": "fx_detach_burst",
+      "frame": 4,
+      "filename": "rb_fx_detach_burst_004.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox_alpha_gt16": [
+        336,
+        294,
+        958,
+        946
+      ],
+      "sha256": "b560d9e6ed26e87cf056fd4ec8fcd25d9d4affc172f852b90b5bac2e7c15282a",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 38289385.19
+    },
+    {
+      "asset_id": "fx_detach_burst",
+      "frame": 7,
+      "filename": "rb_fx_detach_burst_007.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox_alpha_gt16": [
+        387,
+        366,
+        919,
+        933
+      ],
+      "sha256": "db608eaa6fe6a2c49aa019aea4655d3243eb77100bffdc92833cde31a1ea9981",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 6391755.7
+    },
+    {
+      "asset_id": "fx_shield_hit",
+      "frame": 0,
+      "filename": "rb_fx_shield_hit_000.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox_alpha_gt16": [
+        449,
+        455,
+        912,
+        856
+      ],
+      "sha256": "5c6154a9cc35014fde22f66de88b8f078a3a0f0c34492c76946246c5962bd18b",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 12701534.73
+    },
+    {
+      "asset_id": "fx_shield_hit",
+      "frame": 4,
+      "filename": "rb_fx_shield_hit_004.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "visible_bbox_alpha_gt16": [
+        280,
+        260,
+        1081,
+        1023
+      ],
+      "sha256": "57e3624a10dd1f7e39dd9124d98e1cf9620cd6b077e423e200e4084fd6917dc0",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 53187006.25
+    },
+    {
+      "asset_id": "fx_shield_hit",
+      "frame": 7,
+      "filename": "rb_fx_shield_hit_007.png",
+      "requested_canvas": "512x512",
+      "actual_canvas": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        252
+      ],
+      "visible_bbox_alpha_gt16": [
+        370,
+        337,
+        967,
+        977
+      ],
+      "sha256": "b8ee4e573ace6f93252683a87d7d794143dc2801175efdf694810f572f5577eb",
+      "status": "generated_awaiting_engine_QA",
+      "delivery_mode": "keyframes_only_as_permitted",
+      "alpha_weighted_luminance": 7862184.76
+    }
+  ]
+}

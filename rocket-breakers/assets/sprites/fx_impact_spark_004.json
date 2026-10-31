@@ -1,0 +1,37 @@
+{
+  "asset_id": "fx_impact_spark_004",
+  "source_filename": "art/source/batch_004/rb_fx_impact_spark_004.png",
+  "source_sha256": "e430081582b2e40cf26cb25edf59849903da03f5b71fa450aa01dd7b55c1b390",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    196,
+    157,
+    1120,
+    1144
+  ],
+  "runtime_size": [
+    240,
+    256
+  ],
+  "scale": 0.25937,
+  "visible_rect": [
+    2.1,
+    2.1,
+    237.6,
+    253.9
+  ],
+  "pivot_px": [
+    120.0,
+    128.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build; keyframe 4 of a ?-frame effect",
+  "frame_index": 4
+}

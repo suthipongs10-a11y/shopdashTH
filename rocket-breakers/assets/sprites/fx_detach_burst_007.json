@@ -1,0 +1,37 @@
+{
+  "asset_id": "fx_detach_burst_007",
+  "source_filename": "art/source/batch_004/rb_fx_detach_burst_007.png",
+  "source_sha256": "db608eaa6fe6a2c49aa019aea4655d3243eb77100bffdc92833cde31a1ea9981",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    325,
+    267,
+    977,
+    967
+  ],
+  "runtime_size": [
+    238,
+    256
+  ],
+  "scale": 0.36571,
+  "visible_rect": [
+    20.1,
+    33.6,
+    220.2,
+    247.2
+  ],
+  "pivot_px": [
+    119.0,
+    128.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build; keyframe 7 of a ?-frame effect",
+  "frame_index": 7
+}

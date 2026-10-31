@@ -1,0 +1,11 @@
+{
+  "id": "bg_P01_far",
+  "frame": 0,
+  "filename": "rb_bg_p01_far_000.png",
+  "requested_canvas": "1536x2048",
+  "prompt": "Original vertical-scrolling shoot-em-up background, portrait 1536x2048: Graveyard Belt: navy and teal space full of drifting shipwrecks and broken hull plates. FAR layer: deep space backdrop, nebula and distant planet, very low contrast and saturation so bullets stay readable. Top edge and bottom edge must tile seamlessly when stacked vertically. No ships, no characters, no bullets, no text, no UI. Background: fully opaque painted image that fills the whole canvas edge to edge.",
+  "delivery_mode": "single_layer",
+  "actual_prompt": "Original vertical-scrolling shoot-em-up background, portrait 1536x2048: Graveyard Belt: navy and teal space full of drifting shipwrecks and broken hull plates. FAR layer: deep space backdrop, nebula and distant planet, very low contrast and saturation so bullets stay readable. Top edge and bottom edge must tile seamlessly when stacked vertically. No ships, no characters, no bullets, no text, no UI. Background: fully opaque painted image that fills the whole canvas edge to edge.\nSpecific delivery instructions: Background ART ONLY, do not include any UI, actor, explosion or text from reference. Portrait3:4 aspect ratio1536x2048. Very dark muted navy base #08121e; distant teal haze and planet only in middle section, not near top/bottom. The topmost and bottommost80px MUST be identical uniform flat #08121e color with NO stars or objects, to allow a clean vertical wrap. Keep sparse tiny stars and low-contrast nebula confined away from these edge bands. No foreground wreck objects; distant debris may be barely visible.",
+  "reference": "/workspace/scratch/160b59ef5d6f/RB_BATCH_004_SOURCE/RB_BATCH_004_REQUEST/references/in_game_reference_screens.png",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-a94227f1-8bc0-40a2-871d-691eb7be9393.png"
+}

@@ -12,6 +12,7 @@ Usage (from rocket-breakers/):
 - Updates art/asset_manifest.csv status + runtime_path for imported rows.
 """
 import csv
+import re
 import hashlib
 import json
 import shutil
@@ -41,6 +42,14 @@ RULES = {
     "enemy_E02": (160, "center", None),
     "enemy_E03": (220, "center", None),
     "enemy_E04": (220, "center", None),
+    "bg_P01_far": (1280, "center", None),
+    "bg_P01_mid": (1280, "center", None),
+    "bg_P01_foreground": (1280, "center", None),
+    "fx_explosion_small": (256, "center", "fx_explosion_small"),
+    "fx_impact_spark": (256, "center", "fx_impact_spark"),
+    "fx_joint_break": (256, "center", "fx_joint_break"),
+    "fx_detach_burst": (256, "center", "fx_detach_burst"),
+    "fx_shield_hit": (256, "center", "fx_shield_hit"),
     "utility_T001": (128, "socket_bottom", None),
     "utility_T006": (128, "socket_bottom", None),
     "boss_B02_joint": (160, "center", None),
@@ -55,6 +64,32 @@ EXTRA_CATEGORY = {"pickup_pu": ("pickup_icon", "512x512", "alpha", "M1")}
 
 def fname(f):
     return f.get("filename") or f["file"]  # delivery manifests have used both keys
+
+
+# Opaque scrolling backgrounds get a vertically tileable runtime copy (band cross-fade).
+TILE_V = {"bg_P01_far"}
+SEAM_BAND = 0.08  # fraction of height blended
+
+
+def frame_of(f):
+    m = re.search(r"_(\d{3})\.png$", fname(f))
+    return int(m.group(1)) if m else 0
+
+
+def runtime_id(f, multi):
+    return f"{f['asset_id']}_{frame_of(f):03d}" if multi else f["asset_id"]
+
+
+def make_tileable(im):
+    """Cross-fade the bottom band into the top so the image wraps vertically without a seam."""
+    w, h = im.size
+    b = max(2, int(h * SEAM_BAND))
+    body = im.crop((0, 0, w, h - b)).copy()
+    bottom = im.crop((0, h - b, w, h))
+    top = im.crop((0, 0, w, b))
+    mask = Image.linear_gradient("L").resize((w, b))  # 0 at top -> 255 at bottom
+    body.paste(Image.composite(top, bottom, mask), (0, 0))
+    return body
 
 
 def visible_bbox(im):
@@ -75,10 +110,20 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
     for p in delivery.iterdir():
         if p.is_file():
             shutil.copy2(p, src_dir / p.name)
-    files = {f["asset_id"]: f for f in manifest["files"]}
+    entries = []
+    for f in manifest["files"]:
+        if not (delivery / fname(f)).exists():
+            print(f"MISSING {fname(f)} ({f['asset_id']}) — listed in the manifest but not delivered")
+            continue
+        entries.append(f)
+    counts = {}
+    for f in entries:
+        counts[f["asset_id"]] = counts.get(f["asset_id"], 0) + 1
+    files = {f["asset_id"]: f for f in entries}  # group detection only
     # crop groups: union of visible bounds of all members
     groups = {}
-    for aid, f in files.items():
+    for f in entries:
+        aid = f["asset_id"]
         rule = RULES.get(aid)
         if not rule or not rule[2]:
             continue
@@ -94,7 +139,8 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
         if group and group not in files and sc.exists():
             fixed[group] = tuple(json.loads(sc.read_text(encoding="utf-8"))["trim_rect"])
     imported = {}
-    for aid, f in files.items():
+    for f in entries:
+        aid = f["asset_id"]
         if aid not in RULES:
             print(f"skip {aid}: no import rule")
             continue
@@ -111,9 +157,12 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
         if group in fixed and not (own[0] >= crop[0] and own[1] >= crop[1] and own[2] <= crop[2] and own[3] <= crop[3]):
             print(f"warning {aid}: visible area extends past the shared crop of {group}")
         cut = im.crop(crop)
+        if aid in TILE_V:
+            cut = make_tileable(cut.convert("RGBA"))
         k = size / max(cut.size)
         out = cut.convert("RGBa").resize((max(1, round(cut.width * k)), max(1, round(cut.height * k))), Image.LANCZOS).convert("RGBA")
-        rel = f"assets/sprites/{aid}.webp"
+        rid = runtime_id(f, counts[aid] > 1)
+        rel = f"assets/sprites/{rid}.webp"
         out.save(ROOT / rel, "WEBP", quality=90, method=6)
         w, h = out.size
         vis = [(own[0] - crop[0]) * k, (own[1] - crop[1]) * k, (own[2] - crop[0]) * k, (own[3] - crop[1]) * k]
@@ -122,7 +171,7 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
         if aid.startswith("weapon_") or aid.endswith("signature_mount"):
             anchors = {"muzzle": [round((vis[0] + vis[2]) / 2, 1), round(vis[1], 1)], "socket": [round((vis[0] + vis[2]) / 2, 1), round(vis[3], 1)]}
         sidecar = {
-            "asset_id": aid, "source_filename": f"art/source/{batch.lower()}/{fname(f)}", "source_sha256": sha,
+            "asset_id": rid if counts[aid] > 1 else aid, "source_filename": f"art/source/{batch.lower()}/{fname(f)}", "source_sha256": sha,
             "canvas_size": [W, H], "trim_rect": list(crop), "runtime_size": [w, h], "scale": round(k, 5),
             "visible_rect": [round(v, 1) for v in vis], "pivot_px": [round(pivot[0], 1), round(pivot[1], 1)],
             "attachment_anchors": anchors, "blend_mode": f.get("blend", "alpha"), "color_space": "sRGB",
@@ -130,9 +179,14 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
             "status": "approved" if aid in approved_only else "integrated",
             "notes": "anchors estimated from visible bounds; " + ("approved, not used by the current build yet" if aid in approved_only else "verified visually in the web build"),
         }
-        (ROOT / f"assets/sprites/{aid}.json").write_text(json.dumps(sidecar, indent=2), encoding="utf-8")
-        imported[aid] = rel
-        print(f"{aid}: {W}x{H} crop {crop} -> {w}x{h} ({(ROOT / rel).stat().st_size // 1024} KB)")
+        if counts[aid] > 1:
+            sidecar["frame_index"] = frame_of(f)
+            sidecar["notes"] += f"; keyframe {frame_of(f)} of a {f.get('requested_frame_count', '?')}-frame effect"
+        if aid in TILE_V:
+            sidecar["notes"] += f"; runtime copy made vertically tileable ({int(SEAM_BAND * 100)}% band cross-fade)"
+        (ROOT / f"assets/sprites/{rid}.json").write_text(json.dumps(sidecar, indent=2), encoding="utf-8")
+        imported.setdefault(aid, rel)
+        print(f"{rid}: {W}x{H} crop {crop} -> {w}x{h} ({(ROOT / rel).stat().st_size // 1024} KB)")
     # manifest status + runtime_path
     mpath = ROOT / "art/asset_manifest.csv"
     rows = list(csv.DictReader(mpath.open(encoding="utf-8")))

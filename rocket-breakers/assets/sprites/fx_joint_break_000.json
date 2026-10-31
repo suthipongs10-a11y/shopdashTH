@@ -1,0 +1,37 @@
+{
+  "asset_id": "fx_joint_break_000",
+  "source_filename": "art/source/batch_004/rb_fx_joint_break_000.png",
+  "source_sha256": "9fbb4cdc2671b3b89c393ff1f1876cfbbc34ffa4333e0cc04b29d3e3849cac46",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    237,
+    271,
+    1045,
+    1017
+  ],
+  "runtime_size": [
+    256,
+    236
+  ],
+  "scale": 0.31683,
+  "visible_rect": [
+    61.8,
+    51.3,
+    186.6,
+    167.6
+  ],
+  "pivot_px": [
+    128.0,
+    118.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build; keyframe 0 of a ?-frame effect",
+  "frame_index": 0
+}

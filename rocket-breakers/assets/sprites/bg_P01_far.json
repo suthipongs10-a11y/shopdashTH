@@ -1,0 +1,36 @@
+{
+  "asset_id": "bg_P01_far",
+  "source_filename": "art/source/batch_004/rb_bg_p01_far_000.png",
+  "source_sha256": "5d193292831b0b44dffdd80fb64bb83d4343c3ea89ea07ca53d0d210ad1f6bf2",
+  "canvas_size": [
+    1086,
+    1448
+  ],
+  "trim_rect": [
+    0,
+    0,
+    1086,
+    1448
+  ],
+  "runtime_size": [
+    1043,
+    1280
+  ],
+  "scale": 0.96024,
+  "visible_rect": [
+    0.0,
+    0.0,
+    1042.8,
+    1390.4
+  ],
+  "pivot_px": [
+    521.5,
+    640.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build; runtime copy made vertically tileable (8% band cross-fade)"
+}

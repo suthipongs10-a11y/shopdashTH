@@ -1,0 +1,36 @@
+{
+  "asset_id": "bg_P01_mid",
+  "source_filename": "art/source/batch_004/rb_bg_p01_mid_000.png",
+  "source_sha256": "7069188091bbe99f3ff9278f49a27f640fb106296aceb870edd311d088a953db",
+  "canvas_size": [
+    1087,
+    1447
+  ],
+  "trim_rect": [
+    30,
+    108,
+    1062,
+    1356
+  ],
+  "runtime_size": [
+    1058,
+    1280
+  ],
+  "scale": 1.02564,
+  "visible_rect": [
+    8.2,
+    8.2,
+    1050.3,
+    1271.8
+  ],
+  "pivot_px": [
+    529.0,
+    640.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT built-in imagegen via owner, BATCH_004",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

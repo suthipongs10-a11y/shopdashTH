@@ -1,0 +1,11 @@
+{
+  "id": "fx_detach_burst",
+  "frame": 4,
+  "filename": "rb_fx_detach_burst_004.png",
+  "requested_canvas": "512x512",
+  "prompt": "Original game VFX texture: detach burst: cyan bracket flash and small chips as a part breaks free. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.",
+  "delivery_mode": "keyframes_only_as_permitted",
+  "actual_prompt": "Original game VFX texture: detach burst: cyan bracket flash and small chips as a part breaks free. Isolated effect only, centred, fixed pivot, first frame starts small/empty and last frame fades to empty, no cropped glow at the edges. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nSpecific delivery instructions: ONE static keyframe only, not sheet or storyboard. SQUARE512x512or closest square, use exact same square canvas and center pivot as previous keyframe. MIDDLE keyframe: same effect expands to its peak, centered at same point, radius30–35%of square, readable bright core and family-specific details, no crop. No ships, weapon parts, symbols, labels, interface or opaque background. For joint-break only sparks/chips, not a giant hinge or full firearm. For detach burst use abstract cyan bracket-like flash, no literal letters or UI frame. For shield ripple show local cyan hex patch, not entire ship. All glow fully within canvas with wide transparent padding.",
+  "reference": "/workspace/scratch/160b59ef5d6f/generated_images/exec-1b27e8c4-f29c-4721-adf1-8baf595778e9.png",
+  "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-0822e891-80bb-462a-816b-fa1746403df5.png"
+}
