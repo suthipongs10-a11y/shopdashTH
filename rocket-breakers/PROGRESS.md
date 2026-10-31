@@ -1,26 +1,35 @@
 # Progress
 
-Status: **M0 foundation implemented — exit gate partially met** (no native export build yet).
+Status: **M1 salvage slice playable in the browser (web build)** + expansion 1.1 power-ups (8 of 12).
+Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31)
-- Handoff ZIP 01–06 merged; `python3 tools/validate_bundle.py` → PASS (8/48/144/12/36/12/12/16/24/8/8, 386 manifest rows, 4 concept checksums).
-- Godot 4.7.2 stable project (`project.godot`), portrait 720×1280 logical, letterbox + safe-area insets.
-- Catalog importer/validator in GDScript (counts, IDs, cross-references, starter-loadout legality) → typed `HullDef`/`WeaponDef`.
-- Localisation: th/en Translations from `data/i18n/ui.json` + catalog names; live language switch persisted in save.
-- Asset resolver over `art/asset_manifest.csv`; everything resolves to labelled placeholder until `integrated`.
-- Flight sandbox: SYSTEMS §1 movement (accel/decel, effective-speed formula, assembly-width clamp), dash, Overdrive, shared reactor energy + per-module heat lock, W001 straight shots (pooled, swept collision), W008 pulse beam (ray), training targets, sparks, parallax stars.
-- Input: keyboard/gamepad bindings registered in code; relative touch drag; multi-touch HUD buttons that never move the ship; pause overlay; app-background pause.
-- Save repository: atomic tmp→rename, two rotating valid backups, checksum, corrupt-copy preservation, future-schema write block, schema-0 migration, export/import.
+- Engine switched from Godot to TypeScript/Vite/Canvas (owner request; see DECISIONS). Godot M0 code removed.
+- M0 parity: catalog validator, th/en i18n, asset resolver, fixed 60 Hz clock, movement/dash, energy/heat scheduler,
+  swept projectiles, multi-touch HUD routing, pause/background pause, crash-safe saves with export/import.
+- M1 SLICE-01: E01 scouts, E03 shield barge (front shield, rear joint), B02 Scorpion Reclaimer (claw fan, tail sweep,
+  tail vent, claw ring, lane charge; P1/P2/P3), separate core/armor/joint/module with collider priority, joint HP vs
+  integrity, ≥35% intact detach, reckless fire scraps the tail, tractor (cone/range/dwell), spring tow cable with snap,
+  cargo damage, safe dock fitting UI (grid, legal spots, before/after stats, stow/scrap), W022 curved homing plasma,
+  boss permanently loses tail attacks, victory auto-secure, settlement journal (exactly-once), fragment 1/3, results.
+- Expansion 1.1: PU01 Triple Shot, PU02 Laser Core, PU05 Shield/overshield, PU06 Repair, PU07 Magnet, PU08 Coolant,
+  PU09 Overdrive Cell, PU12 Scrap Cache; seeded drop accumulator, 6-pickup cap with queue, authored early/rescue/low-HP
+  drops, buff HUD chips, pickup text (max 2), hitstop on sever/elite break, explosion/shield/plasma VFX textures.
 
 ## Verification
-- `godot --headless --path . -s res://tests/run_tests.gd` → **31 tests, 31 passed** (catalog, localisation, assets, safe area, motion, dash, fire rate, energy/heat, determinism at 30/60/144 Hz + jitter, swept collision, save recovery/migration/future/import, touch routing, pause).
-- Runner fails any test that logs an engine/script error (verified with a deliberate crash probe).
-- Headless boot of `main.tscn` for 300 frames: no errors. Xvfb screenshots of title / sandbox / pause (TH+EN) rendered with the compatibility renderer; title shows "save loaded" on second launch.
+- `npm test` → **54 passed**: catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
+  dash, fire rate/Overdrive, heat lock, fitting errors, salvage transitions, 35% vs 34.99%, sever+core-death,
+  phase/sever same tick, tail attacks gone after theft, tow snap rules, dock no-loss, one-damage-per-bullet, shield,
+  settlement worked examples 1–2 + defeat + crash injection, save recovery/migration/future/import/quota, determinism at
+  30/60/144 Hz + jitter, power-up rules, and a **bot playthrough of the whole M1 gate** (invulnerable player).
+- Chromium (Playwright, phone viewport): full run title → waves → boss → sever → tow → dock → fit → stolen plasma →
+  victory → results; reload keeps 1 fragment / 800 credits / 1 clear; **0 console errors**.
 
 ## Known issues / not done
-- **No native development export yet** (M0 exit item): export templates not installed in the cloud container. Run from the editor for now.
-- Not tested on a real phone or with real touch hardware; desktop frame-rate measured only under Xvfb software GL.
-- Starter guns heat-lock after ~17–20 s continuous fire with current SYSTEMS values (see DECISIONS).
+- **No human playtest yet** — feel, difficulty and touch comfort unverified; bot runs are invulnerable.
+- Mission pacing is short (~40 s for a bot); spec targets 5–7 min boss missions → tune after playtests.
+- All ships/enemies/boss/icons are coded placeholders; BATCH_001/002 art not yet delivered.
+- PU03/PU04/PU10/PU11, XP run upgrades, stars, hangar/fabrication, other 47 missions: not started (M2+).
+- Hold swap UI (replace an installed module at the dock) not built; stow/scrap/fit only.
+- No mid-run save/resume; Story/Veteran difficulty not implemented.
 - Fusion names lack Thai in catalog.
-- All visuals are coded placeholders; no audio.
-- Current milestone: M0 → M1.

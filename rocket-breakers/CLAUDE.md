@@ -12,7 +12,9 @@ Read in this order before implementing anything:
 4. `docs/TECHNICAL.md` — code contracts, saves, tests
 5. `docs/ART_BIBLE.md` + `art/concepts/` — art spec and references
 6. `docs/PRODUCTION.md` + `art/requests/BATCH_###.md` — milestones M0–M6
+7. `expansion_01/POWERUPS_AND_SPECTACLE.md` + `data/powerups.json` — power-ups and VFX (additive spec)
 
+Run/test: `npm install`, `npm test`, `npm run build` (web build — Godot was dropped, see DECISIONS).
 Session cadence: start by reading `PROGRESS.md` and `NEXT_ACTIONS.md`; end by updating both.
 Log any spec conflict or implementation decision in `docs/DECISIONS.md`.
 Final raster art comes from ChatGPT via the owner — write request packs to `art/requests/`,

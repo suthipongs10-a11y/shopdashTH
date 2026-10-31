@@ -1,0 +1,27 @@
+# BATCH_002 — Power-up icons (expansion 1.1)
+
+Status: REQUEST READY. Send with `expansion_01/art/powerups_board.png` as style reference only.
+In-game icons are currently coded placeholders (coloured ring + glyph).
+
+## Shared prompt
+
+Original ROCKET BREAKERS premium 2.5D game pickup icon, single isolated object, front three-quarter view, crisp
+silhouette readable at 48 px, upper-left light, glowing role colour (offense orange, survival mint-green/cyan,
+resource gold), no text, no labels, no background, real alpha transparency, generous padding, centred.
+
+| # | Asset ID / filename | Canvas | Content |
+|---|---|---|---|
+| 1 | pickup_pu01 / rb_icon_pickup_pu01_000.png | 512² | TRIPLE SHOT — exactly **3** brass bullet motifs in a fan (board shows 4; mechanics use 3) |
+| 2 | pickup_pu02 / rb_icon_pickup_pu02_000.png | 512² | LASER CORE — cyan glowing capacitor cylinder |
+| 3 | pickup_pu05 / rb_icon_pickup_pu05_000.png | 512² | SHIELD — hexagon energy shield ring |
+| 4 | pickup_pu06 / rb_icon_pickup_pu06_000.png | 512² | REPAIR — white/green repair drone with cross |
+| 5 | pickup_pu07 / rb_icon_pickup_pu07_000.png | 512² | MAGNET — orange horseshoe magnet with floating nuts |
+| 6 | pickup_pu08 / rb_icon_pickup_pu08_000.png | 512² | COOLANT — cyan canister with snowflake window |
+| 7 | pickup_pu09 / rb_icon_pickup_pu09_000.png | 512² | OVERDRIVE CELL — red/orange turbine cell |
+| 8 | pickup_pu12 / rb_icon_pickup_pu12_000.png | 512² | SCRAP CACHE — yellow/black crate overflowing with scrap |
+
+Next (BATCH_003): PU03 missile swarm, PU04 chain arc, PU10 drone wing, PU11 fusion core icons, plus
+BATCH_001 items (SPARROW hull, W001/W008/W022, B02 core/joint) which are still outstanding.
+
+## Acceptance
+Real alpha (test on black/white/checker), no baked text, readable at 48 px, centred pivot (256,256).

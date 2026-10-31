@@ -1,26 +1,454 @@
 {
-  "ui.title.tagline": {"th": "ยิงให้หลุด ลากกลับมา ยึดเป็นของเรา", "en": "Break it. Tow it. Make it yours."},
-  "ui.title.start_sandbox": {"th": "สนามทดสอบการบิน", "en": "Flight sandbox"},
-  "ui.title.language": {"th": "ภาษา: ไทย", "en": "Language: English"},
-  "ui.title.build_note": {"th": "M0 · ภาพทั้งหมดเป็นภาพชั่วคราว", "en": "M0 · all art is placeholder"},
-  "ui.title.save_ok": {"th": "โหลดเซฟแล้ว", "en": "Save loaded"},
-  "ui.title.save_new": {"th": "สร้างเซฟใหม่", "en": "New save created"},
-  "ui.title.save_recovered": {"th": "เซฟหลักเสีย กู้จากสำรองแล้ว", "en": "Main save damaged — restored from backup"},
-  "ui.title.save_future": {"th": "เซฟนี้มาจากเวอร์ชันใหม่กว่า จะไม่เขียนทับ", "en": "Save is from a newer version — it will not be overwritten"},
-  "ui.title.save_corrupt": {"th": "อ่านเซฟไม่ได้ เก็บไฟล์เดิมไว้แล้ว เริ่มโปรไฟล์ใหม่", "en": "Save unreadable — original kept, new profile started"},
-  "ui.hud.hp": {"th": "ตัวยาน", "en": "Hull"},
-  "ui.hud.shield": {"th": "โล่", "en": "Shield"},
-  "ui.hud.energy": {"th": "พลังงาน", "en": "Energy"},
-  "ui.hud.heat": {"th": "ความร้อน", "en": "Heat"},
-  "ui.hud.overdrive": {"th": "โอเวอร์ไดรฟ์", "en": "Overdrive"},
-  "ui.hud.dash": {"th": "พุ่ง", "en": "Dash"},
-  "ui.hud.ability": {"th": "สกิล", "en": "Ability"},
-  "ui.hud.no_ability": {"th": "ยังไม่มี", "en": "None"},
-  "ui.hud.pause": {"th": "พัก", "en": "Pause"},
-  "ui.hud.overheated": {"th": "ร้อนจัด", "en": "Overheated"},
-  "ui.hud.sandbox": {"th": "สนามทดสอบ · ภาพชั่วคราว", "en": "Sandbox · placeholder art"},
-  "ui.hud.targets": {"th": "เป้าที่ทำลาย", "en": "Targets destroyed"},
-  "ui.pause.title": {"th": "พักเกม", "en": "Paused"},
-  "ui.pause.resume": {"th": "เล่นต่อ", "en": "Resume"},
-  "ui.pause.quit": {"th": "กลับหน้าแรก", "en": "Back to title"}
+  "common.back": {
+    "th": "กลับ",
+    "en": "Back"
+  },
+  "title.tagline": {
+    "th": "ยิงให้หลุด ลากกลับมา ยึดเป็นของเรา",
+    "en": "Break it. Tow it. Make it yours."
+  },
+  "title.blueprint": {
+    "th": "ชิ้นส่วนพิมพ์เขียว (ครบ 3 ชิ้นสร้างอาวุธถาวรได้)",
+    "en": "Blueprint fragments (3 unlock the weapon)"
+  },
+  "title.credits": {
+    "th": "เครดิต",
+    "en": "Credits"
+  },
+  "title.scrap": {
+    "th": "เศษเหล็ก",
+    "en": "Scrap"
+  },
+  "title.clears": {
+    "th": "ผ่านด่าน / เล่นทั้งหมด",
+    "en": "Clears / attempts"
+  },
+  "title.start": {
+    "th": "เริ่มภารกิจทดลอง: ขโมยหางแมงป่อง",
+    "en": "Start test mission: steal the Scorpion Tail"
+  },
+  "title.howto": {
+    "th": "วิธีเล่น",
+    "en": "How to play"
+  },
+  "title.settings": {
+    "th": "ตั้งค่า",
+    "en": "Settings"
+  },
+  "title.language": {
+    "th": "ภาษา: ไทย → English",
+    "en": "Language: English → ไทย"
+  },
+  "title.no_storage": {
+    "th": "เบราว์เซอร์นี้บันทึกเซฟไม่ได้ ความคืบหน้าจะหายเมื่อปิดหน้า",
+    "en": "This browser can't store saves — progress is lost when the page closes"
+  },
+  "title.build_note": {
+    "th": "M1 ด่านทดลอง · ภาพทั้งหมดเป็นภาพชั่วคราว · เสียงสังเคราะห์ชั่วคราว",
+    "en": "M1 test slice · all art is placeholder · prototype synthesized audio"
+  },
+  "howto.title": {
+    "th": "วิธีเล่น",
+    "en": "How to play"
+  },
+  "howto.step1": {
+    "th": "ลากนิ้วตรงไหนก็ได้เพื่อบิน ปืนยิงเอง",
+    "en": "Drag anywhere to fly. Guns fire automatically."
+  },
+  "howto.step2": {
+    "th": "แตะศัตรูหรือจุดอ่อนเพื่อล็อกเป้า ปืนจะเล็งตามในมุมยิงของมัน",
+    "en": "Tap an enemy or weak point to lock on; guns track it within their firing arc."
+  },
+  "howto.step3": {
+    "th": "บอสแมงป่องจะยกหางระบายความร้อน ข้อต่อสีเหลืองจะเปิด — ยิงข้อต่อให้หลุด อย่ายิงตัวหางมั่ว หางจะพังกลายเป็นเศษเหล็ก",
+    "en": "When the Scorpion vents, its amber tail joint opens — shoot the joint. Shooting the tail body ruins it into scrap."
+  },
+  "howto.step4": {
+    "th": "เข้าใกล้หางที่หลุด แล้วกดปุ่ม \"ดึง\" ค้างไว้ เพื่อลากกลับมา",
+    "en": "Get close to the loose tail and hold \"Tractor\" to tow it."
+  },
+  "howto.step5": {
+    "th": "ลากหางไว้จนกำจัดศัตรูรอบนั้นหมด จะเข้าจุดจอดปลอดภัย แล้วติดหางเข้ากับยาน",
+    "en": "Keep towing until the escort wave is cleared — the safe dock opens and you fit the tail."
+  },
+  "howto.step6": {
+    "th": "ใช้หางพลาสมาที่ขโมยมาเอาชนะบอส — บอสจะใช้ท่าหางไม่ได้อีกเลย",
+    "en": "Beat the boss with its own plasma tail — it can never use tail attacks again."
+  },
+  "howto.controls": {
+    "th": "คีย์บอร์ด: WASD บิน · Space พุ่ง · R โอเวอร์ไดรฟ์ · E ดึง/ปล่อย · F สลับเป้า · Esc พัก",
+    "en": "Keyboard: WASD fly · Space dash · R Overdrive · E tractor/release · F cycle target · Esc pause"
+  },
+  "settings.title": {
+    "th": "ตั้งค่า",
+    "en": "Settings"
+  },
+  "settings.auto_lock": {
+    "th": "ล็อกข้อต่อให้อัตโนมัติ",
+    "en": "Auto-lock exposed joints"
+  },
+  "settings.auto_tractor": {
+    "th": "ดึงชิ้นส่วนอัตโนมัติเมื่ออยู่ในระยะ",
+    "en": "Auto-tractor in range"
+  },
+  "settings.left_handed": {
+    "th": "ปุ่มฝั่งซ้าย (ถนัดซ้าย)",
+    "en": "Left-handed buttons"
+  },
+  "settings.photosensitive": {
+    "th": "ลดแสงวาบ (ไวต่อแสง)",
+    "en": "Reduce flashes (photosensitive)"
+  },
+  "settings.sound": {
+    "th": "เสียง",
+    "en": "Sound"
+  },
+  "settings.shake": {
+    "th": "จอสั่น",
+    "en": "Screen shake"
+  },
+  "settings.export": {
+    "th": "ส่งออกเซฟ",
+    "en": "Export save"
+  },
+  "settings.import": {
+    "th": "นำเข้าเซฟ",
+    "en": "Import save"
+  },
+  "settings.import_ok": {
+    "th": "นำเข้าเซฟสำเร็จ",
+    "en": "Save imported"
+  },
+  "settings.import_bad": {
+    "th": "นำเข้าไม่ได้ ({reason}) เซฟเดิมยังอยู่ครบ",
+    "en": "Import failed ({reason}) — current save unchanged"
+  },
+  "settings.note_assist": {
+    "th": "ตัวช่วยเล็ง/ดึงอัตโนมัติไม่ทำให้เสียดาวหรือรางวัล",
+    "en": "Auto-lock and auto-tractor never cost stars or rewards"
+  },
+  "save.recovered": {
+    "th": "เซฟหลักเสีย กู้จากสำรองแล้ว",
+    "en": "Main save damaged — restored from backup"
+  },
+  "save.future": {
+    "th": "เซฟนี้มาจากเวอร์ชันใหม่กว่า จะไม่เขียนทับ",
+    "en": "This save is from a newer version — it will not be overwritten"
+  },
+  "save.corrupt": {
+    "th": "อ่านเซฟไม่ได้ เก็บสำเนาไว้แล้ว เริ่มโปรไฟล์ใหม่",
+    "en": "Save unreadable — a copy was kept, new profile started"
+  },
+  "save.recovered_settlement": {
+    "th": "รับรางวัลรอบก่อนที่ค้างไว้เรียบร้อย",
+    "en": "Pending rewards from your last run were applied"
+  },
+  "hud.hp": {
+    "th": "ตัวยาน",
+    "en": "Hull"
+  },
+  "hud.shield": {
+    "th": "โล่",
+    "en": "Shield"
+  },
+  "hud.energy": {
+    "th": "พลังงาน",
+    "en": "Energy"
+  },
+  "hud.overdrive": {
+    "th": "โอเวอร์ไดรฟ์",
+    "en": "Overdrive"
+  },
+  "hud.overdrive_on": {
+    "th": "โอเวอร์ไดรฟ์ทำงาน!",
+    "en": "OVERDRIVE!"
+  },
+  "hud.overdrive_btn": {
+    "th": "ไดรฟ์",
+    "en": "Drive"
+  },
+  "hud.overheated": {
+    "th": "ร้อนจัด",
+    "en": "overheated"
+  },
+  "hud.blocked": {
+    "th": "ถูกบัง",
+    "en": "blocked"
+  },
+  "hud.dash": {
+    "th": "พุ่ง",
+    "en": "Dash"
+  },
+  "hud.no_ability": {
+    "th": "ยังไม่มี",
+    "en": "None"
+  },
+  "hud.tractor": {
+    "th": "ดึง",
+    "en": "Tractor"
+  },
+  "hud.release": {
+    "th": "ปล่อย",
+    "en": "Release"
+  },
+  "hud.release_confirm": {
+    "th": "แตะอีกครั้ง",
+    "en": "Tap again"
+  },
+  "hud.phase": {
+    "th": "เฟส {n}",
+    "en": "Phase {n}"
+  },
+  "hud.score": {
+    "th": "คะแนน",
+    "en": "Score"
+  },
+  "hud.placeholder": {
+    "th": "ภาพชั่วคราว",
+    "en": "placeholder art"
+  },
+  "hint.intro": {
+    "th": "ลากนิ้วเพื่อบิน ปืนยิงเอง — แตะศัตรูเพื่อล็อกเป้า",
+    "en": "Drag to fly, guns fire on their own — tap an enemy to lock on"
+  },
+  "hint.flank": {
+    "th": "เรือโล่: ยิงอ้อมโล่ไปที่ข้อต่อสีเหลืองด้านข้าง โล่จะดับ",
+    "en": "Shield barge: shoot around the shield at the amber side joint to drop it"
+  },
+  "hint.boss": {
+    "th": "แมงป่องผู้ทวงคืน! รอให้ยกหาง แล้วยิงข้อต่อสีเหลือง",
+    "en": "Scorpion Reclaimer! Wait for the tail vent, then shoot the amber joint"
+  },
+  "hint.tail_damaged": {
+    "th": "ระวัง! ยิงโดนตัวหางทำให้หางเสียหาย",
+    "en": "Careful! Hitting the tail body damages the loot"
+  },
+  "hint.tail_critical": {
+    "th": "หางเสียหายหนัก ถ้าตัดตอนนี้จะได้แค่เศษเหล็ก",
+    "en": "Tail badly damaged — severing now yields only scrap"
+  },
+  "hint.tractor": {
+    "th": "หางหลุดแล้ว! บินเข้าไปใกล้แล้วกด \"ดึง\" ค้างไว้",
+    "en": "Tail severed! Fly close and hold \"Tractor\""
+  },
+  "hint.tractor_hold": {
+    "th": "อยู่ในระยะแล้ว — กดปุ่ม \"ดึง\" ค้างไว้",
+    "en": "In range — hold \"Tractor\""
+  },
+  "hint.tow": {
+    "th": "กำลังลาก! กำจัดศัตรูรอบนี้ให้หมดเพื่อเข้าจุดจอด",
+    "en": "Towing! Clear this wave to reach the safe dock"
+  },
+  "hint.release_confirm": {
+    "th": "แตะ \"ปล่อย\" อีกครั้งเพื่อยืนยันการปล่อยของ",
+    "en": "Tap \"Release\" again to confirm dropping it"
+  },
+  "hint.dock": {
+    "th": "จุดจอดปลอดภัย — เลือกตำแหน่งติดตั้ง",
+    "en": "Safe dock — choose where to fit it"
+  },
+  "hint.stolen": {
+    "th": "ยึดอาวุธบอสสำเร็จ! หางพลาสมาจะยิงโค้งหาจุดอ่อนให้เอง",
+    "en": "Boss weapon stolen! The plasma tail curves toward weak points"
+  },
+  "hint.scrap": {
+    "th": "หางพังเป็นเศษเหล็ก บอสใช้ท่าหางไม่ได้แล้ว แต่ไม่ได้ของ",
+    "en": "Tail scrapped — the boss lost the attack, but you got no loot"
+  },
+  "hint.module_lost": {
+    "th": "อาวุธหลุดจากยาน! ดึงกลับมาซ่อมได้ 1 ครั้ง",
+    "en": "A module broke off! Tow it back to repair it once"
+  },
+  "pause.title": {
+    "th": "พักเกม",
+    "en": "Paused"
+  },
+  "pause.resume": {
+    "th": "เล่นต่อ",
+    "en": "Resume"
+  },
+  "pause.quit": {
+    "th": "ออกจากภารกิจ",
+    "en": "Leave mission"
+  },
+  "pause.quit_note": {
+    "th": "ออกกลางคันจะไม่ได้รางวัลรอบนี้ แต่ความคืบหน้าเดิมไม่หาย",
+    "en": "Leaving forfeits this run's rewards; earlier progress is kept"
+  },
+  "dock.title": {
+    "th": "จุดจอดปลอดภัย",
+    "en": "Safe dock"
+  },
+  "dock.subtitle": {
+    "th": "เวลาหยุดอยู่ คิดได้ไม่จำกัด",
+    "en": "Time is stopped — take as long as you need"
+  },
+  "dock.own_module": {
+    "th": "ชิ้นส่วนของยานเรา",
+    "en": "your own module"
+  },
+  "dock.part_info": {
+    "th": "น้ำหนัก {mass} · ใช้ {cells} ช่อง · ดาเมจ {dmg} × {rate}/วิ",
+    "en": "Mass {mass} · {cells} cells · {dmg} dmg × {rate}/s"
+  },
+  "dock.fit_here": {
+    "th": "ติดตั้งตำแหน่งที่เลือก",
+    "en": "Fit at selected spot"
+  },
+  "dock.stow": {
+    "th": "เก็บเข้าช่องเก็บ ({n}/{cap})",
+    "en": "Stow in hold ({n}/{cap})"
+  },
+  "dock.scrap": {
+    "th": "แยกเป็นเศษเหล็ก",
+    "en": "Scrap it"
+  },
+  "dock.scrap_confirm": {
+    "th": "แยกชิ้นนี้เป็นเศษเหล็กจริงไหม? จะไม่ได้ชิ้นส่วนพิมพ์เขียวจากชิ้นนี้",
+    "en": "Really scrap this part? You won't get its blueprint fragment"
+  },
+  "dock.fitted": {
+    "th": "ติดตั้งแล้ว! ช่องสีเขียวคือตำแหน่งที่ใช้ได้",
+    "en": "Fitted! Green cells were the legal spots"
+  },
+  "dock.stowed": {
+    "th": "เก็บเข้าช่องเก็บแล้ว จะได้รับเมื่อจบภารกิจ",
+    "en": "Stowed — it will be banked when the mission ends"
+  },
+  "dock.scrapped": {
+    "th": "แยกเป็นเศษเหล็กแล้ว",
+    "en": "Scrapped"
+  },
+  "dock.launch": {
+    "th": "ออกบิน",
+    "en": "Launch"
+  },
+  "dock.stat_mass": {
+    "th": "น้ำหนัก",
+    "en": "Mass"
+  },
+  "dock.stat_speed": {
+    "th": "ความเร็ว",
+    "en": "Speed"
+  },
+  "dock.stat_dps": {
+    "th": "ดาเมจต่อวินาที (ประมาณ)",
+    "en": "Damage/sec (estimate)"
+  },
+  "fit.error.off_mask": {
+    "th": "ตรงนั้นไม่มีจุดยึดบนตัวยาน",
+    "en": "There's no mounting socket there"
+  },
+  "fit.error.overlap": {
+    "th": "ทับกับอาวุธที่ติดอยู่แล้ว",
+    "en": "Overlaps a module that's already fitted"
+  },
+  "fit.error.reactor": {
+    "th": "ช่องกลางเป็นเตาปฏิกรณ์ ติดอาวุธไม่ได้",
+    "en": "The centre cell is the reactor"
+  },
+  "fit.error.over_mass": {
+    "th": "หนักเกินที่ยานรับได้",
+    "en": "Too heavy for this hull"
+  },
+  "fit.error.floating": {
+    "th": "ต้องต่อติดกับเตาปฏิกรณ์หรืออาวุธอื่น ห้ามลอย",
+    "en": "Must connect to the reactor or another module"
+  },
+  "fit.error.hold_full": {
+    "th": "ช่องเก็บเต็มแล้ว",
+    "en": "The hold is full"
+  },
+  "fit.error.no_item": {
+    "th": "ไม่มีชิ้นส่วนให้ติดตั้ง",
+    "en": "Nothing to fit"
+  },
+  "results.victory": {
+    "th": "ภารกิจสำเร็จ!",
+    "en": "Mission complete!"
+  },
+  "results.defeat": {
+    "th": "ยานถูกทำลาย",
+    "en": "Ship destroyed"
+  },
+  "results.stolen": {
+    "th": "ขโมยหางพลาสมาสำเร็จ — เก็บเป็นชิ้นส่วนพิมพ์เขียวแล้ว",
+    "en": "Plasma tail stolen — banked as a blueprint fragment"
+  },
+  "results.severed_lost": {
+    "th": "ตัดหางได้ แต่ไม่ได้เก็บกลับมา",
+    "en": "Tail severed, but not recovered"
+  },
+  "results.not_stolen": {
+    "th": "รอบนี้ยังไม่ได้ขโมยหาง",
+    "en": "No tail stolen this run"
+  },
+  "results.fallback": {
+    "th": "ชนะบอสครั้งแรก: ได้ชิ้นส่วนพิมพ์เขียวสำรอง 1 ชิ้น",
+    "en": "First boss clear: 1 fallback blueprint fragment"
+  },
+  "results.blueprint_ready": {
+    "th": "ครบ 3 ชิ้นแล้ว! (โรงสร้างอาวุธจะมาใน M2)",
+    "en": "3/3 collected! (fabrication arrives in M2)"
+  },
+  "results.credits": {
+    "th": "เครดิต",
+    "en": "Credits"
+  },
+  "results.first_clear": {
+    "th": "ผ่านครั้งแรก ×2",
+    "en": "first clear ×2"
+  },
+  "results.scrap": {
+    "th": "เศษเหล็ก",
+    "en": "Scrap"
+  },
+  "results.score": {
+    "th": "คะแนน",
+    "en": "Score"
+  },
+  "results.again": {
+    "th": "เล่นอีกครั้ง",
+    "en": "Play again"
+  },
+  "results.title": {
+    "th": "หน้าแรก",
+    "en": "Title"
+  },
+  "hud.converted": {
+    "th": "แปลงเป็นโอเวอร์ไดรฟ์ +{n}",
+    "en": "Converted +{n}"
+  },
+  "hud.overshield": {
+    "th": "โล่เสริม",
+    "en": "overshield"
+  },
+  "howto.step7": {
+    "th": "เก็บไอเท็มเสริมพลังที่หล่นจากศัตรู (ยิงสามทาง โล่ ซ่อม แม่เหล็ก ฯลฯ) และเศษเหล็กสีทอง",
+    "en": "Grab power-ups dropped by enemies (triple shot, shield, repair, magnet…) and gold scrap"
+  },
+  "dock.scrap_confirm_tap": {
+    "th": "แตะอีกครั้งเพื่อยืนยัน",
+    "en": "Tap again to confirm"
+  },
+  "settings.export_hint": {
+    "th": "คัดลอกข้อความนี้เก็บไว้ ใช้นำเข้าในเครื่องอื่นได้",
+    "en": "Copy this text somewhere safe; import it on another device"
+  },
+  "settings.copy": {
+    "th": "คัดลอก",
+    "en": "Copy"
+  },
+  "settings.copied": {
+    "th": "คัดลอกแล้ว",
+    "en": "Copied"
+  },
+  "settings.copy_manual": {
+    "th": "คัดลอกอัตโนมัติไม่ได้ ข้อความถูกเลือกไว้แล้ว กดคัดลอกเองได้เลย",
+    "en": "Couldn't copy automatically — the text is selected, copy it manually"
+  },
+  "settings.import_hint": {
+    "th": "วางข้อความเซฟ หรือเลือกไฟล์ เซฟปัจจุบันจะถูกเก็บเป็นสำรอง",
+    "en": "Paste save text or choose a file; your current save is kept as a backup"
+  }
 }

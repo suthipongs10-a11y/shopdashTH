@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "status": "recipe_design_not_implemented",
+  "notes": [
+    "Texture reuse is prototype-friendly; final distinct family textures may be requested after in-engine review.",
+    "particle_count is a budget hint; graphics low reduces cosmetic count only.",
+    "All animation is runtime code/particles; source PNGs are single static images."
+  ],
+  "recipes": [
+    {
+      "id": "FXE01",
+      "name": "Small kill",
+      "source_image": "fx_explosion.png",
+      "duration_sec": 0.3,
+      "max_visual_radius_px": 70,
+      "particle_count_hint": 12,
+      "recipe": "scale 0.2→1; opacity 1→0; small procedural fragments",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE02",
+      "name": "Large ship kill",
+      "source_image": "fx_explosion.png",
+      "duration_sec": 0.55,
+      "max_visual_radius_px": 170,
+      "particle_count_hint": 32,
+      "recipe": "2 offset cards max; fragments+smoke; bright-core fade first",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE03",
+      "name": "Boss armor break",
+      "source_image": "fx_explosion.png",
+      "duration_sec": 0.65,
+      "max_visual_radius_px": 220,
+      "particle_count_hint": 40,
+      "recipe": "localize to armor plate; inward/outward shard directions from joint normal",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE04",
+      "name": "Fuel chain blast",
+      "source_image": "fx_explosion.png",
+      "duration_sec": 0.45,
+      "max_visual_radius_px": 140,
+      "particle_count_hint": 24,
+      "recipe": "delayed neighboring flame cards; separate deterministic capped damage events",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE05",
+      "name": "Missile impact",
+      "source_image": "fx_explosion.png",
+      "duration_sec": 0.25,
+      "max_visual_radius_px": 55,
+      "particle_count_hint": 8,
+      "recipe": "single fast card; no giant black smoke; missile light trails code-generated",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE06",
+      "name": "Ion impact",
+      "source_image": "fx_ion.png",
+      "duration_sec": 0.18,
+      "max_visual_radius_px": 90,
+      "particle_count_hint": 10,
+      "recipe": "fast branching card; fade outer glow; hostile tint pass separate",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE07",
+      "name": "Chain lightning",
+      "source_image": "fx_ion.png",
+      "duration_sec": 0.16,
+      "max_visual_radius_px": 45,
+      "particle_count_hint": 6,
+      "recipe": "extract visual motif only; procedural jagged edge connects actual source/target",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE08",
+      "name": "EMP ring",
+      "source_image": "fx_ion.png",
+      "duration_sec": 0.4,
+      "max_visual_radius_px": 180,
+      "particle_count_hint": 14,
+      "recipe": "add procedural expanding ring; no repeated full-screen flash",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE09",
+      "name": "Shield hit",
+      "source_image": "fx_shield.png",
+      "duration_sec": 0.25,
+      "max_visual_radius_px": 115,
+      "particle_count_hint": 6,
+      "recipe": "rotate impact lobe toward incoming projectile; no collider from glow",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE10",
+      "name": "Shield pickup",
+      "source_image": "fx_shield.png",
+      "duration_sec": 0.45,
+      "max_visual_radius_px": 100,
+      "particle_count_hint": 12,
+      "recipe": "stable transparent ring settles around player then fades to HUD buff",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE11",
+      "name": "Plasma shot",
+      "source_image": "fx_plasma.png",
+      "duration_sec": 0.35,
+      "max_visual_radius_px": 70,
+      "particle_count_hint": 8,
+      "recipe": "orient along travel tangent; head collision only; separate curved trail",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE12",
+      "name": "Plasma impact",
+      "source_image": "fx_plasma.png",
+      "duration_sec": 0.25,
+      "max_visual_radius_px": 80,
+      "particle_count_hint": 10,
+      "recipe": "reuse small cropped motif candidate after review; do not flash entire projectile card",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE13",
+      "name": "Joint sever",
+      "source_image": "fx_explosion.png",
+      "duration_sec": 0.2,
+      "max_visual_radius_px": 55,
+      "particle_count_hint": 16,
+      "recipe": "gold procedural sparks and metal chips; avoid flames covering intact loot",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE14",
+      "name": "Tractor lock",
+      "source_image": "fx_ion.png",
+      "duration_sec": 0.3,
+      "max_visual_radius_px": 45,
+      "particle_count_hint": 10,
+      "recipe": "thin cyan code cable + traveling motes; alpha motif scaled very small",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE15",
+      "name": "Overdrive ignition",
+      "source_image": "fx_plasma.png",
+      "duration_sec": 0.45,
+      "max_visual_radius_px": 90,
+      "particle_count_hint": 18,
+      "recipe": "orange engine-tinted small energy motifs; code thruster cones; no damage area",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE16",
+      "name": "Power-up collect",
+      "source_image": "fx_shield.png",
+      "duration_sec": 0.3,
+      "max_visual_radius_px": 65,
+      "particle_count_hint": 12,
+      "recipe": "small colored ring and icon burst; choose tint by pickup role",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE17",
+      "name": "Fusion assemble",
+      "source_image": "fx_ion.png",
+      "duration_sec": 0.6,
+      "max_visual_radius_px": 130,
+      "particle_count_hint": 24,
+      "recipe": "2 procedural orbit rings converge on host weapon; local purple/cyan glow",
+      "simulation_authority": false
+    },
+    {
+      "id": "FXE18",
+      "name": "Dash wake",
+      "source_image": "fx_plasma.png",
+      "duration_sec": 0.2,
+      "max_visual_radius_px": 50,
+      "particle_count_hint": 8,
+      "recipe": "narrow cyan afterimage trail from actual path; no collision length change",
+      "simulation_authority": false
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "fx_explosion",
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Create one high-quality game VFX source image for an original top-down 2.5D spaceship shooter ROCKET BREAKERS. A single spectacular orange and golden spaceship explosion, seen straight down, central white-hot energy flash, asymmetric tongues of flame, dark billowing smoke, dozens of readable glowing metal fragments flying radially outward, expanding thin shockwave ring. Full isolated effect entirely inside square canvas with generous transparent outer margins, real RGBA transparent background, no spaceship or scenery, no text, no grid, no watermark. Rich premium rendered game VFX with crisp energetic center and soft volumetric translucent edges. Useful as a standalone explosion keyframe sprite, NOT a sequence or sheet. Frame all embers and smoke comfortably."
+  },
+  {
+    "id": "fx_ion",
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. A SINGLE isolated original game VFX source sprite for ROCKET BREAKERS: electric cyan lightning detonation with branching arcs stretching radially from a small bright white-cyan energy core, small azure sparks and little luminous ion motes, subtle translucent ring. Top-down view, premium 2.5D real-time rendered game VFX style, dramatic yet crisp readable branches. Entire effect centered with transparent margins on every side, true RGBA transparent background. No ships, no scenery, no text, no sheet, no watermark. This is one electricity impact keyframe, not animation."
+  },
+  {
+    "id": "fx_shield",
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. SINGLE isolated original game VFX source sprite for ROCKET BREAKERS: circular cyan energy shield hit, straight top-down view, thin luminous hexagonal shield perimeter around transparent empty center, one impact on upper-right rim causing bright white-blue ripple rings and cyan hexagonal fragments. Shield circle luminous but see-through, no solid opaque center. Premium stylized 2.5D game effect, fine particles and restrained bloom, entire effect within generous transparent padding. True RGBA transparent background, no ship, no text, no watermark, no sheet. Static shield-hit keyframe."
+  },
+  {
+    "id": "fx_plasma",
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Create SINGLE isolated original game VFX sprite: curved violet plasma projectile for ROCKET BREAKERS top-down spaceship shooter. Bright white-magenta elongated plasma head near top center, segmented purple energy beads and a flowing slightly S-curved tapered tail extending downward, cyan ownership glints near core, tiny sparks and thin electric filaments. Sharp high contrast head, translucent feathery trail, premium 2.5D game VFX. Vertical composition fully inside a square source canvas with generous transparent padding. True RGBA transparent background. No ship, no scenery, no text, no grid, no watermark. One static projectile trail keyframe, not a sequence."
+  },
+  {
+    "id": "powerups_board",
+    "transparent": false,
+    "prompt": "Use case: stylized-concept. Create a polished original ROCKET BREAKERS POWER-UP concept reference board, landscape 3:2. Exactly 12 large distinct floating pickup designs arranged 4 columns by 3 rows, generous space, dark midnight navy background, premium 2.5D rendered game items, strong icon readability at small scale, metallic housings with luminous cores, no pixel art. Consistent small English captions. Row1: TRIPLE SHOT three gold bullet arrowheads; LASER CORE cyan optical reactor; MISSILE SWARM orange miniature missile rack; CHAIN ARC blue forked lightning coil. Row2: SHIELD glowing cyan hexagon generator; REPAIR green mechanical medical drone; MAGNET amber horseshoe tractor coil; COOLANT frosty teal canister. Row3: OVERDRIVE red-orange blazing turbine; DRONE WING two tiny white-orange escort drones; FUSION CORE violet intertwined energy rings; SCRAP CACHE gold salvage container overflowing with bolts. Each item unmistakably different with local glow only. Main header ROCKET BREAKERS - POWER UPS. Concept board not atlas, no watermark."
+  },
+  {
+    "id": "enemies_board",
+    "transparent": false,
+    "prompt": "Use case: stylized-concept. Create a polished original ROCKET BREAKERS ENEMY FLEET concept reference sheet, landscape 3:2. Exactly TWELVE full isolated spaceships or combat drones arranged in 4 columns by3 rows, equal readable sizes, generous gaps, top-down orthographic camera with all noses facing DOWN, upper-left lighting, dark navy background, no pixel art. Premium 2.5D rendered models; charcoal metal with red hostile cores, species-specific secondary accent. Short English captions. Row1 SCOUT tiny dart; INTERCEPTOR angular twin fins; SHIELD BARGE broad armored shield prow; MISSILE FRIGATE long missile racks. Row2 MINELAYER squat with round mines; CABLE CUTTER dual blade arms; BEAM SENTRY triangular laser emitter; FUEL HAULER chunky tanks. Row3 REPAIR ROOT mechanical green vine-like repair arms; GRAVITY ANCHOR violet ring generator; LOOT SNATCHER asymmetric amber claw; DRONE CARRIER enormous bay opening with small drones beside it. Strong distinct silhouettes, separate identifiable weapons and joints. Main title ROCKET BREAKERS - ENEMY FLEET. No existing franchise symbols, no watermark."
+  },
+  {
+    "id": "gameplay_powerup",
+    "transparent": false,
+    "prompt": "Use case: ui-mockup. Create a premium portrait9:16 original ROCKET BREAKERS actual gameplay concept screenshot, vertical top-down2.5D spaceship shooter, not pixel art, no phone frame, no promotional border. Show thrilling late-run play while remaining readable. White-orange modular player ship lower third has a stolen violet scorpion tail mounted on its back, cyan shield, four orange-white escort drones. Distinct friendly fire going UP: three gold bullet lanes, one cyan laser, several curved orange homing missiles, one violet plasma projectile. Enemy graphite-red fleet upper half: scouts in V formation, broad shield barge, missile frigate and a mine layer. One enemy exploding orange with metal fragments at upper-right. Red enemy bullet fans traveling DOWN with a clearly navigable central gap. Space industrial graveyard backdrop low contrast. A few large clearly collectible glowing pickups in middle: green repair pod, amber magnet, cyan laser core. Show a magnet stream pulling tiny gold scrap toward player, chain lightning jumping between exactly3 enemies near upper left. Compact HUD top score148600, HP cyan bars, bottom dash and OVERDRIVE buttons; little buff labels TRIPLE SHOT 8s and MAGNET 12s above bottom HUD. Floating x24 COMBO near explosion. Keep hostile bullets in front of effects and ship silhouette clear. Authentic exciting game screenshot, minimal English text, no watermark."
+  },
+  {
+    "id": "bosses_board",
+    "transparent": false,
+    "prompt": "Use case: stylized-concept. Create ROCKET BREAKERS BOSS SALVAGE reference board, landscape3:2, exactly SIX original distinct mechanical bosses in a clean3columns2rows layout on midnight navy background. Top-down orthographic, premium2.5D rendered game art, no pixel art. Each boss fully visible with a clearly glowing AMBER JOINT marking its one detachable signature weapon. Beside each boss place a small separate miniature of that same weapon as a player module, connected by a thin cyan arrow. Row1 SCORPION RECLAIMER charcoal-red scorpion with violet plasma tail; STORM RAY broad blue-grey manta-like machine with cyan lightning wing; ROOT CATHEDRAL green overgrown mechanical carrier with detachable drone nest. Row2 GLACIER LEVIATHAN armored ice serpent with blue harpoon; SAND BASTION ochre moving siege fortress with giant rail cannon; IRON DEVOURER black-steel segmented worm with gold reactor and violet spinal beam cannon. Distinct proportions and silhouette, no reused recolors. Short English captions only and main heading ROCKET BREAKERS - BREAK & CLAIM. Concept board not production sprite atlas, no watermark."
+  }
+]

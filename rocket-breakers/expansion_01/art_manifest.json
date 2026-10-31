@@ -1,0 +1,133 @@
+{
+  "status": "8_images_delivered_sources_and_concepts_not_full_game_art",
+  "files": [
+    {
+      "id": "fx_explosion",
+      "path": "art/fx_explosion.png",
+      "source": "exec-ccfb23c6-ae07-4c89-8f33-c2509cf41970.png",
+      "size_bytes": 1999123,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "sha256": "1e7c8eaf2bc7d9cd42d41bf1ec677262f2923e40506b406604ad15e80f73dae8",
+      "kind": "single_static_vfx_source",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "transparent_pixel_fraction": 0.4654,
+      "partial_alpha_fraction": 0.5346
+    },
+    {
+      "id": "fx_ion",
+      "path": "art/fx_ion.png",
+      "source": "exec-cd8c1038-24f8-4f71-a520-97a6ad24f69f.png",
+      "size_bytes": 1943559,
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "sha256": "f9218a5d5d8510724383cbf00e2d5ed32a188d679388a48710cc7c21816210e2",
+      "kind": "single_static_vfx_source",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "transparent_pixel_fraction": 0.5359,
+      "partial_alpha_fraction": 0.4641
+    },
+    {
+      "id": "fx_shield",
+      "path": "art/fx_shield.png",
+      "source": "exec-8d31ff93-100c-4044-9bb1-bda19cb9ce1b.png",
+      "size_bytes": 1572195,
+      "width": 1374,
+      "height": 1145,
+      "mode": "RGBA",
+      "sha256": "083a0ab37d2639748a7cd59d8fe1cb042d7a1dbb9d9f9635a5bda676e908cafb",
+      "kind": "single_static_vfx_source",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "transparent_pixel_fraction": 0.4211,
+      "partial_alpha_fraction": 0.5789
+    },
+    {
+      "id": "fx_plasma",
+      "path": "art/fx_plasma.png",
+      "source": "exec-3ef431c1-e54f-4a2b-9874-a6327f214fb7.png",
+      "size_bytes": 618135,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "sha256": "a69cc148a9b471455ed6de738025e2bffd2a913d107b06286110c06d399fd397",
+      "kind": "single_static_vfx_source",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "transparent_pixel_fraction": 0.835,
+      "partial_alpha_fraction": 0.165
+    },
+    {
+      "id": "powerups_board",
+      "path": "art/powerups_board.png",
+      "source": "exec-721ba44c-9653-4c78-9d69-37919aa87e41.png",
+      "size_bytes": 2261944,
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "sha256": "4d062345f6d86deb9797b35d7ed54e53800b54a446cefe19140fa57f30130abc",
+      "kind": "concept_reference_board",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen"
+    },
+    {
+      "id": "enemies_board",
+      "path": "art/enemies_board.png",
+      "source": "exec-a5e2b7df-ed1b-415a-87df-1d20bec8fb7a.png",
+      "size_bytes": 2297559,
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "sha256": "b6148e2316679037157a932e6c591b7758b4c3f4ad3245c57fb0e9d592c740ee",
+      "kind": "concept_reference_board",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen"
+    },
+    {
+      "id": "gameplay_powerup",
+      "path": "art/gameplay_powerup.png",
+      "source": "exec-9c1501af-0c5a-448a-b59d-5a03573a4ca7.png",
+      "size_bytes": 2793452,
+      "width": 941,
+      "height": 1672,
+      "mode": "RGB",
+      "sha256": "a77c82965bb5c14b649c036ee86ce82b8c86a068e39e558d310acc16323fada5",
+      "kind": "gameplay_concept",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen"
+    },
+    {
+      "id": "bosses_board",
+      "path": "art/bosses_board.png",
+      "source": "exec-5b223358-50f4-4056-abee-0e7addf3057d.png",
+      "size_bytes": 2473401,
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "sha256": "b36515afb350b56bf5e77d49bfa57b35f2a1bc176710c87a0303ea20fca9699b",
+      "kind": "concept_reference_board",
+      "status": "generated_unchecked",
+      "generator": "ChatGPT built-in imagegen"
+    }
+  ]
+}

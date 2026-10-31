@@ -1,0 +1,22 @@
+{
+  "name": "rocket-breakers",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "ROCKET BREAKERS — Break it. Tow it. Make it yours.",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "validate": "python3 tools/validate_bundle.py"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.21",
+    "typescript": "5.8.3",
+    "vite": "6.3.5",
+    "vite-plugin-singlefile": "2.2.0",
+    "vitest": "3.2.4"
+  }
+}

@@ -1,4 +1,3 @@
-# Godot cache / exports
-.godot/
-export/
+node_modules/
+dist/
 *.tmp

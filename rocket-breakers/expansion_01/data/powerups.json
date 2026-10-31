@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "expansion_version": "1.1-design",
+  "status": "specification_not_implemented",
+  "pickups": [
+    {
+      "id": "PU01",
+      "name": {
+        "en": "TRIPLE SHOT",
+        "th": "ยิงสามทาง"
+      },
+      "duration_sec": 8,
+      "model": "ballistic_primary_side_shots",
+      "params": {
+        "count": 2,
+        "spread_deg": 12,
+        "damage_fraction": 0.4,
+        "recursive": false
+      },
+      "compatibility": "compatible_ballistic",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu01",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU02",
+      "name": {
+        "en": "LASER CORE",
+        "th": "แกนเลเซอร์"
+      },
+      "duration_sec": 10,
+      "model": "beam_boost",
+      "params": {
+        "damage_multiplier": 1.15,
+        "range_multiplier": 1.15
+      },
+      "compatibility": "equipped_beam",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu02",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU03",
+      "name": {
+        "en": "MISSILE SWARM",
+        "th": "ฝูงมิสไซล์"
+      },
+      "duration_sec": 12,
+      "model": "support_missile_rack",
+      "params": {
+        "count_per_trigger": 2,
+        "interval_sec": 1.5,
+        "damage": 10,
+        "blast_radius": 45,
+        "turn_deg_sec": 90,
+        "max_racks": 1
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu03",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU04",
+      "name": {
+        "en": "CHAIN ARC",
+        "th": "สายฟ้าชิ่ง"
+      },
+      "duration_sec": 8,
+      "model": "primary_impact_arc",
+      "params": {
+        "damage": 10,
+        "hops": 2,
+        "hop_multiplier": 0.75,
+        "proc_cooldown": 1,
+        "targets": "body_or_core",
+        "recursive": false
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu04",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU05",
+      "name": {
+        "en": "SHIELD",
+        "th": "โล่พลังงาน"
+      },
+      "duration_sec": 0,
+      "model": "restore_then_overshield",
+      "params": {
+        "restore": 25,
+        "overshield_cap": 25,
+        "overshield_sec": 10,
+        "adds_invulnerability": false
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu05",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU06",
+      "name": {
+        "en": "REPAIR",
+        "th": "ซ่อมยาน"
+      },
+      "duration_sec": 0,
+      "model": "repair_core_module",
+      "params": {
+        "core_hp": 20,
+        "module_integrity": 10,
+        "revive_module": false,
+        "reset_damage_objective": false
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu06",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU07",
+      "name": {
+        "en": "MAGNET",
+        "th": "แม่เหล็กดูดของ"
+      },
+      "duration_sec": 12,
+      "model": "ordinary_loot_magnet",
+      "params": {
+        "radius": 220,
+        "eligible": [
+          "scrap",
+          "credits",
+          "xp"
+        ],
+        "ineligible": [
+          "signature_module",
+          "mine",
+          "blueprint_fragment"
+        ]
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu07",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU08",
+      "name": {
+        "en": "COOLANT",
+        "th": "น้ำยาหล่อเย็น"
+      },
+      "duration_sec": 8,
+      "model": "coolant",
+      "params": {
+        "instant_heat_reduction": 35,
+        "cooling_multiplier": 1.2,
+        "bypass_min_heatlock": false
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu08",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU09",
+      "name": {
+        "en": "OVERDRIVE CELL",
+        "th": "เซลล์โอเวอร์ไดรฟ์"
+      },
+      "duration_sec": 0,
+      "model": "charge_overdrive",
+      "params": {
+        "charge": 25,
+        "max": 100,
+        "auto_activate": false,
+        "extend_duration": false
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu09",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU10",
+      "name": {
+        "en": "DRONE WING",
+        "th": "ฝูงโดรนคุ้มกัน"
+      },
+      "duration_sec": 12,
+      "model": "temporary_drones",
+      "params": {
+        "count": 2,
+        "damage": 6,
+        "shots_per_sec_per_drone": 1,
+        "permanent_unlock": false
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu10",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU11",
+      "name": {
+        "en": "FUSION CORE",
+        "th": "แกนหลอมอาวุธ"
+      },
+      "duration_sec": 0,
+      "model": "carry_fusion_core",
+      "params": {
+        "max_carried": 1,
+        "random_drop": false,
+        "expires": "run_end"
+      },
+      "compatibility": "authored_cache_or_boss",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu11",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    },
+    {
+      "id": "PU12",
+      "name": {
+        "en": "SCRAP CACHE",
+        "th": "ลังเศษโลหะ"
+      },
+      "duration_sec": 0,
+      "model": "unbanked_scrap",
+      "params": {
+        "scrap": 15,
+        "award": "settlement",
+        "idempotency": "pickup_uuid"
+      },
+      "compatibility": "all",
+      "repeat_policy": "refresh_not_stack",
+      "icon_asset_id": "pickup_pu12",
+      "art_status": "planned_isolated_icon; concept_board_available"
+    }
+  ],
+  "save_extension": {
+    "active_buffs": "id + remaining_ticks + proc_cooldown_ticks",
+    "support_emitters": "owner buff ID + ancestry tag",
+    "drop_accumulator": "seed + value + RNG state",
+    "collected_pickup_ids": "per run unique instance IDs; settled in same journal as rewards"
+  },
+  "drop_rules": {
+    "eligible_kill_increment": 0.04,
+    "elite_increment": 0.25,
+    "threshold": 1,
+    "live_pickup_cap": 6,
+    "ordinary_lifetime_sec": 15,
+    "proc_max_per_source": 1,
+    "random_excludes": [
+      "PU11"
+    ]
+  },
+  "vfx_sources": {
+    "fx_explosion": "single_static_keyframe",
+    "fx_ion": "single_static_keyframe",
+    "fx_shield": "single_static_keyframe",
+    "fx_plasma": "single_static_keyframe"
+  }
+}

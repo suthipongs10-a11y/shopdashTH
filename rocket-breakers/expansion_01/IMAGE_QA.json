@@ -1,0 +1,54 @@
+{
+  "files": [
+    {
+      "id": "fx_explosion",
+      "decode": "PASS",
+      "alpha_check": "PASS",
+      "manual_notes": "Static source, not animation. Anchor/scale/material require in-engine review."
+    },
+    {
+      "id": "fx_ion",
+      "decode": "PASS",
+      "alpha_check": "PASS",
+      "manual_notes": "Static source, not animation. Anchor/scale/material require in-engine review."
+    },
+    {
+      "id": "fx_shield",
+      "decode": "PASS",
+      "alpha_check": "PASS",
+      "manual_notes": "Static source, not animation. Anchor/scale/material require in-engine review."
+    },
+    {
+      "id": "fx_plasma",
+      "decode": "PASS",
+      "alpha_check": "PASS",
+      "manual_notes": "Static source, not animation. Anchor/scale/material require in-engine review."
+    },
+    {
+      "id": "powerups_board",
+      "decode": "PASS",
+      "alpha_check": "not_required",
+      "manual_notes": "Reference only. Power-up TRIPLE SHOT drawing has4 bullet motifs; production isolated icon must use3 as specified."
+    },
+    {
+      "id": "enemies_board",
+      "decode": "PASS",
+      "alpha_check": "not_required",
+      "manual_notes": "Reference only; do not slice as final atlas."
+    },
+    {
+      "id": "gameplay_powerup",
+      "decode": "PASS",
+      "alpha_check": "not_required",
+      "manual_notes": "Concept reference only; not a playable game or finished sprite atlas."
+    },
+    {
+      "id": "bosses_board",
+      "decode": "PASS",
+      "alpha_check": "not_required",
+      "manual_notes": "Concept reference only; not a playable game or finished sprite atlas."
+    }
+  ],
+  "runtime_tested": false,
+  "all_4_vfx_have_alpha": true
+}

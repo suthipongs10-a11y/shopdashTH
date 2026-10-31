@@ -1,0 +1,552 @@
+// Canvas renderer for the combat world. Reads simulation state and interpolates
+// positions between ticks; visual-only effects (stars, sparks, shake) use render
+// time and never feed back into gameplay. All art is labelled placeholder geometry.
+import type { CombatWorld, GameEvent } from "../combat/world";
+import { CABLE_MAX, CORE_RADIUS, TRACTOR_DWELL, TRACTOR_RANGE } from "../combat/world";
+import { CHARGE_WARN, SWEEP_RANGE, SWEEP_WINDUP, SWEEP_WIDTH } from "../combat/boss";
+import { cellToLocal } from "../ships/assembly";
+import { coreOf, type Enemy } from "../combat/enemies";
+import { partWorldPos, type Part } from "../combat/parts";
+import { DEG, lerp, type Vec } from "../core/geometry";
+import { PICKUP_WARN_SEC } from "../salvage/salvage";
+import { ROLE } from "../combat/powerups";
+import { t } from "../core/i18n";
+import explosionUrl from "../../assets/fx/fx_explosion_256.png";
+import shieldUrl from "../../assets/fx/fx_shield_256.png";
+import plasmaUrl from "../../assets/fx/fx_plasma_256.png";
+
+// Expansion VFX source candidates (static keyframes, status generated_unchecked):
+// animated here with code-driven scale/opacity/rotation — not flipbooks.
+function tex(url: string): HTMLImageElement | null {
+  if (typeof Image === "undefined") return null;
+  const img = new Image();
+  img.src = url;
+  return img;
+}
+const TEX = { explosion: tex(explosionUrl), shield: tex(shieldUrl), plasma: tex(plasmaUrl) };
+const ROLE_COLOR = { offense: "#ff8a1f", survival: "#58e0a0", resource: "#ffd76a" };
+const PICKUP_GLYPH: Record<string, string> = { PU01: "3×", PU02: "L", PU03: "M", PU04: "Z", PU05: "S", PU06: "+", PU07: "U", PU08: "❄", PU09: "OD", PU10: "D", PU11: "F", PU12: "$" };
+
+export const C = {
+  bg: "#0b1424", teal: "#12333a", star: "#9fb8c8", ivory: "#e9e2d0", charcoal: "#2c2f36", orange: "#f07a1a",
+  cyan: "#39e1ff", gold: "#ffd76a", graphite: "#3a3d45", graphiteLight: "#5a5f6b", red: "#ff2d55", magenta: "#ff3bd4",
+  violet: "#b06bff", amber: "#ffb020", heat: "#ff8a1f", shield: "#58a6ff", hp: "#7ee081", text: "#e8f3f8", dim: "#8aa4b3",
+};
+const MODULE_COLOR: Record<string, string> = { W001: "#c9a43a", W008: "#2aa7c0", W022: "#7a45c8" };
+
+interface Spark { p: Vec; v: Vec; life: number; max: number; color: string; size: number }
+interface Ring { p: Vec; r: number; grow: number; life: number; max: number; color: string; width: number }
+interface Card { img: HTMLImageElement; p: Vec; r0: number; r1: number; life: number; max: number; rot: number; large: boolean; alpha: number }
+interface FloatText { p: Vec; text: string; color: string; life: number }
+
+export interface RenderSettings { shake: number; flash: number; photosensitive: boolean }
+
+export class Renderer {
+  time = 0;
+  private sparks: Spark[] = [];
+  private rings: Ring[] = [];
+  private cards: Card[] = [];
+  private texts: FloatText[] = [];
+  private shake = 0;
+  private flashA = 0;
+  private stars: { x: number; y: number; s: number; layer: number }[] = [];
+  private wrecks: { x: number; y: number; w: number; h: number; rot: number; speed: number }[] = [];
+  private seed = 7;
+
+  constructor(private ctx: CanvasRenderingContext2D) {
+    for (let i = 0; i < 140; i++) this.stars.push({ x: this.rand() * 720, y: this.rand() * 1280, s: 0.6 + this.rand() * 1.6, layer: i % 3 });
+    for (let i = 0; i < 6; i++) this.wrecks.push({ x: this.rand() * 720, y: this.rand() * 1280, w: 60 + this.rand() * 120, h: 20 + this.rand() * 40, rot: this.rand() * Math.PI, speed: 12 + this.rand() * 10 });
+  }
+
+  private rand(): number {
+    this.seed = (this.seed * 16807) % 2147483647;
+    return this.seed / 2147483647;
+  }
+
+  // ------------------------------------------------------------- effects
+  spawn(e: GameEvent, s: RenderSettings): void {
+    const burst = (n: number, color: string, speed: number, size = 2.5, life = 0.35) => {
+      for (let i = 0; i < n; i++) {
+        if (this.sparks.length > 260) this.sparks.shift();
+        const a = this.rand() * Math.PI * 2, sp = speed * (0.3 + this.rand());
+        const l = life * (0.5 + this.rand());
+        this.sparks.push({ p: { ...e.pos }, v: { x: Math.cos(a) * sp, y: Math.sin(a) * sp }, life: l, max: l, color, size });
+      }
+    };
+    const ring = (r: number, grow: number, color: string, life = 0.35, width = 3) => this.rings.push({ p: { ...e.pos }, r, grow, life, max: life, color, width });
+    // Explosion cards: at most 2 large overlapping cards; extra blasts use particles only.
+    const card = (img: HTMLImageElement | null, r1: number, life: number, large: boolean, alpha = 1) => {
+      if (!img || !img.complete || !img.naturalWidth) return;
+      if (large && this.cards.filter((c) => c.large).length >= 2) return;
+      this.cards.push({ img, p: { ...e.pos }, r0: r1 * 0.2, r1, life, max: life, rot: this.rand() * Math.PI * 2, large, alpha });
+    };
+    const text = (label: string, color: string) => {
+      const same = this.texts.find((x) => x.text === label);
+      if (same) { same.life = 1.1; return; } // combine duplicates
+      if (this.texts.length >= 2) this.texts.shift();
+      this.texts.push({ p: { x: e.pos.x, y: e.pos.y - 30 }, text: label, color, life: 1.1 });
+    };
+    switch (e.type) {
+      case "hit": burst(3, e.tag === "cargo" ? C.amber : C.gold, 160, 2); break;
+      case "deflect": burst(3, C.dim, 140, 2); break;
+      case "kill":
+        burst(e.tag === "boss" ? 60 : 18, C.orange, 260, 3); ring(10, 260, C.orange, 0.4);
+        if (e.tag === "shield") card(TEX.explosion, 170 / 2, 0.55, true); else card(TEX.explosion, 70 / 2 + 10, 0.3, false);
+        this.addShake(e.tag === "shield" ? 4 : 2, s); break;
+      case "blast": ring(8, (e.value ?? 45) * 3, C.violet, 0.3, 4); burst(10, C.violet, 200); break;
+      case "joint_break": burst(22, C.gold, 300, 3); ring(6, 180, C.gold, 0.3, 4); this.addShake(3, s); break;
+      case "sever": burst(30, C.cyan, 320, 3); ring(10, 240, C.cyan, 0.5, 5); this.addShake(6, s); this.addFlash(0.25, s); break;
+      case "scrap": burst(16, C.dim, 200, 3); break;
+      case "secured": ring(20, 200, C.cyan, 0.6, 5); burst(24, C.cyan, 220); break;
+      case "tractor_lock": ring(30, -40, C.cyan, 0.4, 3); break;
+      case "snap": burst(12, C.red, 200); break;
+      case "player_hit": burst(10, C.red, 200); this.addShake(5, s); this.addFlash(0.15, s); break;
+      case "shield_hit": card(TEX.shield, 56, 0.25, false, 0.8); break;
+      case "pickup": {
+        const role = ROLE[e.tag ?? ""] ?? "resource";
+        ring(16, 160, ROLE_COLOR[role], 0.3, 4); burst(12, ROLE_COLOR[role], 180, 2.5, 0.3);
+        if (e.tag === "PU05") card(TEX.shield, 60, 0.45, false, 0.9);
+        text(t(`powerups.${e.tag}.name`), ROLE_COLOR[role]);
+        break;
+      }
+      case "converted": text(t("hud.converted", { n: e.value ?? 10 }), C.gold); break;
+      case "scrap_pick": burst(2, C.gold, 60, 1.5, 0.2); break;
+      case "graze": burst(1, C.cyan, 80, 1.5, 0.2); break;
+      case "overdrive": ring(30, 400, C.gold, 0.5, 6); break;
+      case "dash": ring(20, 60, C.cyan, 0.2, 2); break;
+      case "phase": ring(60, 300, C.red, 0.6, 6); this.addShake(6, s); break;
+      case "boss_dead": burst(120, C.orange, 420, 4, 0.8); ring(40, 600, C.gold, 0.9, 8); card(TEX.explosion, 220, 0.8, true); this.addShake(8, s); this.addFlash(0.4, s); break;
+      case "module_lost": burst(14, C.orange, 200); break;
+      case "muzzle": if (e.family !== "kinetic") burst(1, e.family === "plasma" ? C.violet : C.cyan, 60, 2, 0.12); break;
+    }
+  }
+
+  private addShake(n: number, s: RenderSettings): void { this.shake = Math.min(18, this.shake + n * s.shake); }
+  private addFlash(a: number, s: RenderSettings): void { if (!s.photosensitive) this.flashA = Math.min(0.35, this.flashA + a * s.flash); }
+
+  update(dt: number): void {
+    this.time += dt;
+    for (const p of this.sparks) { p.p.x += p.v.x * dt; p.p.y += p.v.y * dt; p.v.x *= 0.9; p.v.y *= 0.9; p.life -= dt; }
+    this.sparks = this.sparks.filter((p) => p.life > 0);
+    for (const r of this.rings) { r.r += r.grow * dt; r.life -= dt; }
+    this.rings = this.rings.filter((r) => r.life > 0 && r.r > 0);
+    for (const c of this.cards) c.life -= dt;
+    this.cards = this.cards.filter((c) => c.life > 0);
+    for (const x of this.texts) { x.life -= dt; x.p.y -= 40 * dt; }
+    this.texts = this.texts.filter((x) => x.life > 0);
+    this.shake = Math.max(0, this.shake - dt * 40);
+    this.flashA = Math.max(0, this.flashA - dt * 1.5);
+  }
+
+  // ------------------------------------------------------------- frame
+  draw(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    g.save();
+    if (this.shake > 0) g.translate((this.rand() - 0.5) * this.shake, (this.rand() - 0.5) * this.shake);
+    this.drawBackground();
+    for (const e of w.enemies) this.drawEnemy(e, alpha);
+    if (w.boss && (w.boss.e.alive || w.status === "running")) this.drawBoss(w, alpha);
+    this.drawFriendly(w, alpha);
+    this.drawPickups(w, alpha);
+    this.drawSalvage(w, alpha);
+    this.drawPlayer(w, alpha);
+    this.drawLock(w, alpha);
+    for (const r of this.rings) {
+      g.globalAlpha = Math.max(0, r.life / r.max);
+      g.strokeStyle = r.color; g.lineWidth = r.width;
+      g.beginPath(); g.arc(r.p.x, r.p.y, r.r, 0, Math.PI * 2); g.stroke();
+    }
+    for (const c of this.cards) {
+      const k = 1 - c.life / c.max;
+      const r = c.r0 + (c.r1 - c.r0) * Math.min(1, k * 1.6);
+      g.save(); g.globalAlpha = c.alpha * Math.max(0, 1 - k * k); g.globalCompositeOperation = "lighter";
+      g.translate(c.p.x, c.p.y); g.rotate(c.rot + k * 0.4);
+      const ar = c.img.naturalHeight / c.img.naturalWidth;
+      g.drawImage(c.img, -r, -r * ar, r * 2, r * 2 * ar);
+      g.restore();
+    }
+    for (const p of this.sparks) {
+      g.globalAlpha = Math.max(0, p.life / p.max);
+      g.fillStyle = p.color;
+      g.beginPath(); g.arc(p.p.x, p.p.y, p.size * (p.life / p.max) + 0.5, 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = 1;
+    g.textAlign = "center";
+    for (const x of this.texts) {
+      g.globalAlpha = Math.min(1, x.life * 2);
+      g.font = "700 26px RB Thai, sans-serif"; g.lineWidth = 5; g.strokeStyle = "rgba(0,0,0,0.75)";
+      g.strokeText(x.text, x.p.x, x.p.y); g.fillStyle = x.color; g.fillText(x.text, x.p.x, x.p.y);
+    }
+    g.globalAlpha = 1;
+    this.drawTelegraphs(w, alpha);
+    this.drawHostile(w, alpha); // dedicated high-contrast pass, always above effects
+    g.restore();
+    if (w.overdriveLeft > 0) {
+      g.strokeStyle = `rgba(255,215,106,${0.35 + Math.sin(this.time * 10) * 0.1})`;
+      g.lineWidth = 10; g.strokeRect(5, 5, 710, 1270);
+    }
+    if (this.flashA > 0) { g.fillStyle = `rgba(255,255,255,${this.flashA})`; g.fillRect(0, 0, 720, 1280); }
+  }
+
+  private drawBackground(): void {
+    const g = this.ctx;
+    g.fillStyle = C.bg; g.fillRect(-20, -20, 760, 1320);
+    const grd = g.createRadialGradient(540, 300, 20, 540, 300, 520);
+    grd.addColorStop(0, "rgba(18,51,58,0.75)"); grd.addColorStop(1, "rgba(18,51,58,0)");
+    g.fillStyle = grd; g.fillRect(0, 0, 720, 1280);
+    for (const wr of this.wrecks) {
+      const y = ((wr.y + this.time * wr.speed) % 1500) - 110;
+      g.save(); g.translate(wr.x, y); g.rotate(wr.rot + this.time * 0.02);
+      g.fillStyle = "rgba(40,70,80,0.35)"; g.fillRect(-wr.w / 2, -wr.h / 2, wr.w, wr.h);
+      g.fillStyle = "rgba(20,40,48,0.5)"; g.fillRect(-wr.w / 2 + 8, -wr.h / 2 + 5, wr.w * 0.3, wr.h - 10);
+      g.restore();
+    }
+    for (const s of this.stars) {
+      const y = (s.y + this.time * (14 + s.layer * 26)) % 1280;
+      g.fillStyle = `rgba(159,184,200,${0.25 + s.layer * 0.2})`;
+      g.fillRect(s.x, y, s.s, s.s);
+    }
+  }
+
+  private pos(e: Enemy, alpha: number): Vec { return lerp(e.prev, e.pos, alpha); }
+
+  private drawEnemy(e: Enemy, alpha: number): void {
+    const g = this.ctx;
+    const p = this.pos(e, alpha);
+    const core = coreOf(e);
+    const flash = core.flash > 0;
+    if (e.role === "scout") {
+      g.save(); g.translate(p.x, p.y);
+      if (e.telegraph > 0) { g.fillStyle = `rgba(255,45,85,${0.5 + 0.5 * Math.sin(this.time * 40)})`; g.beginPath(); g.arc(0, 20, 9, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = flash ? "#fff" : C.graphite;
+      g.beginPath(); g.moveTo(0, 22); g.lineTo(18, -10); g.lineTo(8, -16); g.lineTo(-8, -16); g.lineTo(-18, -10); g.closePath(); g.fill();
+      g.strokeStyle = C.red; g.lineWidth = 2; g.stroke();
+      g.fillStyle = C.magenta; g.beginPath(); g.arc(0, 0, 4, 0, Math.PI * 2); g.fill();
+      g.restore();
+    } else {
+      const shield = e.parts.find((x) => x.id === "shield")!;
+      const joint = e.parts.find((x) => x.id === "joint")!;
+      g.save(); g.translate(p.x, p.y);
+      if (e.telegraph > 0) { g.fillStyle = `rgba(255,45,85,${0.4 + 0.4 * Math.sin(this.time * 40)})`; g.fillRect(-30, 30, 60, 8); }
+      g.fillStyle = flash ? "#fff" : C.graphite; g.fillRect(-40, -20, 80, 40);
+      g.strokeStyle = C.red; g.lineWidth = 2; g.strokeRect(-40, -20, 80, 40);
+      g.fillStyle = C.graphiteLight; g.fillRect(-28, -12, 56, 10);
+      if (shield.active) {
+        g.fillStyle = shield.flash > 0 ? "#fff" : "rgba(255,59,212,0.55)"; g.fillRect(-44, 21, 88, 12);
+        this.shieldIcon(0, 27, 7);
+      }
+      if (joint.active) this.jointIcon(joint.offset.x, joint.offset.y, 11, joint.flash > 0);
+      g.restore();
+      this.hpBar(p.x - 40, p.y - 34, 80, core.hp / core.hpMax);
+    }
+  }
+
+  private drawBoss(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    const b = w.boss!;
+    const p = this.pos(b.e, alpha);
+    g.save(); g.translate(p.x, p.y);
+    // legs
+    g.strokeStyle = C.graphiteLight; g.lineWidth = 9; g.lineCap = "round";
+    for (const s of [-1, 1]) for (let i = 0; i < 3; i++) {
+      const sway = Math.sin(this.time * 4 + i) * 6;
+      g.beginPath(); g.moveTo(s * 40, -20 + i * 22); g.lineTo(s * (90 + i * 6), -40 + i * 26 + sway); g.lineTo(s * (110 + i * 4), -8 + i * 30 + sway); g.stroke();
+    }
+    // claws
+    for (const s of [-1, 1] as const) {
+      const fanWarn = b.action?.name === "claw_fan" && ((s === -1 && b.action.t < 0.6) || (s === 1 && b.action.t > 1.2 && b.action.t < 1.8));
+      g.fillStyle = C.graphite; g.beginPath(); g.ellipse(s * 130, 58, 34, 30, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = fanWarn ? C.red : C.graphiteLight; g.lineWidth = fanWarn ? 5 : 3; g.stroke();
+      g.fillStyle = C.charcoal; g.beginPath(); g.moveTo(s * 112, 80); g.lineTo(s * 124, 112); g.lineTo(s * 140, 82); g.fill();
+      this.shieldIcon(s * 130, 54, 8);
+    }
+    // torso
+    const coreFlash = b.core.flash > 0;
+    g.fillStyle = coreFlash ? "#fff" : C.graphite;
+    g.beginPath();
+    for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + (i * Math.PI) / 4; g.lineTo(Math.cos(a) * 66, Math.sin(a) * 60); }
+    g.closePath(); g.fill();
+    g.strokeStyle = C.red; g.lineWidth = 3; g.stroke();
+    g.fillStyle = C.charcoal; g.fillRect(-34, -30, 68, 22);
+    for (const x of [-18, 0, 18]) { g.fillStyle = C.red; g.beginPath(); g.arc(x, 22, 6, 0, Math.PI * 2); g.fill(); }
+    // tail
+    if (!b.signatureRemoved) {
+      const pts = (b.tail.shape as { points: Vec[] }).points;
+      const chain = [b.joint.offset, ...pts];
+      g.strokeStyle = C.charcoal; g.lineWidth = 22;
+      g.beginPath(); chain.forEach((q, i) => (i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y))); g.stroke();
+      pts.forEach((q, i) => {
+        g.fillStyle = b.tail.flash > 0 ? "#fff" : i === pts.length - 1 ? "#4a2a6a" : C.graphite;
+        g.beginPath(); g.arc(q.x, q.y, 17, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = C.graphiteLight; g.lineWidth = 2; g.stroke();
+      });
+      const st = pts[pts.length - 1];
+      g.fillStyle = C.violet; g.beginPath(); g.arc(st.x, st.y + 6, 7 + Math.sin(this.time * 8) * 1.5, 0, Math.PI * 2); g.fill();
+      const frac = b.tail.integrity / b.tail.integrityMax;
+      if (frac < 1) {
+        g.fillStyle = "rgba(0,0,0,0.5)"; g.fillRect(st.x - 26, st.y + 26, 52, 7);
+        g.fillStyle = frac >= 0.35 ? C.cyan : C.red; g.fillRect(st.x - 26, st.y + 26, 52 * Math.max(0, frac), 7);
+        g.fillStyle = "#fff"; g.fillRect(st.x - 26 + 52 * 0.35, st.y + 24, 2, 11);
+      }
+      if (b.jointExposed) this.jointIcon(b.joint.offset.x, b.joint.offset.y, 18, b.joint.flash > 0, true);
+      else { g.fillStyle = C.graphiteLight; g.fillRect(b.joint.offset.x - 24, b.joint.offset.y - 22, 48, 44); this.shieldIcon(b.joint.offset.x, b.joint.offset.y, 10); }
+    } else {
+      g.fillStyle = "#1a1c22"; g.beginPath(); g.arc(b.joint.offset.x, b.joint.offset.y, 14, 0, Math.PI * 2); g.fill();
+      g.fillStyle = C.orange; g.beginPath(); g.arc(b.joint.offset.x, b.joint.offset.y, 5 + Math.sin(this.time * 20) * 2, 0, Math.PI * 2); g.fill();
+    }
+    if (b.inTransition && !b.entering) { g.strokeStyle = `rgba(255,45,85,${0.4 + Math.sin(this.time * 12) * 0.3})`; g.lineWidth = 4; g.beginPath(); g.arc(0, 0, 90, 0, Math.PI * 2); g.stroke(); }
+    g.restore();
+  }
+
+  private drawTelegraphs(w: CombatWorld, alpha: number): void {
+    const b = w.boss;
+    if (!b || !b.e.alive || !b.action) return;
+    const g = this.ctx;
+    const a = b.action;
+    const p = this.pos(b.e, alpha);
+    if (a.name === "tail_sweep") {
+      const s = b.stingerWorld();
+      if (a.t < SWEEP_WINDUP) {
+        const k = a.t / SWEEP_WINDUP;
+        g.fillStyle = `rgba(255,45,85,${0.1 + 0.15 * k})`;
+        g.beginPath(); g.moveTo(s.x, s.y);
+        g.arc(s.x, s.y, SWEEP_RANGE, Math.min(a.a0, a.a1) * DEG, Math.max(a.a0, a.a1) * DEG); g.closePath(); g.fill();
+        g.strokeStyle = `rgba(255,45,85,${0.5 + 0.5 * k})`; g.lineWidth = 2;
+        g.setLineDash([12, 10]);
+        g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(s.x + Math.cos(a.a0 * DEG) * SWEEP_RANGE, s.y + Math.sin(a.a0 * DEG) * SWEEP_RANGE); g.stroke();
+        g.setLineDash([]);
+      } else if (b.beamAngle !== null) {
+        const to = { x: s.x + Math.cos(b.beamAngle * DEG) * SWEEP_RANGE, y: s.y + Math.sin(b.beamAngle * DEG) * SWEEP_RANGE };
+        g.strokeStyle = "rgba(255,59,212,0.45)"; g.lineWidth = SWEEP_WIDTH + 14; g.lineCap = "round";
+        g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(to.x, to.y); g.stroke();
+        g.strokeStyle = C.red; g.lineWidth = SWEEP_WIDTH; g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(to.x, to.y); g.stroke();
+        g.strokeStyle = "#fff"; g.lineWidth = 3; g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(to.x, to.y); g.stroke();
+      }
+    } else if (a.name === "claw_ring" && a.t < 0.8) {
+      const k = a.t / 0.8;
+      g.strokeStyle = `rgba(255,45,85,${0.3 + 0.5 * k})`; g.lineWidth = 4;
+      g.beginPath(); g.arc(p.x, p.y, 80 + 40 * (1 - k), (a.a0 + 34) * DEG, (a.a0 - 34 + 360) * DEG); g.stroke();
+      g.strokeStyle = "rgba(126,224,129,0.8)"; g.lineWidth = 6;
+      g.beginPath(); g.arc(p.x, p.y, 120, (a.a0 - 30) * DEG, (a.a0 + 30) * DEG); g.stroke();
+    } else if (a.name === "lateral_charge" && a.t < CHARGE_WARN) {
+      g.save();
+      g.strokeStyle = `rgba(255,45,85,${0.25 + 0.2 * Math.sin(this.time * 20)})`; g.lineWidth = 130; g.lineCap = "round";
+      g.beginPath(); g.moveTo(a.start.x, a.start.y); g.lineTo(a.target.x, a.target.y); g.stroke();
+      g.restore();
+    } else if ((a.name === "aimed_volley" || a.name === "tail_vent") && a.t < 0.4) {
+      const c = b.clawWorld(-1);
+      g.strokeStyle = "rgba(255,45,85,0.6)"; g.lineWidth = 2; g.setLineDash([6, 8]);
+      g.beginPath(); g.moveTo(c.x, c.y); g.lineTo(a.target.x, a.target.y); g.stroke(); g.setLineDash([]);
+    }
+  }
+
+  private drawFriendly(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    for (const b of w.friendly.items) {
+      if (!b.alive) continue;
+      const x = b.px + (b.x - b.px) * alpha, y = b.py + (b.y - b.py) * alpha;
+      if (b.model === "plasma") {
+        const sp = Math.hypot(b.vx, b.vy) || 1;
+        g.strokeStyle = "rgba(176,107,255,0.5)"; g.lineWidth = 8; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x - (b.vx / sp) * 24, y - (b.vy / sp) * 24); g.lineTo(x, y); g.stroke();
+        const img = TEX.plasma;
+        if (img?.complete && img.naturalWidth) {
+          // Source art points up; orient along the travel tangent. Collision stays the head only.
+          g.save(); g.translate(x, y); g.rotate(Math.atan2(b.vy, b.vx) + Math.PI / 2); g.globalCompositeOperation = "lighter";
+          g.drawImage(img, -10, -12, 20, 66); g.restore();
+        }
+        g.fillStyle = C.violet; g.beginPath(); g.arc(x, y, 8, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = C.cyan; g.lineWidth = 2; g.stroke(); // friendly rim, distinct from hostile magenta
+        g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill();
+      } else {
+        const sp = Math.hypot(b.vx, b.vy) || 1;
+        g.strokeStyle = C.gold; g.lineWidth = 4; g.lineCap = "round";
+        g.beginPath(); g.moveTo(x - (b.vx / sp) * 14, y - (b.vy / sp) * 14); g.lineTo(x, y); g.stroke();
+      }
+    }
+    for (const bm of w.beams) {
+      g.strokeStyle = "rgba(57,225,255,0.8)"; g.lineWidth = 7;
+      g.beginPath(); g.moveTo(bm.from.x, bm.from.y); g.lineTo(bm.to.x, bm.to.y); g.stroke();
+      g.strokeStyle = "#fff"; g.lineWidth = 2; g.stroke();
+    }
+  }
+
+  private drawPickups(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    for (const m of w.motes) {
+      const p = lerp(m.prev, m.pos, alpha);
+      g.fillStyle = C.gold;
+      g.beginPath(); g.moveTo(p.x, p.y - 6); g.lineTo(p.x + 5, p.y); g.lineTo(p.x, p.y + 6); g.lineTo(p.x - 5, p.y); g.fill();
+    }
+    if (w.buffs.has("PU07")) {
+      const me = lerp(w.motion.prev, w.motion.pos, alpha);
+      g.strokeStyle = "rgba(255,215,106,0.18)"; g.lineWidth = 2; g.setLineDash([6, 10]);
+      g.beginPath(); g.arc(me.x, me.y, 220, 0, Math.PI * 2); g.stroke(); g.setLineDash([]);
+    }
+    for (const pk of w.pickups) {
+      const p = lerp(pk.prev, pk.pos, alpha);
+      const y = p.y + Math.sin(this.time * 4 + pk.pos.x) * 4;
+      const col = ROLE_COLOR[ROLE[pk.defId] ?? "resource"];
+      g.fillStyle = "rgba(4,10,20,0.85)"; g.beginPath(); g.arc(p.x, y, 24, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = col; g.lineWidth = 4; g.beginPath(); g.arc(p.x, y, 24, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = col; g.font = "700 20px RB Thai, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText(PICKUP_GLYPH[pk.defId] ?? "?", p.x, y + 1); g.textBaseline = "alphabetic";
+      if (pk.life <= 5) {
+        // Last 5 s: steady countdown ring (no blinking, safe for reduced-flash mode).
+        g.strokeStyle = "#fff"; g.lineWidth = 3;
+        g.beginPath(); g.arc(p.x, y, 30, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (pk.life / 5)); g.stroke();
+      }
+    }
+  }
+
+  private drawHostile(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    for (const b of w.hostile.items) {
+      if (!b.alive) continue;
+      const x = b.px + (b.x - b.px) * alpha, y = b.py + (b.y - b.py) * alpha;
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, b.r + 2.5, 0, Math.PI * 2); g.fill();
+      g.fillStyle = b.r >= 5 ? C.magenta : C.red; g.beginPath(); g.arc(x, y, b.r, 0, Math.PI * 2); g.fill();
+    }
+  }
+
+  private drawSalvage(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    const ship = lerp(w.motion.prev, w.motion.pos, alpha);
+    for (const it of w.items) {
+      const loose = it.state === "detached_intact" || it.state === "owner_drop" || it.state === "acquiring";
+      const towed = it.state === "towed";
+      if (!loose && !towed) continue;
+      const p = lerp(it.prev, it.pos, alpha);
+      if (towed) {
+        const len = Math.hypot(p.x - ship.x, p.y - ship.y);
+        const col = len > CABLE_MAX ? C.red : len > CABLE_MAX * 0.8 ? C.orange : C.cyan;
+        const sag = Math.max(0, 140 - len) * 0.4;
+        g.strokeStyle = col; g.lineWidth = 3;
+        g.beginPath(); g.moveTo(ship.x, ship.y + 16);
+        g.quadraticCurveTo((ship.x + p.x) / 2 + sag * 0.3, (ship.y + p.y) / 2 + sag, p.x, p.y);
+        g.stroke();
+        for (let k = 0; k < 4; k++) {
+          const t = (this.time * 1.6 + k / 4) % 1;
+          g.fillStyle = "#bff6ff"; g.beginPath(); g.arc(ship.x + (p.x - ship.x) * t, ship.y + 16 + (p.y - ship.y - 16) * t, 2.5, 0, Math.PI * 2); g.fill();
+        }
+      }
+      // part silhouette (W022 tail segment stack or generic module)
+      g.save(); g.translate(p.x, p.y); g.rotate(towed ? 0 : this.time * 0.8);
+      const signature = it.sourceEncounter !== "player";
+      g.fillStyle = signature ? C.graphite : C.charcoal;
+      for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(0, -14 + k * 14, 11 - k, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = signature ? C.violet : C.orange; g.beginPath(); g.arc(0, 18, 5, 0, Math.PI * 2); g.fill();
+      g.restore();
+      // ownership bracket: cyan for intact signature, amber for neutral/owner drop
+      const col = signature ? C.cyan : C.amber;
+      const r = 30 + Math.sin(this.time * 6) * 2;
+      g.strokeStyle = col; g.lineWidth = 3;
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+        g.beginPath(); g.moveTo(p.x + sx * r, p.y + sy * (r - 10)); g.lineTo(p.x + sx * r, p.y + sy * r); g.lineTo(p.x + sx * (r - 10), p.y + sy * r); g.stroke();
+      }
+      if (loose) {
+        if (it.lifetime <= PICKUP_WARN_SEC) {
+          g.fillStyle = C.red; g.font = "700 22px RB Thai, sans-serif"; g.textAlign = "center";
+          g.fillText(String(Math.ceil(it.lifetime)), p.x, p.y - 40);
+        }
+        const d = Math.hypot(p.x - ship.x, p.y - ship.y);
+        if (d < TRACTOR_RANGE * 1.6) {
+          g.strokeStyle = d <= TRACTOR_RANGE ? "rgba(57,225,255,0.6)" : "rgba(57,225,255,0.2)";
+          g.setLineDash([4, 8]); g.lineWidth = 2; g.beginPath(); g.moveTo(ship.x, ship.y - 30); g.lineTo(p.x, p.y); g.stroke(); g.setLineDash([]);
+        }
+        if (w.tow && w.tow.itemId === it.instanceId && !w.tow.towing) {
+          g.strokeStyle = C.cyan; g.lineWidth = 5;
+          g.beginPath(); g.arc(p.x, p.y, 40, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * w.tow.progress) / TRACTOR_DWELL); g.stroke();
+          g.fillStyle = "rgba(57,225,255,0.15)"; g.beginPath(); g.moveTo(ship.x - 14, ship.y - 30); g.lineTo(p.x - 34, p.y); g.lineTo(p.x + 34, p.y); g.lineTo(ship.x + 14, ship.y - 30); g.fill();
+        }
+      }
+    }
+  }
+
+  private drawPlayer(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    const m = w.motion;
+    const p = lerp(m.prev, m.pos, alpha);
+    if (m.dashing) for (let k = 1; k <= 3; k++) this.hull(p.x - m.dashDir.x * k * 16, p.y - m.dashDir.y * k * 16, `rgba(57,225,255,${0.25 - k * 0.06})`);
+    const flame = 18 + Math.sin(this.time * 40) * 4 + (w.overdriveLeft > 0 ? 8 : 0);
+    g.fillStyle = "rgba(57,225,255,0.85)";
+    for (const ex of [-10, 10]) { g.beginPath(); g.moveTo(p.x + ex - 5, p.y + 34); g.lineTo(p.x + ex + 5, p.y + 34); g.lineTo(p.x + ex, p.y + 34 + flame); g.fill(); }
+    this.hull(p.x, p.y, C.ivory);
+    for (const mod of w.assembly.modules) {
+      const mount = w.weapons.mounts.find((x) => x.module === mod);
+      const heat = (mount?.heat ?? 0) / 100;
+      for (const c of mod.cells) {
+        const l = cellToLocal(c);
+        g.fillStyle = MODULE_COLOR[mod.weapon.id] ?? C.charcoal;
+        g.fillRect(p.x + l.x - 8, p.y + l.y - 9, 16, 18);
+        if (heat > 0.3) { g.fillStyle = `rgba(255,138,31,${(heat - 0.3) * 0.9})`; g.fillRect(p.x + l.x - 8, p.y + l.y - 9, 16, 18); }
+        g.strokeStyle = mount?.locked ? C.red : C.orange; g.lineWidth = 1.5; g.strokeRect(p.x + l.x - 8, p.y + l.y - 9, 16, 18);
+      }
+      if (mod.weapon.id === "W022") { g.fillStyle = C.cyan; g.beginPath(); g.arc(p.x + cellToLocal(mod.cells[0]).x, p.y + cellToLocal(mod.cells[0]).y + 6, 2.5, 0, Math.PI * 2); g.fill(); }
+      if (mount?.blocked) { g.fillStyle = C.red; g.font = "700 14px sans-serif"; g.fillText("✕", p.x + cellToLocal(mod.cells[0]).x - 4, p.y + cellToLocal(mod.cells[0]).y - 14); }
+    }
+    g.fillStyle = "rgba(57,225,255,0.35)"; g.beginPath(); g.arc(p.x, p.y, CORE_RADIUS, 0, Math.PI * 2); g.fill();
+    g.fillStyle = C.cyan; g.beginPath(); g.arc(p.x, p.y, 6, 0, Math.PI * 2); g.fill();
+    if (w.playerInvulnerable && !w.opts.invulnerable) { g.strokeStyle = "rgba(57,225,255,0.9)"; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 48, 0, Math.PI * 2); g.stroke(); }
+    if (w.overshield > 0) { g.strokeStyle = "rgba(255,215,106,0.7)"; g.lineWidth = 3; g.beginPath(); g.arc(p.x, p.y, 60, 0, Math.PI * 2); g.stroke(); }
+    if (w.shield > 0) { g.strokeStyle = `rgba(88,166,255,${0.15 + 0.35 * (w.shield / w.shieldMax)})`; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 54, 0, Math.PI * 2); g.stroke(); }
+  }
+
+  private hull(x: number, y: number, color: string): void {
+    const g = this.ctx;
+    const pts = [[0, -62], [10, -30], [14, -6], [40, 14], [40, 24], [14, 22], [12, 36], [-12, 36], [-14, 22], [-40, 24], [-40, 14], [-14, -6], [-10, -30]];
+    g.fillStyle = color;
+    g.beginPath(); pts.forEach(([px, py], i) => (i ? g.lineTo(x + px, y + py) : g.moveTo(x + px, y + py))); g.closePath(); g.fill();
+    if (color === C.ivory) {
+      g.strokeStyle = C.charcoal; g.lineWidth = 2; g.stroke();
+      g.strokeStyle = C.orange; g.lineWidth = 4;
+      g.beginPath(); g.moveTo(x - 40, y + 19); g.lineTo(x - 26, y + 17); g.moveTo(x + 40, y + 19); g.lineTo(x + 26, y + 17); g.stroke();
+      g.fillStyle = "#1e88a8"; g.beginPath(); g.ellipse(x, y - 30, 5, 12, 0, 0, Math.PI * 2); g.fill();
+    }
+  }
+
+  private drawLock(w: CombatWorld, alpha: number): void {
+    const lp = w.lockedPart();
+    if (!lp) return;
+    const g = this.ctx;
+    const base = this.pos(lp.enemy, alpha);
+    const c = partWorldPos(lp.part, base);
+    const live = lp.part.selectable;
+    const r = (lp.part.kind === "joint" ? 30 : lp.part.kind === "core" ? 46 : 36) + Math.sin(this.time * 6) * 3;
+    g.strokeStyle = live ? (lp.part.kind === "joint" ? C.gold : C.cyan) : "rgba(138,164,179,0.6)";
+    g.lineWidth = 3;
+    for (let k = 0; k < 4; k++) { const a0 = (k * Math.PI) / 2 + this.time; g.beginPath(); g.arc(c.x, c.y, r, a0, a0 + 0.9); g.stroke(); }
+    const tracking = w.weapons.mounts.some((m) => w.aimAngle(m).tracking);
+    if (live && !tracking) {
+      // Target outside the firing arc: arrow from the ship toward it.
+      const ship = lerp(w.motion.prev, w.motion.pos, alpha);
+      const a = Math.atan2(c.y - ship.y, c.x - ship.x);
+      g.fillStyle = C.gold; g.save(); g.translate(ship.x + Math.cos(a) * 80, ship.y + Math.sin(a) * 80); g.rotate(a);
+      g.beginPath(); g.moveTo(14, 0); g.lineTo(-8, -9); g.lineTo(-8, 9); g.fill(); g.restore();
+    }
+  }
+
+  // Weak joint: broken-ring target icon (colour is never the only cue).
+  private jointIcon(x: number, y: number, r: number, flash: boolean, pulse = false): void {
+    const g = this.ctx;
+    const k = pulse ? 1 + Math.sin(this.time * 10) * 0.12 : 1;
+    g.fillStyle = flash ? "#fff" : "rgba(255,176,32,0.35)"; g.beginPath(); g.arc(x, y, r * k, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = C.amber; g.lineWidth = 4;
+    for (let i = 0; i < 3; i++) { const a = (i * Math.PI * 2) / 3 + this.time * 2; g.beginPath(); g.arc(x, y, r * k + 4, a, a + 1.4); g.stroke(); }
+  }
+
+  // Armour: closed shield icon.
+  private shieldIcon(x: number, y: number, s: number): void {
+    const g = this.ctx;
+    g.fillStyle = "rgba(232,243,248,0.55)";
+    g.beginPath(); g.moveTo(x, y - s); g.lineTo(x + s, y - s * 0.5); g.lineTo(x + s * 0.7, y + s * 0.6); g.lineTo(x, y + s); g.lineTo(x - s * 0.7, y + s * 0.6); g.lineTo(x - s, y - s * 0.5); g.closePath(); g.fill();
+  }
+
+  private hpBar(x: number, y: number, w: number, frac: number): void {
+    const g = this.ctx;
+    g.fillStyle = "rgba(0,0,0,0.5)"; g.fillRect(x, y, w, 5);
+    g.fillStyle = C.red; g.fillRect(x, y, w * Math.max(0, frac), 5);
+  }
+}
+
+export type { Part };
