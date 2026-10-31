@@ -10,10 +10,10 @@ import type { MissionRow, WeaponRow } from "../core/types";
 import { Assembly, TILE, cellToLocal, reachesAround, type FittedModule } from "../ships/assembly";
 import { PlayerMotion } from "../ships/motion";
 import { BulletPool, type Bullet } from "./bullets";
-import { coreOf, makeBarge, makeDirected, makeScout, SUPPLY_ROW, updateEnemy, type Enemy } from "./enemies";
-import { formationSpawns, MissionDirector, supplySpawn } from "../campaign/missionDirector";
+import { coreOf, HAZARD_NODE_ROW, makeBarge, makeDirected, makeScout, SUPPLY_ROW, updateEnemy, type Enemy } from "./enemies";
+import { formationSpawns, hazardNodeSpawn, MissionDirector, supplySpawn } from "../campaign/missionDirector";
 import { evaluateStars, type ObjectiveStats } from "../campaign/stars";
-import { firstPartHit, partContains, partWorldPos, PRIORITY, type Part } from "./parts";
+import { firstPartHit, makePart, partContains, partEntryT, partWorldPos, PRIORITY, type Part } from "./parts";
 import type { Emitter } from "./patterns";
 import { SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
 import { CrabBoss } from "./crab";
@@ -68,6 +68,15 @@ export const QUICK_PULL_RANGE = 230;   // quick salvage: any direction, generous
 export const QUICK_FLY_SPEED = 950;
 export const ARMOR_REPAIR = 25;        // part with no room on the hull becomes armour
 export const ARMOR_OVERSHIELD = 30;
+// HZ01 Wreck Drift (catalog: "marked moving cover; slow collisions; no bullet camouflage").
+export const WRECK_HW = 30, WRECK_HH = 56;  // collider half-size (matches the drawn chunk)
+export const WRECK_SPEED = 60;
+export const WRECK_EVERY = 4.5;            // per live hazard node
+export const WRECK_WARN = 0.6;             // node glows before each launch
+export const WRECK_DAMAGE = 5;             // per contact tick (counted as hazard damage)
+export const WRECK_HIT_COOLDOWN = 1.0;
+export const HAZARD_NODE_LIFE = 30;        // then it retreats if not destroyed
+export const WRECK_AMBIENT_EVERY = 5.5;    // the belt drifts on its own all mission; nodes add more
 export const SNATCH_BEAM_SEC = 2.0;    // E21 tractor time before it steals a part (shoot it first)
 export const SNATCH_RANGE = 170;
 export const SNATCH_SPEED = 150;
@@ -134,7 +143,14 @@ export class CombatWorld {
   boss: ScorpionBoss | CrabBoss | null = null;
   namedAttackHits = 0;
   cargoDestroyed = 0;
-  magnet: { itemId: string } | null = null; // quick salvage: part flying to the ship  // parts destroyed after the player started towing them (Star C P01-04) // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
+  magnet: { itemId: string } | null = null;
+  wrecks: { id: number; pos: Vec; prev: Vec; rot: number; spin: number }[] = [];
+  hazardNodesDestroyed = 0;
+  hazardNodesTotal = 0;
+  hazardHits = 0;
+  private wreckSeq = 0;
+  private hazardCd = 0;
+  private ambientWreck = 2.5; // quick salvage: part flying to the ship  // parts destroyed after the player started towing them (Star C P01-04) // hits taken from the boss's signature attack (Star C "avoid_named_attack_hits")
   friendly = new BulletPool(300);
   hostile = new BulletPool(600);
   items: SalvageItem[] = [];
@@ -188,6 +204,7 @@ export class CombatWorld {
     this.mission = opts.missionId && opts.missionId !== "SLICE-01" ? catalog.mission(opts.missionId) : null;
     this.director = this.mission ? new MissionDirector(this.mission) : null;
     this.supplyTotal = this.director?.actors.supply_nodes ?? 0;
+    this.hazardNodesTotal = this.director?.actors.hazard_nodes ?? 0;
     this.rng = new Rng(opts.seed ?? this.mission?.seed ?? 20261031);
     this.runId = opts.runId ?? "run1";
     const hull = catalog.hull("H01");
@@ -311,6 +328,7 @@ export class CombatWorld {
     for (const e of this.enemies) updateEnemy(e, DT, this.em, this.motion.pos);
     this.enemies = this.enemies.filter((e) => !e.leftArena);
     this.updateThieves();
+    this.updateHazard();
     if (this.boss?.e.alive) this.boss.update(DT, this.motion.pos);
     this.resolveBodyContact();
     if (input.overdrive && this.overdriveCharge >= 100 && this.overdriveLeft <= 0) {
@@ -412,7 +430,7 @@ export class CombatWorld {
   // Catalog-driven mission flow (M2): waves, supply nodes, encounter, outro.
   private updateDirected(): void {
     const d = this.director!;
-    const waveAlive = this.enemies.some((e) => e.role !== "supply");
+    const waveAlive = this.enemies.some((e) => e.role !== "supply" && e.role !== "hazard_node");
     const towed = this.tow?.towing ? this.towedItem : null;
     if (towed && !waveAlive && !this.dock && (!this.boss || this.boss.lull || !this.boss.e.alive)) {
       this.startDock(towed);
@@ -428,6 +446,9 @@ export class CombatWorld {
         if (row.id === "E04") this.hint("hint.hauler");
         if (row.id === "E02") this.hint("hint.interceptor");
         if (row.id === "E21") this.hint("hint.snatcher_wave");
+      } else if (ev.kind === "hazard_node") {
+        this.enemies.push(makeDirected(this.spawnId("h"), HAZARD_NODE_ROW, hazardNodeSpawn(this.rng, ev.index), "hazard"));
+        this.hint("hint.hazard_node");
       } else if (ev.kind === "supply") {
         this.enemies.push(makeDirected(this.spawnId("s"), SUPPLY_ROW, supplySpawn(this.rng, ev.index), "supply"));
         this.hint("hint.supply");
@@ -445,6 +466,68 @@ export class CombatWorld {
       if (loose) this.hint("hint.outro_salvage");
       if (this.outroTimer >= OUTRO_MIN_SEC && this.hostile.active === 0 && (!loose || this.outroTimer >= OUTRO_SALVAGE_WAIT)) this.finish(true);
     }
+  }
+
+  // ---------------------------------------------------------------- HZ01 wreck drift
+  // Live hazard nodes launch slow wreck chunks (moving cover). Chunks block bullets both
+  // ways, push the ship out and hurt it a little per contact (hazard damage → Star C).
+  private updateHazard(): void {
+    for (const e of this.enemies) {
+      if (e.role !== "hazard_node" || !e.alive) continue;
+      if (e.age >= HAZARD_NODE_LIFE && e.holdAtEnd) { // retreat
+        e.holdAtEnd = false;
+        e.path = [{ ...e.pos }, { x: e.pos.x, y: -100 }]; e.pathI = 1; e.track = { ...e.pos }; e.speed = 120;
+      }
+      if (!e.holdAtEnd || e.pathI < (e.path?.length ?? 0)) continue; // only launches while parked
+      e.fireTimer -= DT;
+      e.telegraph = e.fireTimer <= WRECK_WARN && e.fireTimer > 0 ? e.fireTimer : 0;
+      if (e.fireTimer <= 0) {
+        e.fireTimer = WRECK_EVERY;
+        const pos = { x: clamp(e.pos.x + (this.rng.next() - 0.5) * 120, 50, 670), y: e.pos.y + 70 };
+        this.wrecks.push({ id: this.wreckSeq++, pos, prev: { ...pos }, rot: (this.rng.next() - 0.5) * 0.3, spin: (this.rng.next() - 0.5) * 0.25 });
+        this.events.push({ type: "blast", pos: { ...pos }, value: 20 });
+      }
+    }
+    // ambient drift from the top, only in missions with a hazard objective (P01-05)
+    if (this.hazardNodesTotal > 0 && this.phase !== "outro" && this.status === "running") {
+      this.ambientWreck -= DT;
+      if (this.ambientWreck <= 0) {
+        this.ambientWreck = WRECK_AMBIENT_EVERY;
+        const pos = { x: 70 + this.rng.next() * 580, y: -70 };
+        this.wrecks.push({ id: this.wreckSeq++, pos, prev: { ...pos }, rot: (this.rng.next() - 0.5) * 0.3, spin: (this.rng.next() - 0.5) * 0.25 });
+      }
+    }
+    for (const w of this.wrecks) { w.prev = { ...w.pos }; w.pos = { x: w.pos.x, y: w.pos.y + WRECK_SPEED * DT }; w.rot += w.spin * DT; }
+    this.wrecks = this.wrecks.filter((w) => w.pos.y < 1400);
+    // ship contact: pushed out like a body, small hazard damage on a cooldown
+    this.hazardCd = Math.max(0, this.hazardCd - DT);
+    const m = this.motion;
+    for (const w of this.wrecks) {
+      let push = penetration(wreckPart(), w.pos, m.pos, PLAYER_BODY_RADIUS);
+      if (!push) continue;
+      // Never pin the ship against the bottom edge: slide it out sideways instead.
+      if (m.pos.y + push.y > m.bounds.y1 - 1 && push.y > 0) {
+        const side = m.pos.x >= w.pos.x ? 1 : -1;
+        const out = w.pos.x + side * (WRECK_HW + PLAYER_BODY_RADIUS + 1) - m.pos.x;
+        push = { x: out, y: 0 };
+      }
+      m.pos = { x: m.pos.x + push.x, y: m.pos.y + push.y };
+      if (this.hazardCd <= 0 && !this.playerInvulnerable) {
+        this.hazardCd = WRECK_HIT_COOLDOWN;
+        this.hazardHits++;
+        this.applyPlayerHit(WRECK_DAMAGE, "core", { ...m.pos });
+      }
+    }
+  }
+
+  // First wreck along a segment (bullets and beams stop there), as a 0..1 fraction or -1.
+  private wreckHitT(a: Vec, b: Vec, pad: number): number {
+    let best = -1;
+    for (const w of this.wrecks) {
+      const t = partEntryT(wreckPart(), w.pos, a, b, pad);
+      if (t >= 0 && (best < 0 || t < best)) best = t;
+    }
+    return best;
   }
 
   // ---------------------------------------------------------------- loot snatchers
@@ -547,8 +630,11 @@ export class CombatWorld {
       const laser = this.buffs.has("PU02") ? 1.15 : 1; // PU02 laser core: +15% damage and range
       const range = (sp.range ?? 600) * laser;
       const to = { x: from.x + Math.cos(angle * DEG) * range, y: from.y + Math.sin(angle * DEG) * range };
-      const hit = this.firstEnemyHit(from, to, 0);
-      const end = hit ? { x: from.x + (to.x - from.x) * hit.t, y: from.y + (to.y - from.y) * hit.t } : to;
+      let hit = this.firstEnemyHit(from, to, 0);
+      const wt = this.wrecks.length ? this.wreckHitT(from, to, 0) : -1;
+      if (wt >= 0 && (!hit || wt < hit.t)) hit = null;
+      const tEnd = hit ? hit.t : wt >= 0 ? wt : 1;
+      const end = { x: from.x + (to.x - from.x) * tEnd, y: from.y + (to.y - from.y) * tEnd };
       if (hit) this.damagePart(hit.enemy, hit.part, w.damage * laser, end);
       this.beams.push({ from, to: end, ttl: sp.pulse_duration ?? 0.08 });
     } else if (w.attack_model === "claw_grab") {
@@ -656,7 +742,10 @@ export class CombatWorld {
   private resolveFriendly(): void {
     for (const b of this.friendly.items) {
       if (!b.alive) continue;
-      const hit = this.firstEnemyHit({ x: b.px, y: b.py }, { x: b.x, y: b.y }, b.r);
+      const wt = this.wrecks.length ? this.wreckHitT({ x: b.px, y: b.py }, { x: b.x, y: b.y }, b.r) : -1;
+      const hit0 = this.firstEnemyHit({ x: b.px, y: b.py }, { x: b.x, y: b.y }, b.r);
+      if (wt >= 0 && (!hit0 || wt < hit0.t)) { this.events.push({ type: "deflect", pos: { x: b.px + (b.x - b.px) * wt, y: b.py + (b.y - b.py) * wt } }); this.friendly.kill(b); continue; }
+      const hit = hit0;
       if (!hit) continue;
       const at = { x: b.px + (b.x - b.px) * hit.t, y: b.py + (b.y - b.py) * hit.t };
       this.damagePart(hit.enemy, hit.part, b.dmg, at);
@@ -756,6 +845,7 @@ export class CombatWorld {
     this.events.push({ type: "kill", pos: { ...e.pos }, tag: e.role });
     if (!credit) return;
     if (e.role === "supply") this.supplyDestroyed++;
+    if (e.role === "hazard_node") { this.hazardNodesDestroyed++; this.hint("hint.hazard_node_down"); }
     if (e.steal?.carrying) { // a shot-down snatcher drops what it carried
       const it = this.items.find((i) => i.instanceId === e.steal!.carrying);
       if (it) { it.heldBy = null; it.vel = { x: 0, y: 40 }; }
@@ -975,6 +1065,7 @@ export class CombatWorld {
     for (const b of this.hostile.items) {
       if (!b.alive) continue;
       const a = { x: b.px, y: b.py }, z = { x: b.x, y: b.y };
+      if (this.wrecks.length && this.wreckHitT(a, z, b.r) >= 0) { this.hostile.kill(b); continue; } // wrecks are cover
       // cargo absorbs half and the shot continues with the rest
       if (cargo && !b.hitCargo && cargo.invuln <= 0 && pointSegmentDistance(cargo.pos, a, z) <= CARGO_RADIUS + b.r) {
         b.hitCargo = true;
@@ -1430,7 +1521,8 @@ export class CombatWorld {
     const mid = this.mission?.id ?? "SLICE-01";
     const m = /^P(\d+)-(\d+)$/.exec(mid);
     const stats: ObjectiveStats = { supplyDestroyed: this.supplyDestroyed, coreDamage: this.coreDamageTaken,
-      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0, namedAttackHits: this.namedAttackHits, cargoDestroyed: this.cargoDestroyed };
+      securedIntact: secured.filter((x) => x.intact).map((x) => x.templateId), interrupts: 0, namedAttackHits: this.namedAttackHits, cargoDestroyed: this.cargoDestroyed,
+      hazardNodes: this.hazardNodesDestroyed, hazardHits: this.hazardHits };
     this.result = {
       runId: this.runId, missionId: mid, sector: m ? +m[1] : 1, missionIndex: m ? +m[2] : 6, victory, score: this.score,
       stats, stars: this.mission ? evaluateStars(this.mission, stats, victory) : null,
@@ -1453,6 +1545,11 @@ export class CombatWorld {
 }
 
 export type { Bullet };
+
+let WRECK_PART: Part | null = null;
+function wreckPart(): Part {
+  return (WRECK_PART ??= makePart({ id: "wreck", kind: "armor", shape: { type: "rect", hw: WRECK_HW, hh: WRECK_HH }, hp: 1, invulnerable: true }));
+}
 
 // Minimum translation that moves a circle (center p, radius r) out of a part, or null.
 function penetration(part: Part, origin: Vec, p: Vec, r: number): Vec | null {

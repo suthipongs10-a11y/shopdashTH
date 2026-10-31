@@ -1,0 +1,36 @@
+{
+  "asset_id": "hazard_HZ05",
+  "source_filename": "art/source/batch_033/rb_hazard_hz05_000.png",
+  "source_sha256": "79491863a01fa204a826c09856fb2265d5fd26cf8b3ec03b106d30c492776745",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    241,
+    202,
+    1000,
+    1061
+  ],
+  "runtime_size": [
+    318,
+    360
+  ],
+  "scale": 0.41909,
+  "visible_rect": [
+    3.4,
+    3.4,
+    314.7,
+    356.6
+  ],
+  "pivot_px": [
+    159.0,
+    180.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_033",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

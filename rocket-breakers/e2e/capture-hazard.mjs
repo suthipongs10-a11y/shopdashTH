@@ -1,0 +1,20 @@
+// Dev-only capture for P01-05: hazard nodes parked up top and HZ01 wrecks drifting.
+import { createRequire } from "node:module";
+const { chromium } = createRequire(import.meta.url)("playwright");
+const url = process.argv[2] ?? "http://localhost:4173/";
+const out = process.argv[3] ?? "./captures";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 412, height: 915 }, deviceScaleFactor: 2 });
+const errors = [];
+page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") errors.push(`${m.type()}: ${m.text()}`); });
+page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
+await page.goto(url);
+await page.waitForTimeout(700);
+await page.evaluate(() => window.__rb.startMission("P01-05"));
+await page.waitForTimeout(300);
+await page.evaluate(() => { const w = window.__rb.screen.world; w.opts.invulnerable = true;
+  for (let i = 0; i < 60 * 60; i++) { if (w.wrecks.length >= 3 && w.enemies.some((e) => e.role === "hazard_node" && e.holdAtEnd)) break; w.step({ move: { x: 0, y: 0 }, fire: false }); } });
+await page.waitForTimeout(200);
+await page.screenshot({ path: `${out}/h01_wrecks.png` });
+console.log(errors.length ? errors.join("\n") : "no console errors");
+await browser.close();

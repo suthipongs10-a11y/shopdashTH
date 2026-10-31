@@ -10,7 +10,7 @@ import type { Vec } from "../core/geometry";
 export interface Enemy {
   id: string;
   defId: string;
-  role: "scout" | "shield" | "boss" | "interceptor" | "cargo" | "supply" | "thief";
+  role: "scout" | "shield" | "boss" | "interceptor" | "cargo" | "supply" | "thief" | "hazard_node";
   pos: Vec;
   prev: Vec;
   parts: Part[];
@@ -40,6 +40,7 @@ export interface Enemy {
   aim: Vec | null;     // aimed volley target, sampled when the warning starts
   // Loot Snatcher (E21) state, driven by the world (it needs the salvage list).
   steal?: { target: string | null; beam: number; carrying: string | null; idle: number };
+  holdAtEnd?: boolean; // stay at the last waypoint instead of leaving (hazard nodes)
 }
 
 export const coreOf = (e: Enemy): Part => e.parts.find((p) => p.kind === "core")!;
@@ -77,6 +78,11 @@ export function makeBarge(id: string, row: EnemyRow, index: number, fromLeft: bo
 
 export interface SpawnSpec { path: Vec[]; speed: number; wobble: number; index: number }
 
+export const HAZARD_NODE_ROW: EnemyRow = {
+  id: "HZNODE", name: { th: "เครื่องกำเนิดซากลอย", en: "Wreck launcher" }, role: "hazard_node", attack_model: "none", movement: "hold",
+  base_hp: 160, base_damage: 0, speed: 120, telegraph_sec: 0.6, threat_cost: 0, xp: 0, asset_id: "hazard_HZ02", counter: "destroy it to stop the wreck drift",
+};
+
 export const SUPPLY_ROW: EnemyRow = {
   id: "SUPPLY", name: { th: "จุดส่งกำลัง", en: "Supply node" }, role: "supply", attack_model: "none", movement: "drift",
   base_hp: 60, base_damage: 0, speed: 50, telegraph_sec: 0, threat_cost: 0, xp: 0, asset_id: "", counter: "shoot before it drifts away",
@@ -86,7 +92,7 @@ export const SUPPLY_ROW: EnemyRow = {
 export function makeDirected(id: string, row: EnemyRow, spec: SpawnSpec, tag: string): Enemy {
   const start = spec.path[0];
   const dir = spec.path.length > 1 && spec.path[1].x < start.x ? -1 : 1;
-  const role: Enemy["role"] = ({ E01: "scout", E02: "interceptor", E03: "shield", E04: "cargo", E21: "thief", SUPPLY: "supply" } as Record<string, Enemy["role"]>)[row.id] ?? "scout";
+  const role: Enemy["role"] = ({ E01: "scout", E02: "interceptor", E03: "shield", E04: "cargo", E21: "thief", SUPPLY: "supply", HZNODE: "hazard_node" } as Record<string, Enemy["role"]>)[row.id] ?? "scout";
   const e = base(id, row, role, start, tag, spec.index, dir);
   e.path = spec.path.map((p) => ({ ...p }));
   e.pathI = 1;
@@ -125,6 +131,10 @@ export function makeDirected(id: string, row: EnemyRow, spec: SpawnSpec, tag: st
       e.steal = { target: null, beam: 0, carrying: null, idle: 0 };
       e.parts = [makePart({ id: "core", kind: "core", shape: { type: "circle", r: 24 }, hp: row.base_hp, selectable: true })];
       break;
+    case "hazard_node":
+      e.charge = 3; e.credits = 15; e.scrap = 3; e.score = 400; e.fireTimer = 0.9; e.holdAtEnd = true;
+      e.parts = [makePart({ id: "core", kind: "core", shape: { type: "rect", hw: 26, hh: 40 }, hp: row.base_hp, selectable: true })];
+      break;
     case "supply":
       e.charge = 2; e.credits = 10; e.scrap = 2; e.score = 250; e.fireTimer = Infinity;
       e.parts = [makePart({ id: "core", kind: "core", shape: { type: "rect", hw: 30, hh: 30 }, hp: row.base_hp, selectable: true })];
@@ -154,7 +164,10 @@ function followPath(e: Enemy, dt: number): void {
     else { p = { x: p.x + (dx / d) * budget, y: p.y + (dy / d) * budget }; budget = 0; }
   }
   e.track = p;
-  if (e.pathI >= path.length) { e.leftArena = true; return; }
+  if (e.pathI >= path.length) {
+    if (e.holdAtEnd) { e.pos = { ...p }; return; }
+    e.leftArena = true; return;
+  }
   const a = path[e.pathI - 1], b = path[e.pathI];
   const d = Math.hypot(b.x - a.x, b.y - a.y) || 1;
   const s = e.wobble ? Math.sin(e.age * 2.2 + e.wobblePhase) * e.wobble : 0;
@@ -182,7 +195,7 @@ export function updateEnemy(e: Enemy, dt: number, em: Emitter, target: Vec = { x
 
 function updateFire(e: Enemy, dt: number, em: Emitter, target: Vec): void {
   const onScreen = e.pos.x > 24 && e.pos.x < 696 && e.pos.y > 30 && e.pos.y < 1000;
-  if (e.role === "cargo" || e.role === "supply" || e.role === "thief") return; // no damaging attack (body contact still hurts)
+  if (e.role === "cargo" || e.role === "supply" || e.role === "thief" || e.role === "hazard_node") return; // no damaging attack (body contact still hurts)
   const warn = e.role === "interceptor" ? VOLLEY_WARN : SCOUT_TELEGRAPH;
   const wasWarning = e.telegraph > 0;
   e.fireTimer -= dt;

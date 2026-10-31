@@ -1,6 +1,6 @@
 # Progress
 
-Status: **M2 stage 3 — P01-01, P01-03, P01-04 and P01-06 playable** (web build) + expansion 1.1 power-ups (8 of 12).
+Status: **M2 stage 4 — P01-01, 03, 04, 05, 06 playable (P01-02 escort left)** + quick salvage (web build) + expansion 1.1 power-ups (8 of 12).
 Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 
 ## Done (2026-10-31)
@@ -118,3 +118,10 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
   a Settings option. Tutorial/hints/how-to rewritten for the tap flow.
 - Tests: 88 (new: one-tap fit, armour fallback, tap-only bot clears P01-01/03/04/06 and steals W021/W022 with no dock).
   Browser capture `e2e/capture-quick.mjs`: real tap on the button fits the stolen tail, no console errors.
+
+## Done (2026-10-31, BATCH_033 art + M2 stage 4 — Wreck Tunnel)
+- Hazards HZ01–HZ08 imported (HZ01 integrated, HZ02 used as the launcher stand-in). QA: `art/source/batch_033/QA_REPORT.md`.
+- HZ01 Wreck Drift: drifting cover that blocks shots both ways, shoves the ship (never pins it), small hazard damage.
+- Hazard nodes (wreck launchers) as P01-05 objective actors; HUD counter; briefing tip.
+- P01-05 playable: Star B destroy 3 launchers, Star C no hazard hits.
+- Tests: 93 (new: wreck cover, contact push + hazard count, node stop, P01-05 stars, P01-05 bot run).

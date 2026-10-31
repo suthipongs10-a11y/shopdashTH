@@ -1,0 +1,258 @@
+[
+  {
+    "filename": "rb_hazard_hz01_000.png",
+    "hazard_id": "HZ01",
+    "name": "Wreck Drift",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      317,
+      68,
+      971,
+      1178
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.21083,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "de848531a6a5c6d749c7bf39b62ac8985d78a51d0e8da007fc6f9f2a1b4849d8"
+  },
+  {
+    "filename": "rb_hazard_hz02_000.png",
+    "hazard_id": "HZ02",
+    "name": "Molten Gates",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      31,
+      200,
+      1223,
+      1054
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.34813,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "e565fb0dbe7feab362c1223672118586160fb5492b61ee939f0c3f6f83021dd0"
+  },
+  {
+    "filename": "rb_hazard_hz03_000.png",
+    "hazard_id": "HZ03",
+    "name": "Ion Front",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      345,
+      217,
+      933,
+      1013
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.04613,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "613d93e94ce4f8bb4bf0a389378d12c7c05adda5fdacb2a648a0ef0ce80867bf"
+  },
+  {
+    "filename": "rb_hazard_hz04_000.png",
+    "hazard_id": "HZ04",
+    "name": "Root Lattice",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      63,
+      110,
+      1194,
+      1144
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.29268,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "4294509c6d44450be84aa2b34fdc2626e068a9699bf961575000bb32f0ebfeee"
+  },
+  {
+    "filename": "rb_hazard_hz05_000.png",
+    "hazard_id": "HZ05",
+    "name": "Prism Ice",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      249,
+      210,
+      990,
+      1053
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.25486,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "79491863a01fa204a826c09856fb2265d5fd26cf8b3ec03b106d30c492776745"
+  },
+  {
+    "filename": "rb_hazard_hz06_000.png",
+    "hazard_id": "HZ06",
+    "name": "Sand Veil",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      253
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      157,
+      85,
+      1144,
+      1171
+    ],
+    "edge_alpha_max": 2,
+    "visible_coverage_alpha_gt16": 0.44879,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "c15b7df756a1ff9788a811e0f1bdebf8a4aa93c56f0db59cfed649f11c3cb1ae"
+  },
+  {
+    "filename": "rb_hazard_hz07_000.png",
+    "hazard_id": "HZ07",
+    "name": "Gravity Wells",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      254
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      104,
+      83,
+      1156,
+      1141
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.41495,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "d82f26b27329fc13fbba84d72f72ac9758e19b9cabb5c8d646a423dbb0d3a682"
+  },
+  {
+    "filename": "rb_hazard_hz08_000.png",
+    "hazard_id": "HZ08",
+    "name": "Eclipse Gates",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "alpha_range": [
+      0,
+      255
+    ],
+    "mode": "RGBA",
+    "visible_bbox_alpha_gt16": [
+      97,
+      300,
+      887,
+      1040
+    ],
+    "edge_alpha_max": 0,
+    "visible_coverage_alpha_gt16": 0.12402,
+    "canvas_pivot_normalized": [
+      0.5,
+      0.5
+    ],
+    "status": "static_art_awaiting_gameplay_readability_and_collision_QA",
+    "sha256": "4b6663f305553741293f236f624a64ef01af4a6fe568ce0aa8235568cc6c4d7b"
+  }
+]

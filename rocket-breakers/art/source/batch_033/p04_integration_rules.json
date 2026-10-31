@@ -1,0 +1,102 @@
+{
+  "status": "implementation_contract_not_runtime_tested",
+  "blend": "alpha (all requested assets)",
+  "reference_canvas": [
+    1024,
+    1024
+  ],
+  "actual_canvas": [
+    1254,
+    1254
+  ],
+  "pivot_normalized": [
+    0.5,
+    0.5
+  ],
+  "render_order_low_to_high": [
+    "background",
+    "sand_veil_and_low_opacity_fields",
+    "physical_hazard_art",
+    "telegraph_geometry",
+    "ships",
+    "enemy_and_player_bullets",
+    "weak_joint_high_contrast_markers",
+    "HUD"
+  ],
+  "recommended_initial_opacity_not_final_balance": {
+    "HZ03": 0.35,
+    "HZ06": 0.15,
+    "HZ07": 0.25
+  },
+  "hazards": {
+    "HZ01": {
+      "name": "Wreck Drift",
+      "rules": [
+        "marked moving cover",
+        "slow collisions",
+        "no bullet camouflage"
+      ]
+    },
+    "HZ02": {
+      "name": "Molten Gates",
+      "warning_seconds": 1.2,
+      "always_safe_lanes_min": 2,
+      "rules": [
+        "Code draws orange lane warning and heat pulse; supplied PNG is gate hardware base state."
+      ]
+    },
+    "HZ03": {
+      "name": "Ion Front",
+      "wind_warning_seconds": 0.8,
+      "max_force_px_per_s2": 100,
+      "lightning_warning_seconds": 1.2
+    },
+    "HZ04": {
+      "name": "Root Lattice",
+      "growth_seconds": 1.5,
+      "destructible": true,
+      "rules": [
+        "Never seal player in",
+        "Collision must follow root sections, not whole rectangular image."
+      ]
+    },
+    "HZ05": {
+      "name": "Prism Ice",
+      "deceleration": 1400,
+      "deceleration_units": "not stated explicitly in request; preserve configured engine convention",
+      "rules": [
+        "Reflect beams only on marked facets",
+        "Specify reflector segments in code, do not infer from texture alpha."
+      ]
+    },
+    "HZ06": {
+      "name": "Sand Veil",
+      "background_only": true,
+      "rules": [
+        "All bullets and joints above fog at high contrast",
+        "Reduce opacity in material; source texture is not guaranteed low-opacity everywhere."
+      ]
+    },
+    "HZ07": {
+      "name": "Gravity Wells",
+      "max_force_px_per_s2": 120,
+      "rules": [
+        "Bounded radial force",
+        "Always reachable exit",
+        "Transparent ring center is not itself proof of a reachable gameplay exit."
+      ]
+    },
+    "HZ08": {
+      "name": "Eclipse Gates",
+      "combined_types": [
+        "Molten Gates",
+        "Gravity Wells"
+      ],
+      "rules": [
+        "Combine two previously taught hazard types",
+        "No overlapping telegraphs that create unavoidable pattern",
+        "Code must schedule independently; PNG is one static base-state appearance."
+      ]
+    }
+  }
+}

@@ -9,6 +9,8 @@ export interface ObjectiveStats {
   interrupts: number;          // boss charge interrupts landed
   namedAttackHits?: number;    // hits from the boss's signature attack
   cargoDestroyed?: number;     // parts destroyed after the player started towing them
+  hazardNodes?: number;        // hazard nodes destroyed
+  hazardHits?: number;         // times the ship was hit by the sector hazard
 }
 
 export function emptyStats(): ObjectiveStats {
@@ -16,7 +18,7 @@ export function emptyStats(): ObjectiveStats {
 }
 
 // Objective keys this build can evaluate; others are shown but cannot be earned yet.
-export const SUPPORTED_OBJECTIVES = new Set(["clear_mission", "destroy_supply_nodes", "core_damage_at_most", "secure_signature", "avoid_named_attack_hits", "secure_intact_parts", "cargo_destroyed_at_most"]);
+export const SUPPORTED_OBJECTIVES = new Set(["clear_mission", "destroy_supply_nodes", "core_damage_at_most", "secure_signature", "avoid_named_attack_hits", "secure_intact_parts", "cargo_destroyed_at_most", "disable_hazard_nodes", "hazard_damage_at_most"]);
 
 export function objectiveMet(o: MissionRow["star_objectives"][number], s: ObjectiveStats, victory: boolean): boolean {
   if (!victory) return false;
@@ -24,6 +26,8 @@ export function objectiveMet(o: MissionRow["star_objectives"][number], s: Object
     case "clear_mission": return true;
     case "destroy_supply_nodes": return s.supplyDestroyed >= o.threshold;
     case "core_damage_at_most": return Math.round(s.coreDamage) <= o.threshold;
+    case "disable_hazard_nodes": return (s.hazardNodes ?? 0) >= o.threshold;
+    case "hazard_damage_at_most": return (s.hazardHits ?? 0) <= o.threshold;
     case "secure_intact_parts": return s.securedIntact.length >= o.threshold;
     case "cargo_destroyed_at_most": return (s.cargoDestroyed ?? 0) <= o.threshold;
     case "avoid_named_attack_hits": return (s.namedAttackHits ?? 0) <= o.threshold;

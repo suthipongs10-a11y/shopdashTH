@@ -43,6 +43,7 @@ RULES = {
     "enemy_E03": (220, "center", None),
     "enemy_E04": (220, "center", None),
     **{f"enemy_E{i:02d}": (220, "center", None) for i in range(5, 25)},
+    **{f"hazard_HZ{i:02d}": (360, "center", None) for i in range(1, 9)},
     "bg_P01_far": (1280, "center", None),
     "bg_P01_mid": (1280, "center", None),
     "bg_P01_foreground": (1280, "center", None),

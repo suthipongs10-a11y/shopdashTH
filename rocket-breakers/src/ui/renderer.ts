@@ -12,7 +12,7 @@ import { PICKUP_WARN_SEC } from "../salvage/salvage";
 import { ROLE } from "../combat/powerups";
 import { TAIL_LEN, ScorpionBoss } from "../combat/boss";
 import { CLAW_LEN, CRAB_TELEGRAPH, CrabBoss } from "../combat/crab";
-import { QUICK_PULL_RANGE, SNATCH_BEAM_SEC } from "../combat/world";
+import { QUICK_PULL_RANGE, SNATCH_BEAM_SEC, WRECK_HH, WRECK_HW } from "../combat/world";
 import { drawAt, preloadSprites, sprite, visCenter, visH, visW } from "./sprites";
 import { t } from "../core/i18n";
 import explosionUrl from "../../assets/fx/fx_explosion_256.png";
@@ -202,6 +202,7 @@ export class Renderer {
     if (this.shake > 0) g.translate((this.rand() - 0.5) * this.shake, (this.rand() - 0.5) * this.shake);
     this.drawBackground();
     this.drawFiringLane(w, alpha);
+    this.drawWrecks(w, alpha);
     for (const e of w.enemies) this.drawEnemy(e, alpha);
     this.drawSnatchBeams(w, alpha);
     if (w.boss && (w.boss.e.alive || w.status === "running")) this.drawBoss(w, alpha);
@@ -316,6 +317,7 @@ export class Renderer {
     const core = coreOf(e);
     const flash = core.flash > 0;
     if (e.role === "supply") { this.drawSupply(e, p, flash); return; }
+    if (e.role === "hazard_node") { this.drawHazardNode(e, p, flash); return; }
     // BATCH_003 art: sources are nose-up, enemies fly toward the player, so rotate 180°.
     const look = ENEMY_LOOK[e.defId] ?? ENEMY_LOOK.E01;
     const art = sprite(look.art);
@@ -383,6 +385,33 @@ export class Renderer {
       g.strokeStyle = C.magenta; g.lineWidth = 5;
       g.beginPath(); g.arc(ip.x, ip.y, 44, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * k); g.stroke();
     }
+  }
+
+  // HZ01 wreck drift chunks (BATCH_033 art), drawn to the collider size.
+  private drawWrecks(w: CombatWorld, alpha: number): void {
+    const g = this.ctx;
+    const art = sprite("hazard_HZ01");
+    for (const wr of w.wrecks) {
+      const p = lerp(wr.prev, wr.pos, alpha);
+      if (art) drawAt(g, art, p.x, p.y, ...visCenter(art), (WRECK_HH * 2 + 12) / visH(art), wr.rot);
+      else { g.fillStyle = C.graphiteLight; g.fillRect(p.x - WRECK_HW, p.y - WRECK_HH, WRECK_HW * 2, WRECK_HH * 2); }
+    }
+  }
+
+  // Hazard node (wreck launcher): BATCH_033 generator art, glows before each launch.
+  private drawHazardNode(e: Enemy, p: Vec, flash: boolean): void {
+    const g = this.ctx;
+    const core = coreOf(e);
+    const art = sprite("hazard_HZ02");
+    if (e.telegraph > 0) {
+      g.fillStyle = `rgba(255,176,32,${0.25 + 0.35 * Math.sin(this.time * 30) ** 2})`;
+      g.beginPath(); g.arc(p.x, p.y + 60, 30, 0, Math.PI * 2); g.fill();
+    }
+    if (art) drawAt(g, art, p.x, p.y, ...visCenter(art), 96 / visH(art), 0, 1, flash);
+    else { g.fillStyle = flash ? "#fff" : C.graphite; g.fillRect(p.x - 26, p.y - 40, 52, 80); }
+    g.strokeStyle = `rgba(255,176,32,${0.4 + 0.3 * Math.sin(this.time * 4)})`; g.lineWidth = 3;
+    g.beginPath(); g.arc(p.x, p.y, 56, 0, Math.PI * 2); g.stroke();
+    this.hpBar(p.x - 32, p.y - 62, 64, core.hp / core.hpMax, C.amber);
   }
 
   // Supply node (no final art yet): a marked container crate drifting down.

@@ -94,8 +94,9 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
       const wave = Math.max(1, Math.min(d.index + 1, d.waves.length));
       let line = t("hud.wave", { n: wave, total: d.waves.length });
       if (w.supplyTotal) line += ` · ${t("hud.supply", { n: w.supplyDestroyed, total: w.supplyTotal })}`;
+      if (w.hazardNodesTotal) line += ` · ${t("hud.hazard_nodes", { n: w.hazardNodesDestroyed, total: w.hazardNodesTotal })}`;
       g.fillStyle = C.gold; g.font = "700 18px RB Thai, sans-serif";
-      g.fillText(line, 620, top + TOP_H + 30, 380);
+      g.fillText(line, 610, top + TOP_H + 30, 360);
     } else {
       g.fillStyle = "rgba(255,215,106,0.85)"; g.font = "16px RB Thai, sans-serif";
       g.fillText(t("hud.placeholder"), 620, top + TOP_H + 30);

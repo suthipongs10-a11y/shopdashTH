@@ -310,42 +310,42 @@ planet_P01,planet,1024x1024,1,alpha,planned,,M2,ChatGPT raster art requested,
 bg_P01_far,background,1536x2048,1,opaque,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/bg_P01_far.webp
 bg_P01_mid,background,1536x2048,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/bg_P01_mid.webp
 bg_P01_foreground,background,1536x2048,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/bg_P01_foreground.webp
-hazard_HZ01,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ01,hazard,1024x1024,1,alpha,integrated,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ01.webp
 planet_P02,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P02_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P02_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P02_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ02,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ02,hazard,1024x1024,1,alpha,integrated,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ02.webp
 planet_P03,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P03_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P03_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P03_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ03,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ03,hazard,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ03.webp
 planet_P04,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P04_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P04_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P04_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ04,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ04,hazard,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ04.webp
 planet_P05,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P05_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P05_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P05_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ05,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ05,hazard,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ05.webp
 planet_P06,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P06_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P06_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P06_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ06,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ06,hazard,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ06.webp
 planet_P07,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P07_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P07_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P07_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ07,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ07,hazard,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ07.webp
 planet_P08,planet,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P08_far,background,1536x2048,1,opaque,planned,,M4,ChatGPT raster art requested,
 bg_P08_mid,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
 bg_P08_foreground,background,1536x2048,1,alpha,planned,,M4,ChatGPT raster art requested,
-hazard_HZ08,hazard,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+hazard_HZ08,hazard,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_033); source in art/source/batch_033,assets/sprites/hazard_HZ08.webp
 fx_explosion_small,fx,512x512,12,alpha,integrated,,M5,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/fx_explosion_small_000.webp
 fx_explosion_large,fx,512x512,12,alpha,planned,,M5,ChatGPT raster art requested,
 fx_impact_spark,fx,512x512,8,additive,integrated,,M1,ChatGPT imagegen via owner (BATCH_004); source in art/source/batch_004,assets/sprites/fx_impact_spark_000.webp

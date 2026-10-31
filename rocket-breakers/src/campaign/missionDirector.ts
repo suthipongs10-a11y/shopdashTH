@@ -29,6 +29,7 @@ export interface RequiredActors {
 // waves and required actors are supported (others show as "coming soon").
 export const SUPPORTED_ENEMIES = new Set(["E01", "E02", "E03", "E04", "E21"]);
 export const SUPPORTED_ENCOUNTERS = new Set(["B01", "B02"]);
+export const SUPPORTED_HAZARDS = new Set(["HZ01"]);
 
 export function missionWaves(m: MissionRow): WaveDef[] {
   return m.waves as unknown as WaveDef[];
@@ -41,7 +42,8 @@ export function requiredActors(m: MissionRow): RequiredActors {
 
 export function missionPlayable(m: MissionRow): boolean {
   const r = requiredActors(m);
-  if (r.escort || r.marked_ambusher_groups || r.hazard_nodes) return false;
+  if (r.escort || r.marked_ambusher_groups) return false;
+  if (r.hazard_nodes && !SUPPORTED_HAZARDS.has(m.hazard_id)) return false;
   // Salvage carriers are the mission's E04 haulers (DECISIONS); enough of them must be authored.
   const haulers = missionWaves(m).filter((w) => w.enemy_id === "E04").reduce((n, w) => n + (w.count ?? 0), 0);
   if (r.salvage_carriers > haulers) return false;
@@ -123,6 +125,12 @@ export function formationSpawns(w: WaveDef, row: EnemyRow): SpawnSpec[] {
   return out;
 }
 
+// Hazard nodes fly in and hover near the top, launching wreck drift until destroyed.
+export function hazardNodeSpawn(rng: Rng, index: number): SpawnSpec {
+  const x = 150 + Math.floor(rng.next() * 420);
+  return { path: [{ x, y: -70 }, { x, y: 300 + (index % 2) * 40 }], speed: 120, wobble: 0, index }; // below the hint strip
+}
+
 // Supply nodes drift down the screen; they never shoot and leave if ignored.
 export function supplySpawn(rng: Rng, index: number): SpawnSpec {
   const x = 140 + Math.floor(rng.next() * 440);
@@ -143,6 +151,7 @@ export function mirrorWave(w: WaveDef): WaveDef {
 export type DirectorEvent =
   | { kind: "wave"; wave: WaveDef; index: number; pulse: number }
   | { kind: "supply"; index: number }
+  | { kind: "hazard_node"; index: number }
   | { kind: "encounter"; wave: WaveDef; index: number }
   | { kind: "complete" };
 
@@ -157,6 +166,7 @@ export class MissionDirector {
   private waiting = true;
   private pendingPulse = false;
   private supplyPlaced = 0;
+  private hazardPlaced = 0;
   done = false;
 
   constructor(readonly mission: MissionRow) {
@@ -204,6 +214,7 @@ export class MissionDirector {
     else {
       out.push({ kind: "wave", wave: w, index: this.index, pulse: 0 });
       if (this.supplyPlaced < this.actors.supply_nodes) out.push({ kind: "supply", index: this.supplyPlaced++ });
+      if (this.hazardPlaced < this.actors.hazard_nodes) out.push({ kind: "hazard_node", index: this.hazardPlaced++ });
     }
     return out;
   }

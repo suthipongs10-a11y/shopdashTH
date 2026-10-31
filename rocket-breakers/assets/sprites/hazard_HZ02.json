@@ -1,0 +1,36 @@
+{
+  "asset_id": "hazard_HZ02",
+  "source_filename": "art/source/batch_033/rb_hazard_hz02_000.png",
+  "source_sha256": "e565fb0dbe7feab362c1223672118586160fb5492b61ee939f0c3f6f83021dd0",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    23,
+    192,
+    1231,
+    1063
+  ],
+  "runtime_size": [
+    360,
+    260
+  ],
+  "scale": 0.29801,
+  "visible_rect": [
+    2.4,
+    2.4,
+    357.6,
+    257.2
+  ],
+  "pivot_px": [
+    180.0,
+    130.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_033",
+  "status": "integrated",
+  "notes": "integrated as a stand-in for the P01-05 hazard node (wreck launcher)"
+}

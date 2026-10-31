@@ -1,9 +1,9 @@
 # Next actions
 
 1. Owner: replay with quick salvage (tap to grab). Is it fun now? Should parts fly in by just touching them (no button)?
-2. Owner: BATCH_033 (hazards, HZ01 wreck drift for P01-05) and an escort ship request for P01-02 (I'll prepare it).
+2. Owner: an escort-ship art request for P01-02 (I'll prepare it) — last missing P01 mission.
 3. Owner: play P01-03 (Rivet Crab) — is the claw sweep readable/fair? Fight length (~15–20 s for a perfect bot)?
-3b. Next: P01-02 escort + marked ambushers; P01-05 HZ01 wreck drift + hazard nodes; supply-node art; A01 ability.
+3b. Next: P01-02 escort + marked ambushers (placeholder art until the request returns); supply-node/launcher art; A01 ability.
 4. M2 stage 3: P01-02 escort + marked ambushers; P01-04 salvage carriers; P01-05 HZ01 wreck drift + hazard nodes.
 5. B02 charge-interrupt node (P01-06 Star C, ATTACK_LIBRARY: 2 windows × 1.5 s, 20 dmg).
 6. XP run upgrades, hangar + fabrication at 3 fragments, research spend, hulls H02/H04, mid-run saves.

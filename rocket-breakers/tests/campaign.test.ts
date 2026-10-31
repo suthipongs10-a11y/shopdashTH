@@ -48,7 +48,7 @@ describe("mission director", () => {
 
   it("marks only fully supported missions playable", () => {
     const ids = catalog.raw.missions.filter((m) => m.sector_id === "P01" && missionPlayable(m)).map((m) => m.id);
-    expect(ids).toEqual(["P01-01", "P01-03", "P01-04", "P01-06"]);
+    expect(ids).toEqual(["P01-01", "P01-03", "P01-04", "P01-05", "P01-06"]);
   });
 });
 
@@ -147,6 +147,8 @@ describe("campaign progress", () => {
     p.mission_records["P01-03"] = { stars: [true, false, false], best_score: 0, difficulty_records: {} };
     expect(un()).toEqual(["P01-01", "P01-02", "P01-03", "P01-04"]);
     p.mission_records["P01-04"] = { stars: [true, false, false], best_score: 0, difficulty_records: {} };
+    expect(un()).toEqual(["P01-01", "P01-02", "P01-03", "P01-04", "P01-05"]);
+    p.mission_records["P01-05"] = { stars: [true, false, false], best_score: 0, difficulty_records: {} };
     expect(un()).toEqual(["P01-01", "P01-02", "P01-03", "P01-04", "P01-05", "P01-06"]);
   });
   it("research pool grows with cleared missions", () => {

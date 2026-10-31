@@ -834,5 +834,21 @@
   "tut.quick_tow_focus": {
     "th": "ชิ้นส่วนที่หลุด",
     "en": "Loose part"
+  },
+  "hud.hazard_nodes": {
+    "th": "ปล่อยซาก {n}/{total}",
+    "en": "Launchers {n}/{total}"
+  },
+  "hint.hazard_node": {
+    "th": "เครื่องปล่อยซากมาแล้ว! ทำลายมันเพื่อหยุดซากลอย (เพื่อดาว)",
+    "en": "Wreck launcher! Destroy it to stop the drifting wrecks (star objective)"
+  },
+  "hint.hazard_node_down": {
+    "th": "ทำลายเครื่องปล่อยซากแล้ว!",
+    "en": "Wreck launcher destroyed!"
+  },
+  "brief.wreck_tip": {
+    "th": "ซากลอย: บังกระสุนทั้งของเราและศัตรู ชนแล้วโดนดันและเสียเลือดนิดหน่อย — ยิงเครื่องปล่อยซากด้านบนทิ้งก่อน",
+    "en": "Wreck drift: blocks both your shots and theirs; touching it shoves you and stings — shoot the launchers up top first"
   }
 }
