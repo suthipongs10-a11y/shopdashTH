@@ -52,7 +52,8 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
   mounts.forEach((m, i) => {
     const name = t(`weapons.${m.module.weapon.id}.name`);
     const label = m.locked ? `${name} · ${t("hud.overheated")}` : m.blocked ? `${name} · ${t("hud.blocked")}` : name;
-    bar(g, 20 + i * colW, top + 84, colW - 16, label, m.heat / HEAT_MAX, m.locked ? C.red : C.heat, 8, "ui_heat");
+    const wIcon = sprite(`weapon_${m.module.weapon.id}_icon`) ? `weapon_${m.module.weapon.id}_icon` : "ui_heat";
+    bar(g, 20 + i * colW, top + 84, colW - 16, label, m.heat / HEAT_MAX, m.locked ? C.red : C.heat, 8, wIcon);
   });
   // boss
   const b = w.boss;

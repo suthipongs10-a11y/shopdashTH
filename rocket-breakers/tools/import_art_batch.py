@@ -60,6 +60,8 @@ RULES = {
     "boss_B02_armor": (180, "center", None),
     "boss_B02_signature_mount": (420, "socket_bottom", None),
     "fx_tractor_mote": (96, "center", None),
+    **{f"weapon_{w}_icon": (128, "center", None) for w in ["W001", "W008", "W022"]},
+    **{f"weapon_{w}_glow": (128, "center", None) for w in ["W001", "W008", "W022"]},
     **{f"pickup_pu{i:02d}": (128, "center", None) for i in range(1, 13)},
 }
 # Expansion assets that are not rows of the handoff manifest yet.

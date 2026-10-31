@@ -1,0 +1,45 @@
+{
+  "asset_id": "weapon_W022_glow",
+  "source_filename": "art/source/batch_007/rb_weapon_w022_glow_000.png",
+  "source_sha256": "93e1be1f089a3a37db034d11dcb58e59a6c3460da59037ea2eb9d3b1d8878a7b",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    377,
+    3,
+    876,
+    394
+  ],
+  "runtime_size": [
+    128,
+    100
+  ],
+  "scale": 0.25651,
+  "visible_rect": [
+    2.1,
+    2.1,
+    125.9,
+    98.2
+  ],
+  "pivot_px": [
+    64.0,
+    50.0
+  ],
+  "attachment_anchors": {
+    "muzzle": [
+      64.0,
+      2.1
+    ],
+    "socket": [
+      64.0,
+      98.2
+    ]
+  },
+  "blend_mode": "additive",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_007",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

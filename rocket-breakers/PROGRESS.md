@@ -82,3 +82,7 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 ## Done (2026-10-31, BATCH_006 art)
 - 10 menu icons delivered; stars/credits/scrap/blueprint/galaxy now on title, sector map, briefing and results.
   Hangar/codex/fusion core/extraction imported as approved. QA: `art/source/batch_006/QA_REPORT.md`.
+
+## Done (2026-10-31, BATCH_007 art)
+- Weapon icons (W001/W008/W022) on the HUD heat rows and the dock card; additive muzzle glows at each gun.
+  QA: `art/source/batch_007/QA_REPORT.md`.

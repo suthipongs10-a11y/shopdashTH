@@ -63,8 +63,8 @@ hull_H12_lean_right,hull,1024x1024,1,alpha,planned,,M3,ChatGPT raster art reques
 hull_H12_damage_overlay,hull,1024x1024,1,alpha,planned,,M3,ChatGPT raster art requested,
 hull_H12_engine_glow,hull,1024x1024,1,additive,planned,,M3,ChatGPT raster art requested,
 weapon_W001,weapon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/weapon_W001.webp
-weapon_W001_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-weapon_W001_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
+weapon_W001_icon,icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_007); source in art/source/batch_007,assets/sprites/weapon_W001_icon.webp
+weapon_W001_glow,weapon_glow,512x512,1,additive,integrated,,M4,ChatGPT imagegen via owner (BATCH_007); source in art/source/batch_007,assets/sprites/weapon_W001_glow.webp
 weapon_W002,weapon,512x512,1,alpha,planned,,M4,ChatGPT raster art requested,
 weapon_W002_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 weapon_W002_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
@@ -84,8 +84,8 @@ weapon_W007,weapon,512x512,1,alpha,planned,,M4,ChatGPT raster art requested,
 weapon_W007_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 weapon_W007_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
 weapon_W008,weapon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/weapon_W008.webp
-weapon_W008_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-weapon_W008_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
+weapon_W008_icon,icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_007); source in art/source/batch_007,assets/sprites/weapon_W008_icon.webp
+weapon_W008_glow,weapon_glow,512x512,1,additive,integrated,,M4,ChatGPT imagegen via owner (BATCH_007); source in art/source/batch_007,assets/sprites/weapon_W008_glow.webp
 weapon_W009,weapon,512x512,1,alpha,planned,,M4,ChatGPT raster art requested,
 weapon_W009_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 weapon_W009_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
@@ -126,8 +126,8 @@ weapon_W021,weapon,512x512,1,alpha,planned,,M4,ChatGPT raster art requested,
 weapon_W021_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 weapon_W021_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
 weapon_W022,weapon,512x512,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/weapon_W022.webp
-weapon_W022_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
-weapon_W022_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,
+weapon_W022_icon,icon,512x512,1,alpha,integrated,,M2,ChatGPT imagegen via owner (BATCH_007); source in art/source/batch_007,assets/sprites/weapon_W022_icon.webp
+weapon_W022_glow,weapon_glow,512x512,1,additive,integrated,,M4,ChatGPT imagegen via owner (BATCH_007); source in art/source/batch_007,assets/sprites/weapon_W022_glow.webp
 weapon_W023,weapon,512x512,1,alpha,planned,,M4,ChatGPT raster art requested,
 weapon_W023_icon,icon,512x512,1,alpha,planned,,M2,ChatGPT raster art requested,
 weapon_W023_glow,weapon_glow,512x512,1,additive,planned,,M4,ChatGPT raster art requested,

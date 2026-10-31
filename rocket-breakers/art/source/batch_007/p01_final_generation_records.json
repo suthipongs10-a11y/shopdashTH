@@ -1,0 +1,41 @@
+[
+  {
+    "filename": "rb_weapon_w001_icon_000.png",
+    "prompt": "Original game HUD icon for the weapon 'Needle Cannon': simplified bold front-three-quarter rendering of the module (brass/gold kinetic barrel, gold-white muzzle accent). Readable at 32 px, strong silhouette, no text, no frame. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Requested canvas 512x512 square. Original ROCKET BREAKERS art. No text, watermark, UI button or frame. REAL transparent alpha. One isolated weapon MODULE only, no ship body, no hand, no pilot or environment. Front-three-quarter view per icon brief, muzzle toward upper part of image. Upper-left light; premium simplified 2.5D rendering, ivory/charcoal machinery with orange accents for player modules. Large readable forms, restrained fine detail, centered, entire object including glow within 18 percent padding. Reference is style only, never copy ship composition. Design clarification: EXACTLY ONE long narrow brass/gold needle barrel and ONE muzzle opening. Single-shot precision kinetic cannon, NOT a Gatling gun, no revolving drum, no multiple barrels or bullet cluster. Compact simple ivory and charcoal base with orange accents. Keep detail simplified for a 32px HUD thumbnail. Entire module at front-three-quarter angle aiming toward upper left.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-cfaf3601-cb1c-494b-b5f2-ea7305494138.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_007_SOURCE/RB_BATCH_007_REQUEST/references/modular_ships.jpg"
+    ]
+  },
+  {
+    "filename": "rb_weapon_w008_icon_000.png",
+    "prompt": "Original game HUD icon for the weapon 'Pulse Laser': simplified bold front-three-quarter rendering of the module (slim emitter with a cyan lens (beam weapon, cyan core / white centre)). Readable at 32 px, strong silhouette, no text, no frame. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Requested canvas 512x512 square. Original ROCKET BREAKERS art. No text, watermark, UI button or frame. REAL transparent alpha. One isolated weapon MODULE only, no ship body, no hand, no pilot or environment. Front-three-quarter view per icon brief, muzzle toward upper part of image. Upper-left light; premium simplified 2.5D rendering, ivory/charcoal machinery with orange accents for player modules. Large readable forms, restrained fine detail, centered, entire object including glow within 18 percent padding. Reference is style only, never copy ship composition.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-786f651b-2fe2-49be-af2a-f31ec091df46.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_007_SOURCE/RB_BATCH_007_REQUEST/references/modular_ships.jpg"
+    ]
+  },
+  {
+    "filename": "rb_weapon_w022_icon_000.png",
+    "prompt": "Original game HUD icon for the weapon 'Scorpion Tail': simplified bold front-three-quarter rendering of the module (violet plasma emitter bulb with purple glow). Keep the stolen boss-part look. Readable at 32 px, strong silhouette, no text, no frame. Background: real transparent alpha (PNG with alpha channel). Do NOT paint a checkerboard. Generous empty padding around the object; nothing touches the canvas edge.\nUse case: stylized-concept. Requested canvas 512x512 square. Original ROCKET BREAKERS art. No text, watermark, UI button or frame. REAL transparent alpha. One isolated weapon MODULE only, no ship body, no hand, no pilot or environment. Front-three-quarter view per icon brief, muzzle toward upper part of image. Upper-left light; premium simplified 2.5D rendering, ivory/charcoal machinery with orange accents for player modules. Large readable forms, restrained fine detail, centered, entire object including glow within 18 percent padding. Reference is style only, never copy ship composition.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-ae67096e-34ba-457e-a709-112034444ebb.png",
+    "refs": [
+      "/workspace/scratch/160b59ef5d6f/RB_BATCH_007_SOURCE/RB_BATCH_007_REQUEST/references/modular_ships.jpg"
+    ]
+  },
+  {
+    "filename": "rb_weapon_w001_glow_000.png",
+    "prompt": "Additive muzzle/emitter glow for the weapon 'Needle Cannon': only the light of its emitter (brass/gold kinetic barrel, gold-white muzzle accent), positioned where the muzzle is on the weapon sprite (top centre). No weapon body. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.\nUse case: stylized-concept. Requested canvas 512x512 square. Original ROCKET BREAKERS art. No text, watermark, UI button or frame. REAL transparent alpha. Glow-only VFX texture, no solid objects or circles of metal, no weapon, no smoke or debris. Crucial layout: light center normalized (0.5,0.169921875) i.e. x=256 y=87 on requested 512 square. The lower 65 percent of canvas must remain EMPTY TRANSPARENT. A compact soft emission bloom with bright white center and feathered colored falloff, radius at most 0.12 of canvas width, fading to full alpha zero before all edges. Do not center the glow vertically; place it near TOP CENTER. No long rays, beam or large flare.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-b69e455a-db39-4c70-84e3-2df92bd4c0ef.png"
+  },
+  {
+    "filename": "rb_weapon_w008_glow_000.png",
+    "prompt": "Additive muzzle/emitter glow for the weapon 'Pulse Laser': only the light of its emitter (slim emitter with a cyan lens (beam weapon, cyan core / white centre)), positioned where the muzzle is on the weapon sprite (top centre). No weapon body. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.\nUse case: stylized-concept. Requested canvas 512x512 square. Original ROCKET BREAKERS art. No text, watermark, UI button or frame. REAL transparent alpha. Glow-only VFX texture, no solid objects or circles of metal, no weapon, no smoke or debris. Crucial layout: light center normalized (0.5,0.169921875) i.e. x=256 y=87 on requested 512 square. The lower 65 percent of canvas must remain EMPTY TRANSPARENT. A compact soft emission bloom with bright white center and feathered colored falloff, radius at most 0.12 of canvas width, fading to full alpha zero before all edges. Do not center the glow vertically; place it near TOP CENTER. No long rays, beam or large flare.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-e2975bc9-9dd5-499b-8d9d-5fc95a893996.png"
+  },
+  {
+    "filename": "rb_weapon_w022_glow_000.png",
+    "prompt": "Additive muzzle/emitter glow for the weapon 'Scorpion Tail': only the light of its emitter (violet plasma emitter bulb with purple glow), positioned where the muzzle is on the weapon sprite (top centre). No weapon body. Background: glow-only additive texture. Preferred: transparent alpha with soft feathered glow. If transparency is impossible, use a PURE BLACK (#000000) background and say so — never grey, never a scene.\nUse case: stylized-concept. Requested canvas 512x512 square. Original ROCKET BREAKERS art. No text, watermark, UI button or frame. REAL transparent alpha. Glow-only VFX texture, no solid objects or circles of metal, no weapon, no smoke or debris. Crucial layout: light center normalized (0.5,0.169921875) i.e. x=256 y=87 on requested 512 square. The lower 65 percent of canvas must remain EMPTY TRANSPARENT. A compact soft emission bloom with bright white center and feathered colored falloff, radius at most 0.12 of canvas width, fading to full alpha zero before all edges. Do not center the glow vertically; place it near TOP CENTER. No long rays, beam or large flare.",
+    "source": "/workspace/scratch/160b59ef5d6f/generated_images/exec-1d1a9f56-d466-471a-9278-0bb126e42d91.png"
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "asset_id": "weapon_W001_icon",
+  "source_filename": "art/source/batch_007/rb_weapon_w001_icon_000.png",
+  "source_sha256": "253a19546a1cf96916adf60a8dcdd985fadb39fd630c0ea6f3dcc34c6ea9ae66",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    128,
+    132,
+    1124,
+    1071
+  ],
+  "runtime_size": [
+    128,
+    121
+  ],
+  "scale": 0.12851,
+  "visible_rect": [
+    1.0,
+    1.0,
+    127.0,
+    119.6
+  ],
+  "pivot_px": [
+    64.0,
+    60.5
+  ],
+  "attachment_anchors": {
+    "muzzle": [
+      64.0,
+      1.0
+    ],
+    "socket": [
+      64.0,
+      119.6
+    ]
+  },
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_007",
+  "status": "integrated",
+  "notes": "anchors estimated from visible bounds; verified visually in the web build"
+}

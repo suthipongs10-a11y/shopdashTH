@@ -28,6 +28,8 @@ function tex(url: string): HTMLImageElement | null {
 const TEX = { explosion: tex(explosionUrl), shield: tex(shieldUrl), plasma: tex(plasmaUrl) };
 // Where the core art is centred relative to the boss origin so its tail socket lands on the joint.
 const BOSS_ART_OFFSET = { x: 0, y: 6 };
+// Drawn size (px) of each weapon's additive muzzle glow.
+const MUZZLE_GLOW_SIZE: Record<string, number> = { W001: 34, W008: 42, W022: 54 };
 // Per-enemy drawing: sprite id, drawn size (largest side, px) and warning-light spot.
 const ENEMY_LOOK: Record<string, { art: string; size: number; warnY: number; warnR: number }> = {
   E01: { art: "enemy_E01", size: 56, warnY: 24, warnR: 9 },
@@ -58,6 +60,7 @@ export class Renderer {
   private sparks: Spark[] = [];
   private rings: Ring[] = [];
   private cards: Card[] = [];
+  private glows: { id: string; p: Vec; life: number; max: number; size: number }[] = [];
   private anims: KeyAnim[] = [];
   private texts: FloatText[] = [];
   private shake = 0;
@@ -149,7 +152,15 @@ export class Renderer {
       case "phase": ring(60, 300, C.red, 0.6, 6); this.addShake(6, s); break;
       case "boss_dead": burst(120, C.orange, 420, 4, 0.8); ring(40, 600, C.gold, 0.9, 8); card(TEX.explosion, 220, 0.8, true); this.addShake(8, s); this.addFlash(0.4, s); break;
       case "module_lost": burst(14, C.orange, 200); break;
-      case "muzzle": if (e.family !== "kinetic") burst(1, e.family === "plasma" ? C.violet : C.cyan, 60, 2, 0.12); break;
+      case "muzzle": {
+        // BATCH_007 additive emitter glow at the real muzzle; particle fallback without art.
+        const id = `weapon_${e.tag}_glow`;
+        if (e.tag && sprite(id)) {
+          if (this.glows.length > 16) this.glows.shift();
+          this.glows.push({ id, p: { ...e.pos }, life: 0.07, max: 0.07, size: MUZZLE_GLOW_SIZE[e.tag] ?? 36 });
+        } else if (e.family !== "kinetic") burst(1, e.family === "plasma" ? C.violet : C.cyan, 60, 2, 0.12);
+        break;
+      }
     }
   }
 
@@ -164,6 +175,8 @@ export class Renderer {
     this.rings = this.rings.filter((r) => r.life > 0 && r.r > 0);
     for (const a of this.anims) a.life -= dt;
     this.anims = this.anims.filter((a) => a.life > 0);
+    for (const c of this.glows) c.life -= dt;
+    this.glows = this.glows.filter((c) => c.life > 0);
     for (const c of this.cards) c.life -= dt;
     this.cards = this.cards.filter((c) => c.life > 0);
     for (const x of this.texts) { x.life -= dt; x.p.y -= 40 * dt; }
@@ -201,6 +214,14 @@ export class Renderer {
         const sp = sprite(`${a.id}_${String(a.frames[fi]).padStart(3, "0")}`);
         if (sp && w8 > 0.01) drawAt(g, sp, a.p.x, a.p.y, ...visCenter(sp), (a.size * scale) / Math.max(visW(sp), visH(sp)), a.rot, w8 * fade);
       }
+    }
+    for (const gl of this.glows) {
+      const sp = sprite(gl.id);
+      if (!sp) continue;
+      const k = gl.life / gl.max;
+      g.save(); g.globalCompositeOperation = "lighter";
+      drawAt(g, sp, gl.p.x, gl.p.y - 4, ...visCenter(sp), (gl.size * (0.8 + 0.2 * k)) / Math.max(visW(sp), visH(sp)), 0, k);
+      g.restore();
     }
     for (const c of this.cards) {
       const k = 1 - c.life / c.max;

@@ -1,0 +1,209 @@
+[
+  {
+    "filename": "rb_weapon_w001_icon_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "blend": "alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      136,
+      140,
+      1116,
+      1063
+    ],
+    "edge_alpha_max": 1,
+    "sha256": "253a19546a1cf96916adf60a8dcdd985fadb39fd630c0ea6f3dcc34c6ea9ae66",
+    "status": "awaiting_in_game_QA"
+  },
+  {
+    "filename": "rb_weapon_w001_glow_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "blend": "additive",
+    "alpha_range": [
+      0,
+      254
+    ],
+    "visible_bbox_alpha_gt16": [
+      473,
+      57,
+      777,
+      378
+    ],
+    "edge_alpha_max": 1,
+    "sha256": "2de5e71f56a2d3310dff12b840c86af9e32ddf7281791fea9b71e941fee6bd2e",
+    "status": "awaiting_in_game_QA",
+    "requested_emitter_normalized": [
+      0.5,
+      0.169921875
+    ],
+    "requested_emitter_on_actual_canvas": [
+      627.0,
+      213.08203125
+    ],
+    "measured_bright_core_center_px": [
+      626.09,
+      214.51
+    ],
+    "measured_bright_core_center_normalized": [
+      0.499277,
+      0.171061
+    ],
+    "layout_note": "Align this measured texture core to the actual world weapon muzzle. These HUD icons are front-three-quarter views; do not blindly overlay the top-center glow on the icon canvas."
+  },
+  {
+    "filename": "rb_weapon_w008_icon_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "blend": "alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      243,
+      112,
+      1032,
+      1127
+    ],
+    "edge_alpha_max": 0,
+    "sha256": "8861afa20875d8161c7fb18da46a938325e3c8b94c13b62ea62a0b5630dccfc9",
+    "status": "awaiting_in_game_QA"
+  },
+  {
+    "filename": "rb_weapon_w008_glow_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "blend": "additive",
+    "alpha_range": [
+      0,
+      253
+    ],
+    "visible_bbox_alpha_gt16": [
+      463,
+      42,
+      794,
+      348
+    ],
+    "edge_alpha_max": 2,
+    "sha256": "19150498271cb4bce6ea5b036009841f0e6f591564eadf85ebd012a93fac7195",
+    "status": "awaiting_in_game_QA",
+    "requested_emitter_normalized": [
+      0.5,
+      0.169921875
+    ],
+    "requested_emitter_on_actual_canvas": [
+      627.0,
+      213.08203125
+    ],
+    "measured_bright_core_center_px": [
+      628.26,
+      195.25
+    ],
+    "measured_bright_core_center_normalized": [
+      0.501002,
+      0.155703
+    ],
+    "layout_note": "Align this measured texture core to the actual world weapon muzzle. These HUD icons are front-three-quarter views; do not blindly overlay the top-center glow on the icon canvas."
+  },
+  {
+    "filename": "rb_weapon_w022_icon_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "blend": "alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      219,
+      120,
+      1090,
+      1090
+    ],
+    "edge_alpha_max": 1,
+    "sha256": "c1679356352903af0426de1806fe548ada7b30fb1ff6776e09681739ec36f165",
+    "status": "awaiting_in_game_QA"
+  },
+  {
+    "filename": "rb_weapon_w022_glow_000.png",
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "requested_size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "blend": "additive",
+    "alpha_range": [
+      0,
+      253
+    ],
+    "visible_bbox_alpha_gt16": [
+      425,
+      33,
+      828,
+      356
+    ],
+    "edge_alpha_max": 3,
+    "sha256": "93e1be1f089a3a37db034d11dcb58e59a6c3460da59037ea2eb9d3b1d8878a7b",
+    "status": "awaiting_in_game_QA",
+    "requested_emitter_normalized": [
+      0.5,
+      0.169921875
+    ],
+    "requested_emitter_on_actual_canvas": [
+      627.0,
+      213.08203125
+    ],
+    "measured_bright_core_center_px": [
+      625.98,
+      196.03
+    ],
+    "measured_bright_core_center_normalized": [
+      0.499184,
+      0.156327
+    ],
+    "layout_note": "Align this measured texture core to the actual world weapon muzzle. These HUD icons are front-three-quarter views; do not blindly overlay the top-center glow on the icon canvas."
+  }
+]

@@ -76,7 +76,7 @@ export interface TickInput {
 }
 
 export type GameEvent =
-  | { type: "muzzle"; pos: Vec; family: string }
+  | { type: "muzzle"; pos: Vec; family: string; tag?: string }
   | { type: "hit" | "deflect" | "blast" | "kill" | "player_hit" | "shield_hit" | "graze" | "joint_break" | "sever" | "scrap" | "secured" | "tractor_lock" | "snap" | "overdrive" | "dash" | "phase" | "boss_dead" | "module_lost" | "pickup" | "scrap_pick" | "converted"; pos: Vec; value?: number; tag?: string };
 
 export interface WorldOptions {
@@ -442,7 +442,7 @@ export class CombatWorld {
     const w = m.module.weapon;
     const from = this.muzzleWorld(m);
     const { angle } = this.aimAngle(m);
-    this.events.push({ type: "muzzle", pos: from, family: w.family });
+    this.events.push({ type: "muzzle", pos: from, family: w.family, tag: w.id });
     const sp = w.special_params;
     if (w.attack_model === "pulse_beam") {
       const laser = this.buffs.has("PU02") ? 1.15 : 1; // PU02 laser core: +15% damage and range

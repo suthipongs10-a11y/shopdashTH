@@ -5,7 +5,7 @@ import type { Cell, WeaponRow } from "../core/types";
 import type { CombatWorld } from "../combat/world";
 import { t } from "../core/i18n";
 import { sfx } from "../audio/sfx";
-import { button, el, type App } from "./app";
+import { button, el, icon, type App } from "./app";
 
 const SHORT: Record<string, string> = { W001: "1", W008: "8", W022: "22" };
 
@@ -40,7 +40,10 @@ export class DockPanel {
     const info = el("div", "card");
     const src = item.sourceEncounter === "player" ? t("dock.own_module")
       : w.catalog.row("bosses", item.sourceEncounter) ? t(`bosses.${item.sourceEncounter}.name`) : t(`enemies.${item.sourceEncounter}.name`);
-    info.append(el("p", "", `${t(`weapons.${weapon.id}.name`)} · ${src}`),
+    const title = el("p", "wname", `${t(`weapons.${weapon.id}.name`)} · ${src}`);
+    const wi = icon(`weapon_${weapon.id}_icon`);
+    if (wi) title.prepend(wi);
+    info.append(title,
       el("div", "dim", t("dock.part_info", { mass: weapon.mass, cells: weapon.footprint.length, dmg: weapon.damage, rate: weapon.trigger_rate })));
     r.append(info);
     if (!this.decided) {
