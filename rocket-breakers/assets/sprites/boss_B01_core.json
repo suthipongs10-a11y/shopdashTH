@@ -1,0 +1,36 @@
+{
+  "asset_id": "boss_B01_core",
+  "source_filename": "art/source/batch_010/rb_boss_b01_core_000.png",
+  "source_sha256": "3a742e1db654d91c02a342f9f5b317c5444c21ef97ec4039b9cab5ae723e95b2",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    58,
+    87,
+    1208,
+    1117
+  ],
+  "runtime_size": [
+    760,
+    681
+  ],
+  "scale": 0.66087,
+  "visible_rect": [
+    5.3,
+    5.3,
+    754.7,
+    675.4
+  ],
+  "pivot_px": [
+    380.0,
+    340.5
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_010",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

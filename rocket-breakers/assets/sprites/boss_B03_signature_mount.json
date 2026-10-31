@@ -1,0 +1,45 @@
+{
+  "asset_id": "boss_B03_signature_mount",
+  "source_filename": "art/source/batch_010/rb_boss_b03_signature_mount_000.png",
+  "source_sha256": "03ba1612e5f6717ea994deea1eeb18b0ce5309dccbbf6a88a3035123a0c6e614",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    202,
+    108,
+    1052,
+    1161
+  ],
+  "runtime_size": [
+    339,
+    420
+  ],
+  "scale": 0.39886,
+  "visible_rect": [
+    3.2,
+    3.2,
+    335.8,
+    416.8
+  ],
+  "pivot_px": [
+    169.5,
+    416.8
+  ],
+  "attachment_anchors": {
+    "muzzle": [
+      169.5,
+      3.2
+    ],
+    "socket": [
+      169.5,
+      416.8
+    ]
+  },
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_010",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

@@ -1,0 +1,51 @@
+{
+  "status": "estimated_visual_landmarks_not_engine_verified",
+  "coordinate_system": "pixels in original 1254x1254 canvas; x right y down",
+  "bosses": {
+    "B01": {
+      "body_socket_center_px": [
+        375,
+        444
+      ],
+      "body_socket_diameter_px_approx": 145,
+      "joint_layer_pivot_px": [
+        627,
+        627
+      ],
+      "armor_layer_pivot_px": [
+        627,
+        627
+      ],
+      "detached_part_socket_center_px_approx": [
+        642,
+        1090
+      ]
+    },
+    "B03": {
+      "body_socket_center_px": [
+        628,
+        230
+      ],
+      "body_socket_diameter_px_approx": 190,
+      "joint_layer_pivot_px": [
+        627,
+        627
+      ],
+      "armor_layer_pivot_px": [
+        627,
+        627
+      ],
+      "detached_part_socket_center_px_approx": [
+        627,
+        985
+      ]
+    }
+  },
+  "notes": [
+    "All landmarks are visual estimates requiring editor confirmation.",
+    "Scale joint outer diameter to body socket, then scale detached coupling to same diameter; set pivots independently. Armor plate is a separately framed component requiring its own scale.",
+    "Do not overlay all canvases at identical size/pivot. Requested mount bottom socket at (512,870) in 1024 maps to (627,1065.41015625); generated socket positions differ.",
+    "Overlay decals share core canvas. Use core alpha mask to suppress marks outside body and exclude socket; test exact plate alignment.",
+    "Detached claw/head match visual family but are not pixel-identical geometry extracted from assembled bosses."
+  ]
+}

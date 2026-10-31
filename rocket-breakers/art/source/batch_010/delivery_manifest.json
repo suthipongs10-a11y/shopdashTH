@@ -1,0 +1,272 @@
+[
+  {
+    "filename": "rb_boss_b01_core_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      68,
+      95,
+      1198,
+      1109
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.37666,
+    "requested_anchor": "core centre (512,512); leave socket for the front grabbing claw (left claw)",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "3a742e1db654d91c02a342f9f5b317c5444c21ef97ec4039b9cab5ae723e95b2"
+  },
+  {
+    "filename": "rb_boss_b01_damage_overlay_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      217,
+      162,
+      1192,
+      1028
+    ],
+    "edge_alpha_max": 0,
+    "visible_coverage_alpha_gt16": 0.0914,
+    "requested_anchor": "same framing as core",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "082af06a94784bf32213080c97663019ddc02846be502201e872e649bc9646ae"
+  },
+  {
+    "filename": "rb_boss_b01_armor_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      284,
+      157,
+      970,
+      1089
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.27019,
+    "requested_anchor": "pivot (512,512) = joint centre",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "192b1a0e6ede3df9f86b431a4cbf4ebbbcece585ab7969921eb054d8eac1e35d"
+  },
+  {
+    "filename": "rb_boss_b01_joint_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      229,
+      230,
+      1025,
+      1022
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.28363,
+    "requested_anchor": "pivot (512,512)",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "cb53054b40392a0e76c6f07ac97d027af8181286670cad14d337003e3cedd3b0"
+  },
+  {
+    "filename": "rb_boss_b01_signature_mount_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      308,
+      66,
+      1001,
+      1189
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.23988,
+    "requested_anchor": "socket end at (512,870)",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "e0ea9de9de782dd00fddd6f82bf29ec8588eba0d14f23bc9d6b8760ad837e6af"
+  },
+  {
+    "filename": "rb_boss_b03_core_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      156,
+      88,
+      1098,
+      1171
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.48849,
+    "requested_anchor": "core centre (512,512); leave socket for the glowing ram head with flame nozzles",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "8eff59633f156d3ba181371dcbe1ed190fd0690d76e34ed83c4ba3a40d5659bd"
+  },
+  {
+    "filename": "rb_boss_b03_damage_overlay_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      235,
+      173,
+      998,
+      948
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.07253,
+    "requested_anchor": "same framing as core",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "a7fca813848808496ff588ca35cd1e155292a54c61a16877420e82bd03d36a84"
+  },
+  {
+    "filename": "rb_boss_b03_armor_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      177,
+      166,
+      1077,
+      1089
+    ],
+    "edge_alpha_max": 0,
+    "visible_coverage_alpha_gt16": 0.41198,
+    "requested_anchor": "pivot (512,512) = joint centre",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "b853d0a956afd052ac9140456561a6275787dfd0be3481469f54f45b721cca5a"
+  },
+  {
+    "filename": "rb_boss_b03_joint_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      207,
+      192,
+      1047,
+      1067
+    ],
+    "edge_alpha_max": 0,
+    "visible_coverage_alpha_gt16": 0.30354,
+    "requested_anchor": "pivot (512,512)",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "64a6f9dfb066037aa7206fa65da26f14f178cf80483b6dcf5d6b4cf866fb6eb8"
+  },
+  {
+    "filename": "rb_boss_b03_signature_mount_000.png",
+    "requested_size": [
+      1024,
+      1024
+    ],
+    "actual_size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "visible_bbox_alpha_gt16": [
+      210,
+      118,
+      1044,
+      1152
+    ],
+    "edge_alpha_max": 1,
+    "visible_coverage_alpha_gt16": 0.32275,
+    "requested_anchor": "socket end at (512,870)",
+    "status": "generated_awaiting_engine_assembly_QA",
+    "sha256": "03ba1612e5f6717ea994deea1eeb18b0ce5309dccbbf6a88a3035123a0c6e614"
+  }
+]

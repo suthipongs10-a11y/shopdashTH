@@ -1,0 +1,36 @@
+{
+  "asset_id": "boss_B03_armor",
+  "source_filename": "art/source/batch_010/rb_boss_b03_armor_000.png",
+  "source_sha256": "b853d0a956afd052ac9140456561a6275787dfd0be3481469f54f45b721cca5a",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    169,
+    158,
+    1085,
+    1097
+  ],
+  "runtime_size": [
+    176,
+    180
+  ],
+  "scale": 0.19169,
+  "visible_rect": [
+    1.5,
+    1.5,
+    174.1,
+    178.5
+  ],
+  "pivot_px": [
+    88.0,
+    90.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_010",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

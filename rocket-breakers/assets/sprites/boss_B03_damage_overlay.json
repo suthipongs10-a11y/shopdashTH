@@ -1,0 +1,36 @@
+{
+  "asset_id": "boss_B03_damage_overlay",
+  "source_filename": "art/source/batch_010/rb_boss_b03_damage_overlay_000.png",
+  "source_sha256": "a7fca813848808496ff588ca35cd1e155292a54c61a16877420e82bd03d36a84",
+  "canvas_size": [
+    1254,
+    1254
+  ],
+  "trim_rect": [
+    148,
+    80,
+    1106,
+    1180
+  ],
+  "runtime_size": [
+    662,
+    760
+  ],
+  "scale": 0.69091,
+  "visible_rect": [
+    56.7,
+    62.9,
+    588.0,
+    601.1
+  ],
+  "pivot_px": [
+    331.0,
+    380.0
+  ],
+  "attachment_anchors": {},
+  "blend_mode": "alpha",
+  "color_space": "sRGB",
+  "provenance": "ChatGPT imagegen via owner, BATCH_010",
+  "status": "approved",
+  "notes": "anchors estimated from visible bounds; approved, not used by the current build yet"
+}

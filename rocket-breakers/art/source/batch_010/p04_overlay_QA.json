@@ -1,0 +1,18 @@
+[
+  {
+    "boss": "B01",
+    "same_canvas": true,
+    "overlay_visible_pixel_count": 143726,
+    "outside_body_visible_pixel_count": 3751,
+    "outside_fraction": 0.0261,
+    "note": "Threshold-based QA, not precise armor surface registration. Clip overlay alpha by core silhouette in engine and verify socket exclusion."
+  },
+  {
+    "boss": "B03",
+    "same_canvas": true,
+    "overlay_visible_pixel_count": 114055,
+    "outside_body_visible_pixel_count": 0,
+    "outside_fraction": 0.0,
+    "note": "Threshold-based QA, not precise armor surface registration. Clip overlay alpha by core silhouette in engine and verify socket exclusion."
+  }
+]

@@ -60,6 +60,10 @@ RULES = {
     "boss_B02_armor": (180, "center", None),
     "boss_B02_signature_mount": (420, "socket_bottom", None),
     "fx_tractor_mote": (96, "center", None),
+    **{f"boss_{b}_{part}": rule for b in ["B01", "B03"] for part, rule in {
+        "core": (760, "center", f"boss_{b}_core"), "damage_overlay": (760, "center", f"boss_{b}_core"),
+        "armor": (180, "center", None), "joint": (160, "center", None),
+        "signature_mount": (420, "socket_bottom", None)}.items()},
     **{f"weapon_{w}_icon": (128, "center", None) for w in ["W001", "W008", "W022"]},
     **{f"weapon_{w}_glow": (128, "center", None) for w in ["W001", "W008", "W022"]},
     **{f"pickup_pu{i:02d}": (128, "center", None) for i in range(1, 13)},
@@ -71,6 +75,10 @@ EXTRA_CATEGORY = {"pickup_pu": ("pickup_icon", "512x512", "alpha", "M1")}
 def fname(f):
     return f.get("filename") or f["file"]  # delivery manifests have used both keys
 
+
+# Damage overlays share the core canvas; their alpha is clipped to the core silhouette
+# so no crack decal floats outside the body (BATCH_010 overlay QA).
+CLIP_TO = {f"boss_{b}_damage_overlay": f"boss_{b}_core" for b in ["B01", "B02", "B03"]}
 
 # Opaque scrolling backgrounds get a vertically tileable runtime copy (band cross-fade).
 TILE_V = {"bg_P01_far"}
@@ -166,6 +174,12 @@ def main(delivery: Path, batch: str, approved_only=frozenset()):
         if sha != f["sha256"]:
             raise SystemExit(f"checksum mismatch for {src.name}")
         im = clean(Image.open(src).convert("RGBA"))
+        base_f = files.get(CLIP_TO.get(aid, ""))
+        if base_f:
+            mask = clean(Image.open(delivery / fname(base_f)).convert("RGBA")).getchannel("A")
+            if mask.size == im.size:
+                r_, g_, b_, a_ = im.split()
+                im = Image.merge("RGBA", (r_, g_, b_, Image.composite(a_, Image.new("L", im.size, 0), mask.point(lambda v: 255 if v > 24 else 0))))
         own = visible_bbox(im)
         bb = groups[group] if group else own
         W, H = im.size

@@ -86,3 +86,7 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
 ## Done (2026-10-31, BATCH_007 art)
 - Weapon icons (W001/W008/W022) on the HUD heat rows and the dock card; additive muzzle glows at each gun.
   QA: `art/source/batch_007/QA_REPORT.md`.
+
+## Done (2026-10-31, BATCH_010 art)
+- B01 Rivet Crab and B03 boss parts imported as approved (core, overlay clipped to body, armor, joint, signature).
+  QA: `art/source/batch_010/QA_REPORT.md`.

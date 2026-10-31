@@ -55,3 +55,4 @@ Append implementation decisions with consequences and whether baseline documenta
 | 2026-10-31 | Bug fix: results screen opened twice (end timer re-armed); settlement was already idempotent, but the second copy showed wrong "new star" / first-clear text | Found by the M2 browser capture |
 | 2026-10-31 | BATCH_006 menu icons: 6 used now (stars, credits, scrap, blueprint, galaxy); hangar/codex/fusion_core/extraction imported as `approved` until their screens exist | Same honesty rule as earlier batches |
 | 2026-10-31 | BATCH_007: weapon icons on HUD heat rows + dock card; emitter glows drawn additively at each real muzzle for 0.07 s (replace the old plasma/beam spark particle) | Glow is lighting only, so it is short and small to keep bullets readable |
+| 2026-10-31 | Importer clips boss damage-overlay alpha to the core silhouette (same canvas) | Overlay QA in BATCH_010 showed decals outside the body; clipping is non-generative and keeps the original untouched |

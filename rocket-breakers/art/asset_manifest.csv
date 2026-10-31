@@ -226,21 +226,21 @@ enemy_E21,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 enemy_E22,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 enemy_E23,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
 enemy_E24,enemy,512x512,1,alpha,planned,,M3,ChatGPT raster art requested,
-boss_B01_core,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B01_armor,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B01_joint,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B01_signature_mount,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B01_damage_overlay,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+boss_B01_core,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_core.webp
+boss_B01_armor,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_armor.webp
+boss_B01_joint,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_joint.webp
+boss_B01_signature_mount,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_signature_mount.webp
+boss_B01_damage_overlay,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B01_damage_overlay.webp
 boss_B02_core,boss_part,1024x1024,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/boss_B02_core.webp
 boss_B02_armor,boss_part,1024x1024,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/boss_B02_armor.webp
 boss_B02_joint,boss_part,1024x1024,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/boss_B02_joint.webp
 boss_B02_signature_mount,boss_part,1024x1024,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_001); source in art/source/batch_001,assets/sprites/boss_B02_signature_mount.webp
 boss_B02_damage_overlay,boss_part,1024x1024,1,alpha,integrated,,M1,ChatGPT imagegen via owner (BATCH_003); source in art/source/batch_003,assets/sprites/boss_B02_damage_overlay.webp
-boss_B03_core,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B03_armor,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B03_joint,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B03_signature_mount,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
-boss_B03_damage_overlay,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
+boss_B03_core,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B03_core.webp
+boss_B03_armor,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B03_armor.webp
+boss_B03_joint,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B03_joint.webp
+boss_B03_signature_mount,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B03_signature_mount.webp
+boss_B03_damage_overlay,boss_part,1024x1024,1,alpha,approved,,M4,ChatGPT imagegen via owner (BATCH_010); source in art/source/batch_010,assets/sprites/boss_B03_damage_overlay.webp
 boss_B04_core,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 boss_B04_armor,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
 boss_B04_joint,boss_part,1024x1024,1,alpha,planned,,M4,ChatGPT raster art requested,
