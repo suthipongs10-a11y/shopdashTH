@@ -144,6 +144,7 @@ export class Renderer {
     g.save();
     if (this.shake > 0) g.translate((this.rand() - 0.5) * this.shake, (this.rand() - 0.5) * this.shake);
     this.drawBackground();
+    this.drawFiringLane(w, alpha);
     for (const e of w.enemies) this.drawEnemy(e, alpha);
     if (w.boss && (w.boss.e.alive || w.status === "running")) this.drawBoss(w, alpha);
     this.drawFriendly(w, alpha);
@@ -296,6 +297,51 @@ export class Renderer {
     }
     if (b.inTransition && !b.entering) { g.strokeStyle = `rgba(255,45,85,${0.4 + Math.sin(this.time * 12) * 0.3})`; g.lineWidth = 4; g.beginPath(); g.arc(0, 0, 90, 0, Math.PI * 2); g.stroke(); }
     g.restore();
+  }
+
+  // Tutorial focus: dim the screen except a ring around the target and point at it.
+  focus: { p: Vec; r: number; label: string } | null = null;
+
+  drawFocus(): void {
+    const f = this.focus;
+    if (!f) return;
+    const g = this.ctx;
+    g.save();
+    g.fillStyle = "rgba(0,0,0,0.55)";
+    g.beginPath(); g.rect(0, 0, 720, 1280); g.arc(f.p.x, f.p.y, f.r, 0, Math.PI * 2, true); g.fill("evenodd");
+    const pulse = 1 + Math.sin(this.time * 6) * 0.06;
+    g.strokeStyle = C.gold; g.lineWidth = 5; g.beginPath(); g.arc(f.p.x, f.p.y, f.r * pulse, 0, Math.PI * 2); g.stroke();
+    // arrow from below
+    const ay = f.p.y + f.r + 70 + Math.sin(this.time * 6) * 8;
+    g.fillStyle = C.gold;
+    g.beginPath(); g.moveTo(f.p.x, f.p.y + f.r + 12); g.lineTo(f.p.x - 22, ay - 20); g.lineTo(f.p.x + 22, ay - 20); g.fill();
+    g.fillRect(f.p.x - 7, ay - 22, 14, 40);
+    g.font = "700 30px RB Thai, sans-serif"; g.textAlign = "center"; g.lineWidth = 6; g.strokeStyle = "rgba(0,0,0,0.85)";
+    g.strokeText(f.label, f.p.x, ay + 52); g.fillStyle = "#fff"; g.fillText(f.label, f.p.x, ay + 52);
+    g.restore();
+  }
+
+  // Where to stand: a green lane under the open joint (shots travel mostly straight up).
+  private drawFiringLane(w: CombatWorld, alpha: number): void {
+    const b = w.boss;
+    if (!b || !b.e.alive || b.signatureRemoved) return;
+    const soon = b.upcoming() === "tail_vent" && !b.action;
+    if (!b.jointExposed && !soon && b.action?.name !== "tail_vent") return;
+    const g = this.ctx;
+    const p = this.pos(b.e, alpha);
+    const jx = p.x + b.joint.offset.x, jy = p.y + b.joint.offset.y;
+    const open = b.jointExposed;
+    const grd = g.createLinearGradient(0, jy, 0, 1050);
+    grd.addColorStop(0, open ? "rgba(126,224,129,0.28)" : "rgba(126,224,129,0.1)");
+    grd.addColorStop(1, "rgba(126,224,129,0)");
+    g.fillStyle = grd; g.fillRect(jx - 26, jy + 20, 52, 1050 - jy);
+    g.setLineDash([10, 12]); g.strokeStyle = open ? "rgba(126,224,129,0.75)" : "rgba(126,224,129,0.35)"; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(jx - 26, jy + 20); g.lineTo(jx - 26, 1000); g.moveTo(jx + 26, jy + 20); g.lineTo(jx + 26, 1000); g.stroke(); g.setLineDash([]);
+    if (open) {
+      g.font = "700 22px RB Thai, sans-serif"; g.textAlign = "center"; g.lineWidth = 5; g.strokeStyle = "rgba(0,0,0,0.8)";
+      const label = t("hud.lane");
+      g.strokeText(label, jx, 1000); g.fillStyle = "#9ff0a2"; g.fillText(label, jx, 1000);
+    }
   }
 
   private drawTelegraphs(w: CombatWorld, alpha: number): void {

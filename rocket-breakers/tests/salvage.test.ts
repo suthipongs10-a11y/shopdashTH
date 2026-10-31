@@ -94,6 +94,8 @@ describe("selective dismantling (B02)", () => {
     w.damagePart(b.e, b.joint, 1000, b.e.pos);
     w.step(idle);
     const item = b.item;
+    item.pos = { x: 360, y: 700 }; // move the part into open space, away from the boss body
+    item.vel = { x: 0, y: 0 };
     w.motion.pos = { x: item.pos.x, y: item.pos.y + 80 };
     for (let i = 0; i < 60 && w.tow?.towing !== true; i++) {
       w.motion.pos = { x: item.pos.x, y: item.pos.y + 80 };

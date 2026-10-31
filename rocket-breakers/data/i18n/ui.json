@@ -450,5 +450,77 @@
   "settings.import_hint": {
     "th": "วางข้อความเซฟ หรือเลือกไฟล์ เซฟปัจจุบันจะถูกเก็บเป็นสำรอง",
     "en": "Paste save text or choose a file; your current save is kept as a backup"
+  },
+  "hud.lane": {
+    "th": "▲ ยืนในแนวนี้แล้วยิงขึ้น",
+    "en": "▲ Stand in this lane and fire"
+  },
+  "hud.joint_open": {
+    "th": "ข้อต่อเปิด! ยิงเลย {s} วิ",
+    "en": "Joint OPEN! {s}s"
+  },
+  "hud.joint_soon": {
+    "th": "ข้อต่อกำลังจะเปิด",
+    "en": "Joint opening soon"
+  },
+  "hud.joint_closed": {
+    "th": "ข้อต่อหางปิดอยู่",
+    "en": "Tail joint closed"
+  },
+  "tut.joint_title": {
+    "th": "จุดอ่อนเปิดแล้ว!",
+    "en": "Weak point open!"
+  },
+  "tut.joint_body": {
+    "th": "วงสีเหลืองคือ \"ข้อต่อหาง\" ยิงตรงนี้ให้หางหลุด\n• ไปยืนในแนวสีเขียวใต้ข้อต่อ ปืนจะยิงขึ้นไปโดน\n• ผมล็อกเป้าที่ข้อต่อให้แล้ว (แตะเป้าเองก็ได้)\n• อย่ายิงตัวหางสีเทา — หางจะพังเป็นเศษเหล็ก",
+    "en": "The amber ring is the TAIL JOINT. Shoot it to sever the tail.\n• Stand in the green lane under it — your guns fire upward\n• I've locked onto the joint for you (or tap it yourself)\n• Don't shoot the grey tail body — it breaks into scrap"
+  },
+  "tut.joint_focus": {
+    "th": "ยิงตรงนี้!",
+    "en": "Shoot here!"
+  },
+  "tut.tow_title": {
+    "th": "หางหลุดแล้ว — ไปเก็บ!",
+    "en": "Tail severed — grab it!"
+  },
+  "tut.tow_body": {
+    "th": "• บินไปใต้หางที่ลอยอยู่ (ให้หางอยู่ด้านหน้ายาน)\n• กดปุ่ม \"ดึง\" (ขวาล่าง) ค้างไว้จนวงเต็ม\n• หางมีเวลา 40 วินาทีก่อนหายไป",
+    "en": "• Fly underneath the floating tail (keep it in front of your nose)\n• Hold the \"Tractor\" button (bottom right) until the ring fills\n• The tail disappears after 40 seconds"
+  },
+  "tut.tow_focus": {
+    "th": "หางที่หลุด",
+    "en": "Loose tail"
+  },
+  "tut.towing_title": {
+    "th": "กำลังลากหาง",
+    "en": "Towing the tail"
+  },
+  "tut.towing_body": {
+    "th": "• ยิงศัตรูรอบนี้ให้หมด แล้วเกมจะเข้า \"จุดจอดปลอดภัย\" ให้อัตโนมัติ\n• อย่าบินห่างหางมากเกินไป สายจะขาด\n• กระสุนศัตรูโดนหางได้ — ระวังหางพัง",
+    "en": "• Clear this wave and the SAFE DOCK opens automatically\n• Don't fly too far from the tail or the cable snaps\n• Enemy shots can damage the tail"
+  },
+  "tut.ok": {
+    "th": "เข้าใจแล้ว เล่นต่อ",
+    "en": "Got it — continue"
+  },
+  "dock.steps": {
+    "th": "1) แตะช่องสีเขียวเพื่อเลือกที่ติด  2) กดติดตั้ง  3) ออกบิน — หรือกด \"ติดตั้งอัตโนมัติ\"",
+    "en": "1) Tap a green cell  2) Fit  3) Launch — or press \"Auto-fit\""
+  },
+  "dock.auto_fit": {
+    "th": "ติดตั้งอัตโนมัติ (แนะนำ)",
+    "en": "Auto-fit (recommended)"
+  },
+  "dock.nose": {
+    "th": "▲ หัวยาน",
+    "en": "▲ Nose"
+  },
+  "dock.legend": {
+    "th": "เขียว = ติดได้ · ม่วง = ตำแหน่งที่เลือก · ⚡ = เตาปฏิกรณ์ · 1/8 = ปืนเดิม",
+    "en": "Green = legal · Purple = selected · ⚡ = reactor · 1/8 = current guns"
+  },
+  "dock.fitted_detail": {
+    "th": "ติดตั้งแล้ว! หางพลาสมาจะยิงเองอัตโนมัติ กระสุนโค้งหาจุดอ่อนให้",
+    "en": "Fitted! The plasma tail fires on its own and curves toward weak points"
   }
 }

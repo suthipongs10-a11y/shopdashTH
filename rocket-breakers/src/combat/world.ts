@@ -13,7 +13,7 @@ import { BulletPool, type Bullet } from "./bullets";
 import { coreOf, makeBarge, makeScout, updateEnemy, type Enemy } from "./enemies";
 import { firstPartHit, partContains, partWorldPos, PRIORITY, type Part } from "./parts";
 import type { Emitter } from "./patterns";
-import { CONTACT_DAMAGE, SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
+import { SWEEP_RANGE, SWEEP_TICK_DMG, SWEEP_WIDTH, ScorpionBoss } from "./boss";
 import { WeaponScheduler, type Mount } from "./weapons";
 import { ageLoose, isIntact, makeItem, transition, PICKUP_INVULN_SEC, type SalvageItem } from "../salvage/salvage";
 import type { RunResult, SecuredItem } from "../campaign/settlement";
@@ -23,6 +23,10 @@ export const WORLD_W = 720;
 export const WORLD_H = 1280;
 export const PLAYER_BOUNDS = { x0: 0, y0: 110, x1: 720, y1: 1040 };
 export const CORE_RADIUS = 12;
+// Solid body radius of the player assembly for ship-vs-enemy contact (not the damage hurtbox).
+export const PLAYER_BODY_RADIUS = 26;
+export const CONTACT_DAMAGE_BODY = 20;
+export const CONTACT_COOLDOWN = 0.6;
 export const HIT_INVULN_SEC = 0.45;
 export const SHIELD_DELAY_SEC = 4;
 export const SHIELD_REGEN = 8;
@@ -254,6 +258,7 @@ export class CombatWorld {
     for (const e of this.enemies) updateEnemy(e, DT, this.em);
     this.enemies = this.enemies.filter((e) => !e.leftArena);
     if (this.boss?.e.alive) this.boss.update(DT, this.motion.pos);
+    this.resolveBodyContact();
     if (input.overdrive && this.overdriveCharge >= 100 && this.overdriveLeft <= 0) {
       this.overdriveCharge = 0;
       this.overdriveLeft = OVERDRIVE_SEC;
@@ -832,7 +837,6 @@ export class CombatWorld {
   private resolveBossBeamAndContact(): void {
     const b = this.boss;
     if (!b || !b.e.alive) return;
-    this.contactCd = Math.max(0, this.contactCd - DT);
     if (b.beamAngle !== null) {
       b.beamTick -= DT;
       if (b.beamTick <= 0) {
@@ -847,10 +851,58 @@ export class CombatWorld {
         }
       }
     } else b.beamTick = 0;
-    if (this.contactCd <= 0 && dist(b.e.pos, this.motion.pos) <= 62 + CORE_RADIUS + 10) {
-      this.contactCd = 0.6;
-      this.applyPlayerHit(CONTACT_DAMAGE, "core", { ...this.motion.pos });
+  }
+
+  // Ship-vs-enemy bodies are solid (SYSTEMS §1): the ship is pushed out of every
+  // enemy part and takes 20 damage per 0.6 s of contact. Overlapping sprites
+  // never insta-kill, and dash cannot pass through a body.
+  private resolveBodyContact(): void {
+    this.contactCd = Math.max(0, this.contactCd - DT);
+    const m = this.motion;
+    let touching = false;
+    for (let pass = 0; pass < 4; pass++) { // several passes settle contacts wedged between parts
+      for (const e of this.allEnemies()) {
+        if (!e.alive) continue;
+        for (const part of e.parts) {
+          if (!part.active) continue;
+          const push = penetration(part, e.pos, m.pos, PLAYER_BODY_RADIUS);
+          if (!push) continue;
+          touching = true;
+          m.pos = { x: m.pos.x + push.x, y: m.pos.y + push.y };
+          const l = Math.hypot(push.x, push.y) || 1;
+          const nx = push.x / l, ny = push.y / l;
+          const into = m.vel.x * nx + m.vel.y * ny;
+          if (into < 0) m.vel = { x: m.vel.x - into * nx, y: m.vel.y - into * ny };
+        }
+      }
     }
+    // Wedged in a gap narrower than the ship (e.g. between core and claw):
+    // refuse the move instead of letting the ship squeeze through.
+    if (touching && this.maxPenetration() > 1.5) {
+      m.pos = { ...m.prev };
+      m.vel = { x: 0, y: 0 };
+      for (const e of this.allEnemies()) for (const part of e.parts) {
+        if (!e.alive || !part.active) continue;
+        const push = penetration(part, e.pos, m.pos, PLAYER_BODY_RADIUS);
+        if (push) m.pos = { x: m.pos.x + push.x, y: m.pos.y + push.y };
+      }
+    }
+    const hw = Math.min(m.halfWidth, 94), b = m.bounds;
+    m.pos = { x: clamp(m.pos.x, b.x0 + hw, b.x1 - hw), y: clamp(m.pos.y, b.y0, b.y1) };
+    if (touching && this.contactCd <= 0) {
+      this.contactCd = CONTACT_COOLDOWN;
+      this.applyPlayerHit(CONTACT_DAMAGE_BODY, "core", { ...m.pos });
+    }
+  }
+
+  private maxPenetration(): number {
+    let worst = 0;
+    for (const e of this.allEnemies()) for (const part of e.parts) {
+      if (!e.alive || !part.active) continue;
+      const push = penetration(part, e.pos, this.motion.pos, PLAYER_BODY_RADIUS);
+      if (push) worst = Math.max(worst, Math.hypot(push.x, push.y));
+    }
+    return worst;
   }
 
   private updatePlayerTimers(): void {
@@ -1080,3 +1132,36 @@ export class CombatWorld {
 }
 
 export type { Bullet };
+
+// Minimum translation that moves a circle (center p, radius r) out of a part, or null.
+function penetration(part: Part, origin: Vec, p: Vec, r: number): Vec | null {
+  const c = { x: origin.x + part.offset.x, y: origin.y + part.offset.y };
+  const s = part.shape;
+  const outOfCircle = (cx: number, cy: number, cr: number): Vec | null => {
+    const dx = p.x - cx, dy = p.y - cy;
+    const d = Math.hypot(dx, dy);
+    const pen = r + cr - d;
+    if (pen <= 0) return null;
+    return d < 1e-6 ? { x: 0, y: pen } : { x: (dx / d) * pen, y: (dy / d) * pen };
+  };
+  if (s.type === "circle") return outOfCircle(c.x, c.y, s.r);
+  if (s.type === "chain") {
+    let best: Vec | null = null;
+    for (const q of s.points) {
+      const v = outOfCircle(c.x + q.x, c.y + q.y, s.r);
+      if (v && (!best || Math.hypot(v.x, v.y) > Math.hypot(best.x, best.y))) best = v;
+    }
+    return best;
+  }
+  const qx = clamp(p.x, c.x - s.hw, c.x + s.hw), qy = clamp(p.y, c.y - s.hh, c.y + s.hh);
+  const dx = p.x - qx, dy = p.y - qy;
+  const d = Math.hypot(dx, dy);
+  if (d >= r) return null;
+  if (d > 1e-6) return { x: (dx / d) * (r - d), y: (dy / d) * (r - d) };
+  // centre inside the rect: leave along the shallowest axis
+  const left = p.x - (c.x - s.hw), right = c.x + s.hw - p.x, up = p.y - (c.y - s.hh), down = c.y + s.hh - p.y;
+  const mn = Math.min(left, right, up, down);
+  if (mn === down) return { x: 0, y: down + r };
+  if (mn === up) return { x: 0, y: -(up + r) };
+  return mn === left ? { x: -(left + r), y: 0 } : { x: right + r, y: 0 };
+}

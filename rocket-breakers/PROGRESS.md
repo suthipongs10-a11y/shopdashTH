@@ -16,8 +16,18 @@ Play: https://claude.ai/artifact/KhZtTSBTb3Zq8piUboUu8S (private link).
   PU09 Overdrive Cell, PU12 Scrap Cache; seeded drop accumulator, 6-pickup cap with queue, authored early/rescue/low-HP
   drops, buff HUD chips, pickup text (max 2), hitstop on sever/elite break, explosion/shield/plasma VFX textures.
 
+## Done (2026-10-31, after first owner playtest)
+- Owner feedback: confusing joint shooting/fitting; ship could overlap the scorpion.
+- Solid ship-vs-enemy bodies: pushed out of every part (core, claws, tail, barges, scouts), cannot squeeze through
+  gaps narrower than the ship, dash cannot tunnel, 20 contact damage per 0.6 s (SYSTEMS §1).
+- Salvage clarity: time-stopping tutorial callouts (joint open / tail severed / towing) with a highlight ring + arrow,
+  shown each run until the first successful steal; green "stand here" firing lane under the joint; joint status
+  (closed / opening soon / OPEN + seconds) on the boss bar; dock has Auto-fit, nose marker, colour legend, compact stats.
+- Art: `tools/build_art_pack.py` generates the full ChatGPT request pack — 394 assets in 41 batches
+  (`art/requests/chatgpt_pack/`), zipped with reference images for the owner.
+
 ## Verification
-- `npm test` → **54 passed**: catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
+- `npm test` → **56 passed** (adds body-contact tests): catalog, i18n completeness (every key used in code exists in th+en), assets, movement,
   dash, fire rate/Overdrive, heat lock, fitting errors, salvage transitions, 35% vs 34.99%, sever+core-death,
   phase/sever same tick, tail attacks gone after theft, tow snap rules, dock no-loss, one-damage-per-bullet, shield,
   settlement worked examples 1–2 + defeat + crash injection, save recovery/migration/future/import/quota, determinism at

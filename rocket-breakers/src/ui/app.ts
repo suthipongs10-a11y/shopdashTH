@@ -314,6 +314,10 @@ export class CombatScreen implements Screen {
   private pauseEl: HTMLElement | null = null;
   private now = 0;
   private off: (() => void)[] = [];
+  // Time-stopping tutorial callouts, shown each run until the first successful steal.
+  private callout: HTMLElement | null = null;
+  private tutorialShown = new Set<string>();
+  private tutorialOn: boolean;
 
   constructor(private app: App, runNumber: number) {
     const st = app.profile.settings;
@@ -336,9 +340,10 @@ export class CombatScreen implements Screen {
     on(window, "keyup", (e) => { this.keys.delete(e.code); if (e.code === "KeyE") this.keyTractor = false; });
     on(window, "blur", () => { this.keys.clear(); this.keyTractor = false; });
     this.world.hint("hint.intro");
+    this.tutorialOn = !(app.profile.boss_archive.B02?.stolen > 0);
   }
 
-  dispose(): void { for (const f of this.off) f(); this.dock?.close(); }
+  dispose(): void { for (const f of this.off) f(); this.dock?.close(); this.callout?.remove(); }
   onHidden(): void { this.setPaused(true); }
 
   // ---------------------------------------------------------- input
@@ -423,7 +428,7 @@ export class CombatScreen implements Screen {
   }
 
   setPaused(v: boolean): void {
-    if (this.world.status !== "running" || this.dock) v = false;
+    if (this.world.status !== "running" || this.dock || this.callout) v = false;
     this.paused = v;
     this.driver.paused = v;
     this.drag = null;
@@ -455,7 +460,7 @@ export class CombatScreen implements Screen {
     this.now += dt;
     const w = this.world;
     const pad = this.pollPad();
-    const running = w.status === "running" && !w.dock && !this.paused;
+    const running = w.status === "running" && !w.dock && !this.paused && !this.callout;
     this.driver.paused = !running;
     const ticks = this.driver.advance(dt);
     for (let i = 0; i < ticks; i++) {
@@ -469,6 +474,7 @@ export class CombatScreen implements Screen {
     w.events.length = 0;
     this.renderer.update(running ? dt : 0);
     this.updateHints(dt);
+    this.checkTutorial();
     if (w.dock && !this.dock) {
       sfx.play("secured");
       this.dock = new DockPanel(this.app, w, () => { this.dock = null; });
@@ -478,6 +484,36 @@ export class CombatScreen implements Screen {
       this.endTimer -= dt;
       if (this.endTimer <= 0 && this.endTimer > -1) { this.endTimer = -99; this.finish(); }
     }
+  }
+
+  private checkTutorial(): void {
+    const w = this.world;
+    const b = w.boss;
+    if (!this.tutorialOn || this.callout || !b || w.status !== "running") return;
+    if (b.jointExposed && !this.tutorialShown.has("joint")) {
+      const p = { x: b.e.pos.x + b.joint.offset.x, y: b.e.pos.y + b.joint.offset.y };
+      this.showCallout("joint", p, 46, () => { w.lock = { enemyId: b.e.id, partId: "tail_joint" }; });
+    } else if (b.item.state === "detached_intact" && !this.tutorialShown.has("tow")) {
+      this.showCallout("tow", { ...b.item.pos }, 50);
+    } else if (w.tow?.towing && !this.tutorialShown.has("towing")) {
+      const it = w.towedItem!;
+      this.showCallout("towing", { ...it.pos }, 50);
+    }
+  }
+
+  private showCallout(kind: "joint" | "tow" | "towing", focus: Vec, r: number, onOk?: () => void): void {
+    this.tutorialShown.add(kind);
+    this.drag = null;
+    this.pointerButtons.clear();
+    this.renderer.focus = { p: focus, r, label: kind === "towing" ? "" : t(`tut.${kind}_focus`) };
+    const box = el("div", "callout");
+    box.append(el("h3", "", t(`tut.${kind}_title`)), el("p", "", t(`tut.${kind}_body`)),
+      button(t("tut.ok"), () => { onOk?.(); box.remove(); this.callout = null; this.renderer.focus = null; }, "btn primary"));
+    // keep the box away from the highlighted target
+    box.style.top = focus.y < 640 ? "760px" : "300px";
+    this.callout = box;
+    this.app.ui.append(box);
+    sfx.play("warn");
   }
 
   private updateHints(dt: number): void {
@@ -505,6 +541,7 @@ export class CombatScreen implements Screen {
   draw(g: CanvasRenderingContext2D): void {
     this.renderer.draw(this.world, this.driver.alpha());
     drawHud(g, this.world, this.buttons, this.app.insets, new Set(this.pointerButtons.values()), this.renderer.time);
+    this.renderer.drawFocus();
   }
 }
 

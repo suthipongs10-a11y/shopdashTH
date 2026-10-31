@@ -47,11 +47,18 @@ p, li { font-size: 26px; line-height: 1.55; margin: 0; color: var(--text); }
 #hint { position: absolute; left: 40px; right: 40px; top: 166px; font-size: 23px; padding: 10px 18px; padding: 16px 22px; border-radius: 16px; background: rgba(4, 12, 24, 0.86); border: 2px solid var(--cyan); font-size: 26px; text-align: center; transition: opacity 0.3s; pointer-events: none; }
 #hint.hidden { opacity: 0; }
 
-.dock { position: absolute; inset: 0; background: rgba(2, 8, 16, 0.9); display: flex; flex-direction: column; align-items: center; padding: 56px 48px 40px; gap: 12px; }
+.callout { position: absolute; left: 36px; right: 36px; padding: 22px 26px; border-radius: 20px; background: rgba(4, 12, 24, 0.95); border: 3px solid var(--gold); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+.callout h3 { margin: 0; font-size: 34px; color: var(--gold); }
+.callout p { white-space: pre-line; font-size: 25px; line-height: 1.5; }
+.dock .nose { color: var(--cyan); font-size: 22px; font-weight: 700; margin-bottom: -6px; }
+.dock { position: absolute; inset: 0; background: rgba(2, 8, 16, 0.92); display: flex; flex-direction: column; align-items: center; padding: 40px 44px 30px; gap: 10px; overflow-y: auto; }
+.dock .dim { font-size: 19px; }
+.dock .statrow { display: flex; gap: 18px; font-size: 21px; color: var(--dim); flex-wrap: wrap; justify-content: center; }
+.dock .statrow b { color: var(--gold); }
 .dock .card { padding: 14px 22px; gap: 6px; }
 .dock h2 { font-size: 40px; }
 .dock h2 { color: var(--cyan); }
-.grid { display: grid; grid-template-columns: repeat(7, 60px); grid-template-rows: repeat(7, 60px); gap: 5px; }
+.grid { display: grid; grid-template-columns: repeat(7, 46px); grid-template-rows: repeat(7, 46px); gap: 4px; }
 .cell { border-radius: 10px; border: 2px solid transparent; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--dim); }
 .cell.mask { background: rgba(57, 225, 255, 0.07); border-color: rgba(57, 225, 255, 0.18); }
 .cell.reactor { background: rgba(57, 225, 255, 0.35); color: #fff; }

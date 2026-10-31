@@ -63,13 +63,26 @@ export function drawHud(g: CanvasRenderingContext2D, w: CombatWorld, buttons: Hu
     g.fillStyle = C.red; g.fillRect(20, y + 24, 600 * Math.max(0, b.hpFrac), 12);
     g.fillStyle = "#fff";
     for (const f of [0.6, 0.25]) g.fillRect(20 + 600 * f - 1, y + 20, 2, 20);
+    // Tail joint state: closed / opening soon / OPEN with remaining time.
+    if (!b.signatureRemoved) {
+      const left = b.exposureLeft();
+      const soon = !b.jointExposed && (b.upcoming() === "tail_vent" || b.action?.name === "tail_vent");
+      const label = b.jointExposed ? t("hud.joint_open", { s: left.toFixed(1) }) : soon ? t("hud.joint_soon") : t("hud.joint_closed");
+      const col = b.jointExposed ? C.amber : soon ? C.gold : C.dim;
+      // Same row as the boss name, right-aligned, so hints below never cover it.
+      g.font = "700 18px RB Thai, sans-serif"; g.textAlign = "right";
+      g.fillStyle = col; g.fillText(label, 622, y + 16, 320);
+      if (b.jointExposed) { g.fillStyle = C.amber; g.fillRect(20, y + 37, 600 * (left / 2.5), 4); }
+    }
   } else {
     g.fillStyle = C.dim; g.font = "20px RB Thai, sans-serif"; g.textAlign = "left";
     g.fillText(`${t("hud.score")} ${w.score}`, 20, top + TOP_H + 30);
   }
   drawBuffs(g, w, 1280 - insets.bottom - 236); // bottom-left, above the thumb buttons and below the flight area
-  g.fillStyle = "rgba(255,215,106,0.85)"; g.font = "16px RB Thai, sans-serif"; g.textAlign = "right";
-  g.fillText(t("hud.placeholder"), 620, top + TOP_H + 30);
+  if (!(b && b.e.alive && !b.entering)) {
+    g.fillStyle = "rgba(255,215,106,0.85)"; g.font = "16px RB Thai, sans-serif"; g.textAlign = "right";
+    g.fillText(t("hud.placeholder"), 620, top + TOP_H + 30);
+  }
   for (const btn of buttons) drawButton(g, btn, w, pressed.has(btn.action), time);
 }
 

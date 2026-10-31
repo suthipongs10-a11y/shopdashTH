@@ -259,6 +259,19 @@ export class ScorpionBoss {
     return out;
   }
 
+  // Next action in the loop (for the HUD's "joint opens soon" cue).
+  upcoming(): ActionName | null {
+    if (this.entering) return null;
+    const loop = this.loop();
+    return loop[this.loopIndex % loop.length];
+  }
+
+  // Seconds the tail joint stays open, or 0.
+  exposureLeft(): number {
+    const a = this.action;
+    return this.jointExposed && a?.name === "tail_vent" ? Math.max(0, a.dur - 0.2 - a.t) : 0;
+  }
+
   startLull(): void { this.lull = true; this.loopIndex = 0; }
 
   endLull(): void {

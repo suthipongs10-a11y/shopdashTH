@@ -31,3 +31,6 @@ Append implementation decisions with consequences and whether baseline documenta
 | 2026-10-31 | Power-ups implemented: PU01/02/05/06/07/08/09/12 + drop accumulator + authored early/rescue drops with time fallbacks. PU03/04/10/11 pending (need support emitters / fusion) | Expansion step 1–2 order |
 | 2026-10-31 | Expansion VFX used as code-animated static cards from premultiplied-alpha 256 px copies in `assets/fx/`; originals untouched in `expansion_01/art/` | Spec: static keyframes, not flipbooks; status stays generated_unchecked |
 | 2026-10-31 | Artifact viewer constraints: no `confirm()` (two-tap confirm instead), no downloads (save export as copyable text) | Host sandbox rules |
+| 2026-10-31 | Player body radius 26 px for ship-vs-enemy contact (separate from the 12 px core hurtbox); moves into gaps narrower than the ship are refused | Owner saw the ship sitting on the boss; SYSTEMS §1 requires separation + 20 dmg / 0.6 s |
+| 2026-10-31 | Tutorial callouts pause the sim and repeat every run until the first successful B02 steal | Owner found stealing/fitting confusing; pausing keeps the 2.5 s joint window fair while reading |
+| 2026-10-31 | Art requests generated from data by `tools/build_art_pack.py` (394 assets / 41 batches, ≤12 per batch, priority order) | One reproducible pack instead of hand-written batches drifting from the catalog |
