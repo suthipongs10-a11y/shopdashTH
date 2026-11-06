@@ -32,7 +32,7 @@
 
 | ส่วน | สถานะ | ที่อยู่ |
 |---|---|---|
-| **แผนใหม่: ฮีโร่แบบเฟรม** | สเปคเสร็จ + prompt pilot P11A–C (ทิศ SW: ยืน 4 / เดิน 8 / ฟัน 6 เฟรม) **รอเจ้าของสั่ง ChatGPT** · เครื่องมือตัดเฟรม + GIF/contact sheet ตรวจ **พร้อมแล้ว** (ทดสอบกับ P01/P02A, รอชีตจริง) (2026-11-06) | `docs/07-sprite-frames.md` + `chatgpt-pack/prompts/P11_hero_frames_pilot.txt` + `tools/build_hero_frames.py` |
+| **แผนใหม่: ฮีโร่แบบเฟรม** | สเปคเสร็จ · เจ้าของขอ**ท่าถือดาบ + ท่าเดินก่อนอย่างเดียว** → ชุด zip **P12** (ขั้น 1 เลือกท่าถือดาบ 3 แบบ, ขั้น 2 เดิน 8 เฟรม ทิศ SW; แทน pilot P11) + สรุปค้นคว้าเกมอื่น **รอเจ้าของสั่ง ChatGPT** · เครื่องมือตัดเฟรม + GIF/contact sheet ตรวจ **พร้อมแล้ว** (ทดสอบกับ P01/P02A, รอชีตจริง) (2026-11-06) | `docs/07-sprite-frames.md` + `chatgpt-pack/packs/P12_walk_sword/` (zip `Mossbridge_P12_walk_sword.zip`) + `tools/build_hero_frames.py` |
 | เอกสารออกแบบ 01–07 | เสร็จ | `docs/` |
 | Headgear Lab (ต้นแบบระบบหมวก 3 ช่อง) | เสร็จ ภาพ placeholder วาดด้วยโค้ด | `prototype/headgear-lab/index.html` |
 | **เดโมเล่นได้ v0.6 (เจ้าของตรวจผ่าน)** | v0.5 + **เปลี่ยนชุดได้ 4 ชุด** (เดิม, พรานป่ามอส, องครักษ์ทองเหลือง, เทศกาลโคมไฟ) จากภาพ P10A–C ในแผง 👒 (2026-11-06) — เจ้าของ: "ผ่านแล้ว" (ชุด/หมวก) แต่การถือดาบและการเดินของ rig ยังไม่ผ่าน → §5.A | `demo/` |
@@ -92,7 +92,8 @@ python3 tools/build_hero_frames.py --check art/inbox/<ไฟล์>.png   # ต�
 
 ### 4.1 วิธีหลัก (มือถือ / เว็บ / ทุก session)
 1. **เขียน prompt** ลงไฟล์ใหม่ `chatgpt-pack/prompts/Pxx_<เรื่อง>.txt` รูปแบบเดิม (หัวไฟล์ภาษาไทย 2–3 บรรทัด, แต่ละภาพมี `[PxxA] SAVE AS:`, `SIZE:`, `PROMPT:` ภาษาอังกฤษ คั่นด้วย `=====`)
-   - เลขถัดไปคือ **P12** (P11 = pilot ฮีโร่แบบเฟรม) · ถ้า prompt อ้างภาพเดิม ให้เขียนชื่อชัด ๆ เช่น "my P01 image", "my P11A image"
+   - เลขถัดไปคือ **P13** (P11 = pilot เดิม ถูกแทนที่, P12 = ถือดาบ + เดิน ทิศ SW) · ถ้า prompt อ้างภาพเดิม ให้เขียนชื่อชัด ๆ เช่น "my P01 image", "my P12A image"
+   - **ชุดแบบ zip** (เจ้าของชอบโยน zip ให้ ChatGPT): โฟลเดอร์ `chatgpt-pack/packs/<ชื่อ>/` = `00_README_TH.md` (ขั้นตอน + ประโยคแก้ภาพ), `01_START_HERE_for_ChatGPT.md` (กติกา + "ทำทีละ STEP แล้วรอ"), ไฟล์ `STEPn_*.txt`, `refs.txt` (ภาพของเราเองที่จะใส่ใน zip) → `python3 tools/make_pack.py <ชื่อ>` ได้ `Mossbridge_<ชื่อ>.zip` → commit แล้วส่งไฟล์ให้เจ้าของด้วย SendUserFile; ไฟล์ `prompts/Pxx_*.txt` ชี้ไปที่ชุดนั้น
    - ถ้าต้องการให้ท่า/ขนาดเหมือนภาพเดิมเป๊ะ ให้บอกเจ้าของใช้ **Edit บนภาพเดิมใน ChatGPT** พร้อมข้อความแก้ (ได้ผลดีกว่าวาดใหม่มาก ดูบทเรียน P10C ใน `docs/06`)
 2. **ส่งในแชทให้เจ้าของ** 1 กล่องโค้ดต่อ 1 ภาพ (กล่องละ prompt ล้วน ๆ ให้กดคัดลอกได้) + บอก `SAVE AS:` และ branch ที่ต้องอัปโหลดภาพเข้า + commit/push ไฟล์ prompt
 3. เจ้าของสั่งในแชท ChatGPT เดิม ("Acknowledge Readiness" มีต้นแบบครบ) แล้ว**อัปโหลดภาพเข้า `games/mossbridge/art/inbox/`** บน GitHub (หรือแนบในแชท Claude เพื่อให้ดูเร็ว ๆ)
@@ -131,7 +132,7 @@ python3 tools/build_hero_frames.py --check art/inbox/<ไฟล์>.png   # ต�
 - เจ้าของตรวจ rig v0.6: **ถือดาบและเดินยังไม่ผ่าน** → เปลี่ยนเป็น sprite ที่ ChatGPT วาดทุกเฟรม (ท่าจริงจากภาพ ไม่ใช่การบิดภาพ)
 - โครง: 5 ทิศวาดจริง (S, SW, W, NW, N) + กลับภาพ 3 ทิศ · เลเยอร์ body (ไม่มีหัว ถือดาบในเฟรม) → head → headgear · จุดยึด `feet/neck/tip` ต่อเฟรมหาโดยเครื่องมือ
 - ท่ารุ่นแรก: idle 4, walk 8, attack 6 (ต่อไป hurt 2, die 4, cast 4) · เดินเลื่อนเฟรมตามระยะทาง เท้าไม่ลื่น
-- ลำดับ: **pilot ทิศ SW (P11A–C)** → เจ้าของดู GIF แล้วตัดสิน → สั่ง 4 ทิศที่เหลือ → ตัวไม่มีหัวด้วย Edit ของ ChatGPT → `tools/build_hero_frames.py` → `SpriteHero` ในเกม
+- ลำดับ: **P12 ทิศ SW: เลือกท่าถือดาบ (P12A) → เดิน 8 เฟรม (P12B)** (เจ้าของขอแค่ถือดาบ + เดินก่อน; ท่าฟันทีหลัง) → เจ้าของดู GIF แล้วตัดสิน → สั่ง 4 ทิศที่เหลือ → ตัวไม่มีหัวด้วย Edit ของ ChatGPT → `tools/build_hero_frames.py` → `SpriteHero` ในเกม
 - rig ข้างล่าง (§5.0) **ยังเป็นของที่เล่นได้ตอนนี้** เก็บไว้เป็นทางเลือกจนกว่าเฟรมจะครบทุกท่า/ทิศ
 
 ### 5.0 rig ปัจจุบัน (v0.3–v0.6) ทำงานอย่างไร (ต้องเข้าใจก่อนแก้)
@@ -186,7 +187,7 @@ python3 tools/build_hero_frames.py --check art/inbox/<ไฟล์>.png   # ต�
 ## 6. Backlog (ทำจากบนลงล่าง)
 
 **ใหม่ (2026-11-06) — ฮีโร่แบบเฟรม (`docs/07`):**
-- **A1. Pilot ทิศ SW:** (prompt ส่งให้เจ้าของแล้ว 2026-11-06 รอภาพใน `art/inbox/`) ส่ง prompt `P11A–C` ให้เจ้าของ (ยืน 4 / เดิน 8 / ฟัน 6 เฟรม ตัวเต็มมีหัว) → รับภาพจาก `art/inbox/` → ตรวจ (ขนาด/เส้นฐานเท่ากันทุกช่อง, หน้าตาตรง P01, ดาบอยู่ในมือขวา, ไม่มีเอฟเฟกต์) → ทำ GIF/contact sheet ให้เจ้าของดู → **เจ้าของตัดสินว่าใช่ก่อนทำต่อ**
+- **A1. Pilot ทิศ SW = ชุด P12** (ส่ง zip ให้เจ้าของแล้ว 2026-11-06 รอภาพใน `art/inbox/`; แทน P11 เพราะเจ้าของขอ "ถือดาบ + เดินก่อน เอาแค่นี้ให้ได้"): **ขั้น 1** `P12A_hero_sw_hold3.png` ถือดาบ 3 แบบ → ตรวจ (`--check`: กำเต็มมือ, มือขวา = ซ้ายของภาพใน SW, ดาบยาว ~55% ความสูง, ขนาดเท่ากัน) → **เจ้าของเลือก 1 แบบ** → **ขั้น 2** `P12B_hero_sw_walk8.png` (สำรอง `P12C_hero_sw_walk4.png`) → ตรวจ + GIF เดินบนพื้นจุด → **เจ้าของตัดสินว่าใช่ก่อนทำต่อ** · สรุปค้นคว้าเกมอื่นอยู่ใน `chatgpt-pack/packs/P12_walk_sword/02_RESEARCH_TH.md`
 - **A2. เครื่องมือ** ~~`tools/build_hero_frames.py` (ตัดช่อง, key, หา feet/neck/tip, สเกลต่อชีต, atlas + `demo/sprites/kaelrin.json`, GIF ตรวจ)~~ **ทำแล้ว 2026-11-06** (`docs/07` §7; ค่า `ALIGN`/`STRIDE` ต้องจูนอีกครั้งเมื่อได้ชีตจริง) + `SpriteHero` ในเกม (ยังไม่ทำ — รอเจ้าของตัดสิน pilot) (เปิดด้วย flag, เดินเลื่อนเฟรมตามระยะทาง) ใช้ทิศ SW ก่อน ทิศอื่นใช้ rig ชั่วคราว
 - **A3. ผลิตครบ 5 ทิศ:** prompt P12+ สำหรับ S, W, NW, N (idle/walk/attack) + หัว 5 ทิศ ผมปกติ/ผมยุบ → ตัวไม่มีหัวด้วย Edit ของ ChatGPT บนชีตที่ผ่านแล้ว → หัว + หมวกปักที่ `neck`
 - **A4. ท่าเพิ่ม:** hurt 2, die 4 (+ ลุก), cast 4, คอมโบ attack2/attack3 · ชุด P10 แบบเฟรม (Edit ชีตเดิม "repaint only the clothing")
@@ -232,7 +233,8 @@ games/mossbridge/
   prototype/headgear-lab/    ต้นแบบระบบหมวก
   chatgpt-pack/              คำสั่งสร้างภาพ + refs (zip อยู่ที่ Mossbridge_ChatGPT_Pack.zip; zip มีแค่ P01–P09)
   chatgpt-pack/03_PHONE_WORKFLOW_TH.md  ขั้นตอนสั่งภาพจากมือถือฉบับเจ้าของ
-  chatgpt-pack/prompts/      P01–P10 (ใช้แล้ว), P11 pilot ฮีโร่แบบเฟรม, P12+ ถัดไป
+  chatgpt-pack/prompts/      P01–P10 (ใช้แล้ว), P11 pilot (ถูกแทนที่), P12 ชี้ไปที่ชุด zip, P13+ ถัดไป
+  chatgpt-pack/packs/        ชุดคำสั่งแบบ zip ต่อเรื่อง (P12_walk_sword = ถือดาบ + เดิน) → tools/make_pack.py → Mossbridge_<ชื่อ>.zip
   art/reference/             ภาพต้นแบบจากเจ้าของ (concept, environment, sprite atlas)
   art/samples/               sprite ที่ล้างแล้วจาก atlas (ชื่อไฟล์ hero_* เดาทิศผิด และเลิกใช้ในเดโมแล้ว)
   art/samples/kaelrin/       ชิ้นส่วน Kaelrin จาก P01–P03: body_full/headless, head_full/capped, weapon_a/b + manifest
@@ -246,6 +248,7 @@ games/mossbridge/
   tools/build_headgear.py    P04A–F, P05A–C → gear_{id}_{view}.png บนแคนวาสหัว (transform เดียวกับหัว + FIT ต่อชิ้น) + "gear" ใน manifest
   tools/build_outfits.py     P10A–C → ชุดที่จัดทับท่า P02A + ชิ้น rig ต่อชุด + ไอคอน
   tools/build_map.py         P07A + P07B → map_town_meadow.jpg + demo/maps/mossbridge.json (พื้นที่เดิน/จุดเกิด วาดตามกริด)
+  tools/make_pack.py         zip ชุดคำสั่ง chatgpt-pack/packs/<ชื่อ>/ + ภาพอ้างอิงใน refs.txt
   tools/build_hero_frames.py ชีตฮีโร่แบบเฟรม (P11+) → atlas ต่อทิศ + demo/sprites/kaelrin.json + GIF/contact sheet ตรวจ (--check = ตรวจอย่างเดียว)
   tools/qa/                  frames.js, sheet.py, sim.js, video.js (Playwright) · rig_check.js (node ล้วน) · serve.js + inpage.js (QA ในเบราว์เซอร์ใดก็ได้)
 ```

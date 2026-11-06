@@ -1,0 +1,33 @@
+STEP 2 — P12B: 8-frame walk cycle, view SW, holding the sword the way the owner chose in P12A.
+Before this step the owner writes in the chat which P12A cell they chose, e.g. "I choose cell 2 (READY GUARD) from P12A."
+SAVE AS: P12B_hero_sw_walk8.png
+SIZE: 1536x1024 (landscape)
+
+PROMPT:
+Walk-cycle sprite sheet of the same Kaelrin as in my P12A image (same face, hair, armor, scarf, the same sword at the
+same size). Every frame is view SW (front three-quarter, facing down-left), the same camera as REF_03 view 1.
+He carries the sword in the hold I chose from my P12A image, in every frame: the sword in his RIGHT hand (the hand on
+the left side of the picture), the right fist fully closed around the leather grip with the brass guard just above the
+fist, the same blade angle and the same sword size as in that P12A cell.
+8 frames in a 4x2 grid, read left to right, top to bottom = one complete looping walk cycle (frame 8 flows back into
+frame 1):
+1. CONTACT: right foot forward with the heel touching the ground, left foot behind on its toes, legs at their widest,
+   the left arm forward.
+2. DOWN: the weight drops onto the right leg, right knee bent, the body at its LOWEST.
+3. PASSING: the left leg swings forward past the right leg under the body, left foot lifted a little, the body rising.
+4. UP: the right leg pushes off, the body at its HIGHEST, the left foot reaching forward.
+5. CONTACT: left foot forward with the heel touching the ground, right foot behind on its toes, legs at their widest,
+   the left arm back.
+6. DOWN: the weight on the left leg, left knee bent, the body at its LOWEST.
+7. PASSING: the right leg passes the left leg under the body, the body rising.
+8. UP: the body at its HIGHEST, the right foot reaching forward.
+Chibi walk: short quick steps, the feet lift only a little (about ankle height), the knees clearly bend. Upright
+posture: back straight, chest up, hips directly under the shoulders, a very slight forward lean, never leaning back or
+pushing the hips out. The whole body, head included, bobs up and down a small amount (about 3% of his height): lowest in
+frames 2 and 6, highest in frames 4 and 8. The shoulders turn slightly against the hips. The head stays steady and level.
+The sword arm keeps the chosen hold and moves only slightly with each step because the weapon has weight; the blade
+never crosses his legs or his face. The free left arm swings opposite to the legs.
+He walks IN PLACE: his body stays in the middle of each cell, the planted foot slides back under him, nothing drifts
+sideways between frames. Same size in every frame, feet on the same baseline, every frame clearly different from its
+neighbours. No motion lines, no dust, no glow, no effects, no ground shadow, no text, no numbers. Flat solid magenta
+#FF00FF background. Follow all rules in 01_START_HERE_for_ChatGPT.md.

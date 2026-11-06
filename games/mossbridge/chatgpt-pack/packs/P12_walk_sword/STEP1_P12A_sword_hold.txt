@@ -1,0 +1,29 @@
+STEP 1 — P12A: three ways for Kaelrin to hold his sword (view SW). The owner picks one.
+SAVE AS: P12A_hero_sw_hold3.png
+SIZE: 1536x1024 (landscape)
+
+PROMPT:
+Three full-body sprites of Kaelrin side by side in one row (3 equal cells, read left to right), exactly as in REF_03
+and my P01 image (same face, teal spiky hair, teal leather armor with brass trim and shoulder pads, dark teal scarf,
+brown belt with pouch, armored boots). Every figure is view SW (front three-quarter, facing down-left), the same camera
+as REF_03 view 1, standing upright with the feet on the same baseline, the same size in every cell (about two thirds of
+the image height).
+In all three he holds the weapon from my P03 image (steel blade with the pick hook, brass guard, leather grip, round
+brass pommel) in his RIGHT hand, which is the hand on the left side of the picture. The sword keeps its P03 proportions:
+its full length is about 55% of his height.
+THE GRIP: his right fist is fully closed around the leather grip — four fingers wrapped around it, the thumb over the
+fingers, the brass guard directly above the fist and the pommel just below it. The handle disappears into the fist and
+the blade continues in a straight line out of it. The wrist and forearm look firm, as if carrying real weight.
+Three different holds:
+1. LOW CARRY (left cell): a relaxed carry for walking. The right arm hangs naturally with the elbow slightly bent, the
+   fist beside the hip, the blade pointing down and forward at about 45 degrees, the tip in front of and outside his
+   feet, never crossing his legs. Left hand a loose fist at his side. Feet close together, weight even.
+2. READY GUARD (middle cell): a classic swordsman battle-ready stance. The right elbow bent, the fist in front of the
+   waist on his right side, the blade pointing forward and up at about 45 degrees, well away from his face. Left hand a
+   loose fist near the chest. Left foot slightly forward, knees slightly bent, weight on the balls of the feet, body
+   upright, not leaning back.
+3. SHOULDER REST (right cell): a casual adventurer carry. The back of the blade rests on his right shoulder, pointing up
+   and back behind him, the fist in front of the shoulder, elbow down. Left hand relaxed at his side. Standing upright.
+Each pose must read clearly as a solid black silhouette: the sword stays clear of his face and of the body outline.
+No motion lines, no glow, no effects, no ground shadow, no text, no labels, no numbers. Flat solid magenta #FF00FF
+background. Follow all rules in 01_START_HERE_for_ChatGPT.md.

@@ -4,7 +4,7 @@ build_hero_frames.py — ChatGPT animation sheets of Kaelrin -> per-frame sprite
 
 One sheet = one action x one direction, frames in an equal grid read left->right, top->bottom on
 flat magenta. File names (chatgpt-pack SAVE AS):  P{nn}{X}_hero_{dir}_{action}{frames}[_{layer}].png
-  e.g. P11A_hero_sw_idle4.png, P11B_hero_sw_walk8.png, P11C_hero_sw_attack6.png
+  e.g. P12A_hero_sw_hold3.png (3 ways to hold the sword), P12B_hero_sw_walk8.png, P12C_hero_sw_walk4.png
   dir    s | sw | w | nw | n          (se, e, ne are mirrored in the game)
   layer  full (default: whole body with head) | body (headless body, from a ChatGPT edit of the full sheet)
   An action with a digit (attack2) needs a dash before the frame count: hero_sw_attack2-6.png
@@ -80,13 +80,15 @@ ATLAS_W = 2048
 GRID = {1: (1, 1), 2: (2, 1), 3: (3, 1), 4: (2, 2), 6: (3, 2), 8: (4, 2)}
 # frames whose height defines the sheet scale (upright, sword below the head); value = expected
 # height relative to the idle stance
-REF_FRAMES = {"idle": (None, 1.0), "walk": ((2, 6), 1.0), "attack": ((0,), 1.0), "hurt": ((0,), 1.0),
-              "cast": ((0,), 1.0), "die": ((0,), 1.0)}
-ALIGN = {"idle": ("feet", "feet"), "walk": ("head", "row"), "attack": ("cell", "cell"),
+# height relative to the idle stance. A dict picks by frame count (4-frame walk: passing = frames 2+4)
+REF_FRAMES = {"idle": (None, 1.0), "walk": ({8: (2, 6), 4: (1, 3)}, 1.0), "attack": ((0,), 1.0), "hurt": ((0,), 1.0),
+              "cast": ((0,), 1.0), "die": ((0,), 1.0), "hold": (None, 1.0)}
+ALIGN = {"idle": ("feet", "feet"), "hold": ("feet", "feet"), "walk": ("head", "row"), "attack": ("cell", "cell"),
          "hurt": ("cell", "feet"), "cast": ("feet", "feet"), "die": ("cell", "cell")}
 TIMING = {   # docs/07 §4 (idle slowed to a 1.6 s breath, §5.2 asks for 1.5-2 s)
     "idle": {"loop": True, "durations": [0.4, 0.4, 0.4, 0.4]},
     "walk": {"loop": True, "stride": None},          # frames advance with distance, see STRIDE
+    "hold": {"loop": False, "durations": [0.8, 0.8, 0.8]},   # P12A: 3 ways to hold the sword (a choice, not an animation)
     "attack": {"loop": False, "durations": [0.08, 0.08, 0.05, 0.12, 0.08, 0.10], "hit": 3, "smear": [2, 3]},
     "hurt": {"loop": False, "durations": [0.08, 0.18]},
     "die": {"loop": False, "durations": [0.12, 0.12, 0.12, 0.6]},
@@ -292,6 +294,8 @@ def process(path, meta, grid=None, ref_hist=None):
 
     # --- scale: reference frames -> HEIGHT * expected
     ref, expect = REF_FRAMES.get(act, (None, 1.0))
+    if isinstance(ref, dict):
+        ref = ref.get(n)
     ref = [i for i in (ref if ref is not None else range(n)) if i < n]
     ref_h = float(np.median([ms[i]["h"] for i in ref]))
     scale = HEIGHT * expect / ref_h
@@ -326,7 +330,7 @@ def process(path, meta, grid=None, ref_hist=None):
         worst = max(range(n), key=lambda i: ms[i]["color"])
         if ms[worst]["color"] > COLOR_WARN:
             notes.append(f"! frame {worst + 1} colours differ from P01 ({ms[worst]['color']:.2f} > {COLOR_WARN}): face/outfit drift?")
-    if meta["layer"] == "full" and act in ("idle", "walk", "attack"):
+    if meta["layer"] == "full" and act in ("idle", "walk", "attack", "hold"):
         missing = [i + 1 for i, m in enumerate(ms) if m["tip"] is None]
         if missing:
             notes.append(f"! no sword found in frame(s) {missing}")

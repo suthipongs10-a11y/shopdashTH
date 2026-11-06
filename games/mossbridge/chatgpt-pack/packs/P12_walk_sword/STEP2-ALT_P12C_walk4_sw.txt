@@ -1,0 +1,24 @@
+STEP 2-ALT — P12C: 4-frame walk cycle, view SW. Use only if the 8-frame walk (STEP 2) keeps coming out inconsistent.
+Fewer frames are easier for the image model to keep identical; the game plays them a little slower.
+SAVE AS: P12C_hero_sw_walk4.png
+SIZE: 1024x1024 (square)
+
+PROMPT:
+Walk-cycle sprite sheet of the same Kaelrin as in my P12A image (same face, hair, armor, scarf, the same sword at the
+same size). Every frame is view SW (front three-quarter, facing down-left), the same camera as REF_03 view 1.
+He carries the sword in the hold I chose from my P12A image, in every frame: the sword in his RIGHT hand (the hand on
+the left side of the picture), the right fist fully closed around the leather grip with the brass guard just above the
+fist, the same blade angle and the same sword size as in that P12A cell.
+4 frames in a 2x2 grid, read left to right, top to bottom = one complete looping walk cycle:
+1. CONTACT: right foot forward with the heel touching the ground, left foot behind on its toes, legs wide apart, the
+   left arm forward, the body slightly low.
+2. PASSING: the left leg passes the right leg under the body, left foot lifted a little, the body at its HIGHEST.
+3. CONTACT: left foot forward with the heel touching the ground, right foot behind on its toes, legs wide apart, the
+   left arm back, the body slightly low.
+4. PASSING: the right leg passes the left leg under the body, right foot lifted a little, the body at its HIGHEST.
+Chibi walk: short steps, knees clearly bend, upright posture (back straight, chest up, hips under the shoulders, a very
+slight forward lean, never leaning back). The head stays steady and level. The sword arm keeps the chosen hold and moves
+only slightly; the free left arm swings opposite to the legs; the blade never crosses his legs or face.
+He walks IN PLACE in the middle of each cell. Same size in every frame, feet on the same baseline, every frame clearly
+different. No motion lines, no dust, no glow, no effects, no ground shadow, no text, no numbers. Flat solid magenta
+#FF00FF background. Follow all rules in 01_START_HERE_for_ChatGPT.md.

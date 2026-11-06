@@ -1,3 +1,4 @@
+** แทนที่ด้วย P12 (2026-11-06): เจ้าของขอทำแค่ท่าถือดาบ + ท่าเดินก่อน → ใช้ chatgpt-pack/packs/P12_walk_sword/ · P11C (ฟัน) เก็บไว้ทำทีหลัง **
 P11 — PILOT: Kaelrin animation frames, view SW, full body with sword      (3 images)
 ใช้ทำ: ทดลองฮีโร่แบบเฟรม (docs/07) ทิศเดียวก่อน — ถ้าผ่านจะสั่งทิศ S, W, NW, N ต่อ
 วิธีใช้: ส่งในแชท ChatGPT เดิมที่มี refs + P01 + P03 อยู่แล้ว (ถ้าแชทใหม่ ให้แนบ REF_03, P01, P03 และวาง 01_START_HERE ก่อน)

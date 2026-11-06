@@ -1,0 +1,5 @@
+# reference images copied into refs/ of the zip (our own images only)
+chatgpt-pack/refs/REF_03_kaelrin_4_views.png
+art/raw/P01_kaelrin_body_empty_hands.png
+art/raw/P03_weapon_brass_pickblade.png
+chatgpt-pack/refs/REF_04_sprite_atlas_style.jpg

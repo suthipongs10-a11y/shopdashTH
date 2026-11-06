@@ -1,0 +1,7 @@
+P12 — Kaelrin ถือดาบ + เดิน ทิศ SW (ฮีโร่แบบเฟรม, docs/07)      (2 ภาพ + 1 สำรอง)
+ใช้ทำ: ขั้น 1 เลือกท่าถือดาบ 3 แบบ → ขั้น 2 ท่าเดิน 8 เฟรมด้วยท่าถือที่เลือก (สำรอง: เดิน 4 เฟรม)
+prompt เต็มอยู่ในชุด zip: chatgpt-pack/packs/P12_walk_sword/ (STEP1_..., STEP2_..., STEP2-ALT_...) → zip = Mossbridge_P12_walk_sword.zip
+
+[P12A] SAVE AS: P12A_hero_sw_hold3.png   SIZE: 1536x1024   PROMPT: packs/P12_walk_sword/STEP1_P12A_sword_hold.txt
+[P12B] SAVE AS: P12B_hero_sw_walk8.png   SIZE: 1536x1024   PROMPT: packs/P12_walk_sword/STEP2_P12B_walk8_sw.txt
+[P12C] SAVE AS: P12C_hero_sw_walk4.png   SIZE: 1024x1024   PROMPT: packs/P12_walk_sword/STEP2-ALT_P12C_walk4_sw.txt
