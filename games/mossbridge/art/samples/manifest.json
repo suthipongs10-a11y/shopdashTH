@@ -1,0 +1,149 @@
+{
+  "source": "03_sprite_atlas_original.png",
+  "canvas": [
+    320,
+    320
+  ],
+  "anchor": [
+    160,
+    300
+  ],
+  "sprites": [
+    {
+      "name": "hero_se",
+      "file": "hero_se.png",
+      "source_bbox": [
+        16,
+        157,
+        296,
+        535
+      ],
+      "scale": 0.6878,
+      "placed": [
+        64,
+        40,
+        193,
+        260
+      ]
+    },
+    {
+      "name": "hero_sw",
+      "file": "hero_sw.png",
+      "source_bbox": [
+        352,
+        158,
+        616,
+        524
+      ],
+      "scale": 0.7104,
+      "placed": [
+        66,
+        40,
+        188,
+        260
+      ]
+    },
+    {
+      "name": "hero_e",
+      "file": "hero_e.png",
+      "source_bbox": [
+        658,
+        162,
+        908,
+        539
+      ],
+      "scale": 0.6897,
+      "placed": [
+        74,
+        40,
+        172,
+        260
+      ]
+    },
+    {
+      "name": "hero_nw",
+      "file": "hero_nw.png",
+      "source_bbox": [
+        970,
+        162,
+        1236,
+        533
+      ],
+      "scale": 0.7008,
+      "placed": [
+        67,
+        40,
+        186,
+        260
+      ]
+    },
+    {
+      "name": "npc_bram",
+      "file": "npc_bram.png",
+      "source_bbox": [
+        9,
+        749,
+        311,
+        1145
+      ],
+      "scale": 0.6313,
+      "placed": [
+        65,
+        50,
+        191,
+        250
+      ]
+    },
+    {
+      "name": "npc_minae",
+      "file": "npc_minae.png",
+      "source_bbox": [
+        334,
+        753,
+        624,
+        1144
+      ],
+      "scale": 0.665,
+      "placed": [
+        64,
+        40,
+        193,
+        260
+      ]
+    },
+    {
+      "name": "mob_sproutling",
+      "file": "mob_sproutling.png",
+      "source_bbox": [
+        649,
+        812,
+        859,
+        1080
+      ],
+      "scale": 0.4478,
+      "placed": [
+        113,
+        180,
+        94,
+        120
+      ]
+    },
+    {
+      "name": "mob_mossback",
+      "file": "mob_mossback.png",
+      "source_bbox": [
+        900,
+        760,
+        1243,
+        1127
+      ],
+      "scale": 0.6267,
+      "placed": [
+        53,
+        70,
+        215,
+        230
+      ]
+    }
+  ]
+}

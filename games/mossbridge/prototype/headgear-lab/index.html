@@ -1,0 +1,806 @@
+<title>Mossbridge Headgear Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: game viewport on the left, workbench panel on the right; stacks to one column on phones.
+   Single deliberate dark look (tavern wood + Mossbridge teal/brass), same in every theme. */
+:root {
+  color-scheme: dark;
+  --bg: #1b1511;          /* dark oak */
+  --panel: #271e18;       /* panel board */
+  --panel-2: #31261e;     /* inset */
+  --line: #4b3b2e;        /* plank seams */
+  --text: #f2e5d0;        /* parchment */
+  --muted: #b8a287;
+  --teal: #35b7a5;        /* Mossbridge banner teal */
+  --brass: #e2a94b;       /* brass trim */
+  --danger: #e2705a;
+  --font-display: "Mitr", "Noto Sans Thai", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r: 10px;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font: 15px/1.55 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 28px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+h1 { font: 600 clamp(22px, 3.2vw, 30px)/1.15 var(--font-display); margin: 0; letter-spacing: .01em; text-wrap: balance; }
+h1 span { color: var(--teal); }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+@media (max-width: 960px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+.stage { display: grid; gap: 10px; min-width: 0; }
+.world-box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; }
+#world { width: 100%; height: auto; display: block; border-radius: 6px; cursor: crosshair; touch-action: manipulation; aspect-ratio: 960 / 560; max-width: 100%; }
+.hint { color: var(--muted); font-size: 13px; margin: 0; }
+.order { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 12.5px var(--font-mono); color: var(--muted); }
+.order b { font: 500 12.5px var(--font-mono); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 7px; }
+.order b.on { border-color: var(--teal); color: var(--teal); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); display: grid; min-width: 0; }
+.preview-box { position: relative; background: radial-gradient(ellipse at 50% 85%, #3c4a33 0%, #253020 55%, #1c2418 100%); border-bottom: 1px solid var(--line); border-radius: var(--r) var(--r) 0 0; }
+#preview { width: 100%; height: auto; display: block; aspect-ratio: 320 / 360; max-width: 100%; }
+.dir-tag { position: absolute; top: 10px; left: 10px; font: 500 12px var(--font-mono); background: rgba(0,0,0,.45); padding: 2px 8px; border-radius: 5px; color: var(--text); }
+section { padding: 12px 14px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+section:last-child { border-bottom: 0; }
+h2 { font: 500 13px/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--brass); margin: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.grid3 { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; }
+label { color: var(--muted); font-size: 13.5px; }
+select, button, input[type=file], textarea {
+  font: inherit; color: var(--text); background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 7px;
+}
+select { padding: 5px 8px; min-width: 0; width: 100%; }
+button { padding: 5px 11px; cursor: pointer; }
+button:hover { border-color: var(--brass); }
+button[aria-pressed="true"] { border-color: var(--teal); color: var(--teal); background: #1f3532; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; padding: 0; border: 2px solid var(--line); }
+.swatch[aria-pressed="true"] { border-color: var(--text); box-shadow: 0 0 0 2px var(--teal); }
+.dirs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.dirs button { font: 500 13px var(--font-mono); padding: 6px 4px; }
+.readout { font: 13px var(--font-mono); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 9px; font-variant-numeric: tabular-nums; }
+.pad { display: grid; grid-template-columns: repeat(3, 38px); gap: 4px; }
+.pad button { padding: 5px 0; font-family: var(--font-mono); }
+textarea { width: 100%; min-height: 120px; font: 12px/1.45 var(--font-mono); padding: 8px; resize: vertical; }
+.small { font-size: 12.5px; color: var(--muted); margin: 0; }
+.toast { color: var(--teal); font-size: 13px; min-height: 1.2em; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+input[type=file] { padding: 4px; width: 100%; font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Mossbridge <span>Headgear Lab</span></h1>
+    <p>ต้นแบบระบบ "ใส่หมวกแล้วเห็นบนตัวละคร" แบบเลเยอร์ซ้อนกัน: ตัว + หัว + หมวก 3 ช่อง (บน/กลาง/ล่าง) ทุกชิ้นยึดจุด pivot เดียวกัน คลิกแผนที่เพื่อเดิน แล้วลองสลับหมวก ทรงผม และทิศดูได้เลย</p>
+  </header>
+
+  <div class="lab">
+    <div class="stage">
+      <div class="world-box"><canvas id="world" width="960" height="560" aria-label="แผนที่ทดสอบ คลิกเพื่อเดิน"></canvas></div>
+      <p class="hint">คลิก/แตะบนแผนที่เพื่อเดิน • ตัวละครอื่นสุ่มหมวกมาให้ดูว่าหลายคนใส่ไม่ซ้ำกันได้ • ภาพทั้งหมดในหน้านี้เป็น placeholder วาดด้วยโค้ด รอแทนด้วยภาพจาก ChatGPT</p>
+      <div class="order" id="order" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+      <div class="preview-box">
+        <canvas id="preview" width="320" height="360" aria-label="ภาพตัวละครขยาย"></canvas>
+        <span class="dir-tag" id="dirTag">SE</span>
+      </div>
+
+      <section>
+        <h2>ทิศหันหน้า</h2>
+        <div class="dirs" id="dirs">
+          <button id="dir-sw" data-dir="SW">↙ SW</button>
+          <button id="dir-se" data-dir="SE">↘ SE</button>
+          <button id="dir-nw" data-dir="NW">↖ NW</button>
+          <button id="dir-ne" data-dir="NE">↗ NE</button>
+        </div>
+        <p class="small">วาดจริงแค่ 2 ทิศ (SE หน้า, NE หลัง) อีก 2 ทิศคือภาพกลับด้าน หมวกหนึ่งใบเลยใช้ภาพแค่ 2 รูป</p>
+        <div class="row">
+          <button id="walkInPlace" aria-pressed="false">เดินอยู่กับที่</button>
+          <button id="debug" aria-pressed="true">แสดงจุด pivot</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>ตัวละคร</h2>
+        <div class="grid3">
+          <label for="hairStyle">ทรงผม</label>
+          <select id="hairStyle"></select>
+          <label>สีผม</label>
+          <div class="row" id="hairColors"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>ของสวมหัว (Headgear)</h2>
+        <div class="grid3">
+          <label for="slot-top">บน</label><select id="slot-top"></select>
+          <label for="slot-mid">กลาง</label><select id="slot-mid"></select>
+          <label for="slot-low">ล่าง</label><select id="slot-low"></select>
+        </div>
+        <p class="small" id="hairNote"></p>
+      </section>
+
+      <section>
+        <h2>ปรับตำแหน่ง (Fit) ทิศ <span id="fitView">front</span></h2>
+        <div class="row">
+          <div class="seg" id="fitSlot">
+            <button id="fit-top" data-slot="head_top" aria-pressed="true">บน</button>
+            <button id="fit-mid" data-slot="head_mid" aria-pressed="false">กลาง</button>
+            <button id="fit-low" data-slot="head_low" aria-pressed="false">ล่าง</button>
+          </div>
+        </div>
+        <div class="row" style="align-items:start">
+          <div class="pad">
+            <span></span><button id="nudge-up" data-d="0,-1" aria-label="ขึ้น">↑</button><span></span>
+            <button id="nudge-left" data-d="-1,0" aria-label="ซ้าย">←</button><button id="fit-reset" aria-label="รีเซ็ต">0</button><button id="nudge-right" data-d="1,0" aria-label="ขวา">→</button>
+            <span></span><button id="nudge-down" data-d="0,1" aria-label="ลง">↓</button><span></span>
+          </div>
+          <div style="display:grid;gap:6px;min-width:0;flex:1">
+            <div class="readout" id="fitReadout">dx 0 · dy 0 · s 1.00</div>
+            <div class="row"><button id="scale-down">ย่อ −</button><button id="scale-up">ขยาย +</button></div>
+          </div>
+        </div>
+        <p class="small">คีย์บอร์ด: ลูกศร = ขยับ 1px (Shift = 5px) • [ ] = ย่อ/ขยาย • ค่าที่ได้คือ metadata ของไอเท็ม ไม่ต้องแก้รูป</p>
+      </section>
+
+      <section>
+        <h2>ใช้รูปของคุณ</h2>
+        <div class="grid3">
+          <label for="uploadTarget">แทนที่</label>
+          <select id="uploadTarget">
+            <option value="head_top">หมวกช่องบนที่ใส่อยู่</option>
+            <option value="head_mid">ช่องกลางที่ใส่อยู่</option>
+            <option value="head_low">ช่องล่างที่ใส่อยู่</option>
+            <option value="head">หัว (หน้า+ผม)</option>
+          </select>
+        </div>
+        <input type="file" id="upload" accept="image/png,image/webp">
+        <p class="small">PNG พื้นใส ควรวาดบนแคนวาส 256×256 โดยจุดคอ (pivot) อยู่ที่ (128, 200) ถ้าขนาดไม่ตรง ระบบจะย่อให้กว้าง 256 แล้วค่อยจูนด้วย Fit ภาพใช้กับทิศที่กำลังดูอยู่ (หน้า/หลัง)</p>
+      </section>
+
+      <section>
+        <h2>Export metadata</h2>
+        <div class="row"><button id="export">สร้าง JSON</button><button id="copy">คัดลอก</button><span class="toast" id="toast"></span></div>
+        <textarea id="json" spellcheck="false" aria-label="JSON ของค่า fit"></textarea>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* =====================================================================
+   Coordinate conventions (same as docs/03-sprite-spec.md)
+   - Character origin = feet contact point (0,0). Up is negative y.
+   - Head-layer canvas = 256x256, pivot (neck) = (128,200). Head, hair,
+     every headgear image share this canvas, so they line up by default.
+   - Drawn art faces RIGHT. Left-facing directions = mirrored.
+   - Views: "front" (SE / SW) and "back" (NE / NW).
+   ===================================================================== */
+const HEAD_SIZE = 256, PIV = { x: 128, y: 200 };
+const HEAD = { cx: 130, cy: 140, rx: 60, ry: 56 };   // bald head ellipse inside the head canvas
+const HIP_Y = -52, NECK_Y = -80;                      // hip above feet; neck above hip
+const ORDER = {
+  front: ["shadow", "legs", "torso", "head", "head_low", "head_mid", "head_top"],
+  back:  ["shadow", "legs", "torso", "head", "head_low", "head_mid", "head_top"],
+};
+const SKIN = "#f2c7a0", INK = "rgba(52,30,20,.72)";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------------------------------------------------------- color utils */
+function hexRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+function shade(h, k) { // k>0 lighter, k<0 darker
+  const [r, g, b] = hexRgb(h), t = k < 0 ? 0 : 255, p = Math.abs(k);
+  return `rgb(${Math.round(r + (t - r) * p)},${Math.round(g + (t - g) * p)},${Math.round(b + (t - b) * p)})`;
+}
+function canvas(w, h) { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+
+/* Paint a closed path with top-lit gradient + soft outline (light from above, so mirroring is invisible). */
+function paint(g, path, base, y0, y1, o = {}) {
+  g.save();
+  g.beginPath(); path(g);
+  const gr = g.createLinearGradient(0, y0, 0, y1);
+  gr.addColorStop(0, shade(base, o.light ?? 0.22));
+  gr.addColorStop(0.55, base);
+  gr.addColorStop(1, shade(base, -(o.dark ?? 0.3)));
+  g.fillStyle = gr; g.fill();
+  if (o.line !== 0) { g.lineWidth = o.line ?? 4; g.strokeStyle = o.stroke ?? INK; g.lineJoin = "round"; g.stroke(); }
+  g.restore();
+}
+const E = (x, y, rx, ry) => g => g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+function dot(g, x, y, r, c) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = c; g.fill(); }
+
+/* ---------------------------------------------------------------- body (cutout parts) */
+const BODY = {};
+function buildBody() {
+  for (const view of ["front", "back"]) {
+    // torso canvas 200x170, pivot at hip (100,150)
+    const t = canvas(200, 170), g = t.getContext("2d");
+    // arms
+    paint(g, E(48, 112, 15, 30), "#2c8f86", 80, 145);
+    paint(g, E(152, 112, 15, 30), "#2c8f86", 80, 145);
+    paint(g, E(46, 140, 12, 11), "#6b4127", 128, 152);
+    paint(g, E(154, 140, 12, 11), "#6b4127", 128, 152);
+    // chest
+    paint(g, gg => { gg.roundRect(56, 66, 88, 88, [26, 26, 18, 18]); }, "#2f9c90", 66, 154);
+    if (view === "front") {
+      paint(g, gg => { gg.moveTo(84, 92); gg.lineTo(116, 92); gg.lineTo(100, 122); gg.closePath(); }, "#e0a84a", 92, 122, { line: 3 });
+      paint(g, E(100, 74, 30, 12), "#1f6f69", 62, 86);                 // scarf
+      paint(g, gg => gg.roundRect(60, 128, 80, 14, 5), "#6b4127", 128, 142, { line: 3 }); // belt
+      paint(g, gg => gg.roundRect(92, 126, 16, 18, 4), "#e0a84a", 126, 144, { line: 3 });
+      paint(g, gg => gg.roundRect(110, 136, 22, 18, 5), "#8a5a35", 136, 154, { line: 3 }); // pouch
+    } else {
+      paint(g, gg => gg.roundRect(70, 80, 60, 56, 14), "#7a4e2d", 80, 136);   // backpack
+      paint(g, gg => gg.roundRect(76, 88, 48, 10, 4), "#e0a84a", 88, 98, { line: 2 });
+      paint(g, E(100, 72, 30, 11), "#1f6f69", 62, 84);
+    }
+    // pauldrons on top
+    paint(g, E(54, 84, 24, 20), "#2f9c90", 64, 104);
+    paint(g, E(146, 84, 24, 20), "#2f9c90", 64, 104);
+    g.lineWidth = 4; g.strokeStyle = "#e0a84a";
+    g.beginPath(); g.ellipse(54, 84, 18, 14, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
+    g.beginPath(); g.ellipse(146, 84, 18, 14, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
+    BODY[view] = { torso: t };
+  }
+  // one leg image (40x60, pivot top-center)
+  const l = canvas(40, 60), g = l.getContext("2d");
+  paint(g, gg => gg.roundRect(9, 0, 22, 34, 8), "#3b2f2a", 0, 34);
+  paint(g, gg => gg.roundRect(5, 26, 30, 28, [8, 8, 10, 10]), "#6b4127", 26, 54);
+  paint(g, gg => gg.roundRect(6, 26, 28, 7, 3), "#e0a84a", 26, 33, { line: 2 });
+  BODY.leg = l;
+}
+
+/* ---------------------------------------------------------------- head + hair */
+const HAIR_STYLES = {
+  spiky: { name: "ชี้ฟู (Kaelrin)", crown: { front: -26, back: -22 } },
+  bob:   { name: "บ็อบกลม",        crown: { front: -8,  back: -8 } },
+  tail:  { name: "หางม้า",          crown: { front: -6,  back: -6 } },
+};
+const HAIR_COLORS = ["#2a9d8f", "#7b4fb8", "#d9772b", "#e8c766", "#c9ced6", "#e58fa8", "#4a3428"];
+
+function spikes(g, pts) { g.moveTo(pts[0][0], pts[0][1]); for (const p of pts.slice(1)) g.lineTo(p[0], p[1]); g.closePath(); }
+
+function drawHairBack(g, style, mode, view, c) {
+  if (mode === "hidden") return;
+  if (style === "bob") {
+    paint(g, gg => { gg.ellipse(130, 150, 70, 64, 0, 0, Math.PI * 2); }, c, 86, 214);
+  } else if (style === "tail" && view === "front") {
+    paint(g, gg => { gg.moveTo(78, 120); gg.bezierCurveTo(30, 140, 40, 210, 70, 236); gg.bezierCurveTo(66, 200, 70, 160, 96, 136); gg.closePath(); }, c, 110, 236);
+  }
+}
+
+function drawHairFront(g, style, mode, view, c) {
+  if (mode === "hidden") return;
+  const capped = mode === "capped";
+  if (view === "front") {
+    if (style === "spiky") {
+      if (!capped) paint(g, gg => spikes(gg, [[66,128],[58,96],[44,70],[76,78],[78,44],[106,62],[118,26],[138,58],[164,30],[166,66],[198,52],[186,88],[206,104],[190,118],[176,104],[150,112],[126,100],[104,116],[86,110],[76,134]]), c, 26, 134);
+      else paint(g, gg => spikes(gg, [[68,132],[66,100],[96,98],[130,96],[176,98],[194,104],[190,120],[172,110],[150,118],[126,106],[104,120],[86,114],[76,136]]), c, 96, 136);
+    } else if (style === "bob" || style === "tail") {
+      if (!capped) paint(g, gg => { gg.moveTo(68, 150); gg.bezierCurveTo(56, 70, 120, 66, 140, 70); gg.bezierCurveTo(196, 74, 204, 120, 196, 140); gg.lineTo(178, 116); gg.lineTo(150, 124); gg.lineTo(122, 112); gg.lineTo(96, 126); gg.lineTo(80, 118); gg.closePath(); }, c, 66, 150);
+      else paint(g, gg => { gg.moveTo(68, 150); gg.lineTo(70, 102); gg.lineTo(194, 102); gg.lineTo(196, 140); gg.lineTo(178, 116); gg.lineTo(150, 124); gg.lineTo(122, 112); gg.lineTo(96, 126); gg.lineTo(80, 118); gg.closePath(); }, c, 100, 150);
+      if (style === "bob") { // side locks
+        paint(g, gg => gg.roundRect(62, 118, 22, 78, 11), c, 118, 196);
+      }
+    }
+  } else { // back: hair covers the whole head
+    if (style === "spiky") {
+      paint(g, E(130, 140, 64, 60), c, 80, 200);
+      if (!capped) paint(g, gg => spikes(gg, [[70,110],[56,74],[90,84],[98,44],[124,72],[140,30],[156,70],[186,50],[180,92],[204,96],[190,124],[130,96]]), c, 30, 124);
+    } else {
+      paint(g, gg => { gg.ellipse(130, capped ? 146 : 138, 66, capped ? 56 : 64, 0, 0, Math.PI * 2); }, c, 76, 204);
+      if (style === "tail") paint(g, gg => { gg.moveTo(116, 150); gg.bezierCurveTo(96, 200, 118, 236, 132, 250); gg.bezierCurveTo(150, 226, 156, 190, 144, 150); gg.closePath(); }, c, 150, 250);
+    }
+  }
+}
+
+function drawFace(g, view) {
+  if (view === "front") {
+    paint(g, E(HEAD.cx - 56, 148, 11, 15), SKIN, 132, 164);              // ear
+    paint(g, E(HEAD.cx, HEAD.cy, HEAD.rx, HEAD.ry), SKIN, 84, 196);
+    for (const x of [118, 158]) {                                         // eyes
+      paint(g, E(x, 148, 8.5, 11.5), "#2b2622", 136, 160, { line: 0, light: 0.1, dark: 0.1 });
+      dot(g, x - 2.5, 143.5, 3, "#fff"); dot(g, x + 2.5, 152, 1.6, "rgba(255,255,255,.8)");
+    }
+    dot(g, 108, 168, 7, "rgba(232,120,110,.32)"); dot(g, 170, 168, 7, "rgba(232,120,110,.32)");
+    g.beginPath(); g.moveTo(134, 174); g.quadraticCurveTo(141, 180, 148, 173); g.lineWidth = 3; g.strokeStyle = "#7a3b2a"; g.lineCap = "round"; g.stroke();
+  } else {
+    paint(g, E(HEAD.cx + 54, 150, 10, 14), SKIN, 136, 164);
+    paint(g, E(HEAD.cx, HEAD.cy, HEAD.rx, HEAD.ry), SKIN, 84, 196);
+  }
+}
+
+const headCache = new Map();
+function headImage(style, mode, view, color) {
+  const key = [style, mode, view, color].join("|");
+  if (headCache.has(key)) return headCache.get(key);
+  const c = canvas(HEAD_SIZE, HEAD_SIZE), g = c.getContext("2d");
+  drawHairBack(g, style, mode, view, color);
+  drawFace(g, view);
+  drawHairFront(g, style, mode, view, color);
+  headCache.set(key, c);
+  return c;
+}
+
+/* ---------------------------------------------------------------- headgear items */
+const ITEMS = [
+  { id: "none_top", slot: "head_top", name: "— ไม่ใส่ —", hair: "full" },
+  { id: "hat_witch", slot: "head_top", name: "หมวกแม่มดม่วง", hair: "capped", draw: drawWitch },
+  { id: "hat_beanie", slot: "head_top", name: "หมวกไหมพรม", hair: "capped", draw: drawBeanie },
+  { id: "hat_crown", slot: "head_top", name: "มงกุฎทองเหลือง", hair: "full", draw: drawCrown },
+  { id: "hat_sprout", slot: "head_top", name: "ต้นอ่อนสไลม์", hair: "full", draw: drawSprout },
+  { id: "hat_catears", slot: "head_top", name: "ที่คาดหูแมว", hair: "full", draw: drawCatEars },
+  { id: "helm_mossback", slot: "head_top", name: "หมวกเกราะหมูป่ามอส", hair: "hidden", draw: drawBoarHelm },
+  { id: "none_mid", slot: "head_mid", name: "— ไม่ใส่ —" },
+  { id: "mid_goggles", slot: "head_mid", name: "แว่นกันลมช่างตีเหล็ก", draw: drawGoggles },
+  { id: "mid_glasses", slot: "head_mid", name: "แว่นกลมนักปราชญ์", draw: drawGlasses },
+  { id: "none_low", slot: "head_low", name: "— ไม่ใส่ —" },
+  { id: "low_scarf", slot: "head_low", name: "ผ้าปิดปากนักเดินทาง", draw: drawScarf },
+  { id: "low_mustache", slot: "head_low", name: "หนวดขดเจ้าสัว", draw: drawMustache },
+];
+for (const it of ITEMS) {
+  it.fit = { front: { dx: 0, dy: 0, s: 1 }, back: { dx: 0, dy: 0, s: 1 } };
+  it.custom = {};
+  it.img = {};
+}
+const itemById = id => ITEMS.find(i => i.id === id);
+
+function itemImage(it, view) {
+  if (!it.draw && !it.custom[view]) return null;
+  if (it.custom[view]) return it.custom[view];
+  if (!it.img[view]) { const c = canvas(HEAD_SIZE, HEAD_SIZE); it.draw(c.getContext("2d"), view); it.img[view] = c; }
+  return it.img[view];
+}
+
+function drawWitch(g, view) {
+  const P = "#6a46a8";
+  paint(g, E(130, 100, 98, 24), shade(P, -0.25), 76, 124);              // brim (back half)
+  paint(g, gg => { gg.moveTo(72, 100); gg.bezierCurveTo(92, 60, 118, 30, 150, 18); gg.quadraticCurveTo(182, 6, 210, 30); gg.quadraticCurveTo(180, 28, 172, 52); gg.bezierCurveTo(178, 72, 186, 88, 190, 100); gg.closePath(); }, P, 10, 100);
+  paint(g, gg => { gg.moveTo(76, 90); gg.lineTo(188, 90); gg.lineTo(190, 102); gg.lineTo(72, 102); gg.closePath(); }, "#e0a84a", 88, 102, { line: 3 });
+  if (view === "front") paint(g, gg => { gg.moveTo(130, 84); gg.lineTo(140, 96); gg.lineTo(130, 108); gg.lineTo(120, 96); gg.closePath(); }, "#c45ad6", 84, 108, { line: 3 });
+  paint(g, gg => { gg.ellipse(130, 102, 98, 24, 0, 0, Math.PI); }, P, 100, 126);   // brim (front half)
+}
+function drawBeanie(g, view) {
+  const C = "#d9772b";
+  paint(g, gg => { gg.moveTo(64, 116); gg.bezierCurveTo(62, 40, 198, 40, 196, 116); gg.closePath(); }, C, 50, 116);
+  g.save(); g.globalAlpha = .25; g.strokeStyle = "#5a2e12"; g.lineWidth = 3;
+  for (let x = 80; x <= 180; x += 16) { g.beginPath(); g.moveTo(x, 62); g.quadraticCurveTo(x + 2, 90, x, 106); g.stroke(); }
+  g.restore();
+  paint(g, gg => gg.roundRect(60, 100, 140, 22, 10), "#2f9c90", 100, 122);
+  paint(g, E(view === "front" ? 136 : 124, 46, 17, 16), "#f2e5d0", 30, 62);
+}
+function drawCrown(g) {
+  const C = "#e2b04b";
+  paint(g, gg => spikes(gg, [[84,104],[80,62],[100,84],[114,52],[130,80],[146,48],[160,80],[176,58],[180,104]]), C, 48, 104);
+  paint(g, gg => gg.roundRect(80, 92, 102, 16, 6), shade(C, -0.1), 92, 108, { line: 3 });
+  dot(g, 114, 100, 5, "#35b7a5"); dot(g, 132, 100, 5, "#e2705a"); dot(g, 150, 100, 5, "#35b7a5");
+}
+function drawSprout(g) {
+  g.lineWidth = 6; g.strokeStyle = "#3f7d33"; g.lineCap = "round";
+  g.beginPath(); g.moveTo(130, 92); g.quadraticCurveTo(128, 74, 132, 60); g.stroke();
+  paint(g, gg => { gg.moveTo(130, 62); gg.bezierCurveTo(108, 30, 76, 34, 70, 48); gg.bezierCurveTo(84, 72, 112, 74, 130, 62); }, "#6cc04a", 30, 74);
+  paint(g, gg => { gg.moveTo(134, 60); gg.bezierCurveTo(150, 22, 186, 22, 194, 34); gg.bezierCurveTo(182, 62, 154, 70, 134, 60); }, "#7fd15a", 22, 70);
+}
+function drawCatEars(g, view) {
+  const C = "#4a3428";
+  g.lineWidth = 7; g.strokeStyle = "#2b2622"; g.beginPath(); g.ellipse(130, 120, 64, 46, 0, Math.PI * 1.08, Math.PI * 1.92); g.stroke();
+  for (const [x, flip] of [[92, -1], [168, 1]]) {
+    paint(g, gg => { gg.moveTo(x - 22, 96); gg.lineTo(x + flip * 6, 46); gg.lineTo(x + 22, 92); gg.closePath(); }, C, 46, 96);
+    if (view === "front") paint(g, gg => { gg.moveTo(x - 11, 90); gg.lineTo(x + flip * 4, 62); gg.lineTo(x + 11, 88); gg.closePath(); }, "#e58fa8", 60, 90, { line: 0 });
+  }
+}
+function drawBoarHelm(g, view) {
+  const S = "#8d8a80";
+  paint(g, E(130, 138, 74, 72), S, 66, 210);
+  if (view === "front") {
+    g.save(); g.globalCompositeOperation = "destination-out"; g.beginPath(); g.ellipse(140, 152, 46, 40, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    g.lineWidth = 4; g.strokeStyle = INK; g.beginPath(); g.ellipse(140, 152, 46, 40, 0, 0, Math.PI * 2); g.stroke();
+    for (const [x, d] of [[98, -1], [184, 1]]) paint(g, gg => { gg.moveTo(x, 176); gg.quadraticCurveTo(x + d * 26, 170, x + d * 22, 132); gg.quadraticCurveTo(x + d * 10, 160, x - d * 6, 162); gg.closePath(); }, "#f2c94c", 132, 178, { line: 3 });
+    paint(g, E(128, 98, 13, 13), "#f08a2a", 85, 111, { line: 2 });
+    dot(g, 128, 98, 6, "#ffd27a");
+  } else {
+    for (let i = 0; i < 4; i++) paint(g, gg => { const x = 100 + i * 20; gg.moveTo(x - 9, 104 + i * 4); gg.lineTo(x, 70 + i * 6); gg.lineTo(x + 9, 104 + i * 4); gg.closePath(); }, "#a7a397", 70, 110, { line: 3 });
+  }
+  for (const [x, y, r] of [[96, 84, 18], [126, 72, 20], [158, 80, 18], [176, 102, 13]]) paint(g, E(x, y, r, r * 0.8), "#6aa84f", y - r, y + r, { line: 3 });
+}
+function drawGoggles(g, view) {
+  paint(g, gg => gg.roundRect(68, 136, 126, 14, 6), "#6b4127", 136, 150, { line: 3 });
+  if (view === "front") {
+    for (const x of [118, 158]) { paint(g, E(x, 144, 17, 16), "#e0a84a", 128, 160, { line: 3 }); paint(g, E(x, 144, 11, 10), "#5fd0c4", 134, 154, { line: 2, light: .4 }); dot(g, x - 4, 140, 3, "rgba(255,255,255,.85)"); }
+  } else {
+    paint(g, gg => gg.roundRect(118, 134, 24, 18, 4), "#e0a84a", 134, 152, { line: 3 });
+  }
+}
+function drawGlasses(g, view) {
+  if (view !== "front") return;   // invisible from behind: an empty layer is valid
+  g.lineWidth = 3.5; g.strokeStyle = "#3b2a20";
+  for (const x of [118, 158]) { g.beginPath(); g.arc(x, 147, 14, 0, Math.PI * 2); g.fillStyle = "rgba(200,235,255,.25)"; g.fill(); g.stroke(); }
+  g.beginPath(); g.moveTo(132, 145); g.quadraticCurveTo(138, 140, 144, 145); g.stroke();
+  g.beginPath(); g.moveTo(104, 145); g.lineTo(80, 140); g.stroke();
+}
+function drawScarf(g, view) {
+  const C = "#2f9c90";
+  if (view === "front") {
+    paint(g, gg => { gg.moveTo(76, 160); gg.quadraticCurveTo(132, 150, 190, 160); gg.lineTo(186, 196); gg.quadraticCurveTo(130, 210, 82, 196); gg.closePath(); }, C, 152, 206);
+    g.save(); g.globalAlpha = .3; g.strokeStyle = "#103b37"; g.lineWidth = 3; g.beginPath(); g.moveTo(90, 178); g.quadraticCurveTo(132, 172, 178, 178); g.stroke(); g.restore();
+  } else {
+    paint(g, gg => gg.roundRect(76, 172, 108, 24, 10), C, 172, 196);
+    paint(g, E(130, 186, 14, 12), shade(C, -0.15), 174, 198, { line: 3 });
+    paint(g, gg => { gg.moveTo(124, 192); gg.lineTo(108, 240); gg.lineTo(126, 236); gg.lineTo(132, 196); gg.closePath(); }, C, 192, 240, { line: 3 });
+    paint(g, gg => { gg.moveTo(136, 192); gg.lineTo(156, 236); gg.lineTo(140, 240); gg.lineTo(128, 196); gg.closePath(); }, C, 192, 240, { line: 3 });
+  }
+}
+function drawMustache(g, view) {
+  if (view !== "front") return;
+  paint(g, gg => { gg.moveTo(141, 166); gg.bezierCurveTo(124, 156, 104, 166, 102, 180); gg.bezierCurveTo(112, 172, 126, 176, 141, 172); gg.bezierCurveTo(156, 176, 170, 172, 180, 180); gg.bezierCurveTo(178, 166, 158, 156, 141, 166); gg.closePath(); }, "#5a3a22", 156, 182, { line: 3 });
+}
+
+/* ---------------------------------------------------------------- character */
+function makeLook(o = {}) {
+  return { hair: "spiky", hairColor: HAIR_COLORS[0], head_top: "none_top", head_mid: "none_mid", head_low: "none_low", ...o };
+}
+function makeChar(name, x, y, look) {
+  return { name, x, y, tx: x, ty: y, view: "front", flip: false, moving: false, phase: Math.random() * 6, t: Math.random() * 6, idle: 1 + Math.random() * 3, look, lv: 28 + Math.floor(Math.random() * 8) };
+}
+
+function hairModeFor(look) { return itemById(look.head_top)?.hair || "full"; }
+
+function anim(ch, forceWalk) {
+  const walking = ch.moving || forceWalk;
+  const ph = ch.phase, t = ch.t;
+  const idleAmp = reduceMotion ? 0 : 1;
+  return {
+    walking,
+    bob: walking ? -Math.abs(Math.sin(ph)) * 7 : Math.sin(t * 2.2) * 1.4 * idleAmp,
+    tilt: walking ? Math.sin(ph * 2) * 0.025 : 0,
+    breathe: walking ? 1 : 1 + Math.sin(t * 2.2) * 0.012 * idleAmp,
+    headLag: walking ? Math.sin(ph * 2 - 0.6) * 1.6 : Math.sin(t * 2.2 - 0.5) * 0.8 * idleAmp,
+    legSwing: walking ? Math.sin(ph) : 0,
+  };
+}
+
+/* Draw one character. All coordinates in authored px, origin = feet. */
+function drawChar(ctx, ch, sx, sy, scale, opts = {}) {
+  const look = ch.look, view = ch.view, a = anim(ch, opts.forceWalk);
+  const mode = hairModeFor(look);
+  const style = HAIR_STYLES[look.hair];
+  const pivots = [];
+  ctx.save();
+  ctx.translate(sx, sy);
+  ctx.scale(ch.flip ? -scale : scale, scale);
+
+  for (const layer of ORDER[view]) {
+    if (layer === "shadow") {
+      ctx.fillStyle = "rgba(10,14,8,.32)"; ctx.beginPath(); ctx.ellipse(0, 0, 44 - Math.abs(a.bob) * 0.8, 11, 0, 0, Math.PI * 2); ctx.fill();
+    } else if (layer === "legs") {
+      for (const side of [-1, 1]) {
+        const sw = a.legSwing * side;
+        ctx.save();
+        ctx.translate(side * 19 + sw * 6, HIP_Y + Math.max(0, sw) * -8);
+        ctx.rotate(sw * 0.18);
+        ctx.drawImage(BODY.leg, -20, 0);
+        ctx.restore();
+      }
+    } else if (layer === "torso") {
+      ctx.save();
+      ctx.translate(0, HIP_Y + a.bob);
+      ctx.rotate(a.tilt);
+      ctx.scale(1, a.breathe);
+      ctx.drawImage(BODY[view].torso, -100, -150);
+      ctx.restore();
+    } else {
+      // head layers share one transform: neck point on the torso + small lag
+      ctx.save();
+      ctx.translate(0, HIP_Y + a.bob);
+      ctx.rotate(a.tilt);
+      ctx.translate(0, NECK_Y * a.breathe + a.headLag);
+      if (layer === "head") {
+        const img = customHead[view] || headImage(look.hair, mode, view, look.hairColor);
+        drawOnHeadCanvas(ctx, img, { dx: 0, dy: 0, s: 1 });
+        if (opts.debug) pivots.push(ctx.getTransform());
+      } else {
+        const it = itemById(look[layer]);
+        const img = it && itemImage(it, view);
+        if (img) {
+          const f = it.fit[view];
+          const crown = it.slot === "head_top" && it.hair === "full" ? style.crown[view] : 0;
+          drawOnHeadCanvas(ctx, img, { dx: f.dx, dy: f.dy + crown, s: f.s });
+          if (opts.debug && opts.fitSlot === layer) { ctx.translate(f.dx, f.dy + crown); pivots.push(ctx.getTransform()); }
+        }
+      }
+      ctx.restore();
+    }
+  }
+  if (opts.debug) {
+    pivots.unshift(ctx.getTransform()); // feet
+  }
+  ctx.restore();
+  if (opts.debug) drawPivots(ctx, pivots);
+}
+
+function drawOnHeadCanvas(ctx, img, f) {
+  // normalise any image to the 256-wide head canvas, pivot proportional to (128,200)
+  const w = HEAD_SIZE, h = img.height * (HEAD_SIZE / img.width);
+  ctx.save();
+  ctx.translate(f.dx, f.dy);
+  ctx.scale(f.s, f.s);
+  ctx.drawImage(img, -PIV.x, -PIV.y * (h / HEAD_SIZE), w, h);
+  ctx.restore();
+}
+
+function drawPivots(ctx, mats) {
+  const colors = ["#ff6b6b", "#ffd166", "#35b7a5"];
+  const labels = ["feet", "neck", "fit"];
+  ctx.save();
+  mats.forEach((m, i) => {
+    const x = m.e, y = m.f;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const dpr = ctx.__dpr || 1;
+    ctx.scale(dpr, dpr);
+    const px = x / dpr, py = y / dpr;
+    ctx.strokeStyle = colors[i]; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(px - 7, py); ctx.lineTo(px + 7, py); ctx.moveTo(px, py - 7); ctx.lineTo(px, py + 7); ctx.stroke();
+    ctx.fillStyle = colors[i]; ctx.font = "500 10px 'IBM Plex Mono', monospace"; ctx.fillText(labels[i], px + 8, py - 4);
+  });
+  ctx.restore();
+}
+
+/* ---------------------------------------------------------------- world */
+const world = document.getElementById("world"), wctx = world.getContext("2d");
+const prev = document.getElementById("preview"), pctx = prev.getContext("2d");
+const W = 960, Hh = 560, WORLD_SCALE = 0.42;
+let bg;
+
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+function buildBackground() {
+  bg = canvas(W, Hh); const g = bg.getContext("2d"), r = rng(42);
+  const gr = g.createLinearGradient(0, 0, 0, Hh); gr.addColorStop(0, "#6fa64c"); gr.addColorStop(1, "#86b957"); g.fillStyle = gr; g.fillRect(0, 0, W, Hh);
+  for (let i = 0; i < 900; i++) { g.fillStyle = r() < .5 ? "rgba(40,80,30,.10)" : "rgba(220,240,140,.10)"; g.beginPath(); g.ellipse(r() * W, r() * Hh, 6 + r() * 16, 3 + r() * 6, 0, 0, Math.PI * 2); g.fill(); }
+  // stream
+  g.beginPath(); g.moveTo(W, 40); g.bezierCurveTo(760, 160, 820, 300, 700, Hh); g.lineTo(820, Hh); g.bezierCurveTo(930, 320, 860, 180, W, 140); g.closePath();
+  const wg = g.createLinearGradient(700, 0, W, Hh); wg.addColorStop(0, "#43c2b6"); wg.addColorStop(1, "#2a9aa3"); g.fillStyle = wg; g.fill();
+  g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 2; for (let i = 0; i < 14; i++) { const y = 80 + i * 34; g.beginPath(); g.moveTo(800 + Math.sin(i) * 30, y); g.lineTo(830 + Math.sin(i) * 30, y + 6); g.stroke(); }
+  // cobble path
+  g.save(); g.beginPath(); g.moveTo(0, 380); g.bezierCurveTo(260, 330, 420, 420, 700, 300); g.lineTo(720, 380); g.bezierCurveTo(440, 500, 240, 420, 0, 470); g.closePath(); g.clip();
+  g.fillStyle = "#d9a98d"; g.fillRect(0, 280, 760, 240);
+  for (let y = 280; y < 520; y += 16) for (let x = (y / 16 % 2) * 12; x < 760; x += 24) { g.fillStyle = r() < .5 ? "#e7b9a0" : "#cf9c80"; g.beginPath(); g.roundRect(x + 1, y + 1, 21, 13, 4); g.fill(); }
+  g.restore();
+  // flowers
+  for (let i = 0; i < 70; i++) { const x = r() * 720, y = r() * Hh; if (y > 300 && y < 470) continue; dot(g, x, y, 3, ["#f4e26b", "#f2f0ea", "#b48be0", "#ef8fa8"][i % 4]); }
+  // trees along the top
+  for (let i = 0; i < 9; i++) {
+    const x = 40 + i * 92 + r() * 30, y = 40 + r() * 40;
+    g.fillStyle = "rgba(10,20,8,.25)"; g.beginPath(); g.ellipse(x, y + 52, 40, 12, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "#6b4a2c"; g.fillRect(x - 7, y + 8, 14, 44);
+    for (const [ox, oy, rr, c] of [[0, -6, 44, "#3f7a35"], [-22, 6, 30, "#4d8d3d"], [20, 4, 32, "#4d8d3d"], [-6, -18, 26, "#64a64a"]]) dot(g, x + ox, y + oy, rr, c);
+  }
+  // sign
+  g.fillStyle = "#6b4a2c"; g.fillRect(96, 250, 8, 56); g.beginPath(); g.roundRect(40, 222, 140, 40, 6); g.fill();
+  g.fillStyle = "#f2e5d0"; g.font = "500 15px Mitr, sans-serif"; g.textAlign = "center"; g.fillText("Mossbridge", 110, 248); g.textAlign = "left";
+}
+
+const player = makeChar("Kaelrin", 300, 400, makeLook({ head_top: "hat_witch", head_mid: "none_mid", head_low: "none_low" }));
+const NPC_NAMES = ["Lyris", "Neria", "Orin", "Thorn", "Minae", "Coral", "Riven"];
+const npcs = NPC_NAMES.map((n, i) => {
+  const tops = ITEMS.filter(it => it.slot === "head_top"), mids = ITEMS.filter(it => it.slot === "head_mid"), lows = ITEMS.filter(it => it.slot === "head_low");
+  const r = rng(100 + i * 7);
+  const look = makeLook({
+    hair: Object.keys(HAIR_STYLES)[i % 3], hairColor: HAIR_COLORS[(i * 3 + 1) % HAIR_COLORS.length],
+    head_top: tops[(i + 1) % tops.length].id, head_mid: mids[Math.floor(r() * mids.length)].id, head_low: lows[Math.floor(r() * lows.length)].id,
+  });
+  const c = makeChar(n, 120 + r() * 560, 170 + r() * 340, look);
+  c.flip = r() < .5; c.view = r() < .5 ? "front" : "back";
+  return c;
+});
+
+function face(ch, dx, dy) {
+  if (Math.abs(dx) > 0.5) ch.flip = dx < 0;
+  if (Math.abs(dy) > Math.abs(dx) * 0.35) ch.view = dy < 0 ? "back" : "front";
+}
+function step(ch, dt, speed) {
+  ch.t += dt;
+  const dx = ch.tx - ch.x, dy = ch.ty - ch.y, d = Math.hypot(dx, dy);
+  if (d > 2) {
+    const v = Math.min(d, speed * dt);
+    ch.x += dx / d * v; ch.y += dy / d * v;
+    face(ch, dx, dy);
+    ch.moving = true; ch.phase += dt * 9;
+  } else { ch.moving = false; }
+}
+
+world.addEventListener("pointerdown", e => {
+  const r = world.getBoundingClientRect();
+  player.tx = Math.max(30, Math.min(W - 30, (e.clientX - r.left) / r.width * W));
+  player.ty = Math.max(150, Math.min(Hh - 10, (e.clientY - r.top) / r.height * Hh));
+  dirOverride = null; syncDirButtons();
+});
+
+function nameTag(ctx, ch, x, y, isPlayer) {
+  ctx.font = "500 13px Mitr, sans-serif"; ctx.textAlign = "center"; ctx.lineJoin = "round";
+  ctx.lineWidth = 4; ctx.strokeStyle = "rgba(20,14,10,.85)"; ctx.strokeText(ch.name, x, y);
+  ctx.fillStyle = isPlayer ? "#ffe3a3" : "#f2e5d0"; ctx.fillText(ch.name, x, y);
+  ctx.font = "500 10px 'IBM Plex Mono', monospace"; ctx.strokeText("Lv." + ch.lv, x, y + 13); ctx.fillStyle = "#b8e6dc"; ctx.fillText("Lv." + ch.lv, x, y + 13);
+  ctx.fillStyle = "rgba(20,14,10,.8)"; ctx.fillRect(x - 22, y + 18, 44, 5); ctx.fillStyle = "#5fd36b"; ctx.fillRect(x - 21, y + 19, 42, 3);
+  ctx.textAlign = "left";
+}
+
+/* ---------------------------------------------------------------- HiDPI */
+function fitCanvas(c, ctx, w, h) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if (c.width !== w * dpr) { c.width = w * dpr; c.height = h * dpr; }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.__dpr = dpr;
+}
+
+/* ---------------------------------------------------------------- UI state */
+let fitSlot = "head_top", dirOverride = null, debug = true, walkInPlace = false;
+const customHead = {};
+const $ = id => document.getElementById(id);
+
+function currentViewDir() {
+  const v = player.view, f = player.flip;
+  return v === "front" ? (f ? "SW" : "SE") : (f ? "NW" : "NE");
+}
+function syncDirButtons() {
+  const d = currentViewDir();
+  for (const b of $("dirs").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.dir === d));
+  $("dirTag").textContent = d + (player.flip ? " (mirror)" : "");
+  $("fitView").textContent = player.view;
+  updateReadout(); updateOrder();
+}
+$("dirs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const d = b.dataset.dir;
+  player.view = d[0] === "S" ? "front" : "back"; player.flip = d[1] === "W";
+  player.tx = player.x; player.ty = player.y; dirOverride = d; syncDirButtons();
+});
+
+function fillSelect(sel, opts, val) {
+  sel.innerHTML = ""; for (const [v, t] of opts) { const o = document.createElement("option"); o.value = v; o.textContent = t; sel.appendChild(o); }
+  sel.value = val;
+}
+fillSelect($("hairStyle"), Object.entries(HAIR_STYLES).map(([k, v]) => [k, v.name]), player.look.hair);
+$("hairStyle").addEventListener("change", e => { player.look.hair = e.target.value; updateReadout(); });
+for (const c of HAIR_COLORS) {
+  const b = document.createElement("button"); b.className = "swatch"; b.style.background = c; b.id = "hc-" + c.slice(1); b.setAttribute("aria-label", "สีผม " + c);
+  b.setAttribute("aria-pressed", String(c === player.look.hairColor));
+  b.addEventListener("click", () => { player.look.hairColor = c; for (const s of $("hairColors").children) s.setAttribute("aria-pressed", String(s === b)); });
+  $("hairColors").appendChild(b);
+}
+for (const [slot, id] of [["head_top", "slot-top"], ["head_mid", "slot-mid"], ["head_low", "slot-low"]]) {
+  fillSelect($(id), ITEMS.filter(i => i.slot === slot).map(i => [i.id, i.name]), player.look[slot]);
+  $(id).addEventListener("change", e => { player.look[slot] = e.target.value; updateHairNote(); updateReadout(); });
+}
+function updateHairNote() {
+  const it = itemById(player.look.head_top);
+  const m = { full: "ผมแสดงเต็ม หมวกวางบนจุด crown ของทรงผม", capped: "ทรงผมสลับเป็นแบบ \"capped\" (ผมยุบ) เพื่อไม่ให้ผมทะลุหมวก", hidden: "ซ่อนผมทั้งหมด (หมวกครอบทั้งหัว)" };
+  $("hairNote").textContent = "hair mode: " + (it?.hair || "full") + " · " + m[it?.hair || "full"];
+}
+
+$("fitSlot").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  fitSlot = b.dataset.slot; for (const x of $("fitSlot").children) x.setAttribute("aria-pressed", String(x === b));
+  $("uploadTarget").value = fitSlot; updateReadout();
+});
+function activeFit() { const it = itemById(player.look[fitSlot]); return it && it.draw !== undefined || (it && Object.keys(it.custom).length) ? it.fit[player.view] : null; }
+function nudge(dx, dy, ds = 0) {
+  const f = activeFit(); if (!f) { toast("ช่องนี้ยังไม่ได้ใส่อะไร"); return; }
+  f.dx += dx; f.dy += dy; f.s = Math.max(0.3, Math.min(2.5, +(f.s + ds).toFixed(2))); updateReadout();
+}
+function updateReadout() {
+  const f = activeFit();
+  $("fitReadout").textContent = f ? `dx ${f.dx} · dy ${f.dy} · s ${f.s.toFixed(2)}` : "ช่องนี้ว่าง";
+}
+for (const id of ["nudge-up", "nudge-down", "nudge-left", "nudge-right"]) $(id).addEventListener("click", e => { const [x, y] = e.currentTarget.dataset.d.split(",").map(Number); nudge(x, y); });
+$("fit-reset").addEventListener("click", () => { const f = activeFit(); if (f) { f.dx = 0; f.dy = 0; f.s = 1; updateReadout(); } });
+$("scale-up").addEventListener("click", () => nudge(0, 0, 0.02));
+$("scale-down").addEventListener("click", () => nudge(0, 0, -0.02));
+document.addEventListener("keydown", e => {
+  if (/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName)) return;
+  const k = e.shiftKey ? 5 : 1;
+  const map = { ArrowUp: [0, -k], ArrowDown: [0, k], ArrowLeft: [-k, 0], ArrowRight: [k, 0] };
+  if (map[e.key]) { e.preventDefault(); nudge(...map[e.key]); }
+  else if (e.key === "[") nudge(0, 0, -0.02);
+  else if (e.key === "]") nudge(0, 0, 0.02);
+});
+$("walkInPlace").addEventListener("click", e => { walkInPlace = !walkInPlace; e.currentTarget.setAttribute("aria-pressed", String(walkInPlace)); });
+$("debug").addEventListener("click", e => { debug = !debug; e.currentTarget.setAttribute("aria-pressed", String(debug)); });
+
+$("upload").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => {
+    const target = $("uploadTarget").value, view = player.view;
+    if (target === "head") { customHead[view] = img; toast(`ใช้รูปหัวสำหรับทิศ ${view} แล้ว`); }
+    else {
+      const it = itemById(player.look[target]);
+      if (!it || it.id.startsWith("none")) { toast("เลือกไอเท็มในช่องนั้นก่อน แล้วค่อยอัปโหลด"); return; }
+      it.custom[view] = img; toast(`แทนรูป "${it.name}" ทิศ ${view} แล้ว`);
+      fitSlot = target; for (const x of $("fitSlot").children) x.setAttribute("aria-pressed", String(x.dataset.slot === target));
+    }
+    updateReadout(); e.target.value = "";
+  };
+  img.onerror = () => toast("เปิดไฟล์นี้ไม่ได้ ใช้ PNG หรือ WebP");
+  img.src = url;
+});
+
+function exportJson() {
+  const out = {
+    version: 1,
+    headCanvas: { size: [HEAD_SIZE, HEAD_SIZE], pivot: [PIV.x, PIV.y] },
+    hairStyles: Object.fromEntries(Object.entries(HAIR_STYLES).map(([k, v]) => [k, { crownY: v.crown }])),
+    drawOrder: ORDER,
+    items: ITEMS.filter(i => !i.id.startsWith("none")).map(i => ({ id: i.id, slot: i.slot, ...(i.hair ? { hair: i.hair } : {}), fit: i.fit })),
+  };
+  $("json").value = JSON.stringify(out, null, 2);
+}
+$("export").addEventListener("click", exportJson);
+$("copy").addEventListener("click", () => {
+  if (!$("json").value) exportJson();
+  const ta = $("json");
+  navigator.clipboard?.writeText(ta.value).then(() => toast("คัดลอกแล้ว"), () => { ta.select(); toast("เลือกข้อความไว้แล้ว กด Ctrl/⌘+C"); })
+    ?? (ta.select(), toast("เลือกข้อความไว้แล้ว กด Ctrl/⌘+C"));
+});
+let toastTimer;
+function toast(msg) { $("toast").textContent = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").textContent = "", 2600); }
+
+function updateOrder() {
+  const el = $("order"); el.innerHTML = "ลำดับการวาด (" + player.view + "): ";
+  ORDER[player.view].forEach((l, i) => {
+    const b = document.createElement("b"); b.textContent = l; if (l === fitSlot) b.className = "on";
+    el.appendChild(b); if (i < ORDER[player.view].length - 1) el.appendChild(document.createTextNode("→"));
+  });
+}
+
+/* ---------------------------------------------------------------- loop */
+let last = performance.now();
+let lastView = "", lastFlip = null;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  step(player, dt, 140);
+  for (const n of npcs) {
+    if (!n.moving) { n.idle -= dt; if (n.idle <= 0) { n.tx = 80 + Math.random() * 640; n.ty = 170 + Math.random() * 360; n.idle = 2 + Math.random() * 4; } }
+    step(n, dt, 55);
+  }
+  if (player.view !== lastView || player.flip !== lastFlip) { lastView = player.view; lastFlip = player.flip; syncDirButtons(); }
+
+  fitCanvas(world, wctx, W, Hh);
+  wctx.drawImage(bg, 0, 0);
+  // click target marker
+  if (player.moving) { wctx.strokeStyle = "rgba(255,227,163,.8)"; wctx.lineWidth = 2; wctx.beginPath(); wctx.ellipse(player.tx, player.ty, 12, 5, 0, 0, Math.PI * 2); wctx.stroke(); }
+  const all = [player, ...npcs].sort((a, b) => a.y - b.y);
+  for (const ch of all) {
+    if (ch === player) { wctx.strokeStyle = "rgba(255,210,110,.85)"; wctx.lineWidth = 2; wctx.beginPath(); wctx.ellipse(ch.x, ch.y, 24, 8, 0, 0, Math.PI * 2); wctx.stroke(); }
+    drawChar(wctx, ch, ch.x, ch.y, WORLD_SCALE);
+  }
+  for (const ch of all) nameTag(wctx, ch, ch.x, ch.y - 146, ch === player);
+
+  fitCanvas(prev, pctx, 320, 360);
+  pctx.clearRect(0, 0, 320, 360);
+  pctx.strokeStyle = "rgba(255,255,255,.06)"; pctx.lineWidth = 1;
+  for (let x = 0; x <= 320; x += 32) { pctx.beginPath(); pctx.moveTo(x, 0); pctx.lineTo(x, 360); pctx.stroke(); }
+  for (let y = 0; y <= 360; y += 32) { pctx.beginPath(); pctx.moveTo(0, y); pctx.lineTo(320, y); pctx.stroke(); }
+  if (walkInPlace) { player.phase += dt * 9; }
+  drawChar(pctx, player, 160, 342, 0.98, { debug, fitSlot, forceWalk: walkInPlace });
+  requestAnimationFrame(frame);
+}
+
+buildBody(); buildBackground(); updateHairNote(); syncDirButtons(); exportJson();
+requestAnimationFrame(frame);
+})();
+</script>
