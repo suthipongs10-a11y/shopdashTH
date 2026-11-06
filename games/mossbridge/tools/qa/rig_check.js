@@ -40,12 +40,14 @@ for (const speedV of [130, 300]) for (let deg = 0; deg < 360; deg += 30) {
     for (const side of ["L", "R"]) {
       const f = loco.feet[side];
       // world position of the solved ankle at ground height (lift removed)
-      const ax = x + (J["ankle" + side][0] - O[0]) * sx, ay = y + (J["ankle" + side][1] + P["foot" + side + "Lift"] - O[1]) * s;
+      const ax = x + (J["ankle" + side][0] - O[0]) * sx, ay = y + (J["ankle" + side][1] + P["foot" + side + "Lift"] - O[1]) * s;   // walking keeps footS constant, so it cannot hide a slide
       const planted = !f.sw && P["foot" + side + "Pitch"] <= 0.01;
       if (planted && prev[side] && i > 30) slide = Math.max(slide, Math.hypot(ax - prev[side][0], ay - prev[side][1]) / s);
       prev[side] = planted ? [ax, ay] : null;
       const pitch = P["foot" + side + "Pitch"], heel = pitch > 0 ? sk.legs[side].toeLen * Math.sin(pitch) * .8 : 0;
-      const want = [sk.J0["ankle" + side][0] + P["foot" + side + "X"], sk.J0["ankle" + side][1] + P["foot" + side + "Y"] - P["foot" + side + "Lift"] - heel];
+      const F = P["foot" + side + "F"], S = P["foot" + side + "S"];   // extra forward / sideways channels
+      const want = [sk.J0["ankle" + side][0] + P["foot" + side + "X"] + sk.fwd[0] * F + sk.right[0] * S,
+                    sk.J0["ankle" + side][1] + P["foot" + side + "Y"] + sk.fwd[1] * F + sk.right[1] * S - P["foot" + side + "Lift"] - heel];
       const miss = Math.hypot(J["ankle" + side][0] - want[0], J["ankle" + side][1] - want[1]);
       if (miss > 0.5) { stretched++; worstMiss = Math.max(worstMiss, miss); }
     }

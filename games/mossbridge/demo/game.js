@@ -392,9 +392,9 @@ class Hero {
   place() { const s = depthScale(this.y); this.scale = s; this.root.x = this.x; this.root.y = this.y; this.root.zIndex = this.y; this.root.scale.set(s, s); }
 
   /* action clip values -> rig pose over the locomotion pose (channels the clip has replace it) */
-  actionPose(vals, loco, lunge) {
-    const P = { ...loco };
-    for (const k in vals) if (k in MossRig.POSE) P[k] = vals[k];
+  actionPose(vals, loco, lunge, clip, t) {
+    const P = { ...loco }, st = MossRig.Locomotion.stance(RIG.motion, this.cur.skel), k0 = MossRig.Locomotion.stanceIn(clip, t);
+    for (const k in vals) if (k in MossRig.POSE) P[k] = vals[k] + (st[k] || 0) * k0;
     for (const f of ["L", "R"]) {
       P["foot" + f + "X"] = 0; P["foot" + f + "Y"] = 0;                     // feet relative to the body...
       if ("foot" + f + "F" in vals) P["foot" + f + "F"] = vals["foot" + f + "F"] - lunge;   // ...minus the lunge
@@ -458,7 +458,7 @@ class Hero {
     }
     // pose = locomotion (feet planted in the world) blended with the action
     const loco = this.loco.update({ dt, x: this.x, y: this.y, vx: mvx, vy: mvy, s: depthScale(this.y), flip: this.flip, skel: this.cur.skel, lock: w });
-    const P = ap && w > 0 ? MossRig.blendPose(loco, this.actionPose(ap, loco, act.lunge), w) : loco;
+    const P = ap && w > 0 ? MossRig.blendPose(loco, this.actionPose(ap, loco, act.lunge, act.clip, Math.min(act.t, act.clip.dur)), w) : loco;
     this.pose = P;
     // draw the rig (+ the previous facing while cross-fading); hair / scarf springs lag behind the neck
     const sxs = this.flip ? -1 : 1, hd = this.springs.hair.d, sd = this.springs.scarf.d;

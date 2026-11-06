@@ -196,7 +196,8 @@ function simulate() {
     const v = sc.speed(t), vx = dir[0] * v, vy = dir[1] * v; x += vx * DT; y += vy * DT;
     P = loco.update({ dt: DT, x, y, vx, vy, s: 1, flip: FACING[turned ? NEXT[S.facing] : S.facing][1], skel: cur.skel, lock: w });
     if (vals && w > 0) {
-      const AP = { ...P }; for (const k in vals) if (k in R.POSE) AP[k] = vals[k];
+      const stc = R.Locomotion.stance(rig.motion, cur.skel), k0 = R.Locomotion.stanceIn(sc.track, Math.min(t, sc.track.dur));
+      const AP = { ...P }; for (const k in vals) if (k in R.POSE) AP[k] = vals[k] + (stc[k] || 0) * k0;
       for (const f of ["L", "R"]) { AP["foot" + f + "X"] = AP["foot" + f + "Y"] = 0; if ("foot" + f + "F" in vals) AP["foot" + f + "F"] = vals["foot" + f + "F"] - lunge; if (!("foot" + f + "Pitch" in vals)) AP["foot" + f + "Pitch"] = 0; if (!("foot" + f + "Lift" in vals)) AP["foot" + f + "Lift"] = 0; }
       P = R.blendPose(P, AP, w);
     }

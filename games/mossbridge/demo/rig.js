@@ -328,6 +328,10 @@ class Locomotion {
     this.over = []; this.speed = 0; this.lastSettle = 0;
   }
   trigger(name) { const c = this.M[name]; if (c) this.over.push({ c, t: 0 }); }
+  /* motion.stance + the view's own stance (e.g. the wrist angle that points the blade forward-up) */
+  static stance(M, skel) { const o = { ...(M.stance || {}) }; const v = skel.V.stance || {}; for (const k in v) o[k] = (o[k] || 0) + v[k]; return o; }
+  /* action clips leave the stance in their first 0.1 s and return to it over their last 0.15 s */
+  static stanceIn(clip, t) { return 1 - smooth(0, .1, t) * (1 - smooth(clip.dur - .15, clip.dur, t)); }
   reset() { this.feet.L.w = this.feet.R.w = null; this.feet.L.sw = this.feet.R.sw = null; }
   /* ctx: { dt, x, y, vx, vy, s (scale), flip, skel, lock (0..1: an action drives the legs), run (0..1 wish) } */
   update(ctx) {
@@ -435,6 +439,9 @@ class Locomotion {
       P["foot" + side + "Lift"] = f.lift; P["foot" + side + "Pitch"] = f.pitch;
     }
     if (P.squashX !== undefined) P.squashX += 1;
+    // the character's held stance (sword ready, guard hand up) sits under every locomotion state
+    const st = Locomotion.stance(M, skel);
+    for (const ch in st) P[ch] = (P[ch] || 0) + st[ch];
     return pose(P);
   }
 }
