@@ -97,6 +97,13 @@ async function film(prefix, plan, opt) {
     if (it.reset) { filmN = 0; cam.on = false; }
     if (it.place) { hero.x = it.place[0]; hero.y = it.place[1]; hero.path = []; hero.speedCur = 0; hero.loco.reset(); if (it.face) hero.face(...it.face); g.step(.5); }
     if (it.idle) for (let t = 0; t < it.idle; t += 1 / 30) { g.step(1 / 30, 60); await frameOut(prefix, opt); }
+    // combat: {fight: s} auto-attacks the nearest slime for s seconds; {skill: i, dur: s} casts skill i
+    if (it.fight) {
+      const live = g.mobs.filter(m => !m.dead && !m.boss).sort((a, b) => Math.hypot(a.x - hero.x, a.y - hero.y) - Math.hypot(b.x - hero.x, b.y - hero.y));
+      hero.target = live[0] || null;
+      for (let t = 0; t < it.fight; t += 1 / 30) { if (!hero.target || hero.target.dead) hero.target = g.mobs.find(m => !m.dead && !m.boss) || null; g.step(1 / 30, 60); await frameOut(prefix, opt); }
+    }
+    if (it.skill !== undefined) { g.useSkill(it.skill); for (let t = 0; t < (it.dur || 1.2); t += 1 / 30) { g.step(1 / 30, 60); await frameOut(prefix, opt); } }
     if (it.go) {
       hero.runMode = !!it.run; hero.target = null; hero.path = g.findPath(hero.x, hero.y, ...it.go);
       let t = 0, still = 0;

@@ -26,14 +26,24 @@ const POSE = {
   air: 0, squash: 1, squashX: 1, bodyU: 0, bodyF: 0, bodyL: 0, lean: 0, tilt: 0, hipRoll: 0, breath: 0, head: 0,
   armLSwing: 0, armLBend: 0, armLReachF: 0, armLReachU: 0, armRSwing: 0, armRBend: 0, armRReachF: 0, armRReachU: 0,
   footLX: 0, footLY: 0, footLLift: 0, footLPitch: 0, footRX: 0, footRY: 0, footRLift: 0, footRPitch: 0,
+  footLF: 0, footLS: 0, footRF: 0, footRS: 0,   // extra foot move forward / sideways (view independent)
   weaponRot: 0, weaponTop: 0,
 };
+/* Channel meaning (the same in every view; the solver turns it into screen motion per view):
+   lean +   = chest forward        armXSwing + = hand forward (pi/2 = arm straight ahead, pi = overhead)
+   head +   = nod down             armXBend +  = forearm folds forward / up
+   weaponRot + = blade tip turns forward/up from where the fist holds it
+   footXF / footXS = foot moved forward / to the character's right, in view px
+   footXX / footXY = raw screen offset (locomotion's planted feet), footXLift = up, footXPitch + = heel up */
 const pose = (o) => Object.assign({}, POSE, o);
 function blendPose(a, b, w) { const o = {}; for (const k in POSE) o[k] = lerp(a[k] ?? POSE[k], b[k] ?? POSE[k], w); return o; }
 
 /* ------------------------------------------------------------------ tracks */
 // keys [[t, v], ...] sorted by t. period: wrap t into [0, period) and treat keys[0]/keys[n-1] as joined
 // (author the last key at t = period with the first key's value). Tangents: Catmull-Rom style.
+// A key may carry an easing for the segment that ARRIVES at it: [t, v, "in" | "out" | "io" | "lin"]
+// ("in" = accelerate into the key, e.g. a strike; "out" = decelerate, e.g. a wind-up settling).
+const EASE = { lin: k => k, in: k => k * k * k, out: k => 1 - (1 - k) ** 3, io: k => (k < .5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2) };
 function sample(keys, t, period) {
   if (!keys || !keys.length) return 0;
   const n = keys.length;
@@ -42,11 +52,12 @@ function sample(keys, t, period) {
   if (t <= keys[0][0]) return keys[0][1];
   if (t >= keys[n - 1][0]) return keys[n - 1][1];
   let i = 0; while (i < n - 2 && t > keys[i + 1][0]) i++;
-  const [t0, v0] = keys[i], [t1, v1] = keys[i + 1];
+  const [t0, v0] = keys[i], [t1, v1, ease] = keys[i + 1];
+  if (ease && EASE[ease]) return v0 + (v1 - v0) * EASE[ease]((t - t0) / (t1 - t0));
   const tan = (j) => {
     let pj = keys[j - 1], nj = keys[j + 1];
     if (period) { if (j === 0) pj = [keys[n - 2][0] - period, keys[n - 2][1]]; if (j === n - 1) nj = [keys[1][0] + period, keys[1][1]]; }
-    if (!pj || !nj) return 0;
+    if (!pj || !nj || keys[j][2] || (keys[j + 1] && keys[j + 1][2])) return 0;   // flat next to eased keys
     return (nj[1] - pj[1]) / (nj[0] - pj[0]);
   };
   const h = t1 - t0, s = (t - t0) / h, s2 = s * s, s3 = s2 * s;
@@ -139,7 +150,7 @@ class RigSkeleton {
       // arm: FK swing (+bend) in the walking plane, then IK toward a reach offset
       const arm = this.arms[s], S = RigSkeleton.mapThrough(chestB, chestF, J0["shoulder" + s]);
       const sw = P["arm" + s + "Swing"], bd = P["arm" + s + "Bend"];
-      let E = add(S, this.rotSag(arm.u, sw)), W = add(E, this.rotSag(arm.f, sw + bd * arm.bend));
+      let E = add(S, this.rotSag(arm.u, -sw)), W = add(E, this.rotSag(arm.f, -(sw + bd)));
       const rf = P["arm" + s + "ReachF"], ru = P["arm" + s + "ReachU"];
       if (rf || ru) {
         const T = add(add(W, mul(this.fwd, rf)), mul(up, ru));
@@ -150,7 +161,8 @@ class RigSkeleton {
       // leg: the foot offset (footX/Y) is a move on the ground = forward + sideways. Forward and
       // height (lift, heel rise) go into the walking-plane IK; sideways shifts the lower leg.
       const leg = this.legs[s], H = RigSkeleton.mapThrough(hipB, hipF, J0["hip" + s]);
-      const pitch = P["foot" + s + "Pitch"], [ga, gl] = this.decG([P["foot" + s + "X"], P["foot" + s + "Y"]]);
+      const pitch = P["foot" + s + "Pitch"];
+      let [ga, gl] = this.decG([P["foot" + s + "X"], P["foot" + s + "Y"]]); ga += P["foot" + s + "F"]; gl += P["foot" + s + "S"];
       const latBody = mul(this.right, P.bodyL), latFoot = mul(this.right, gl), Hp = sub(H, latBody);
       const lift = P["foot" + s + "Lift"] + (pitch > 0 ? leg.toeLen * Math.sin(pitch) * .8 : 0);
       const T = add(add(J0["ankle" + s], mul(this.fwd, ga)), [0, -lift]);
@@ -167,7 +179,7 @@ class RigSkeleton {
       J["toe" + s] = add(add(J["ankle" + s], leg.toe0), tp);
     }
     for (let i = 0; i < this.bones.length; i++) frames[i] = frame(this.bones[i]);
-    J.headRot = Math.atan2(cv[1], cv[0]) - Math.atan2(c0[1], c0[0]) + P.head;
+    J.headRot = Math.atan2(cv[1], cv[0]) - Math.atan2(c0[1], c0[0]) + P.head * Math.sign(this.fwd[0] || 1);
     return { J, frames };
   }
 }
@@ -278,7 +290,7 @@ class RigView {
       const gp = RigSkeleton.mapThrough(fb, fr, w.grip), g = G(gp[0], gp[1]);
       const armRot = Math.atan2(fr.e[1], fr.e[0]) - Math.atan2(fb.t0[1], fb.t0[0]);
       this.weapon.position.set(g[0], g[1]);
-      this.weapon.rotation = w.angle * Math.PI / 180 + armRot * (1 - P.weaponTop) + P.weaponRot;
+      this.weapon.rotation = w.angle * Math.PI / 180 + armRot - Math.sign(this.skel.fwd[0] || 1) * P.weaponRot;
       // during attacks the weapon is drawn on top (it swings in front of the body)
       const want = P.weaponTop > .5 ? this.container.children.length - 1 : this.weaponHome;
       if (this.container.getChildIndex(this.weapon) !== want) this.container.setChildIndex(this.weapon, want);

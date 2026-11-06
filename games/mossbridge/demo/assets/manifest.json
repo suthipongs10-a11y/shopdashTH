@@ -167,5 +167,56 @@
    1672,
    941
   ]
+ },
+ "fx": {
+  "slash": {
+   "file": "fx_slash.png",
+   "frames": 8,
+   "size": [
+    185,
+    180
+   ],
+   "origin": [
+    7,
+    68
+   ],
+   "scale": 0.5,
+   "anchor": [
+    83.2,
+    90.0
+   ],
+   "reach": 99.3
+  },
+  "quake": {
+   "file": "fx_quake.png",
+   "frames": 8,
+   "size": [
+    235,
+    206
+   ],
+   "origin": [
+    -4,
+    79
+   ],
+   "scale": 0.6,
+   "anchor": [
+    117.6,
+    109.8
+   ]
+  },
+  "vortex": {
+   "file": "fx_vortex.png",
+   "size": [
+    512,
+    364
+   ]
+  }
+ },
+ "icons": {
+  "tide": "icon_tide.png",
+  "quake": "icon_quake.png",
+  "dash": "icon_dash.png",
+  "mend": "icon_mend.png",
+  "potion": "icon_potion.png"
  }
 }

@@ -94,6 +94,7 @@ code, .mono { font: 12px var(--font-mono); }
     <div class="row"><label>คลิป <select id="clip">
       <option value="idle">idle (ยืน)</option><option value="walk" selected>walk (เดิน)</option><option value="run">run (วิ่ง)</option>
       <option value="start">start (ออกตัว)</option><option value="stop">stop (หยุด)</option><option value="turn">turn (เปลี่ยนทิศ)</option>
+      <optgroup label="โจมตี / สกิล (motion.actions)" id="actGroup"></optgroup>
       <option value="pose">ท่าอิสระ (ทดสอบกระดูก)</option></select></label></div>
     <p class="hint" id="clipHint"></p>
     <div id="cycleParams" class="row"></div>
@@ -161,6 +162,7 @@ function scene() {
   if (c === "start") return { dur: .6, pre: .5, speed: t => (t >= 0 ? M.run.speed * Math.min(1, t / .12) : 0), track: M.start, domain: .6 };
   if (c === "stop") return { dur: .6, pre: 1.2, speed: t => (t < 0 ? M.run.speed : 0), track: M.stop, domain: .6 };
   if (c === "turn") return { dur: .4, pre: 1.0, speed: () => M.run.speed, track: M.turn, domain: .4, turn: true };
+  if (M.actions && M.actions[c]) { const A = M.actions[c]; return { dur: A.dur + .15, pre: .4, speed: () => 0, track: A, domain: A.dur + .15, action: true }; }
   return { dur: 1, pre: 0, speed: () => 0, track: null, domain: 1, pose: true };
 }
 let sim = null;
@@ -181,10 +183,23 @@ function simulate() {
   };
   const end = sc.pre + S.t;
   if (sc.track === rig.motion.idle) loco.time = 0;
+  let prevStep = 0, lunge = 0;
   for (let t = -sc.pre, n = 0; more(t, n); t += DT, n++) {
+    // action clips: same mapping as Hero.actionPose in game.js (feet F tracks minus the lunge)
+    let vals = null, w = 0;
+    if (sc.action && t >= 0) {
+      const A = sc.track; vals = R.sampleClip(A, Math.min(t, A.dur));
+      w = t > A.dur ? 1 - clamp01((t - A.dur) / .12) : clamp01(t / .06);
+      const st = vals.step || 0; x += dir[0] * (st - prevStep); y += dir[1] * (st - prevStep); lunge += st - prevStep; prevStep = st;
+    }
     if (sc.turn && !turned && t >= 0) { turned = true; cur = rvTurn; dir = dirOf(NEXT[S.facing]); loco.trigger("turn"); spr.hair.reset(); spr.scarf.reset(); fade = t; }
     const v = sc.speed(t), vx = dir[0] * v, vy = dir[1] * v; x += vx * DT; y += vy * DT;
-    P = loco.update({ dt: DT, x, y, vx, vy, s: 1, flip: FACING[turned ? NEXT[S.facing] : S.facing][1], skel: cur.skel, lock: 0 });
+    P = loco.update({ dt: DT, x, y, vx, vy, s: 1, flip: FACING[turned ? NEXT[S.facing] : S.facing][1], skel: cur.skel, lock: w });
+    if (vals && w > 0) {
+      const AP = { ...P }; for (const k in vals) if (k in R.POSE) AP[k] = vals[k];
+      for (const f of ["L", "R"]) { AP["foot" + f + "X"] = AP["foot" + f + "Y"] = 0; if ("foot" + f + "F" in vals) AP["foot" + f + "F"] = vals["foot" + f + "F"] - lunge; if (!("foot" + f + "Pitch" in vals)) AP["foot" + f + "Pitch"] = 0; if (!("foot" + f + "Lift" in vals)) AP["foot" + f + "Lift"] = 0; }
+      P = R.blendPose(P, AP, w);
+    }
     if (sc.track === rig.motion.idle) loco.time = Math.max(0, t);
     res = cur.skel.solve(P);
     const fl = FACING[turned ? NEXT[S.facing] : S.facing][1] ? -1 : 1, O = cur.skel.origin;
@@ -391,10 +406,11 @@ const HINT = {
   stop: "หยุด: วิ่งแล้วหยุด ที่ t = 0 • คีย์เป็นค่าบวกเพิ่ม (ถ่วงตัว 0.15 วินาที)",
   turn: "เปลี่ยนทิศ: ที่ t = 0 สลับมุมกล้อง cross-fade 70 ms + คีย์ squash",
   pose: "ท่าอิสระ: ลากจุดบนตัว หรือเลื่อนแถบด้านล่างเพื่อทดสอบกระดูก/IK (ไม่บันทึกลงไฟล์)",
+  action: "ท่าโจมตี/สกิล: ค่าเป็นค่าจริงทับท่ายืน • step = ตัวพุ่งไปข้างหน้า (px) • footRF/footLF วัดจากจุดเริ่ม (เท้าที่ค่าคงที่ = เหยียบอยู่กับที่) • คีย์ใส่ easing ได้: [t, ค่า, \"in\"|\"out\"|\"io\"|\"lin\"] • spin (Tidecleave) และเอฟเฟกต์ดูในเกม",
 };
 function buildTracks() {
   const sc = scene(), el = $("trackList"); el.innerHTML = "";
-  $("clipHint").textContent = HINT[S.clip];
+  $("clipHint").textContent = HINT[S.clip] || (sc.action ? HINT.action : "");
   $("sliders").hidden = S.clip !== "pose"; $("keyEdit").hidden = !sc.track;
   const cp = $("cycleParams"); cp.innerHTML = "";
   if (sc.cycle) for (const k of ["speed", "cadence", "swing", "lift"]) {
@@ -404,7 +420,7 @@ function buildTracks() {
   if (!sc.track) return;
   const names = Object.keys(sc.track.tracks);
   for (const n of names) { const b = document.createElement("button"); b.textContent = n; if (n === S.track) b.classList.add("on"); b.onclick = () => { S.track = n; S.key = -1; buildTracks(); showKey(); drawCurve(); }; el.appendChild(b); }
-  const add = document.createElement("select"); add.innerHTML = `<option value="">+ แทร็ก</option>` + Object.keys(R.POSE).concat(sc.cycle ? ["armSwing", "armBend"] : []).filter(n => !names.includes(n)).map(n => `<option>${n}</option>`).join("");
+  const add = document.createElement("select"); add.innerHTML = `<option value="">+ แทร็ก</option>` + Object.keys(R.POSE).concat(sc.cycle ? ["armSwing", "armBend"] : sc.action ? ["step", "spin"] : []).filter(n => !names.includes(n)).map(n => `<option>${n}</option>`).join("");
   add.onchange = () => { if (!add.value) return; sc.track.tracks[add.value] = [[0, 0], [sc.cycle ? 1 : sc.track.dur, 0]]; S.track = add.value; buildTracks(); drawCurve(); };
   el.appendChild(add);
   $("trackName").textContent = S.track ? `แทร็ก: ${S.clip}.${S.track}` : "";
@@ -539,6 +555,7 @@ app.ticker.add(() => {
   if (dirty) { dirty = false; render(); }
 });
 app.ticker.autoStart = true;
+$("actGroup").innerHTML = Object.keys(rig.motion.actions || {}).map(n => `<option value="${n}">${n}</option>`).join("");
 buildViews(); setMode("anim"); syncPlay();
 window.__rigEditor = { S, get rig() { return rig; }, get rv() { return rv; }, app, setupLayer, world, redraw, render, resize, setMode, setT };   // test hook (render() draws synchronously)
 })();

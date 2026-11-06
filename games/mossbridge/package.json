@@ -11,7 +11,8 @@
     "qa:video": "node tools/qa/video.js",
     "qa:rig": "node tools/qa/rig_check.js",
     "assets": "python3 tools/build_demo_assets.py",
-    "rig": "python3 tools/build_kaelrin_rig.py"
+    "rig": "python3 tools/build_kaelrin_rig.py",
+    "fx": "python3 tools/build_fx_assets.py"
   },
   "devDependencies": {
     "playwright": "1.48.2"

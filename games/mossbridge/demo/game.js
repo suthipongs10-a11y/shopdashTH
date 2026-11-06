@@ -42,8 +42,15 @@ const RIG = await (await fetch("rigs/kaelrin.json")).json();   // hero skeleton 
 const urls = [A + man.map.file];
 for (const v of Object.values(RIG.views)) urls.push(A + v.atlas, A + v.head.file, A + v.weapon.file);
 for (const m of Object.values(man.mobs)) urls.push(A + m.file);
+for (const f of Object.values(man.fx || {})) urls.push(A + f.file);
 const T = await PIXI.Assets.load([...new Set(urls)]);
 const tex = f => T[A + f];
+/* effect frames from the ChatGPT sheets (tools/build_fx_assets.py); black = transparent with ADD */
+const FXF = {};
+for (const [k, f] of Object.entries(man.fx || {})) {
+  const base = tex(f.file).baseTexture, n = f.frames || 1, w = f.size[0], h = f.size[1];
+  FXF[k] = { ...f, tex: Array.from({ length: n }, (_, i) => new PIXI.Texture(base, new PIXI.Rectangle(i * w, 0, w, h))) };
+}
 
 const MAP_W = man.map.size[0], MAP_H = man.map.size[1];
 const world = new PIXI.Container();
@@ -247,6 +254,7 @@ class Trail {
 
 /* ------------------------------------------------------------------ camera & feel */
 const cam = { x: 640, y: 700, zoom: 1, shake: 0 };
+const CAM_WIDE = 0.72;   // fraction of the old fit-to-screen zoom: lower = see more of the map
 let hitstop = 0;
 function shake(a) { cam.shake = Math.max(cam.shake, reduceMotion ? a * .25 : a); }
 
@@ -293,65 +301,19 @@ class MeshActor {
 }
 
 /* ------------------------------------------------------------------ hero */
-// legacy clip channels (attacks / skills); Hero.legacyPose() maps them onto the rig
-const POSE0 = { air: 0, bob: 0, lean: 0, squash: 1, raise: 0, reachF: 0, reachU: 0, head: 0, legA: 0, legB: 0, liftA: 0, liftB: 0, step: 0, spin: 0 };
-
-function keys(list) { // keyframe clip -> (t) => pose ; each key {t, ease?, ...params}
-  return t => {
-    let i = 0; while (i < list.length - 1 && t > list[i + 1].t) i++;
-    const a = list[i], b = list[Math.min(i + 1, list.length - 1)];
-    const k = b.t > a.t ? clamp((t - a.t) / (b.t - a.t), 0, 1) : 1;
-    const e = (b.ease || easeInOut)(k), out = {};
-    for (const key in POSE0) out[key] = lerp(a[key] ?? POSE0[key], b[key] ?? POSE0[key], e);
-    return out;
-  };
-}
-
-const CLIPS = {
-  slash1: { dur: .46, hits: [.2], pose: keys([
-    { t: 0 }, { t: .13, raise: 1.55, lean: -.1, reachF: -6, reachU: 10, bob: 3, squash: 1.03, head: -.05, legA: 4, legB: -3, ease: easeOut },
-    { t: .21, raise: -1.35, lean: .17, reachF: 18, reachU: -4, squash: .93, step: 12, legA: -6, legB: 8, ease: easeIn },
-    { t: .3, raise: -1.25, lean: .13, reachF: 14, squash: .97, step: 14, legA: -5, legB: 7, ease: easeOut }, { t: .46, step: 14 } ]) },
-  slash2: { dur: .46, hits: [.19], pose: keys([
-    { t: 0 }, { t: .12, raise: -1.7, lean: .04, reachF: 6, reachU: -6, squash: .94, legA: -4, legB: 5, ease: easeOut },
-    { t: .2, raise: 2.0, lean: -.05, reachF: 10, reachU: 16, air: 6, bob: 3, squash: 1.04, step: 10, legA: 6, legB: -4, liftA: 5, ease: easeIn },
-    { t: .3, raise: 1.85, air: 3, bob: 3, reachU: 13, step: 12, ease: easeOut }, { t: .46, step: 12 } ]) },
-  slash3: { dur: .74, hits: [.37], pose: keys([
-    { t: 0 }, { t: .1, squash: .9, raise: 1.2, lean: .05, ease: easeOut },
-    { t: .22, raise: 2.7, air: 16, bob: 4, squash: 1.06, lean: -.15, reachU: 18, head: -.1, legA: 5, legB: -3, liftA: 8, liftB: 4, ease: easeOut },
-    { t: .32, raise: 2.9, air: 22, bob: 4, squash: 1.04, lean: -.12, reachU: 20, liftA: 10, liftB: 6, step: 6, ease: easeOut },
-    { t: .38, raise: -1.55, air: 0, bob: 0, squash: .84, lean: .22, reachF: 20, reachU: -8, step: 22, head: .08, legA: -8, legB: 9, ease: easeIn },
-    { t: .55, raise: -1.45, squash: .95, lean: .14, reachF: 14, step: 22, legA: -6, legB: 7 }, { t: .74, step: 22 } ]) },
-  tidecleave: { dur: .95, hits: [.38, .66], pose: t => {
-    const k = clamp((t - .1) / .7, 0, 1), spin = easeInOut(k) * TAU * 2;
-    const base = keys([{ t: 0 }, { t: .1, squash: .9, lean: .08, raise: .4 }, { t: .8, squash: .95, lean: .05, raise: .4, bob: 4 }, { t: .95 }])(t);
-    base.spin = spin; base.lean += Math.sin(spin) * .08 * (k > 0 && k < 1 ? 1 : 0); base.bob += Math.abs(Math.sin(spin)) * 5 * (k > 0 && k < 1 ? 1 : 0);
-    base.legA = Math.sin(spin) * 6; base.legB = -Math.sin(spin) * 6; return base;
-  } },
-  mossquake: { dur: 1.05, hits: [.55], pose: keys([
-    { t: 0 }, { t: .16, squash: .8, raise: 1.1, lean: .1, legA: 4, legB: -4, ease: easeOut },
-    { t: .24, squash: 1.12, air: 30, bob: 3, raise: 2.2, lean: -.06, liftA: 8, liftB: 10, ease: easeOut },
-    { t: .42, air: 84, bob: 4, squash: 1.04, raise: 2.9, lean: -.12, reachU: 18, liftA: 12, liftB: 14, legA: 4, legB: -6, ease: easeOut },
-    { t: .54, air: 0, bob: 0, squash: .76, raise: -1.7, lean: .24, reachF: 18, reachU: -10, legA: -9, legB: 10, ease: easeIn },
-    { t: .78, squash: .97, raise: -1.4, lean: .12, reachF: 10 }, { t: 1.05 } ]) },
-  galedash: { dur: .5, hits: [], pose: keys([
-    { t: 0 }, { t: .08, squash: .86, lean: .22, raise: .8, legA: -5, legB: 6, ease: easeOut },
-    { t: .14, squash: 1.04, lean: .32, raise: -1.2, reachF: 16, legA: 10, legB: -10, liftA: 8, ease: easeOut },
-    { t: .3, squash: .95, lean: .2, raise: -1.4, reachF: 14, legA: -8, legB: 8 }, { t: .5 } ]) },
-  mend: { dur: .95, hits: [.45], pose: keys([
-    { t: 0 }, { t: .25, raise: 2.5, lean: -.12, reachU: 22, reachF: 4, bob: 6, head: -.12, squash: 1.04, ease: easeOut },
-    { t: .65, raise: 2.6, lean: -.1, reachU: 24, bob: 8, head: -.1, squash: 1.03 }, { t: .95 } ]) },
-  hurt: { dur: .3, hits: [], pose: keys([{ t: 0 }, { t: .06, lean: -.2, squash: .92, raise: .5, head: -.12, ease: easeOut }, { t: .3 }]) },
-};
-
+// Attacks, skills and the hurt flinch are rig clips in rigs/kaelrin.json (motion.actions), edited in the Rig Editor.
 // facing -> [painted view, mirrored]. E and NW are the W and NE paintings flipped.
 const FACING = { sw: ["sw", false], se: ["se", false], w: ["w", false], e: ["w", true], ne: ["ne", false], nw: ["ne", true] };
 const WALK_SPEED = 130, RUN_SPEED = 300;            // view px / s (world speed = this x depthScale)
 const AlphaFilter = PIXI.AlphaFilter || PIXI.filters.AlphaFilter;
 
 /* Kaelrin: a cutout rig (rig.js + rigs/kaelrin.json). Locomotion (idle, walk, run, start, stop,
-   turn) comes from MossRig.Locomotion with feet planted in the world. Attacks and skills still use
-   the keyframe CLIPS above; legacyPose() maps their values onto the rig (rebuilt in backlog 3). */
+   turn) comes from MossRig.Locomotion with feet planted in the world. Attacks / skills / hurt are
+   clips in motion.actions: absolute channel values blended over locomotion, plus
+     step     how far the body travels forward (view px); foot F tracks are measured from where the
+              action started, so a foot whose track stays still is planted while the body lunges
+     spin     radians the facing turns (Tidecleave): the body turns through the painted views
+     hits / smear / kick   damage times, slash-arc effects, hair+scarf impulses */
 class Hero {
   constructor() {
     this.root = new PIXI.Container();
@@ -386,7 +348,8 @@ class Hero {
     if (this.fade) this.endFade();
     this.cur = this.rigView(key); this.cur.container.visible = true;
     const V = RIG.views[this.view]; this.rig = { s: Math.sign(V.fwd[0]) || 1, fwd: V.fwd };
-    if (prev && prev !== this.cur) {                 // turn: 70 ms cross-fade + a small squash (motion.turn)
+    if (prev && prev !== this.cur && this.noFade) prev.container.visible = false;   // spinning: swap at once
+    else if (prev && prev !== this.cur) {            // turn: 70 ms cross-fade + a small squash (motion.turn)
       prev.af = prev.af || new AlphaFilter(1); this.cur.af = this.cur.af || new AlphaFilter(0);
       prev.af.alpha = 1; this.cur.af.alpha = 0;
       prev.container.filters = [prev.af]; this.cur.container.filters = [this.cur.af];
@@ -412,7 +375,11 @@ class Hero {
   }
   /* world-space facing unit vector (used for lunges and dash) */
   facingVec() { const f = this.rig.fwd; const sx = this.flip ? -1 : 1; const l = Math.hypot(f[0], f[1]); return [f[0] * sx / l, f[1] / l]; }
-  play(name, opts = {}) { this.action = { name, clip: CLIPS[name], t: 0, fired: 0, ...opts }; this.prevStep = 0; }
+  play(name, opts = {}) {
+    const [fx, fy] = this.facingVec();
+    this.action = { name, clip: RIG.motion.actions[name], t: 0, fired: 0, ev: 0, lunge: 0, a0: Math.atan2(fy, fx), ...opts };
+    this.prevStep = 0;
+  }
   busy() { return this.action && this.action.t < this.action.clip.dur; }
   setFlash(a) {
     this.flashAmt = a;
@@ -424,16 +391,17 @@ class Hero {
   }
   place() { const s = depthScale(this.y); this.scale = s; this.root.x = this.x; this.root.y = this.y; this.root.zIndex = this.y; this.root.scale.set(s, s); }
 
-  /* the old clip values (POSE0) expressed as rig channels */
-  legacyPose(ap) {
-    const sk = this.cur.skel, s = this.rig.s, fw = sk.fwd, hand = RIG.views[this.view].weapon.hand, off = hand === "R" ? "L" : "R";
-    const a = sk.J0.ankleL[0] < sk.J0.ankleR[0] ? "L" : "R", b = a === "L" ? "R" : "L";   // legA = left leg of the painting
-    const P = { air: ap.air, squash: ap.squash, bodyU: -2.2 + ap.bob, lean: ap.lean, head: ap.head, weaponTop: 1,
-      weaponRot: -s * ap.raise + ap.lean * s * .6 + (ap.spin || 0) * s };
-    P["arm" + hand + "ReachF"] = ap.reachF; P["arm" + hand + "ReachU"] = ap.reachU; P["arm" + off + "Swing"] = -ap.lean * 1.2;
-    P["foot" + a + "X"] = fw[0] * ap.legA; P["foot" + a + "Y"] = fw[1] * ap.legA; P["foot" + a + "Lift"] = ap.liftA * .8;
-    P["foot" + b + "X"] = fw[0] * ap.legB; P["foot" + b + "Y"] = fw[1] * ap.legB; P["foot" + b + "Lift"] = ap.liftB * .8;
-    return MossRig.pose(P);
+  /* action clip values -> rig pose over the locomotion pose (channels the clip has replace it) */
+  actionPose(vals, loco, lunge) {
+    const P = { ...loco };
+    for (const k in vals) if (k in MossRig.POSE) P[k] = vals[k];
+    for (const f of ["L", "R"]) {
+      P["foot" + f + "X"] = 0; P["foot" + f + "Y"] = 0;                     // feet relative to the body...
+      if ("foot" + f + "F" in vals) P["foot" + f + "F"] = vals["foot" + f + "F"] - lunge;   // ...minus the lunge
+      if (!("foot" + f + "Pitch" in vals)) P["foot" + f + "Pitch"] = 0;
+      if (!("foot" + f + "Lift" in vals)) P["foot" + f + "Lift"] = 0;
+    }
+    return P;
   }
 
   update(dt) {
@@ -470,21 +438,27 @@ class Hero {
       }
     }
     // action clip (attacks / skills / hurt)
-    let ap = null, w = 0;
+    let ap = null, w = 0, act = null;
     if (this.action) {
-      const a = this.action; a.t += dt;
-      const clipT = Math.min(a.t, a.clip.dur);
-      ap = a.clip.pose(clipT);
-      while (a.fired < a.clip.hits.length && clipT >= a.clip.hits[a.fired]) { onHit(this, a, a.fired); a.fired++; }
+      const a = act = this.action, C = a.clip; a.t += dt;
+      const clipT = Math.min(a.t, C.dur);
+      ap = MossRig.sampleClip(C, clipT);
+      while (a.fired < C.hits.length && clipT >= C.hits[a.fired]) { onHit(this, a, a.fired); a.fired++; }
+      const evs = a.evs || (a.evs = [...(C.smear || []).map(e => ({ ...e, type: "smear" })), ...(C.kick || []).map(e => ({ ...e, type: "kick" }))].sort((x, y) => x.t - y.t));
+      while (a.ev < evs.length && clipT >= evs[a.ev].t) actionEvent(this, evs[a.ev++]);
       if (a.onUpdate) a.onUpdate(clipT, dt);
-      const dStep = ap.step - this.prevStep; this.prevStep = ap.step;        // lunge along facing
-      if (dStep) { const [fx, fy] = this.facingVec(), s2 = depthScale(this.y); const nx = this.x + fx * dStep * s2 * 1.6, ny = this.y + fy * dStep * s2 * 1.1; if (walkable(nx, ny)) { this.x = nx; this.y = ny; } }
+      const st = ap.step || 0, dStep = st - this.prevStep; this.prevStep = st;   // lunge along facing (view px)
+      if (dStep) { const [fx, fy] = this.facingVec(), s2 = depthScale(this.y), nx = this.x + fx * dStep * s2, ny = this.y + fy * dStep * s2; if (walkable(nx, ny)) { this.x = nx; this.y = ny; a.lunge += dStep; } }
+      if (ap.spin !== undefined) {                                              // Tidecleave: turn through the views
+        const ang = a.a0 + ap.spin * (Math.cos(a.a0) < 0 ? -1 : 1);
+        this.noFade = Math.abs(ap.spin) > .2; this.face(Math.cos(ang), Math.sin(ang)); this.noFade = false;
+      }
       w = clamp(a.t / .06, 0, 1);
-      if (a.t > a.clip.dur) { w = 1 - clamp((a.t - a.clip.dur) / .12, 0, 1); if (w <= 0) { this.action = null; if (a.onEnd) a.onEnd(); } }
+      if (a.t > C.dur) { w = 1 - clamp((a.t - C.dur) / .12, 0, 1); if (w <= 0) { this.action = null; if (a.onEnd) a.onEnd(); } }
     }
     // pose = locomotion (feet planted in the world) blended with the action
     const loco = this.loco.update({ dt, x: this.x, y: this.y, vx: mvx, vy: mvy, s: depthScale(this.y), flip: this.flip, skel: this.cur.skel, lock: w });
-    const P = ap && w > 0 ? MossRig.blendPose(loco, this.legacyPose(ap), w) : loco;
+    const P = ap && w > 0 ? MossRig.blendPose(loco, this.actionPose(ap, loco, act.lunge), w) : loco;
     this.pose = P;
     // draw the rig (+ the previous facing while cross-fading); hair / scarf springs lag behind the neck
     const sxs = this.flip ? -1 : 1, hd = this.springs.hair.d, sd = this.springs.scarf.d;
@@ -505,7 +479,7 @@ class Hero {
     const toWorld = p => [this.x + (p[0] - O[0]) * sxs * this.scale, this.y + (p[1] - O[1]) * this.scale];
     const tip = toWorld(this.cur.weaponTip(1)), mid = toWorld(this.cur.weaponTip(.5));
     this.tipWorld = tip;
-    this.trail.on = !!(this.action && this.action.t < this.action.clip.dur && this.action.kind !== "cast");
+    this.trail.on = !!(this.action && this.action.t < this.action.clip.dur && this.action.kind !== "cast" && !this.action.clip.smear);   // clips with a painted arc skip the code trail
     this.trail.push(tip[0], tip[1], mid[0], mid[1]);
     this.trail.update(dt);
   }
@@ -796,6 +770,47 @@ function hurtHero(amount, src, dir) {
   }
 }
 
+/* clip events: slash arc (ChatGPT P09A frames, additive) and hair/scarf impulses */
+function actionEvent(h, e) {
+  const [fx, fy] = h.facingVec();
+  if (e.type === "kick") {
+    const sx = Math.sign(fx) || 1;
+    for (const sp of Object.values(h.springs)) { sp.v[0] += e.x * .05 * sx; sp.v[1] += e.y * .05; }
+    return;
+  }
+  if (e.type === "smear" && FXF.slash) slashArc(h, e, fx, fy);
+}
+function slashArc(h, e, fx, fy) {
+  const F = FXF.slash, outer = new PIXI.Container(), sp = new PIXI.Sprite(F.tex[0]);
+  sp.anchor.set(F.anchor[0] / F.size[0], F.anchor[1] / F.size[1]); sp.blendMode = PIXI.BLEND_MODES.ADD;
+  const k = 120 * h.scale / F.reach * (e.scale || 1);
+  outer.addChild(sp); fxLayer.addChild(outer);
+  if (e.flat) {             // horizontal sweep: lies on the ground plane in front of the hero
+    outer.x = h.x + fx * 20 * h.scale; outer.y = h.y - 50 * h.scale; outer.scale.set(k, k * .5);
+    sp.rotation = Math.atan2(fy * 2, fx);
+  } else {                  // chop in the forward-up plane: convex side toward the facing
+    outer.x = h.x + fx * 62 * h.scale; outer.y = h.y - 100 * h.scale + fy * 30 * h.scale;
+    outer.scale.set(fx < 0 ? -k : k, e.flipY ? -k : k);
+    sp.rotation = Math.atan2(fy * .35, Math.abs(fx)) * (fx < 0 ? -1 : 1) * (e.flipY ? -1 : 1);
+  }
+  const fxp = { t: 0, life: e.dur || .2 };
+  fxp.update = dt => {
+    fxp.t += dt; const q = fxp.t / fxp.life; if (q >= 1) { outer.destroy({ children: true }); return false; }
+    sp.texture = F.tex[Math.min(F.tex.length - 1, Math.floor(q * F.tex.length))]; outer.alpha = .8 * (q > .75 ? (1 - q) / .25 : 1);
+    return true;
+  };
+  effects.push(fxp);
+}
+/* ground shockwave (P09C frames) centred on x, y, r = radius in world px */
+function quakeFx(x, y, r, life = .6) {
+  if (!FXF.quake) return;
+  const F = FXF.quake, sp = new PIXI.Sprite(F.tex[0]);
+  sp.anchor.set(F.anchor[0] / F.size[0], F.anchor[1] / F.size[1]); sp.blendMode = PIXI.BLEND_MODES.ADD;
+  sp.x = x; sp.y = y; sp.alpha = .7; sp.scale.set(2 * r / F.size[0]); groundFx.addChild(sp);
+  const p = { t: 0 }; p.update = dt => { p.t += dt; const q = p.t / life; if (q >= 1) { sp.destroy(); return false; } sp.texture = F.tex[Math.min(F.tex.length - 1, Math.floor(q * F.tex.length))]; return true; };
+  effects.push(p);
+}
+
 /* hit events from hero clips */
 function onHit(h, a, i) {
   const sc = depthScale(h.y) / .45;
@@ -805,9 +820,7 @@ function onHit(h, a, i) {
       damageMob(m, heavy ? rand(4200, 4800) : rand(2100, 2600), { critRate: heavy ? .3 : .16, shake: heavy ? 8 : 3.5, stop: heavy ? .1 : .055 });
       if (heavy) { ring(m.x, m.y, { tint: 0x9ff7e8, s0: .1, s1: .9, life: .35 }); burst(m.x, m.y, 8, { tex: FX.dust, add: false, s0: .5, s1: 1.2, life: .6, tint: 0xd8c4a0, alpha: .8 }); }
     }
-    // slash crescent
-    const [fx, fy] = h.facingVec();
-    particle({ tex: FX.crescent, x: h.x + fx * 40 * sc, y: h.y - 60 * h.scale + fy * 20 * sc, tint: 0x5fd8c8, alpha: .45, s0: .45 * sc, s1: .8 * sc, life: .2, rot: Math.atan2(fy, fx), sy: a.name === "slash2" ? -.7 : .7, drag: 1 });
+    if (heavy) { const [fx, fy] = h.facingVec(); quakeFx(h.x + fx * 30 * sc, h.y + fy * 14 * sc, 55 * sc, .45); }
   } else if (a.name === "tidecleave") {
     const r = 120 * sc;
     for (const m of mobsInRadius(h.x, h.y, r)) damageMob(m, rand(3600, 4200), { critRate: .2, tint: 0x6fe8ff });
@@ -817,7 +830,7 @@ function onHit(h, a, i) {
     const r = 175 * sc;
     for (const m of mobsInRadius(h.x, h.y, r)) damageMob(m, rand(7200, 8400), { critRate: .25, shake: 0, stop: .12, tint: 0xb6ff8a });
     shake(16); hitstop = Math.max(hitstop, .11);
-    ring(h.x, h.y, { tint: 0xb6ff8a, s0: .2, s1: 1.8 * sc, life: .6, sy: .42 });
+    quakeFx(h.x, h.y, r, .75);
     ring(h.x, h.y, { tint: 0xfff2c4, s0: .1, s1: 1.2 * sc, life: .35, sy: .42 });
     ring(h.x, h.y, { tint: 0x6aa84f, s0: .3, s1: 2.3 * sc, life: .9, sy: .42, tex: FX.disc, alpha: .6 });
     for (let k = 0; k < 14; k++) { const ang = rand(0, TAU), v = rand(140, 320) * sc; particle({ tex: FX.rock, add: false, x: h.x + Math.cos(ang) * 30 * sc, y: h.y + Math.sin(ang) * 14 * sc, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v * .5, z: 4, vz: rand(180, 380), gz: 950, s0: rand(.45, .8) * sc, s1: .3, life: 1, drag: .97, vr: rand(-9, 9) }); }
@@ -864,11 +877,23 @@ function useSkill(i) {
   } else {
     hero.play(S.id, { kind: S.id === "mend" ? "cast" : "skill", target: tgt });
     if (S.id === "tidecleave") {
-      const sw = { t: 0, sprites: [] };
-      for (let k = 0; k < 3; k++) { const s = new PIXI.Sprite(FX.crescent); s.anchor.set(.5); s.blendMode = k === 2 ? PIXI.BLEND_MODES.ADD : PIXI.BLEND_MODES.NORMAL; s.tint = [0x1f9fc0, 0x3fd0c8, 0xbffcff][k]; fxLayer.addChild(s); sw.sprites.push(s); }
+      const sw = { t: 0, rings: [] };
+      const V = FXF.vortex, vt = V ? tex(V.file) : FX.crescent;
+      for (let k = 0; k < 2; k++) {
+        const outer = new PIXI.Container(), sp = new PIXI.Sprite(vt); sp.anchor.set(.5); sp.blendMode = PIXI.BLEND_MODES.ADD;
+        outer.addChild(sp); (k ? fxLayer : groundFx).addChild(outer); sw.rings.push({ outer, sp });
+      }
       sw.update = dt => {
-        sw.t += dt; const k = sw.t / .9; if (k >= 1) { sw.sprites.forEach(s => s.destroy()); return false; }
-        sw.sprites.forEach((s, j) => { s.x = hero.x; s.y = hero.y - 30 * hero.scale; s.rotation = -sw.t * 14 * (hero.rig.s * (hero.flip ? -1 : 1)) + j * 2.1; const sc2 = (.5 + j * .1) * depthScale(hero.y) / .45; s.scale.set(sc2, sc2 * .42); s.alpha = Math.sin(k * Math.PI) * (j === 2 ? .35 : .55); });
+        sw.t += dt; const k = sw.t / .9; if (k >= 1) { sw.rings.forEach(r => r.outer.destroy({ children: true })); return false; }
+        const sc2 = depthScale(hero.y) / .45, dir = hero.rig.s * (hero.flip ? -1 : 1);
+        sw.rings.forEach((r, j) => {
+          const R = (150 + j * 22) * sc2 * (.7 + .3 * Math.min(1, k * 4)), circ = V ? V.size[1] / V.size[0] : 1;
+          r.outer.x = hero.x; r.outer.y = hero.y - (j ? 46 : 8) * hero.scale;
+          r.sp.scale.set(R / (V ? V.size[0] : 256), R / (V ? V.size[0] : 256) / circ);   // make the painted ellipse round...
+          r.outer.scale.set(1, .42 * circ * (j ? 1.15 : 1));                          // ...spin it, then lay it on the ground
+          r.sp.rotation = -sw.t * 13 * dir + j * 1.3;
+          r.outer.alpha = Math.sin(k * Math.PI) * (j ? .35 : .6);
+        });
         if (Math.random() < .5) particle({ tex: FX.drop, add: false, x: hero.x + rand(-70, 70) * sc, y: hero.y - rand(10, 50) * hero.scale, tint: 0x9fe8ff, s0: .45, s1: .1, life: .5, vy: -60, g: 260 });
         return true;
       };
@@ -965,7 +990,8 @@ function iconCanvas(kind) {
 }
 const hotbar = $("hotbar");
 SKILLS.forEach((S, i) => {
-  const b = document.createElement("button"); b.className = "slot"; b.id = "slot-" + S.id; b.style.backgroundImage = `url(${iconCanvas(S.icon)})`;
+  const b = document.createElement("button"); b.className = "slot"; b.id = "slot-" + S.id;
+  b.style.backgroundImage = `url(${man.icons && man.icons[S.icon] ? A + man.icons[S.icon] : iconCanvas(S.icon)})`;
   b.title = `${S.name} — ${S.th}${S.cost ? ` (MP ${S.cost})` : ""}`; b.setAttribute("aria-label", b.title);
   b.innerHTML = `<span class="cd"></span>${S.cost ? `<span class="cost">${S.cost}</span>` : ""}<span class="key">${i + 1}</span>`;
   b.addEventListener("pointerdown", e => { e.stopPropagation(); useSkill(i); });
@@ -1012,7 +1038,7 @@ function updateHud(dt) {
 /* ------------------------------------------------------------------ main loop */
 function updateCamera(dt) {
   const sw = app.screen.width, sh = app.screen.height;
-  cam.zoom = clamp(Math.max(sw / 1000, sh / 560), .6, 2.2);
+  cam.zoom = clamp(Math.max(sw / 1000, sh / 560) * CAM_WIDE, .5, 1.6);   // owner: wider view (v0.3: x0.72)
   const vw = sw / cam.zoom, vh = sh / cam.zoom;
   const tx = clamp(hero.x, vw / 2, Math.max(vw / 2, MAP_W - vw / 2)), ty = clamp(hero.y - 40, vh / 2, Math.max(vh / 2, MAP_H - vh / 2));
   const k = 1 - Math.pow(.02, dt); cam.x = lerp(cam.x, vw >= MAP_W ? MAP_W / 2 : tx, k); cam.y = lerp(cam.y, vh >= MAP_H ? MAP_H / 2 : ty, k);

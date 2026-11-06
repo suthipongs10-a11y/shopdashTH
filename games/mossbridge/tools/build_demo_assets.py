@@ -69,6 +69,11 @@ def trim(name, out, pad=10):
 def main():
     os.makedirs(OUT, exist_ok=True)
     man = {"hero": hero_parts(), "mobs": {}}
+    try:  # keep what tools/build_fx_assets.py added (effects + icons)
+        old = json.load(open(os.path.join(OUT, "manifest.json"), encoding="utf-8"))
+        man.update({k: old[k] for k in ("fx", "icons") if k in old})
+    except (OSError, ValueError):
+        pass
     man["mobs"]["sproutling"] = trim("mob_sproutling.png", "mob_sproutling.png")
     man["mobs"]["mossback"] = trim("mob_mossback.png", "mob_mossback.png")
     src = os.path.join(ROOT, "art", "reference", "02_environment_full.jpg")
