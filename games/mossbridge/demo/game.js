@@ -1,11 +1,10 @@
 /* Mossbridge demo — one hero, one town map, sproutling slimes and the Mossback Boar.
  *
- * Rendering: PixiJS 7. Every character is ONE painted image per view, animated by
- * deforming a mesh (SimplePlane) every frame — the Spine-style approach that keeps
- * AI-painted art perfectly consistent while still moving smoothly. The hero is painted
- * in separate parts (tools/build_kaelrin_parts.py): a headless body (the mesh), a head
- * sprite pinned to the deformed neck (headgear will sit on it), and a weapon sprite
- * pinned to the deformed right fist so it can swing freely.
+ * Rendering: PixiJS 7. The hero is a cutout rig (rig.js + rigs/kaelrin.json): pieces cut from
+ * the painted headless body, each a mesh skinned to bones, legs on 2-bone IK with feet planted
+ * in the world, a head mesh on the neck (headgear will sit on it) and the weapon in the right
+ * fist. Monsters are still ONE painted image per view, animated by deforming a mesh
+ * (SimplePlane) every frame. Both keep the AI-painted art perfectly consistent.
  *
  * Coordinates: world = pixels of the map painting (1672 x 941). Actors use a fake
  * perspective scale (smaller near the top of the painting) to match the art.
@@ -39,8 +38,9 @@ stageEl.appendChild(app.view);
 await Promise.race([Promise.all([document.fonts.load('500 15px Mitr'), document.fonts.load('600 24px Mitr')]).catch(() => {}), new Promise(r => setTimeout(r, 2500))]);
 PIXI.Assets.setPreferences({ preferWorkers: false });
 const man = await (await fetch(A + "manifest.json")).json();
+const RIG = await (await fetch("rigs/kaelrin.json")).json();   // hero skeleton + cut pieces (rig.js)
 const urls = [A + man.map.file];
-for (const v of Object.values(man.hero)) urls.push(A + v.body, A + v.head, A + v.weapon);
+for (const v of Object.values(RIG.views)) urls.push(A + v.atlas, A + v.head.file, A + v.weapon.file);
 for (const m of Object.values(man.mobs)) urls.push(A + m.file);
 const T = await PIXI.Assets.load([...new Set(urls)]);
 const tex = f => T[A + f];
@@ -293,14 +293,7 @@ class MeshActor {
 }
 
 /* ------------------------------------------------------------------ hero */
-// per view rig landmarks in texture pixels (320x320, feet at 160,300). split = x between the
-// legs, hipY = just above the crotch. neckY comes from the manifest (top of the neck stump).
-const RIG = {
-  sw: { s: -1, fwd: [-.8, .6], hipY: 222, split: 128 },
-  se: { s: 1, fwd: [.8, .6], hipY: 222, split: 192 },
-  w:  { s: -1, fwd: [-1, .05], hipY: 224, split: 148 },
-  ne: { s: 1, fwd: [.8, -.6], hipY: 226, split: 125 },
-};
+// legacy clip channels (attacks / skills); Hero.legacyPose() maps them onto the rig
 const POSE0 = { air: 0, bob: 0, lean: 0, squash: 1, raise: 0, reachF: 0, reachU: 0, head: 0, legA: 0, legB: 0, liftA: 0, liftB: 0, step: 0, spin: 0 };
 
 function keys(list) { // keyframe clip -> (t) => pose ; each key {t, ease?, ...params}
@@ -351,111 +344,117 @@ const CLIPS = {
   hurt: { dur: .3, hits: [], pose: keys([{ t: 0 }, { t: .06, lean: -.2, squash: .92, raise: .5, head: -.12, ease: easeOut }, { t: .3 }]) },
 };
 
-class Hero extends MeshActor {
+// facing -> [painted view, mirrored]. E and NW are the W and NE paintings flipped.
+const FACING = { sw: ["sw", false], se: ["se", false], w: ["w", false], e: ["w", true], ne: ["ne", false], nw: ["ne", true] };
+const WALK_SPEED = 130, RUN_SPEED = 300;            // view px / s (world speed = this x depthScale)
+const AlphaFilter = PIXI.AlphaFilter || PIXI.filters.AlphaFilter;
+
+/* Kaelrin: a cutout rig (rig.js + rigs/kaelrin.json). Locomotion (idle, walk, run, start, stop,
+   turn) comes from MossRig.Locomotion with feet planted in the world. Attacks and skills still use
+   the keyframe CLIPS above; legacyPose() maps their values onto the rig (rebuilt in backlog 3). */
+class Hero {
   constructor() {
-    const v = man.hero.sw;
-    super(tex(v.body), 22, 22, v.feet);
-    this.head = new PIXI.Sprite(tex(v.head)); this.root.addChild(this.head);
-    this.weapon = new PIXI.Sprite(tex(v.weapon)); this.root.addChild(this.weapon);
-    this.view = "sw"; this.setView("sw");
+    this.root = new PIXI.Container();
+    this.shadow = new PIXI.Graphics(); this.shadow.beginFill(0x0d1406, .35); this.shadow.drawEllipse(0, 0, 50, 15); this.shadow.endFill();
+    this.body = new PIXI.Container();
+    this.root.addChild(this.shadow, this.body);
+    actorLayer.addChild(this.root);
+    this.flash = new PIXI.ColorMatrixFilter(); this.flashAmt = 0; this.flashTint = false;
+    this.views = {}; this.cur = null; this.fade = null; this.key = null;
+    this.loco = new MossRig.Locomotion(RIG);
+    this.springs = { hair: new MossRig.Spring(110, 7, .8, 12), scarf: new MossRig.Spring(170, 12, .45, 5) };
+    this.x = 640; this.y = 720; this.flip = false; this.lastSide = -1; this.scale = depthScale(this.y);
+    this.setFacing("sw");
     this.trail = new Trail();
-    this.x = 640; this.y = 720; this.maxHp = 9842; this.hp = 9842; this.maxMp = 1620; this.mp = 1620;
-    this.phase = 0; this.walkW = 0; this.time = 0; this.path = []; this.lastSide = -1;
-    this.action = null; this.actionW = 0; this.blendOut = 0; this.lastPose = { ...POSE0 };
-    this.target = null; this.combo = 0; this.comboTimer = 0; this.prevStep = 0; this.invuln = 0; this.repathT = 0;
+    this.maxHp = 9842; this.hp = 9842; this.maxMp = 1620; this.mp = 1620; this.dead = false;
+    this.time = 0; this.path = []; this.speedCur = 0; this.runMode = true;
+    this.action = null; this.target = null; this.combo = 0; this.comboTimer = 0; this.prevStep = 0; this.invuln = 0; this.repathT = 0;
     this.name = "Kaelrin";
   }
-  setView(v) {
-    if (this.viewSet === v) return; this.viewSet = v;
-    const m = man.hero[v];
-    this.plane.texture = tex(m.body); this.setRest(tex(m.body));
-    this.head.texture = tex(m.head);
-    this.head.anchor.set(m.headPivot[0] / tex(m.head).width, m.headPivot[1] / tex(m.head).height);
-    this.neck = m.neck;
-    this.weapon.texture = tex(m.weapon);
-    this.weapon.anchor.set(m.weaponGrip[0] / tex(m.weapon).width, m.weaponGrip[1] / tex(m.weapon).height);
-    this.grip = m.grip; this.rig = { ...RIG[v], neckY: m.neck[1] };
-    // the weapon is painted blade-down; each view holds it at a resting angle
-    const a0 = m.weaponAngle * Math.PI / 180, tx = m.weaponTip[0] - m.weaponGrip[0], ty = m.weaponTip[1] - m.weaponGrip[1];
-    this.weaponAngle = a0; this.tipLocal = [tx * Math.cos(a0) - ty * Math.sin(a0), tx * Math.sin(a0) + ty * Math.cos(a0)];
+  rigView(key) {
+    if (!this.views[key]) {
+      const [v, flip] = FACING[key], V = RIG.views[v];
+      const rv = new MossRig.RigView(RIG, v, { atlas: tex(V.atlas), head: tex(V.head.file), weapon: tex(V.weapon.file) }, flip);
+      rv.container.visible = false; this.body.addChild(rv.container); this.views[key] = rv;
+    }
+    return this.views[key];
   }
+  setFacing(key) {
+    if (key === this.key) return;
+    const prev = this.cur;
+    this.key = key; [this.view, this.flip] = FACING[key];
+    if (this.fade) this.endFade();
+    this.cur = this.rigView(key); this.cur.container.visible = true;
+    const V = RIG.views[this.view]; this.rig = { s: Math.sign(V.fwd[0]) || 1, fwd: V.fwd };
+    if (prev && prev !== this.cur) {                 // turn: 70 ms cross-fade + a small squash (motion.turn)
+      prev.af = prev.af || new AlphaFilter(1); this.cur.af = this.cur.af || new AlphaFilter(0);
+      prev.af.alpha = 1; this.cur.af.alpha = 0;
+      prev.container.filters = [prev.af]; this.cur.container.filters = [this.cur.af];
+      this.fade = { from: prev, t: 0, dur: .07 };
+      this.loco.trigger("turn");
+    }
+  }
+  endFade() { const f = this.fade; if (!f) return; f.from.container.visible = false; f.from.container.filters = null; this.cur.container.filters = null; this.fade = null; }
   face(dx, dy) {
     if (Math.abs(dx) < .01 && Math.abs(dy) < .01) return;
     const a = Math.atan2(dy, dx) * 180 / Math.PI; // screen angle
     if (Math.abs(dx) > .2 * Math.hypot(dx, dy)) this.lastSide = Math.sign(dx);
-    let view, flip = false;
-    if (a > -22.5 && a <= 22.5) { view = "w"; flip = true; }
-    else if (a > 22.5 && a <= 67.5) view = "se";
-    else if (a > 67.5 && a <= 112.5) view = this.lastSide > 0 ? "se" : "sw";
-    else if (a > 112.5 && a <= 157.5) view = "sw";
-    else if (a > 157.5 || a <= -157.5) view = "w";
-    else if (a > -157.5 && a <= -112.5) { view = "ne"; flip = true; }
-    else if (a > -112.5 && a <= -67.5) { view = "ne"; flip = this.lastSide < 0; }
-    else view = "ne";
-    this.view = view; this.flip = flip; this.setView(view);
+    let key;
+    if (a > -22.5 && a <= 22.5) key = "e";
+    else if (a > 22.5 && a <= 67.5) key = "se";
+    else if (a > 67.5 && a <= 112.5) key = this.lastSide > 0 ? "se" : "sw";
+    else if (a > 112.5 && a <= 157.5) key = "sw";
+    else if (a > 157.5 || a <= -157.5) key = "w";
+    else if (a > -157.5 && a <= -112.5) key = "nw";
+    else if (a > -112.5 && a <= -67.5) key = this.lastSide < 0 ? "nw" : "ne";
+    else key = "ne";
+    this.setFacing(key);
   }
   /* world-space facing unit vector (used for lunges and dash) */
   facingVec() { const f = this.rig.fwd; const sx = this.flip ? -1 : 1; const l = Math.hypot(f[0], f[1]); return [f[0] * sx / l, f[1] / l]; }
-  play(name, opts = {}) { this.action = { name, clip: CLIPS[name], t: 0, fired: 0, ...opts }; this.prevStep = 0; this.blendOut = 0; }
+  play(name, opts = {}) { this.action = { name, clip: CLIPS[name], t: 0, fired: 0, ...opts }; this.prevStep = 0; }
   busy() { return this.action && this.action.t < this.action.clip.dur; }
-
-  locoPose(dt, speed) {
-    const target = speed > 5 ? 1 : 0;
-    this.walkW = lerp(this.walkW, target, 1 - Math.pow(.0001, dt));
-    const ph = this.phase, t = this.time, w = this.walkW;
-    const breathe = Math.sin(t * 2.3);
-    const idle = { ...POSE0, squash: 1 + breathe * .012, bob: breathe * .8, raise: .06 * Math.sin(t * 1.1), head: .015 * Math.sin(t * 1.1 + 1) };
-    const s = Math.sin(ph), c = Math.cos(ph);
-    const walk = { ...POSE0, legA: s * 19, legB: -s * 19, liftA: Math.max(0, c) * 12, liftB: Math.max(0, -c) * 12,
-      bob: 3.2 * (1 + Math.cos(2 * ph)), lean: .09 + Math.sin(ph) * .035, raise: .2 + s * .22, squash: 1 - .025 * Math.cos(2 * ph), head: Math.sin(2 * ph - .8) * .035, reachF: -s * 5, reachU: Math.abs(s) * 2 };
-    const out = {}; for (const k in POSE0) out[k] = lerp(idle[k], walk[k], w); return out;
+  setFlash(a) {
+    this.flashAmt = a;
+    if (a <= .01) { this.body.filters = null; this.flashTint = false; return; }
+    this.flash.matrix = this.flashTint
+      ? [1, 0, 0, 0, a * .6, 0, 1 - a * .5, 0, 0, 0, 0, 0, 1 - a * .5, 0, 0, 0, 0, 0, 1, 0]     // hurt: red
+      : [1 - a * .2, 0, 0, 0, a * .9, 0, 1 - a * .2, 0, 0, a * .9, 0, 0, 1 - a * .2, 0, a * .9, 0, 0, 0, 1, 0];
+    if (!this.body.filters) this.body.filters = [this.flash];
   }
+  place() { const s = depthScale(this.y); this.scale = s; this.root.x = this.x; this.root.y = this.y; this.root.zIndex = this.y; this.root.scale.set(s, s); }
 
-  /* deform one vertex (texture coords) */
-  deform(x, y, P, handW) {
-    const R = this.rig, F = this.feet, fwd = R.fwd;
-    // legs
-    if (y > R.hipY - 12) {
-      const t = smooth(R.hipY - 12, F[1], y), side = smooth(R.split - 16, R.split + 16, x);
-      const step = lerp(P.legA, P.legB, side), lift = lerp(P.liftA, P.liftB, side);
-      x += fwd[0] * step * t; y += fwd[1] * step * t * .6 - lift * Math.sin(t * Math.PI * .9);
-    }
-    // upper body: lean around the hip, head tilt around the neck
-    const u = smooth(R.hipY + 10, R.hipY - 24, y);
-    if (u > 0) {
-      const hx = R.split, hy = R.hipY, ang = P.lean * R.s * u;
-      const dx = x - hx, dy = y - hy, ca = Math.cos(ang), sa = Math.sin(ang);
-      x = hx + dx * ca - dy * sa; y = hy + dx * sa + dy * ca;
-      const hw = smooth(R.neckY + 6, R.neckY - 26, y);
-      if (hw > 0) {
-        const nx = hx + (R.neckY - hy) * -Math.sin(ang), ny = hy + (R.neckY - hy) * Math.cos(ang);
-        const a2 = P.head * R.s * hw, dx2 = x - nx, dy2 = y - ny, c2 = Math.cos(a2), s2 = Math.sin(a2);
-        x = nx + dx2 * c2 - dy2 * s2; y = ny + dx2 * s2 + dy2 * c2;
-      }
-    }
-    // weapon hand follows the swing
-    if (handW > 0) { x += (fwd[0] * P.reachF) * handW; y += (fwd[1] * P.reachF * .5 - P.reachU) * handW; }
-    // bob (feet stay planted) + squash & stretch around the feet
-    const legT = y > R.hipY ? smooth(R.hipY, F[1], y) : 0;
-    y -= P.bob * (1 - legT * .85);
-    const sq = P.squash, sx = 1 + (1 - sq) * .7;
-    x = F[0] + (x - F[0]) * sx; y = F[1] + (y - F[1]) * sq;
-    return [x, y - P.air];
+  /* the old clip values (POSE0) expressed as rig channels */
+  legacyPose(ap) {
+    const sk = this.cur.skel, s = this.rig.s, fw = sk.fwd, hand = RIG.views[this.view].weapon.hand, off = hand === "R" ? "L" : "R";
+    const a = sk.J0.ankleL[0] < sk.J0.ankleR[0] ? "L" : "R", b = a === "L" ? "R" : "L";   // legA = left leg of the painting
+    const P = { air: ap.air, squash: ap.squash, bodyU: -2.2 + ap.bob, lean: ap.lean, head: ap.head, weaponTop: 1,
+      weaponRot: -s * ap.raise + ap.lean * s * .6 + (ap.spin || 0) * s };
+    P["arm" + hand + "ReachF"] = ap.reachF; P["arm" + hand + "ReachU"] = ap.reachU; P["arm" + off + "Swing"] = -ap.lean * 1.2;
+    P["foot" + a + "X"] = fw[0] * ap.legA; P["foot" + a + "Y"] = fw[1] * ap.legA; P["foot" + a + "Lift"] = ap.liftA * .8;
+    P["foot" + b + "X"] = fw[0] * ap.legB; P["foot" + b + "Y"] = fw[1] * ap.legB; P["foot" + b + "Lift"] = ap.liftB * .8;
+    return MossRig.pose(P);
   }
 
   update(dt) {
     this.time += dt; this.invuln -= dt; this.comboTimer -= dt;
     if (this.comboTimer < 0) this.combo = 0;
-    // movement
-    let speed = 0;
-    const busy = this.busy();
+    const busy = this.busy(), sc = depthScale(this.y);
+    // movement: speed up over ~0.12 s, slow down before the end of the path (run start / stop)
+    const px = this.x, py = this.y, vmax = (this.runMode ? RUN_SPEED : WALK_SPEED) * sc;
+    let want = 0;
     if (!busy && !this.dead && this.path.length) {
-      const [tx, ty] = this.path[0], dx = tx - this.x, dy = ty - this.y, d = Math.hypot(dx, dy);
-      const v = 300 * depthScale(this.y) * dt;
-      if (d <= v) { this.x = tx; this.y = ty; this.path.shift(); }
-      else { this.x += dx / d * v; this.y += dy / d * v; this.face(dx, dy); }
-      speed = v / dt; this.phase += (v / depthScale(this.y)) / 92 * TAU;
+      let rem = 0, ax = this.x, ay = this.y; for (const [tx, ty] of this.path) { rem += Math.hypot(tx - ax, ty - ay); ax = tx; ay = ty; }
+      want = Math.min(vmax, Math.sqrt(2 * (vmax / .14) * rem) + vmax * .15);
     }
+    this.speedCur = want > this.speedCur ? Math.min(want, this.speedCur + vmax / .12 * dt) : want;
+    let mv = this.speedCur * dt;
+    while (mv > 1e-6 && this.path.length && !busy && !this.dead) {
+      const [tx, ty] = this.path[0], dx = tx - this.x, dy = ty - this.y, d = Math.hypot(dx, dy);
+      if (d <= mv) { this.x = tx; this.y = ty; this.path.shift(); mv -= d; if (d > .5) this.face(dx, dy); }
+      else { this.x += dx / d * mv; this.y += dy / d * mv; this.face(dx, dy); mv = 0; }
+    }
+    const idt = 1 / Math.max(dt, 1e-4), mvx = (this.x - px) * idt, mvy = (this.y - py) * idt;
     // combat: chase + auto attack
     if (this.target && !this.dead) {
       const m = this.target;
@@ -470,51 +469,44 @@ class Hero extends MeshActor {
         }
       }
     }
-    // pose
-    const loco = this.locoPose(dt, speed);
-    let P = loco;
+    // action clip (attacks / skills / hurt)
+    let ap = null, w = 0;
     if (this.action) {
       const a = this.action; a.t += dt;
       const clipT = Math.min(a.t, a.clip.dur);
-      const ap = a.clip.pose(clipT);
+      ap = a.clip.pose(clipT);
       while (a.fired < a.clip.hits.length && clipT >= a.clip.hits[a.fired]) { onHit(this, a, a.fired); a.fired++; }
       if (a.onUpdate) a.onUpdate(clipT, dt);
-      // lunge along facing
-      const dStep = ap.step - this.prevStep; this.prevStep = ap.step;
-      if (dStep) { const [fx, fy] = this.facingVec(), sc = depthScale(this.y); const nx = this.x + fx * dStep * sc * 1.6, ny = this.y + fy * dStep * sc * 1.1; if (walkable(nx, ny)) { this.x = nx; this.y = ny; } }
-      const inW = clamp(a.t / .06, 0, 1);
-      let w = inW;
+      const dStep = ap.step - this.prevStep; this.prevStep = ap.step;        // lunge along facing
+      if (dStep) { const [fx, fy] = this.facingVec(), s2 = depthScale(this.y); const nx = this.x + fx * dStep * s2 * 1.6, ny = this.y + fy * dStep * s2 * 1.1; if (walkable(nx, ny)) { this.x = nx; this.y = ny; } }
+      w = clamp(a.t / .06, 0, 1);
       if (a.t > a.clip.dur) { w = 1 - clamp((a.t - a.clip.dur) / .12, 0, 1); if (w <= 0) { this.action = null; if (a.onEnd) a.onEnd(); } }
-      P = {}; for (const k in POSE0) P[k] = lerp(loco[k], ap[k], w);
     }
+    // pose = locomotion (feet planted in the world) blended with the action
+    const loco = this.loco.update({ dt, x: this.x, y: this.y, vx: mvx, vy: mvy, s: depthScale(this.y), flip: this.flip, skel: this.cur.skel, lock: w });
+    const P = ap && w > 0 ? MossRig.blendPose(loco, this.legacyPose(ap), w) : loco;
     this.pose = P;
-    // mesh
-    const g = this.grip, sig = 26;
-    this.writeVerts((x, y) => { const dx = x - g[0], dy = y - g[1]; return this.deform(x, y, P, Math.exp(-(dx * dx + dy * dy) / (2 * sig * sig))); });
-    // weapon: grip follows the deformed hand, rotation = raise (+ spin) and body lean
-    const gp = this.deform(g[0], g[1], P, 1);
-    this.weapon.x = gp[0] - this.feet[0]; this.weapon.y = gp[1] - this.feet[1];
-    const rot = -this.rig.s * P.raise + P.lean * this.rig.s * .6 + (P.spin || 0) * this.rig.s;
-    this.weapon.rotation = this.weaponAngle + rot;
-    // head: pinned to the deformed neck, turns with the upper body lean + head tilt, squashes with the body
-    const np = this.deform(this.neck[0], this.neck[1], P, 0);
-    this.head.x = np[0] - this.feet[0]; this.head.y = np[1] - this.feet[1];
-    this.head.rotation = (P.lean + P.head) * this.rig.s;
-    this.head.scale.set(1 + (1 - P.squash) * .7, P.squash);
+    // draw the rig (+ the previous facing while cross-fading); hair / scarf springs lag behind the neck
+    const sxs = this.flip ? -1 : 1, hd = this.springs.hair.d, sd = this.springs.scarf.d;
+    const spr = { hair: [hd[0] * sxs, hd[1]], scarf: [sd[0] * sxs, sd[1]] };
+    const res = this.cur.update(P, spr);
+    if (this.fade) {
+      const f = this.fade; f.t += dt; const k = clamp(f.t / f.dur, 0, 1);
+      f.from.update(P, spr); f.from.af.alpha = 1 - k; this.cur.af.alpha = k;
+      if (k >= 1) this.endFade();
+    }
+    const O = this.cur.skel.origin, anchor = [this.x / .45 + (res.J.neck[0] - O[0]) * sxs, this.y / .45 + res.J.neck[1] - O[1]];
+    this.springs.hair.update(dt, anchor); this.springs.scarf.update(dt, anchor);
     // shadow shrinks while airborne
     const air = clamp(P.air / 90, 0, 1); this.shadow.scale.set(1 - air * .45, 1 - air * .45); this.shadow.alpha = 1 - air * .5;
     this.place();
-    this.setFlash(Math.max(0, this.flashAmt - dt * 5));
-    this.head.filters = this.plane.filters;
+    if (this.flashAmt > 0) this.setFlash(Math.max(0, this.flashAmt - dt * 5));
     // trail from the blade tip (world coords)
-    const tipX = this.tipLocal[0] * Math.cos(rot) - this.tipLocal[1] * Math.sin(rot) + this.weapon.x;
-    const tipY = this.tipLocal[0] * Math.sin(rot) + this.tipLocal[1] * Math.cos(rot) + this.weapon.y;
-    const midX = this.tipLocal[0] * .5 * Math.cos(rot) - this.tipLocal[1] * .45 * Math.sin(rot) + this.weapon.x;
-    const midY = this.tipLocal[0] * .5 * Math.sin(rot) + this.tipLocal[1] * .5 * Math.cos(rot) + this.weapon.y;
-    const sx = this.flip ? -this.scale : this.scale;
-    this.tipWorld = [this.x + tipX * sx, this.y + tipY * this.scale];
+    const toWorld = p => [this.x + (p[0] - O[0]) * sxs * this.scale, this.y + (p[1] - O[1]) * this.scale];
+    const tip = toWorld(this.cur.weaponTip(1)), mid = toWorld(this.cur.weaponTip(.5));
+    this.tipWorld = tip;
     this.trail.on = !!(this.action && this.action.t < this.action.clip.dur && this.action.kind !== "cast");
-    this.trail.push(this.x + tipX * sx, this.y + tipY * this.scale, this.x + midX * sx, this.y + midY * this.scale);
+    this.trail.push(tip[0], tip[1], mid[0], mid[1]);
     this.trail.update(dt);
   }
 }
@@ -800,7 +792,7 @@ function hurtHero(amount, src, dir) {
   if (hero.hp <= 0) {
     hero.hp = 0; hero.dead = true; hero.target = null; hero.path = [];
     banner("คุณหมดสติ", "กำลังกลับไปที่จัตุรัส Mossbridge…");
-    later(3, () => { hero.dead = false; hero.hp = hero.maxHp; hero.mp = hero.maxMp; hero.x = 640; hero.y = 720; hero.invuln = 2; hero.root.alpha = 1; ring(hero.x, hero.y, { tint: 0x8ff5e4, s1: 1.4, life: .8 }); });
+    later(3, () => { hero.dead = false; hero.hp = hero.maxHp; hero.mp = hero.maxMp; hero.x = 640; hero.y = 720; hero.loco.reset(); hero.invuln = 2; hero.root.alpha = 1; ring(hero.x, hero.y, { tint: 0x8ff5e4, s1: 1.4, life: .8 }); });
   }
 }
 
@@ -891,12 +883,9 @@ function useSkill(i) {
 }
 function nearestMob(r) { let best = null, bd = r; for (const m of mobs) { if (m.dead) continue; const d = Math.hypot(m.x - hero.x, (m.y - hero.y) * 1.25); if (d < bd) { bd = d; best = m; } } return best; }
 function ghost(h) {
-  const s = new PIXI.Container();
-  const body = new PIXI.Sprite(h.plane.texture); body.anchor.set(h.feet[0] / h.w, h.feet[1] / h.h);
-  const head = new PIXI.Sprite(h.head.texture); head.anchor.copyFrom(h.head.anchor);
-  head.position.copyFrom(h.head.position); head.rotation = h.head.rotation; head.scale.copyFrom(h.head.scale);
-  for (const p of [body, head]) { p.tint = 0x6ff0e0; p.blendMode = PIXI.BLEND_MODES.ADD; s.addChild(p); }
-  s.x = h.x; s.y = h.y; s.scale.set(h.flip ? -h.scale : h.scale, h.scale); s.alpha = .5;
+  const s = new PIXI.Container(), snap = h.cur.snapshot();
+  for (const m of snap.children) { m.tint = 0x6ff0e0; m.blendMode = PIXI.BLEND_MODES.ADD; }
+  s.addChild(snap); s.x = h.x; s.y = h.y; s.scale.set(h.scale); s.alpha = .5;
   actorLayer.addChild(s); s.zIndex = h.y - 1;
   effects.push({ t: 0, update(dt) { this.t += dt; s.alpha = .5 * (1 - this.t / .3); if (this.t > .3) { s.destroy({ children: true }); return false; } return true; } });
 }
@@ -945,6 +934,7 @@ addEventListener("keydown", e => {
   if (n !== undefined) useSkill(n);
   if (e.code === "Space") { e.preventDefault(); const m = nearestMob(420); if (m) hero.target = m; }
   if (e.code === "KeyG") debugWalk.visible = !debugWalk.visible;
+  if (e.code === "KeyR" && !e.repeat) { hero.runMode = !hero.runMode; log(`<span class="w">[ระบบ] ${hero.runMode ? "วิ่ง" : "เดิน"}</span>`); }
   if (/^Arrow/.test(e.code)) e.preventDefault();
 });
 addEventListener("keyup", e => keysDown.delete(e.code));
@@ -1059,10 +1049,6 @@ function frame(rdtIn) {
   updateCamera(rdt); updateHud(rdt);
 }
 app.ticker.add(() => frame(app.ticker.deltaMS / 1000));
-
-// hero hurt flash should be red, not white: tint via the filter matrix
-const baseSetFlash = hero.setFlash.bind(hero);
-hero.setFlash = a => { if (!hero.flashTint) return baseSetFlash(a); hero.flashAmt = a; if (a <= .01) { hero.plane.filters = null; hero.flashTint = false; return; } hero.flash.matrix = [1, 0, 0, 0, a * .6, 0, 1 - a * .5, 0, 0, 0, 0, 0, 1 - a * .5, 0, 0, 0, 0, 0, 1, 0]; if (!hero.plane.filters) hero.plane.filters = [hero.flash]; };
 
 log(`<span class="w">[World] Minae: LFM Mossback (2/4), any role!</span>`);
 log(`<span class="g">[Guild] Riven: Bridge looks clear on west side.</span>`);

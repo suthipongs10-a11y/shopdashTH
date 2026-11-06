@@ -4,11 +4,14 @@
   "description": "Mossbridge MMORPG prototype (separate from ShopDash)",
   "scripts": {
     "serve": "python3 -m http.server 8000 --directory demo",
+    "qa:serve": "node tools/qa/serve.js 8000",
     "qa:frames": "node tools/qa/frames.js",
     "qa:sheet": "python3 tools/qa/sheet.py",
     "qa:sim": "node tools/qa/sim.js",
     "qa:video": "node tools/qa/video.js",
-    "assets": "python3 tools/build_demo_assets.py"
+    "qa:rig": "node tools/qa/rig_check.js",
+    "assets": "python3 tools/build_demo_assets.py",
+    "rig": "python3 tools/build_kaelrin_rig.py"
   },
   "devDependencies": {
     "playwright": "1.48.2"

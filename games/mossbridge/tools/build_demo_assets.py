@@ -3,8 +3,9 @@
 build_demo_assets.py — prepare textures for demo/ from art/ (reproducible).
 
   1. Hero: Kaelrin's separate parts from art/samples/kaelrin/ (run tools/build_kaelrin_parts.py first):
-     headless body per view (mesh-deformed in the game), head per view (a sprite pinned to the
-     neck, so headgear can sit on it later) and one weapon drawn on its own (a = hook on the
+     headless body per view (the source the Rig Editor shows; the game draws the rig pieces cut
+     from it by tools/build_kaelrin_rig.py), head per view (pinned to the rig's neck, so headgear
+     can sit on it later) and one weapon drawn on its own (a = hook on the
      left, b = hook on the right when the blade points down). Per view we set where the right
      fist is on the body canvas, which weapon side shows, and the resting weapon angle.
   2. Monsters: trim the 320x320 sample canvases and record the feet anchor.
@@ -12,6 +13,7 @@ build_demo_assets.py — prepare textures for demo/ from art/ (reproducible).
   Writes demo/assets/*.png|jpg and demo/assets/manifest.json
 
 Usage (from games/mossbridge):  python3 tools/build_kaelrin_parts.py && python3 tools/build_demo_assets.py
+                                && python3 tools/build_kaelrin_rig.py   (rig pieces; reads demo/rigs/kaelrin.json)
 Requires: Pillow
 """
 import json

@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mossbridge Rig Editor</title>
+<style>
+/* Rig Editor for demo/rigs/kaelrin.json — same dark tavern look as the Headgear Lab.
+   Left: canvas (PIXI rig + 2D overlay with handles). Right: panel. Bottom: timeline + curve. */
+:root {
+  color-scheme: dark;
+  --bg: #1b1511; --panel: #271e18; --panel-2: #31261e; --line: #4b3b2e;
+  --text: #f2e5d0; --muted: #b8a287; --teal: #35b7a5; --brass: #e2a94b; --danger: #e2705a;
+  --font-display: "Mitr", "Noto Sans Thai", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 14px/1.5 var(--font-body); display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: minmax(0, 1fr) auto; height: 100vh; }
+@media (max-width: 900px) { body { grid-template-columns: minmax(0, 1fr); grid-template-rows: 60vh auto auto; height: auto; } }
+#view { position: relative; min-height: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 80%, #3c4a33 0%, #253020 55%, #1c2418 100%); }
+#stage, #overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+#overlay { touch-action: none; cursor: crosshair; }
+#tag { position: absolute; top: 10px; left: 10px; font: 500 12px var(--font-mono); background: rgba(0,0,0,.5); padding: 3px 9px; border-radius: 6px; pointer-events: none; }
+aside { grid-row: 1 / span 2; grid-column: 2; background: var(--panel); border-left: 1px solid var(--line); overflow: auto; }
+@media (max-width: 900px) { aside { grid-row: auto; grid-column: 1; border-left: 0; border-top: 1px solid var(--line); } }
+#timeline { background: var(--panel); border-top: 1px solid var(--line); padding: 8px 12px 10px; display: grid; gap: 6px; }
+h1 { font: 600 20px/1.2 var(--font-display); margin: 0; }
+h1 span { color: var(--teal); }
+h2 { font: 500 12px/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--brass); margin: 0; }
+section { padding: 12px 14px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+label { color: var(--muted); font-size: 13px; }
+select, button, input { font: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; }
+select, button { padding: 4px 10px; min-height: 32px; }
+button { cursor: pointer; }
+button:hover { border-color: var(--brass); }
+button.on { border-color: var(--teal); color: var(--teal); }
+input[type=number] { width: 76px; padding: 3px 6px; font-family: var(--font-mono); font-size: 13px; }
+input[type=range] { accent-color: var(--teal); }
+.list { display: flex; flex-wrap: wrap; gap: 4px; }
+.list button { min-height: 26px; padding: 1px 8px; font: 12px var(--font-mono); }
+.hint { color: var(--muted); font-size: 12.5px; margin: 0; }
+.warn { color: var(--brass); font-size: 12.5px; margin: 0; }
+code, .mono { font: 12px var(--font-mono); }
+#curve { width: 100%; height: 130px; display: block; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; cursor: crosshair; touch-action: none; }
+#scrub { width: 100%; }
+.sliders { display: grid; grid-template-columns: 92px minmax(0, 1fr) 52px; gap: 2px 6px; align-items: center; font: 11.5px var(--font-mono); }
+.sliders input[type=range] { width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div id="view"><div id="stage"></div><canvas id="overlay"></canvas><div id="tag"></div></div>
+
+<div id="timeline">
+  <div class="row">
+    <button id="play" title="เล่น / หยุด (Space)">⏸ หยุด</button>
+    <label>ความเร็วเล่น <select id="rate"><option value="1">1×</option><option value="0.5">0.5×</option><option value="0.25">0.25×</option><option value="0.1">0.1×</option></select></label>
+    <span class="mono" id="time">t = 0.00</span>
+    <label><input type="checkbox" id="bones" checked> กระดูก</label>
+    <label><input type="checkbox" id="prints" checked> รอยเท้า</label>
+    <span class="hint" id="trackName"></span>
+  </div>
+  <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="เลื่อนเวลา">
+  <canvas id="curve" aria-label="กราฟคีย์เฟรมของแทร็กที่เลือก"></canvas>
+  <p class="hint">กราฟ: คลิกคีย์ = เลือก • ลากคีย์ = แก้เวลา/ค่า • ดับเบิลคลิก = เพิ่มคีย์ • Delete = ลบคีย์ • คลิกที่ว่าง = เลื่อนเวลา</p>
+</div>
+
+<aside>
+  <section>
+    <h1>Rig Editor <span>Kaelrin</span></h1>
+    <div class="row">
+      <label>มุม <select id="facing"><option>sw</option><option>se</option><option>w</option><option value="e">e (กลับ w)</option><option>ne</option><option value="nw">nw (กลับ ne)</option></select></label>
+      <button id="mSetup">โครง / ชิ้นส่วน</button><button id="mAnim" class="on">ท่าทาง</button>
+    </div>
+  </section>
+
+  <section id="setupPanel" hidden>
+    <h2>จุดข้อต่อและรอยตัด</h2>
+    <p class="hint">ลากจุดขาว = ข้อต่อ • ลากจุดสี = มุมรอยตัดของชิ้นที่เลือก • Shift+คลิกบนเส้น = เพิ่มมุม • Alt+คลิก (หรือคลิกขวา) = ลบมุม • ลาก ✚ = จุดยืน (root) • ลาก ◆ = จุดจับอาวุธ • ปลายลูกศร = ทิศหน้า (fwd) / ขวา (right)</p>
+    <label>ชิ้นส่วน (แก้รอยตัดของชิ้นที่เลือก)</label>
+    <div class="list" id="slotList"></div>
+    <div class="row"><label><input type="checkbox" id="editFill"> แก้พื้นที่เติมส่วนที่ถูกบัง (fill)</label></div>
+    <div class="row"><label><input type="checkbox" id="tint" checked> ระบายสีชิ้นส่วน</label></div>
+    <div class="row mono" id="selInfo">—</div>
+    <div class="row" id="selEdit" hidden><label>x <input type="number" id="selX" step="0.5"></label><label>y <input type="number" id="selY" step="0.5"></label></div>
+    <p class="warn" id="stale" hidden>รอยตัดเปลี่ยนแล้ว: Export JSON แทนไฟล์ demo/rigs/kaelrin.json แล้วรัน <code>python3 tools/build_kaelrin_rig.py</code> เพื่อตัดชิ้นใหม่ (โหมดท่าทางยังใช้ชิ้นเดิม)</p>
+  </section>
+
+  <section id="animPanel">
+    <h2>ท่าทาง</h2>
+    <div class="row"><label>คลิป <select id="clip">
+      <option value="idle">idle (ยืน)</option><option value="walk" selected>walk (เดิน)</option><option value="run">run (วิ่ง)</option>
+      <option value="start">start (ออกตัว)</option><option value="stop">stop (หยุด)</option><option value="turn">turn (เปลี่ยนทิศ)</option>
+      <option value="pose">ท่าอิสระ (ทดสอบกระดูก)</option></select></label></div>
+    <p class="hint" id="clipHint"></p>
+    <div id="cycleParams" class="row"></div>
+    <label>แทร็ก (เลือกเพื่อแก้กราฟ)</label>
+    <div class="list" id="trackList"></div>
+    <div class="row" id="keyEdit" hidden><label>เวลา <input type="number" id="keyT" step="0.01"></label><label>ค่า <input type="number" id="keyV" step="0.01"></label><button id="keyAdd">+ คีย์ที่เวลาปัจจุบัน</button></div>
+    <p class="hint">ลากบนตัวละคร: ปลายคอ = เอนตัว (lean) • สะโพก = ยกตัว (bodyU) • หัว = เอียงหัว • มือ = แกว่งแขน • (ท่าอิสระ) เท้า = วางเท้า</p>
+    <div class="sliders" id="sliders" hidden></div>
+  </section>
+
+  <section>
+    <h2>ไฟล์</h2>
+    <div class="row"><button id="export">Export JSON</button><button id="copy">คัดลอก JSON</button><label class="hint"><input type="file" id="import" accept=".json,application/json" hidden><button id="importBtn" type="button">Import…</button></label></div>
+    <p class="hint">ไฟล์ที่ได้ใช้แทน <code>demo/rigs/kaelrin.json</code> (ข้อต่อ, รอยตัด, คลิป motion) • รอยตัดใหม่ต้องรัน build_kaelrin_rig.py</p>
+    <p class="hint" id="status"></p>
+  </section>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.4.2/pixi.min.js"></script>
+<script src="rig.js"></script>
+<script>
+(async () => {
+"use strict";
+const R = MossRig, A = "assets/", $ = id => document.getElementById(id);
+let rig = await (await fetch("rigs/kaelrin.json", { cache: "no-store" })).json();
+const FACING = { sw: ["sw", false], se: ["se", false], w: ["w", false], e: ["w", true], ne: ["ne", false], nw: ["ne", true] };
+const NEXT = { sw: "se", se: "ne", w: "sw", e: "se", ne: "nw", nw: "w" };           // turn preview target
+const COLORS = ["#ff6a5a", "#5ac8ff", "#ffd23c", "#7dff7a", "#e27aff", "#ff9a3c"];
+const cutKey = r => JSON.stringify(Object.fromEntries(Object.entries(r.views).map(([k, v]) => [k, v.slots.map(s => [s.poly, s.fill])])));
+let builtCut = cutKey(rig);
+
+/* ------------------------------------------------------------------ PIXI */
+const view = $("view"), ov = $("overlay"), og = ov.getContext("2d");
+const app = new PIXI.Application({ resizeTo: view, backgroundAlpha: 0, antialias: true, autoDensity: true, resolution: Math.min(devicePixelRatio || 1, 2) });
+$("stage").appendChild(app.view);
+const urls = new Set();
+for (const V of Object.values(rig.views)) [V.atlas, V.head.file, V.weapon.file, V.source].forEach(f => urls.add(A + f));
+const T = await PIXI.Assets.load([...urls]); const tex = f => T[A + f];
+const world = new PIXI.Container(); app.stage.addChild(world);
+const ground = new PIXI.Graphics(), shadow = new PIXI.Graphics(), heroRoot = new PIXI.Container();
+shadow.beginFill(0x0d1406, .35); shadow.drawEllipse(0, 0, 50, 15); shadow.endFill();
+heroRoot.addChild(shadow); world.addChild(ground, heroRoot);
+const srcSprite = new PIXI.Sprite(); const tintSprite = new PIXI.Sprite(); tintSprite.alpha = .45;
+const setupLayer = new PIXI.Container(); setupLayer.addChild(srcSprite, tintSprite); app.stage.addChild(setupLayer);
+
+/* ------------------------------------------------------------------ state */
+const S = { mode: "anim", facing: "sw", clip: "walk", t: 0, playing: true, rate: 1, sel: null, slot: null, track: null, key: -1, free: R.pose({}), drag: null };
+let rv = null, rvTurn = null;
+function buildViews() {
+  for (const r of [rv, rvTurn]) if (r) { heroRoot.removeChild(r.container); r.destroy(); }
+  const mk = f => { const [v, flip] = FACING[f], V = rig.views[v]; return new R.RigView(rig, v, { atlas: tex(V.atlas), head: tex(V.head.file), weapon: tex(V.weapon.file) }, flip); };
+  rv = mk(S.facing); rvTurn = mk(NEXT[S.facing]); rvTurn.container.visible = false;
+  heroRoot.addChild(rvTurn.container, rv.container);
+}
+const baseView = () => FACING[S.facing][0];
+
+/* ------------------------------------------------------------------ preview simulation
+   Every frame re-simulates the scene from its start up to S.t at 120 Hz, so scrubbing is exact and
+   planted feet stay planted (the ground dots and footprints are in world space). */
+const DT = 1 / 120;
+function scene() {
+  const M = rig.motion, c = S.clip;
+  if (c === "idle") return { dur: M.idle.dur, pre: 0, speed: () => 0, track: M.idle, domain: M.idle.dur };
+  if (c === "walk" || c === "run") return { dur: 1 / M[c].cadence, pre: 1.2, speed: () => M[c].speed, track: M[c], domain: 1, cycle: true };
+  if (c === "start") return { dur: .6, pre: .5, speed: t => (t >= 0 ? M.run.speed * Math.min(1, t / .12) : 0), track: M.start, domain: .6 };
+  if (c === "stop") return { dur: .6, pre: 1.2, speed: t => (t < 0 ? M.run.speed : 0), track: M.stop, domain: .6 };
+  if (c === "turn") return { dur: .4, pre: 1.0, speed: () => M.run.speed, track: M.turn, domain: .4, turn: true };
+  return { dur: 1, pre: 0, speed: () => 0, track: null, domain: 1, pose: true };
+}
+let sim = null;
+function simulate() {
+  const sc = scene(), loco = new R.Locomotion(rig), spr = { hair: new R.Spring(110, 7, .8, 12), scarf: new R.Spring(170, 12, .45, 5) };
+  let x = 0, y = 0, cur = rv, prints = [], last = { L: null, R: null }, P = R.pose({}), res = null, fade = 0;
+  const dirOf = f => { const V = rig.views[FACING[f][0]], s = FACING[f][1] ? -1 : 1, l = Math.hypot(V.fwd[0], V.fwd[1]); return [V.fwd[0] * s / l, V.fwd[1] / l]; };
+  let dir = dirOf(S.facing), turned = false;
+  if (sc.pose) { P = S.free; res = rv.update(P, {}); return { x, y, P, res, cur: rv, other: rvTurn, prints, fade: 1, sc }; }
+  // cycles: run the warm-up, then stop exactly at step phase S.t of the next full cycle
+  let base = null;
+  const more = (t, n) => {
+    if (n === 0) return true;
+    if (!sc.cycle) return t < S.t - 1e-9;
+    if (t < 0) return true;
+    if (base === null) base = Math.ceil(loco.phase);
+    return loco.phase < base + S.t && t < 6;
+  };
+  const end = sc.pre + S.t;
+  if (sc.track === rig.motion.idle) loco.time = 0;
+  for (let t = -sc.pre, n = 0; more(t, n); t += DT, n++) {
+    if (sc.turn && !turned && t >= 0) { turned = true; cur = rvTurn; dir = dirOf(NEXT[S.facing]); loco.trigger("turn"); spr.hair.reset(); spr.scarf.reset(); fade = t; }
+    const v = sc.speed(t), vx = dir[0] * v, vy = dir[1] * v; x += vx * DT; y += vy * DT;
+    P = loco.update({ dt: DT, x, y, vx, vy, s: 1, flip: FACING[turned ? NEXT[S.facing] : S.facing][1], skel: cur.skel, lock: 0 });
+    if (sc.track === rig.motion.idle) loco.time = Math.max(0, t);
+    res = cur.skel.solve(P);
+    const fl = FACING[turned ? NEXT[S.facing] : S.facing][1] ? -1 : 1, O = cur.skel.origin;
+    spr.hair.update(DT, [x / .45 + (res.J.neck[0] - O[0]) * fl, y / .45 + res.J.neck[1] - O[1]]); spr.scarf.update(DT, [x / .45 + (res.J.neck[0] - O[0]) * fl, y / .45 + res.J.neck[1] - O[1]]);
+    for (const s of ["L", "R"]) { const f = loco.feet[s]; if (!f.sw && (!last[s] || Math.hypot(f.w[0] - last[s][0], f.w[1] - last[s][1]) > 2)) { prints.push([f.w[0], f.w[1], s]); last[s] = f.w.slice(); } }
+  }
+  const fl = FACING[turned ? NEXT[S.facing] : S.facing][1] ? -1 : 1;
+  const sp = { hair: [spr.hair.d[0] * fl, spr.hair.d[1]], scarf: [spr.scarf.d[0] * fl, spr.scarf.d[1]] };
+  res = cur.update(P, sp);
+  const other = cur === rv ? rvTurn : rv; other.update(P, sp);
+  return { x, y, P, res, cur, other, prints: prints.slice(-10), fade: turned ? clamp01((end - sc.pre - fade) / .07) : 1, sc, loco };
+}
+const clamp01 = v => Math.max(0, Math.min(1, v));
+
+/* ------------------------------------------------------------------ transforms */
+let Z = 2, CX = 0, CY = 0;            // screen = (p - [CX,CY]) * Z + center
+function fitSetup() { const w = view.clientWidth, h = view.clientHeight; Z = Math.min(w / 200, h / 220); CX = 150; CY = 200; }
+function fitAnim() { const w = view.clientWidth, h = view.clientHeight; Z = Math.min(w / 300, h / 300); }
+const toScreen = p => [(p[0] - CX) * Z + view.clientWidth / 2, (p[1] - CY) * Z + view.clientHeight / 2];
+const toWorld = s => [(s[0] - view.clientWidth / 2) / Z + CX, (s[1] - view.clientHeight / 2) / Z + CY];
+// anim: rig view px -> world (hero at x,y, scale 1)
+const rigToWorld = (p, cur, x, y) => { const O = cur.skel.origin, f = cur.flip ? -1 : 1; return [x + (p[0] - O[0]) * f, y + (p[1] - O[1])]; };
+const worldToRig = (w, cur, x, y) => { const O = cur.skel.origin, f = cur.flip ? -1 : 1; return [O[0] + (w[0] - x) * f, O[1] + (w[1] - y)]; };
+
+/* ------------------------------------------------------------------ setup mode: partition preview */
+function partitionCanvas(vn) {
+  const V = rig.views[vn], img = tex(V.source).baseTexture.resource.source, c = document.createElement("canvas"); c.width = 320; c.height = 320;
+  const g = c.getContext("2d"), order = V.drawOrder.filter(n => V.slots.some(s => s.name === n));
+  const color = n => COLORS[V.slots.findIndex(s => s.name === n) % COLORS.length];
+  const rest = V.slots.find(s => !s.poly); if (rest) { g.fillStyle = color(rest.name); g.fillRect(0, 0, 320, 320); }
+  for (const n of order) { const s = V.slots.find(q => q.name === n); if (!s.poly) continue; g.fillStyle = color(n); g.beginPath(); s.poly.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill(); }
+  g.globalCompositeOperation = "destination-in"; g.drawImage(img, 0, 0);
+  return c;
+}
+function refreshSetup() {
+  const vn = baseView(), V = rig.views[vn];
+  srcSprite.texture = tex(V.source);
+  if (tintSprite.texture && tintSprite.texture !== PIXI.Texture.EMPTY) tintSprite.texture.destroy(true);
+  tintSprite.texture = $("tint").checked ? PIXI.Texture.from(partitionCanvas(vn)) : PIXI.Texture.EMPTY;
+  $("stale").hidden = cutKey(rig) === builtCut;
+}
+function setupHandles() {
+  const vn = baseView(), V = rig.views[vn], H = [];
+  for (const [n, p] of Object.entries(V.joints)) H.push({ kind: "joint", name: n, p, r: 6 });
+  const s = V.slots.find(q => q.name === S.slot), poly = s && ($("editFill").checked ? s.fill : s.poly);
+  if (poly) poly.forEach((p, i) => H.push({ kind: "vert", name: `${s.name}${$("editFill").checked ? ".fill" : ""}[${i}]`, p, i, poly, r: 5 }));
+  H.push({ kind: "root", name: "root", p: V.root, r: 7 });
+  H.push({ kind: "grip", name: "weapon.grip", p: V.weapon.grip, r: 6 });
+  if (V.scarf) H.push({ kind: "scarf", name: "scarf", p: V.scarf, r: 6 });
+  H.push({ kind: "vec", name: "fwd", p: [V.root[0] + V.fwd[0] * 50, V.root[1] + V.fwd[1] * 50], key: "fwd", r: 6 });
+  H.push({ kind: "vec", name: "right", p: [V.root[0] + V.right[0] * 50, V.root[1] + V.right[1] * 50], key: "right", r: 6 });
+  return H;
+}
+function drawSetup() {
+  const vn = baseView(), V = rig.views[vn];
+  setupLayer.position.set(view.clientWidth / 2 - CX * Z, view.clientHeight / 2 - CY * Z); setupLayer.scale.set(Z);
+  og.save();
+  og.lineWidth = 1.5;
+  for (const b of rig.bones) { const a = toScreen(V.joints[b.from]), c = toScreen(V.joints[b.to]); og.strokeStyle = "rgba(0,0,0,.8)"; og.lineWidth = 4; line(a, c); og.strokeStyle = "#fff"; og.lineWidth = 1.5; line(a, c); }
+  V.slots.forEach((s, i) => {
+    const col = COLORS[i % COLORS.length], on = s.name === S.slot;
+    if (s.poly) { og.strokeStyle = col; og.lineWidth = on ? 2.5 : 1; og.setLineDash([]); path(s.poly); og.stroke(); }
+    if (s.fill && (on || $("editFill").checked)) { og.strokeStyle = col; og.lineWidth = 1; og.setLineDash([4, 4]); path(s.fill); og.stroke(); og.setLineDash([]); }
+  });
+  const r = toScreen(V.root);
+  og.strokeStyle = "#ffe7a8"; og.lineWidth = 2; for (const k of ["fwd", "right"]) { const e = toScreen([V.root[0] + V[k][0] * 50, V.root[1] + V[k][1] * 50]); line(r, e); og.fillStyle = "#ffe7a8"; og.font = "12px monospace"; og.fillText(k, e[0] + 6, e[1]); }
+  if (V.scarf) { const c = toScreen(V.scarf); og.strokeStyle = "rgba(120,240,220,.7)"; og.beginPath(); og.arc(c[0], c[1], V.scarf[2] * Z, 0, 7); og.stroke(); }
+  for (const h of setupHandles()) {
+    const p = toScreen(h.p), sel = S.sel && S.sel.name === h.name;
+    og.fillStyle = h.kind === "joint" ? "#fff" : h.kind === "vert" ? COLORS[V.slots.findIndex(s => s.name === S.slot) % COLORS.length] : "#ffe7a8";
+    og.strokeStyle = sel ? "#35b7a5" : "#000"; og.lineWidth = sel ? 3 : 1.5;
+    og.beginPath();
+    if (h.kind === "vert") og.rect(p[0] - 4, p[1] - 4, 8, 8);
+    else if (h.kind === "grip") { og.moveTo(p[0], p[1] - 7); og.lineTo(p[0] + 7, p[1]); og.lineTo(p[0], p[1] + 7); og.lineTo(p[0] - 7, p[1]); og.closePath(); }
+    else if (h.kind === "root") { og.rect(p[0] - 2, p[1] - 8, 4, 16); og.rect(p[0] - 8, p[1] - 2, 16, 4); }
+    else og.arc(p[0], p[1], h.r, 0, 7);
+    og.fill(); og.stroke();
+    if (h.kind === "joint" && Z > 2) { og.fillStyle = "rgba(255,255,255,.75)"; og.font = "11px monospace"; og.fillText(h.name, p[0] + 8, p[1] - 6); }
+  }
+  og.restore();
+}
+function line(a, b) { og.beginPath(); og.moveTo(a[0], a[1]); og.lineTo(b[0], b[1]); og.stroke(); }
+function path(poly) { og.beginPath(); poly.forEach((q, i) => { const p = toScreen(q); i ? og.lineTo(p[0], p[1]) : og.moveTo(p[0], p[1]); }); og.closePath(); }
+
+/* ------------------------------------------------------------------ anim mode drawing */
+function drawAnim() {
+  sim = simulate();
+  const { x, y, res, cur, other, prints, fade } = sim;
+  CX = x; CY = y - 120;
+  world.position.set(view.clientWidth / 2 - CX * Z, view.clientHeight / 2 - CY * Z); world.scale.set(Z);
+  heroRoot.position.set(x, y);
+  cur.container.visible = true; cur.container.alpha = fade;
+  if (other) { other.container.visible = fade < 1; other.container.alpha = 1 - fade; }
+  // ground: dots every 20 px in world space (they scroll by while walking; planted feet stay on them)
+  ground.clear(); ground.beginFill(0xffffff, .16);
+  const gx0 = Math.floor((CX - 400 / Z * 2) / 20) * 20, gy0 = Math.floor((CY - 300 / Z * 2) / 20) * 20;
+  for (let gx = gx0; gx < CX + 800 / Z; gx += 20) for (let gy = gy0; gy < CY + 600 / Z; gy += 20) ground.drawCircle(gx, gy, 1.2);
+  ground.endFill();
+  if ($("prints").checked) for (const [px, py, s] of prints) { ground.beginFill(s === "L" ? 0x35b7a5 : 0xe2a94b, .35); ground.drawEllipse(px, py + 14, 10, 4); ground.endFill(); }
+  if ($("bones").checked) {
+    const J = res.J, G = res.G, P = (n) => toScreen(rigToWorld(G(J[n][0], J[n][1]), cur, x, y));
+    og.save();
+    for (const b of rig.bones) { const a = P(b.from), c = P(b.to); og.strokeStyle = "rgba(0,0,0,.7)"; og.lineWidth = 4; line(a, c); og.strokeStyle = b.name.endsWith("L") ? "#7ff0e0" : b.name.endsWith("R") ? "#ffd27a" : "#fff"; og.lineWidth = 1.5; line(a, c); }
+    for (const h of animHandles()) { const p = h.s; og.fillStyle = "#fff"; og.strokeStyle = S.drag && S.drag.h.name === h.name ? "#35b7a5" : "#000"; og.lineWidth = 2; og.beginPath(); og.arc(p[0], p[1], 6, 0, 7); og.fill(); og.stroke(); }
+    og.restore();
+  }
+}
+function animHandles() {
+  if (!sim) return [];
+  const { res, cur, x, y } = sim, J = res.J, G = res.G, P = n => toScreen(rigToWorld(G(J[n][0], J[n][1]), cur, x, y)), H = [];
+  H.push({ name: "neck", ch: "lean", s: P("neck") }, { name: "pelvis", ch: "bodyU", s: P("pelvis") });
+  const head = [J.neck[0] + Math.sin(J.headRot) * 70, J.neck[1] - Math.cos(J.headRot) * 70];
+  H.push({ name: "head", ch: "head", s: toScreen(rigToWorld(G(head[0], head[1]), cur, x, y)) });
+  for (const s of ["L", "R"]) H.push({ name: "hand" + s, ch: "arm" + s + "Swing", side: s, s: P("hand" + s) });
+  if (S.clip === "pose") for (const s of ["L", "R"]) H.push({ name: "ankle" + s, ch: "foot" + s, side: s, s: P("ankle" + s) });
+  return H;
+}
+
+/* ------------------------------------------------------------------ input on the canvas */
+ov.addEventListener("contextmenu", e => e.preventDefault());
+ov.addEventListener("pointerdown", e => {
+  const pt = [e.offsetX, e.offsetY];
+  if (S.mode === "setup") {
+    const vn = baseView(), V = rig.views[vn], H = setupHandles();
+    let best = null, bd = 12;
+    for (const h of H) { const p = toScreen(h.p), d = Math.hypot(p[0] - pt[0], p[1] - pt[1]); if (d < bd) { bd = d; best = h; } }
+    const s = V.slots.find(q => q.name === S.slot), poly = s && ($("editFill").checked ? (s.fill = s.fill || []) : s.poly);
+    if (best && best.kind === "vert" && (e.altKey || e.button === 2)) { if (best.poly.length > 3) best.poly.splice(best.i, 1); S.sel = null; changed(); return; }
+    if (!best && e.shiftKey && poly) {                // insert a corner on the nearest edge
+      const w = toWorld(pt); let bi = -1, bdist = 1e9;
+      if (poly.length < 3) { poly.push([Math.round(w[0]), Math.round(w[1])]); changed(); return; }
+      for (let i = 0; i < poly.length; i++) { const a = poly[i], b = poly[(i + 1) % poly.length]; const d = segDist(w, a, b); if (d < bdist) { bdist = d; bi = i; } }
+      poly.splice(bi + 1, 0, [Math.round(w[0]), Math.round(w[1])]); changed(); return;
+    }
+    S.sel = best; if (best) { S.drag = { h: best, start: toWorld(pt) }; ov.setPointerCapture(e.pointerId); }
+    showSel(); redraw(); return;
+  }
+  let best = null, bd = 16;
+  for (const h of animHandles()) { const d = Math.hypot(h.s[0] - pt[0], h.s[1] - pt[1]); if (d < bd) { bd = d; best = h; } }
+  if (best) { S.drag = { h: best, last: pt }; S.playing = false; syncPlay(); ov.setPointerCapture(e.pointerId); }
+});
+ov.addEventListener("pointermove", e => {
+  if (!S.drag) return;
+  const pt = [e.offsetX, e.offsetY];
+  if (S.mode === "setup") {
+    const h = S.drag.h, w = toWorld(pt).map(v => Math.round(v * 2) / 2), V = rig.views[baseView()];
+    if (h.kind === "vec") { const d = [w[0] - V.root[0], w[1] - V.root[1]], l = Math.hypot(d[0], d[1]) || 1; V[h.key] = h.key === "fwd" ? [+(d[0] / l).toFixed(3), +(d[1] / l).toFixed(3)] : [+(d[0] / 50).toFixed(3), +(d[1] / 50).toFixed(3)]; }
+    else { h.p[0] = w[0]; h.p[1] = w[1]; }
+    changed(h.kind === "vert"); showSel(); return;
+  }
+  const h = S.drag.h, d = [(pt[0] - S.drag.last[0]) / Z, (pt[1] - S.drag.last[1]) / Z]; S.drag.last = pt;
+  const cur = sim.cur, rd = [d[0] * (cur.flip ? -1 : 1), d[1]], sk = cur.skel, [da, db] = sk.dec(rd);
+  let delta = 0;
+  if (h.ch === "lean") delta = da / 80;
+  else if (h.ch === "bodyU") delta = -d[1];
+  else if (h.ch === "head") delta = (cur.flip ? -1 : 1) * d[0] / 70;
+  else if (h.ch.endsWith("Swing")) delta = da / 45;
+  if (h.ch.startsWith("foot")) { S.free["foot" + h.side + "X"] += rd[0]; S.free["foot" + h.side + "Y"] += rd[1]; }
+  else applyDelta(h.ch, delta, h.side);
+  buildSliders(); redraw();
+});
+ov.addEventListener("pointerup", () => { if (S.drag && S.mode === "setup") refreshSetup(); S.drag = null; redraw(); });
+function segDist(p, a, b) { const v = [b[0] - a[0], b[1] - a[1]], l2 = v[0] * v[0] + v[1] * v[1] || 1, t = Math.max(0, Math.min(1, ((p[0] - a[0]) * v[0] + (p[1] - a[1]) * v[1]) / l2)); return Math.hypot(p[0] - a[0] - v[0] * t, p[1] - a[1] - v[1] * t); }
+
+/* a drag on the rig changes a channel: in a clip it edits (or adds) the key at the playhead */
+function applyDelta(ch, delta, side) {
+  if (!delta) return;
+  if (S.clip === "pose") { S.free[ch] += delta; return; }
+  const sc = scene(), clip = sc.track; if (!clip) return;
+  let name = ch, t = S.t;
+  if (sc.cycle && ch.endsWith("Swing")) { name = "armSwing"; if (side === "L") t = (t + .5) % 1; delta /= (rig.motion.armScale[side] || 1); }
+  const keys = clip.tracks[name] = clip.tracks[name] || [[0, 0], [sc.cycle ? 1 : clip.dur, 0]];
+  const per = sc.cycle ? 1 : clip.loop ? clip.dur : 0;
+  let i = keys.findIndex(k => Math.abs(k[0] - t) < .012);
+  if (i < 0) { const v = R.sample(keys, t, per); keys.push([+t.toFixed(3), v]); keys.sort((a, b) => a[0] - b[0]); i = keys.findIndex(k => Math.abs(k[0] - t) < 1e-6 || k[0] === +t.toFixed(3)); }
+  keys[i][1] = +(keys[i][1] + delta).toFixed(4);
+  syncLoopEnds(keys, per, i);
+  S.track = name; S.key = i; buildTracks(); showKey();
+}
+function syncLoopEnds(keys, per, i) { if (!per) return; const n = keys.length - 1; if (i === 0 && Math.abs(keys[n][0] - per) < 1e-6) keys[n][1] = keys[0][1]; if (i === n && keys[0][0] === 0 && Math.abs(keys[n][0] - per) < 1e-6) keys[0][1] = keys[n][1]; }
+
+/* ------------------------------------------------------------------ panel */
+function showSel() {
+  const h = S.sel; $("selEdit").hidden = !h || h.kind === "vec";
+  $("selInfo").textContent = h ? `${h.name}: ${h.kind === "vec" ? rig.views[baseView()][h.key].join(", ") : h.p[0] + ", " + h.p[1]}` : "คลิกจุดเพื่อเลือก";
+  if (h && h.kind !== "vec") { $("selX").value = h.p[0]; $("selY").value = h.p[1]; }
+}
+for (const id of ["selX", "selY"]) $(id).addEventListener("input", () => { const h = S.sel; if (!h || h.kind === "vec") return; h.p[0] = +$("selX").value; h.p[1] = +$("selY").value; changed(h.kind === "vert"); refreshSetup(); showSel(); });
+function changed(cut) {
+  // joints / anchors changed: rebuild the rig views (weights are recomputed from the joints)
+  if (!cut) buildViews();
+  if (cut) $("stale").hidden = false;
+  redraw();
+}
+function buildSlots() {
+  const V = rig.views[baseView()], el = $("slotList"); el.innerHTML = "";
+  V.slots.forEach((s, i) => { const b = document.createElement("button"); b.textContent = s.name + (s.poly ? "" : " (ที่เหลือ)"); b.style.borderColor = COLORS[i % COLORS.length]; if (s.name === S.slot) b.classList.add("on"); b.disabled = !s.poly && !$("editFill").checked; b.onclick = () => { S.slot = s.name; buildSlots(); redraw(); }; el.appendChild(b); });
+}
+const HINT = {
+  idle: "ยืน: วนตามเวลา (หายใจ ≈ 1.8 วินาที) • เส้นเวลา = วินาที",
+  walk: "เดิน: เส้นเวลา = 1 รอบก้าว (0 = เท้าซ้ายเริ่มยก) • เท้าล็อกกับพื้นจริง ความยาวก้าว = ความเร็ว ÷ จังหวะ",
+  run: "วิ่ง: เหมือนเดิน แต่ช่วงลอยตัวยาวกว่า • armSwing = แขนขวา (แขนซ้ายใช้ครึ่งรอบถัดไป)",
+  start: "ออกตัว: ยืนแล้ววิ่ง ที่ t = 0 • คีย์เป็นค่าบวกเพิ่มบนท่าวิ่ง (ยาว 0.15 วินาที)",
+  stop: "หยุด: วิ่งแล้วหยุด ที่ t = 0 • คีย์เป็นค่าบวกเพิ่ม (ถ่วงตัว 0.15 วินาที)",
+  turn: "เปลี่ยนทิศ: ที่ t = 0 สลับมุมกล้อง cross-fade 70 ms + คีย์ squash",
+  pose: "ท่าอิสระ: ลากจุดบนตัว หรือเลื่อนแถบด้านล่างเพื่อทดสอบกระดูก/IK (ไม่บันทึกลงไฟล์)",
+};
+function buildTracks() {
+  const sc = scene(), el = $("trackList"); el.innerHTML = "";
+  $("clipHint").textContent = HINT[S.clip];
+  $("sliders").hidden = S.clip !== "pose"; $("keyEdit").hidden = !sc.track;
+  const cp = $("cycleParams"); cp.innerHTML = "";
+  if (sc.cycle) for (const k of ["speed", "cadence", "swing", "lift"]) {
+    const l = document.createElement("label"); l.textContent = k + " "; const i = document.createElement("input"); i.type = "number"; i.step = k === "speed" ? 5 : .01; i.value = rig.motion[S.clip][k];
+    i.oninput = () => { rig.motion[S.clip][k] = +i.value; redraw(); }; l.appendChild(i); cp.appendChild(l);
+  }
+  if (!sc.track) return;
+  const names = Object.keys(sc.track.tracks);
+  for (const n of names) { const b = document.createElement("button"); b.textContent = n; if (n === S.track) b.classList.add("on"); b.onclick = () => { S.track = n; S.key = -1; buildTracks(); showKey(); drawCurve(); }; el.appendChild(b); }
+  const add = document.createElement("select"); add.innerHTML = `<option value="">+ แทร็ก</option>` + Object.keys(R.POSE).concat(sc.cycle ? ["armSwing", "armBend"] : []).filter(n => !names.includes(n)).map(n => `<option>${n}</option>`).join("");
+  add.onchange = () => { if (!add.value) return; sc.track.tracks[add.value] = [[0, 0], [sc.cycle ? 1 : sc.track.dur, 0]]; S.track = add.value; buildTracks(); drawCurve(); };
+  el.appendChild(add);
+  $("trackName").textContent = S.track ? `แทร็ก: ${S.clip}.${S.track}` : "";
+}
+function buildSliders() {
+  const el = $("sliders"); if (el.hidden) return;
+  if (!el.children.length) {
+    for (const k of Object.keys(R.POSE)) {
+      const big = /foot.[XY]|Lift|body|air|breath|Reach/.test(k), lo = k === "squash" || k === "squashX" ? .6 : big ? -40 : -1.5, hi = k === "squash" || k === "squashX" ? 1.4 : big ? 40 : 1.5;
+      const lab = document.createElement("span"); lab.textContent = k;
+      const r = document.createElement("input"); r.type = "range"; r.min = lo; r.max = hi; r.step = (hi - lo) / 400; r.dataset.k = k;
+      const val = document.createElement("span"); val.dataset.v = k;
+      r.oninput = () => { S.free[k] = +r.value; val.textContent = (+r.value).toFixed(2); redraw(); };
+      el.append(lab, r, val);
+    }
+  }
+  for (const r of el.querySelectorAll("input")) { r.value = S.free[r.dataset.k]; el.querySelector(`[data-v="${r.dataset.k}"]`).textContent = (+S.free[r.dataset.k]).toFixed(2); }
+}
+function showKey() {
+  const sc = scene(), keys = sc.track && S.track && sc.track.tracks[S.track];
+  if (!keys || S.key < 0 || !keys[S.key]) { $("keyT").value = ""; $("keyV").value = ""; return; }
+  $("keyT").value = keys[S.key][0]; $("keyV").value = keys[S.key][1];
+}
+$("keyT").addEventListener("change", () => { const keys = curKeys(); if (!keys || S.key < 0) return; keys[S.key][0] = +$("keyT").value; const k = keys[S.key]; keys.sort((a, b) => a[0] - b[0]); S.key = keys.indexOf(k); redraw(); });
+$("keyV").addEventListener("input", () => { const keys = curKeys(); if (!keys || S.key < 0) return; keys[S.key][1] = +$("keyV").value; syncLoopEnds(keys, period(), S.key); redraw(); });
+$("keyAdd").addEventListener("click", () => addKeyAt(S.t));
+const curKeys = () => { const sc = scene(); return sc.track && S.track ? sc.track.tracks[S.track] : null; };
+const period = () => { const sc = scene(); return sc.cycle ? 1 : sc.track && sc.track.loop ? sc.track.dur : 0; };
+function addKeyAt(t) { const keys = curKeys(); if (!keys) return; const v = R.sample(keys, t, period()); const k = [+t.toFixed(3), +v.toFixed(4)]; keys.push(k); keys.sort((a, b) => a[0] - b[0]); S.key = keys.indexOf(k); showKey(); redraw(); }
+
+/* ------------------------------------------------------------------ curve + timeline */
+const cv = $("curve"), cg = cv.getContext("2d");
+let curveMap = null;
+function drawCurve() {
+  const r = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * r; cv.height = h * r; cg.setTransform(r, 0, 0, r, 0, 0);
+  cg.clearRect(0, 0, w, h);
+  const sc = scene(), dom = sc.domain, keys = curKeys(), per = period();
+  const X = t => 10 + t / dom * (w - 20);
+  cg.strokeStyle = "#4b3b2e"; cg.lineWidth = 1; for (let i = 0; i <= 10; i++) { const x = X(dom * i / 10); cg.beginPath(); cg.moveTo(x, 0); cg.lineTo(x, h); cg.stroke(); }
+  if (keys && keys.length) {
+    let lo = Infinity, hi = -Infinity; for (let i = 0; i <= 100; i++) { const v = R.sample(keys, dom * i / 100, per); lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    for (const k of keys) { lo = Math.min(lo, k[1]); hi = Math.max(hi, k[1]); }
+    if (hi - lo < 1e-3) { hi += .5; lo -= .5; } const pad = (hi - lo) * .15; lo -= pad; hi += pad;
+    const Y = v => h - 8 - (v - lo) / (hi - lo) * (h - 16);
+    cg.strokeStyle = "rgba(242,229,208,.25)"; cg.beginPath(); cg.moveTo(0, Y(0)); cg.lineTo(w, Y(0)); cg.stroke();
+    cg.strokeStyle = "#35b7a5"; cg.lineWidth = 2; cg.beginPath();
+    for (let i = 0; i <= 200; i++) { const t = dom * i / 200, x = X(t), y = Y(R.sample(keys, t, per)); i ? cg.lineTo(x, y) : cg.moveTo(x, y); }
+    cg.stroke();
+    keys.forEach((k, i) => { cg.fillStyle = i === S.key ? "#e2a94b" : "#f2e5d0"; cg.beginPath(); cg.arc(X(k[0]), Y(k[1]), i === S.key ? 6 : 4.5, 0, 7); cg.fill(); });
+    cg.fillStyle = "#b8a287"; cg.font = "11px monospace"; cg.fillText(hi.toFixed(2), 4, 12); cg.fillText(lo.toFixed(2), 4, h - 4);
+    curveMap = { X, Y, lo, hi, w, h, dom };
+  } else { cg.fillStyle = "#b8a287"; cg.font = "12px sans-serif"; cg.fillText(sc.track ? "เลือกแทร็กเพื่อดูกราฟ" : "คลิปนี้ไม่มีคีย์", 12, 22); curveMap = { X, w, h, dom }; }
+  cg.strokeStyle = "#e2a94b"; cg.lineWidth = 1.5; const px = X(S.t * (sc.cycle ? 1 : 1)); cg.beginPath(); cg.moveTo(px, 0); cg.lineTo(px, h); cg.stroke();
+}
+let cdrag = null;
+cv.addEventListener("pointerdown", e => {
+  const keys = curKeys(), m = curveMap; if (!m) return;
+  const x = e.offsetX, y = e.offsetY;
+  if (keys && m.Y) { const i = keys.findIndex(k => Math.hypot(m.X(k[0]) - x, m.Y(k[1]) - y) < 8); if (i >= 0) { S.key = i; cdrag = { i }; cv.setPointerCapture(e.pointerId); showKey(); drawCurve(); return; } }
+  setT(Math.max(0, Math.min(m.dom, (x - 10) / (m.w - 20) * m.dom))); cdrag = { scrub: true }; cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener("pointermove", e => {
+  if (!cdrag) return; const m = curveMap, keys = curKeys(), t = Math.max(0, Math.min(m.dom, (e.offsetX - 10) / (m.w - 20) * m.dom));
+  if (cdrag.scrub) { setT(t); return; }
+  const k = keys[cdrag.i], per = period(), n = keys.length - 1;
+  const endKey = per && (cdrag.i === 0 || cdrag.i === n);
+  if (!endKey) k[0] = +t.toFixed(3);
+  k[1] = +(m.lo + (m.h - 8 - e.offsetY) / (m.h - 16) * (m.hi - m.lo)).toFixed(4);
+  syncLoopEnds(keys, per, cdrag.i);
+  keys.sort((a, b) => a[0] - b[0]); cdrag.i = S.key = keys.indexOf(k); showKey(); redraw();
+});
+cv.addEventListener("pointerup", () => { cdrag = null; });
+cv.addEventListener("dblclick", e => { const m = curveMap; if (!m) return; addKeyAt(Math.max(0, Math.min(m.dom, (e.offsetX - 10) / (m.w - 20) * m.dom))); });
+addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if ((e.key === "Delete" || e.key === "Backspace") && S.key >= 0) { const keys = curKeys(); if (keys && keys.length > 2) { keys.splice(S.key, 1); S.key = -1; showKey(); redraw(); } e.preventDefault(); }
+  if (e.code === "Space") { S.playing = !S.playing; syncPlay(); e.preventDefault(); }
+});
+function setT(t) { S.t = t; $("scrub").value = Math.round(t / scene().domain * 1000); redraw(); }
+$("scrub").addEventListener("input", () => setT($("scrub").value / 1000 * scene().domain));
+$("play").addEventListener("click", () => { S.playing = !S.playing; syncPlay(); });
+function syncPlay() { $("play").textContent = S.playing ? "⏸ หยุด" : "▶ เล่น"; }
+$("rate").addEventListener("change", () => { S.rate = +$("rate").value; });
+
+/* ------------------------------------------------------------------ modes, facing, files */
+function setMode(m) {
+  S.mode = m; $("mSetup").classList.toggle("on", m === "setup"); $("mAnim").classList.toggle("on", m === "anim");
+  $("setupPanel").hidden = m !== "setup"; $("animPanel").hidden = m !== "anim"; $("timeline").hidden = m !== "anim";
+  setupLayer.visible = m === "setup"; world.visible = m === "anim";
+  if (m === "setup") { fitSetup(); refreshSetup(); buildSlots(); showSel(); } else { fitAnim(); buildViews(); buildTracks(); }
+  setTimeout(() => { resize(); redraw(); }, 0);
+}
+$("mSetup").onclick = () => setMode("setup"); $("mAnim").onclick = () => setMode("anim");
+$("facing").addEventListener("change", () => { S.facing = $("facing").value; S.sel = null; if (!rig.views[baseView()].slots.some(s => s.name === S.slot)) S.slot = null; buildViews(); if (S.mode === "setup") { refreshSetup(); buildSlots(); } redraw(); });
+$("clip").addEventListener("change", () => { S.clip = $("clip").value; S.t = 0; S.track = null; S.key = -1; buildTracks(); buildSliders(); showKey(); redraw(); });
+$("tint").addEventListener("change", () => { refreshSetup(); redraw(); });
+$("editFill").addEventListener("change", () => { buildSlots(); redraw(); });
+$("bones").addEventListener("change", redraw); $("prints").addEventListener("change", redraw);
+const fmtJSON = (o, ind = 0) => {   // same layout as tools/build_kaelrin_rig.py: point lists on one line
+  const sp = " ".repeat(ind);
+  if (Array.isArray(o)) {
+    const flat = o.every(v => typeof v !== "object" || v === null) || o.every(v => Array.isArray(v) && v.every(w => typeof w !== "object"));
+    if (flat) return JSON.stringify(o).replace(/,/g, o.length && Array.isArray(o[0]) ? "," : ", ");
+    if (o.every(v => v && typeof v === "object" && !Array.isArray(v) && JSON.stringify(v).length < 150)) return "[\n" + o.map(v => sp + "  " + JSON.stringify(v).replace(/":/g, '": ').replace(/,"/g, ', "')).join(",\n") + "\n" + sp + " ]";
+    return "[\n" + o.map(v => sp + "  " + fmtJSON(v, ind + 2)).join(",\n") + "\n" + sp + " ]";
+  }
+  if (o && typeof o === "object") { const e = Object.entries(o); if (!e.length) return "{}"; return "{\n" + e.map(([k, v]) => `${sp} ${JSON.stringify(k)}: ${fmtJSON(v, ind + 1)}`).join(",\n") + "\n" + sp + "}"; }
+  return JSON.stringify(o);
+};
+$("export").onclick = () => { const b = new Blob([fmtJSON(rig) + "\n"], { type: "application/json" }), a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "kaelrin.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); status("ดาวน์โหลด kaelrin.json แล้ว — วางแทน demo/rigs/kaelrin.json"); };
+$("copy").onclick = async () => { try { await navigator.clipboard.writeText(fmtJSON(rig) + "\n"); status("คัดลอก JSON แล้ว"); } catch { status("คัดลอกไม่ได้ (เบราว์เซอร์ไม่อนุญาต) ใช้ Export แทน"); } };
+$("importBtn").onclick = () => $("import").click();
+$("import").onchange = async () => { const f = $("import").files[0]; if (!f) return; try { const r = JSON.parse(await f.text()); if (!r.views || !r.bones || !r.motion) throw new Error("ไม่ใช่ไฟล์ rig"); rig = r; builtCut = cutKey(rig); buildViews(); setMode(S.mode); status("โหลด " + f.name + " แล้ว (ชิ้นภาพยังเป็นชุดเดิมใน assets/)"); } catch (err) { status("โหลดไม่ได้: " + err.message); } };
+function status(t) { $("status").textContent = t; }
+
+/* ------------------------------------------------------------------ loop */
+function resize() { app.resize(); const r = devicePixelRatio || 1; ov.width = view.clientWidth * r; ov.height = view.clientHeight * r; og.setTransform(r, 0, 0, r, 0, 0); if (S.mode === "setup") fitSetup(); else fitAnim(); }
+new ResizeObserver(() => { resize(); redraw(); }).observe(view);
+let dirty = true; function redraw() { dirty = true; }
+function render() {
+  og.clearRect(0, 0, view.clientWidth, view.clientHeight);
+  if (S.mode === "setup") drawSetup(); else { drawAnim(); drawCurve(); }
+  $("tag").textContent = S.mode === "setup" ? `${baseView()} — โครง (${S.facing !== baseView() ? "มุมกลับภาพแก้ที่ " + baseView() : "ภาพต้นฉบับ"})` : `${S.facing} — ${S.clip}`;
+  $("time").textContent = S.mode === "anim" ? `t = ${S.t.toFixed(2)}${scene().cycle ? " รอบ" : " s"}` : "";
+  app.render();
+}
+app.ticker.add(() => {
+  if (S.mode === "anim" && S.playing && !S.drag) {
+    const sc = scene(), adv = app.ticker.deltaMS / 1000 * S.rate / (sc.cycle ? sc.dur : 1);
+    S.t = (S.t + adv) % sc.domain; $("scrub").value = Math.round(S.t / sc.domain * 1000); dirty = true;
+  }
+  if (dirty) { dirty = false; render(); }
+});
+app.ticker.autoStart = true;
+buildViews(); setMode("anim"); syncPlay();
+window.__rigEditor = { S, get rig() { return rig; }, get rv() { return rv; }, app, setupLayer, world, redraw, render, resize, setMode, setT };   // test hook (render() draws synchronously)
+})();
+</script>
+</body>
+</html>
