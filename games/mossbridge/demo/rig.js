@@ -209,7 +209,8 @@ class Spring {
 /* ------------------------------------------------------------------ PixiJS view */
 const GRID = 8, TAU_W = 6;
 class RigView {
-  /* tex: { atlas: PIXI.Texture (whole atlas), head: PIXI.Texture, weapon: PIXI.Texture } */
+  /* tex: { atlas: PIXI.Texture (whole atlas), head, headCapped?, weapon: PIXI.Texture,
+            slots?: { slotName: { rect, pos } } (an outfit's pieces in its own atlas) } */
   constructor(rig, viewName, tex, flip = false) {
     const PIXI = global.PIXI;
     this.skel = new RigSkeleton(rig, viewName); this.V = rig.views[viewName]; this.flip = flip; this.rig = rig;
@@ -233,7 +234,8 @@ class RigView {
         this.container.addChild(this.weapon); continue;
       }
       const s = byName[name]; if (!s || !s.rect) continue;
-      this.slots[name] = this.makeSlot(s, tex.atlas);
+      const ov = tex.slots && tex.slots[name];          // an outfit: same cut, its own atlas rects
+      this.slots[name] = this.makeSlot(ov ? { ...s, ...ov } : s, tex.atlas);
       this.container.addChild(this.slots[name].mesh);
     }
     this.weaponHome = this.container.children.indexOf(this.weapon);

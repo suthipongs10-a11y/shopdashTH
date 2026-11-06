@@ -1,0 +1,50 @@
+P10 — Outfits for Kaelrin (headless body, same pose as P02A)      (3 images)
+ใช้ทำ: ระบบเปลี่ยนชุด — ตัวไม่มีหัวชุดใหม่ ท่าเดียวกับ P02A เป๊ะ เพื่อให้ตัดเป็นชิ้น rig ด้วยรอยตัดเดิมได้
+ส่งในแชทเดิมที่มี P01/P02A อยู่แล้ว (หรือแนบ P02A ไปด้วยทุกครั้ง) ส่งทีละภาพ
+ตรวจทุกภาพ: ท่าแขน/ขา/กำปั้น/เท้า ต้องทับกับ P02A ได้, NE ต้องเห็นจากด้านหลัง, ไม่มีผ้าคลุม/กระโปรงยาว/ของห้อย
+
+=====================================================================
+[P10-A] SAVE AS: P10A_outfit_ranger.png
+SIZE: 1024x1024
+
+PROMPT:
+Use my P02A image (Kaelrin's headless body) as the exact reference for pose, size and placement.
+Draw the same 4 views in the same 2x2 layout (top-left SW, top-right SE, bottom-left W, bottom-right NE),
+same scale, same pose: arms, empty fists, legs and boots exactly where they are in P02A, so this image can be laid
+over P02A and every limb lines up. Still HEADLESS with the same short neck stump and collar height.
+Only the outfit changes: "Mossbridge Ranger" — moss-green padded leather jerkin with leaf-shaped shoulder guards,
+a brown belt with a small pouch, olive trousers, tall brown boots, fingerless leather gloves, a short green neck scarf.
+Keep it close to the body: no cape, no cloak, no hood, nothing hanging below mid-thigh, no weapon.
+The bottom-right NE cell is seen from BEHIND like P02A's NE cell. No pink or magenta in the outfit.
+Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P10-B] SAVE AS: P10B_outfit_knight.png
+SIZE: 1024x1024
+
+PROMPT:
+Use my P02A image (Kaelrin's headless body) as the exact reference for pose, size and placement.
+Draw the same 4 views in the same 2x2 layout (top-left SW, top-right SE, bottom-left W, bottom-right NE),
+same scale, same pose: arms, empty fists, legs and boots exactly where they are in P02A, so this image can be laid
+over P02A and every limb lines up. Still HEADLESS with the same short neck stump and collar height.
+Only the outfit changes: "Brass Guard" — light knight armor: polished steel breastplate and rounded pauldrons with
+brass trim, a deep blue tabard that ends at mid-thigh with a small golden leaf crest, steel gauntlets, steel greaves
+over brown boots. Chibi-friendly, chunky and rounded, not bulky.
+Keep it close to the body: no cape, no cloak, nothing hanging below mid-thigh, no shield, no weapon.
+The bottom-right NE cell is seen from BEHIND like P02A's NE cell. No pink or magenta in the outfit.
+Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P10-C] SAVE AS: P10C_outfit_festival.png
+SIZE: 1024x1024
+
+PROMPT:
+Use my P02A image (Kaelrin's headless body) as the exact reference for pose, size and placement.
+Draw the same 4 views in the same 2x2 layout (top-left SW, top-right SE, bottom-left W, bottom-right NE),
+same scale, same pose: arms, empty fists, legs and boots exactly where they are in P02A, so this image can be laid
+over P02A and every limb lines up. Still HEADLESS with the same short neck stump and collar height.
+Only the outfit changes: "Lantern Festival" — a cream linen shirt with rolled sleeves, an amber embroidered vest,
+a red-orange cloth sash, brown knee-length trousers, soft brown boots, a small lantern charm on the belt.
+Keep it close to the body: no cape, no cloak, nothing hanging below mid-thigh, no weapon.
+The bottom-right NE cell is seen from BEHIND like P02A's NE cell. No pink or magenta in the outfit.
+Flat solid magenta #FF00FF background. Follow all global rules.

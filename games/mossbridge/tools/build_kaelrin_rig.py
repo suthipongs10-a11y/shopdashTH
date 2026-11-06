@@ -114,8 +114,9 @@ def cut_hash(view):
     return hashlib.sha1(json.dumps(data, sort_keys=True).encode()).hexdigest()[:12]
 
 
-def build_view(name, view, debug_dir=None):
-    rgba = np.array(Image.open(SRC.format(name)).convert("RGBA"))
+def build_view(name, view, debug_dir=None, src=None):
+    """src: another headless body in the same pose (an outfit); default = the base body"""
+    rgba = np.array(Image.open(src or SRC.format(name)).convert("RGBA"))
     rgba[..., 3], specks = drop_specks(rgba[..., 3])
     shape = rgba.shape[:2]
     fig = rgba[..., 3] > OPAQUE
@@ -193,7 +194,8 @@ def build_view(name, view, debug_dir=None):
         slots[n]["rect"] = [ax, ay, w, h]
         slots[n]["pos"] = list(pos)
     Image.fromarray(atlas).save(os.path.join(OUT, view["atlas"]), optimize=True)
-    view["built"] = cut_hash(view)
+    if src is None:
+        view["built"] = cut_hash(view)
 
     if debug_dir:
         debug_image(name, view, rgba, own, pieces, debug_dir)

@@ -158,7 +158,7 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
 <div class="hud" id="hotbar" role="toolbar" aria-label="สกิล"></div>
 
 <div class="hud" id="menu">
-  <button id="gearBtn" aria-expanded="false" aria-controls="gear" title="หมวกและของสวมหัว (H)">👒</button>
+  <button id="gearBtn" aria-expanded="false" aria-controls="gear" title="ชุดและหมวก (H)">👒</button>
   <button id="helpBtn" aria-expanded="true" aria-controls="help" title="วิธีเล่น">?</button>
 </div>
 <div class="hud panel" id="help">
@@ -167,13 +167,14 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
     <li>คลิก/แตะพื้น = เดิน • กดค้างเพื่อเดินตาม</li>
     <li>คลิกมอนสเตอร์ = ตีอัตโนมัติ (คอมโบ 3 จังหวะ)</li>
     <li>WASD / ลูกศร = เดิน • Space = ตีตัวใกล้สุด</li>
-    <li>R = สลับวิ่ง/เดิน • H = ลองใส่หมวก</li>
+    <li>R = สลับวิ่ง/เดิน • H = ลองใส่ชุดและหมวก</li>
     <li>1–4 = สกิล • 5 = ยาฟื้นฟู</li>
   </ul>
 </div>
 
 <div class="hud panel" id="gear" hidden>
-  <h3>ลองใส่หมวก</h3>
+  <h3>ลองใส่ชุดและหมวก</h3>
+  <h4>ชุด</h4><div class="items" data-slot="outfit"></div>
   <h4>หมวก / ที่คาดผม</h4><div class="items" data-slot="top"></div>
   <h4>แว่น</h4><div class="items" data-slot="mid"></div>
   <h4>ผ้าปิดหน้า</h4><div class="items" data-slot="low"></div>

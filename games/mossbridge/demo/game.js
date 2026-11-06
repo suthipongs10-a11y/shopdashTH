@@ -42,7 +42,10 @@ const RIG = await (await fetch("rigs/kaelrin.json")).json();   // hero skeleton 
 // map data (walk areas, spawns, scale): maps/*.json from tools/build_map.py; old maps carry none
 const MAPD = man.map.data ? await (await fetch(man.map.data)).json() : {};
 const urls = [A + man.map.file];
-for (const v of Object.values(RIG.views)) urls.push(A + v.atlas, A + v.head.file, A + v.weapon.file);
+for (const v of Object.values(RIG.views)) {
+  urls.push(A + v.atlas, A + v.head.file, A + v.weapon.file);
+  for (const o of Object.values(v.outfits || {})) urls.push(A + o.atlas);   // outfits (tools/build_outfits.py)
+}
 const GEAR = man.gear || { items: {}, capped: {} };          // headgear from tools/build_headgear.py
 for (const f of Object.values(GEAR.capped)) urls.push(A + f);
 for (const it of Object.values(GEAR.items)) for (const f of Object.values(it.views)) urls.push(A + f);
@@ -341,8 +344,8 @@ class Hero {
   }
   rigView(key) {
     if (!this.views[key]) {
-      const [v, flip] = FACING[key], V = RIG.views[v];
-      const rv = new MossRig.RigView(RIG, v, { atlas: tex(V.atlas), head: tex(V.head.file), headCapped: GEAR.capped[v] ? tex(GEAR.capped[v]) : null, weapon: tex(V.weapon.file) }, flip);
+      const [v, flip] = FACING[key], V = RIG.views[v], O = this.outfit && V.outfits && V.outfits[this.outfit];
+      const rv = new MossRig.RigView(RIG, v, { atlas: tex(O ? O.atlas : V.atlas), slots: O ? O.slots : null, head: tex(V.head.file), headCapped: GEAR.capped[v] ? tex(GEAR.capped[v]) : null, weapon: tex(V.weapon.file) }, flip);
       rv.container.visible = false; this.body.addChild(rv.container); this.views[key] = rv;
       this.applyGear(rv);
     }
@@ -370,6 +373,14 @@ class Hero {
       const it = GEAR.items[this.worn && this.worn[slot]];
       rv.setGear(slot, it ? tex(it.views[rv.skel.name]) : null, it && it.hair);
     }
+  }
+  /* outfit: "base" or an id in RIG.outfits; the rig views are rebuilt with that outfit's pieces */
+  setOutfit(id) {
+    id = id && id !== "base" && RIG.views.sw.outfits && RIG.views.sw.outfits[id] ? id : null;
+    if ((this.outfit || null) === id) return;
+    this.outfit = id; this.endFade();
+    for (const rv of Object.values(this.views)) { this.body.removeChild(rv.container); rv.destroy(); }
+    this.views = {}; this.cur = null; const k = this.key; this.key = null; this.setFacing(k);
   }
   wear(slot, id) { this.worn = { ...(this.worn || {}), [slot]: id }; for (const rv of Object.values(this.views)) this.applyGear(rv); }
   endFade() { const f = this.fade; if (!f) return; f.from.container.visible = false; f.from.container.filters = null; this.cur.container.filters = null; this.fade = null; }
@@ -1024,6 +1035,21 @@ function toggleGear(open) {
 function buildGearPanel() {
   for (const row of document.querySelectorAll("#gear .items")) {
     const slot = row.dataset.slot; row.innerHTML = "";
+    if (slot === "outfit") {                                      // outfits row
+      for (const [id, it] of Object.entries(RIG.outfits || { base: { name: "ชุดเดิม" } })) {
+        const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-label", it.name);
+        if (it.icon) b.style.backgroundImage = `url(${A + it.icon})`; else b.textContent = "เดิม";
+        b.setAttribute("aria-pressed", String((hero.outfit || "base") === id));
+        b.addEventListener("pointerdown", e => e.stopPropagation());
+        b.addEventListener("click", () => {
+          hero.setOutfit(id); buildGearPanel(); $("gearName").textContent = it.name;
+          try { localStorage.setItem(GEAR_KEY + ".outfit", id); } catch (e) { /* not remembered */ }
+          ring(hero.x, hero.y, { tint: 0xffe7a8, s0: .2, s1: .9, life: .4 });
+        });
+        row.appendChild(b);
+      }
+      continue;
+    }
     const opts = [[null, { name: "ไม่ใส่" }], ...Object.entries(GEAR.items).filter(([, it]) => it.slot === slot)];
     for (const [id, it] of opts) {
       const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-label", it.name);
@@ -1039,7 +1065,7 @@ function buildGearPanel() {
     }
   }
 }
-try { const w = JSON.parse(localStorage.getItem(GEAR_KEY) || "null"); if (w) for (const k of ["top", "mid", "low"]) if (w[k] in GEAR.items) hero.wear(k, w[k]); } catch (e) { /* ignore */ }
+try { const w = JSON.parse(localStorage.getItem(GEAR_KEY) || "null"); if (w) for (const k of ["top", "mid", "low"]) if (w[k] in GEAR.items) hero.wear(k, w[k]); hero.setOutfit(localStorage.getItem(GEAR_KEY + ".outfit")); } catch (e) { /* ignore */ }
 buildGearPanel();
 $("gearBtn").addEventListener("click", () => toggleGear());
 $("gear").addEventListener("pointerdown", e => e.stopPropagation());
