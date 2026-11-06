@@ -1,0 +1,35 @@
+P02 — Kaelrin split into BODY (no head) + HEAD, for the hat system      (3 images)
+ใช้ทำ: ระบบใส่หมวกแบบ Ragnarok (หัวกับตัวต้องเป็นคนละไฟล์)
+ส่งทีละช่อง และแนบภาพ P01 ที่ได้ไปด้วยทุกครั้ง พิมพ์ว่า "Use my P01 image as the exact reference."
+=====================================================================
+[P02-A] SAVE AS: P02A_kaelrin_body_headless.png
+SIZE: 1024x1024
+
+PROMPT:
+Use my P01 image as the exact reference. Draw the same 4 views in the same 2x2 layout, same scale, same pose,
+same empty hands, but WITHOUT THE HEAD: remove the head and hair completely. Keep the scarf/collar and a short
+neck stump so the head can be attached later. The top of the collar must be at the same height in all 4 cells.
+Order: top-left SW, top-right SE, bottom-left W, bottom-right NE.
+Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P02-B] SAVE AS: P02B_kaelrin_head_hair_full.png
+SIZE: 1024x1024
+
+PROMPT:
+Use my P01 image as the exact reference. Draw ONLY Kaelrin's HEAD (face, ears, teal spiky hair) with the bottom
+cut cleanly at the neck. No body, no scarf. 2x2 grid with the same view order as P01:
+top-left SW, top-right SE, bottom-left W, bottom-right NE.
+The heads must have exactly the same size in every cell and look exactly like P01.
+Neutral determined expression. Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P02-C] SAVE AS: P02C_kaelrin_head_hair_capped.png
+SIZE: 1024x1024
+
+PROMPT:
+Same as the previous head image (same 4 views, same size, same face), but this is the "CAPPED" hairstyle used
+when he wears a hat: the hair is pressed flat so NOTHING rises above the top of the skull. Only the side locks,
+the back hair and short bangs over the forehead remain, still teal and spiky at the tips.
+Order: top-left SW, top-right SE, bottom-left W, bottom-right NE.
+Flat solid magenta #FF00FF background. Follow all global rules.

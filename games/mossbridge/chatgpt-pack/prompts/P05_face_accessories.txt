@@ -1,0 +1,38 @@
+P05 — Face accessories (glasses / masks), 4 views each      (3 images)
+ใช้ทำ: ช่องกลาง (แว่น) และช่องล่าง (หน้ากาก) — แนบภาพ P02B ไปด้วยทุกครั้ง
+
+=====================================================================
+[P05A] SAVE AS: P05A_mid_goggles.png
+SIZE: 1024x1024
+
+PROMPT:
+Face accessory for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: brass aviator goggles with teal lenses and a brown leather strap.
+How it is worn: worn over the eyes; in the back view only the strap and buckle are visible.
+Draw ONLY THE ACCESSORY, not the head. Sized and positioned exactly as if worn on the head in P02B,
+same 4 views, 2x2 order: top-left SW, top-right SE, bottom-left W, bottom-right NE. Same scale in all cells.
+Flat solid #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P05B] SAVE AS: P05B_mid_glasses.png
+SIZE: 1024x1024
+
+PROMPT:
+Face accessory for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: round thin-framed scholar glasses.
+How it is worn: worn on the eyes; in the back view only the thin temple arms behind the ears are visible (or nothing).
+Draw ONLY THE ACCESSORY, not the head. Sized and positioned exactly as if worn on the head in P02B,
+same 4 views, 2x2 order: top-left SW, top-right SE, bottom-left W, bottom-right NE. Same scale in all cells.
+Flat solid #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P05C] SAVE AS: P05C_low_scarf_mask.png
+SIZE: 1024x1024
+
+PROMPT:
+Face accessory for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a teal traveler's cloth mask covering the mouth and nose.
+How it is worn: covers the lower face; in the back view a knot with two short tails at the back of the head.
+Draw ONLY THE ACCESSORY, not the head. Sized and positioned exactly as if worn on the head in P02B,
+same 4 views, 2x2 order: top-left SW, top-right SE, bottom-left W, bottom-right NE. Same scale in all cells.
+Flat solid #FF00FF background. Follow all global rules.

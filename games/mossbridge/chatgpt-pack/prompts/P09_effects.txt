@@ -1,0 +1,30 @@
+P09 — Skill effect frames on BLACK background      (3 images)
+ใช้ทำ: เอฟเฟกต์สกิล (เกมจะวาดแบบเรืองแสง พื้นดำจะหายไปเอง ไม่ต้องลบ)
+=====================================================================
+[P09A] SAVE AS: P09A_fx_slash_arc_8frames.png
+SIZE: 1536x1024
+
+PROMPT:
+Game VFX animation sheet on a pure black #000000 background (it will be drawn with additive blending).
+A curved sword slash arc made of bright teal-white light with a few water droplets, 8 frames in a 4x2 grid,
+reading left to right, top to bottom: thin start, growing arc, full bright arc, then fading and breaking into
+sparkles. The arc's center point is in the same place in every cell. No character, no weapon, no text.
+
+=====================================================================
+[P09B] SAVE AS: P09B_fx_water_vortex.png
+SIZE: 1024x1024
+
+PROMPT:
+Game VFX on pure black #000000 background: a top-down 3/4 view swirling water vortex ring (like a whirlpool slash
+around a character's waist), teal and white light, splashing droplets, seen from about 45 degrees above so the
+ring is an ellipse. Single frame, centered, empty center. No character, no text.
+
+=====================================================================
+[P09C] SAVE AS: P09C_fx_ground_shockwave_8frames.png
+SIZE: 1536x1024
+
+PROMPT:
+Game VFX animation sheet on pure black #000000 background: a ground-slam shockwave seen from a 3/4 top-down angle
+(flattened ellipse): golden-green energy ring expanding with cracks of light and flying moss and pebbles.
+8 frames in a 4x2 grid, left to right, top to bottom: impact flash, ring expands, ring at full size, fade out.
+Same center point in every cell. No character, no text.

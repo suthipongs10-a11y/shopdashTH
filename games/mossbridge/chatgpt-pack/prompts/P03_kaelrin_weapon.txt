@@ -1,0 +1,13 @@
+P03 — Kaelrin's weapon as a separate object      (1 image)
+ใช้ทำ: อาวุธที่เหวี่ยงได้อิสระในเดโม (แทนการตัดออกจากภาพเดิม)
+=====================================================================
+SAVE AS: P03_weapon_brass_pickblade.png
+SIZE: 1024x1536 (portrait)
+
+PROMPT:
+The weapon Kaelrin holds in REF_03, drawn ALONE as a game item sprite: a short heavy one-handed blade with
+a curved pick hook on the back, steel blade, brass and leather grip with a round brass pommel.
+Show it twice, side by side, same scale:
+- left: pointing straight DOWN (grip at the top, blade tip at the bottom), seen from the side, flat-on.
+- right: the same weapon at the same angle but seen from the other side (mirror side of the hook).
+No hand, no character, no glow. Flat solid magenta #FF00FF background. Follow all global rules.

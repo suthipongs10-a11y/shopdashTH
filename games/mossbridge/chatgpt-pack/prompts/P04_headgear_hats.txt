@@ -1,0 +1,81 @@
+P04 — Headgear: 6 hats, 4 views each      (6 images)
+ใช้ทำ: หมวกในระบบใส่หมวก — ส่งทีละช่อง และแนบภาพ P02B (หัว Kaelrin) ไปด้วยทุกครั้ง
+หมวกสีม่วงใช้พื้นเขียว #00FF00 (เพราะพื้นชมพูจะกลืนกับสีม่วง)
+
+=====================================================================
+[P04A] SAVE AS: P04A_hat_witch.png
+SIZE: 1024x1024
+
+PROMPT:
+Headgear item for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a purple witch hat with a wide floppy brim, brass band and a small violet gem on the front, tip bent backwards.
+How it is worn: covers the top of the head; sits low on the forehead.
+Draw ONLY THE HAT. Do not draw the head, face or hair. The hat must be sized and shaped exactly as if it were
+worn on the head in P02B, in the same 4 views and the same 2x2 order:
+top-left SW, top-right SE, bottom-left W, bottom-right NE. Back views show the back of the hat (no front gem/face).
+Same scale in all cells. Flat solid #00FF00 background. Follow all global rules.
+
+=====================================================================
+[P04B] SAVE AS: P04B_hat_beanie.png
+SIZE: 1024x1024
+
+PROMPT:
+Headgear item for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a cozy knitted beanie, burnt-orange with a teal folded band and a cream pom-pom.
+How it is worn: covers the top of the head down to the eyebrows.
+Draw ONLY THE HAT. Do not draw the head, face or hair. The hat must be sized and shaped exactly as if it were
+worn on the head in P02B, in the same 4 views and the same 2x2 order:
+top-left SW, top-right SE, bottom-left W, bottom-right NE. Back views show the back of the hat (no front gem/face).
+Same scale in all cells. Flat solid #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P04C] SAVE AS: P04C_hat_crown.png
+SIZE: 1024x1024
+
+PROMPT:
+Headgear item for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a small brass crown with five points and teal and red gems.
+How it is worn: sits ON TOP of the spiky hair, slightly tilted.
+Draw ONLY THE HAT. Do not draw the head, face or hair. The hat must be sized and shaped exactly as if it were
+worn on the head in P02B, in the same 4 views and the same 2x2 order:
+top-left SW, top-right SE, bottom-left W, bottom-right NE. Back views show the back of the hat (no front gem/face).
+Same scale in all cells. Flat solid #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P04D] SAVE AS: P04D_hat_sprout.png
+SIZE: 1024x1024
+
+PROMPT:
+Headgear item for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a pair of fresh green sprout leaves on a short stem (like the Sproutling slime's leaves) on a thin headband.
+How it is worn: sits on top of the hair.
+Draw ONLY THE HAT. Do not draw the head, face or hair. The hat must be sized and shaped exactly as if it were
+worn on the head in P02B, in the same 4 views and the same 2x2 order:
+top-left SW, top-right SE, bottom-left W, bottom-right NE. Back views show the back of the hat (no front gem/face).
+Same scale in all cells. Flat solid #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P04E] SAVE AS: P04E_hat_catears.png
+SIZE: 1024x1024
+
+PROMPT:
+Headgear item for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a dark brown cat-ear headband with pink inner ears.
+How it is worn: sits on top of the hair.
+Draw ONLY THE HAT. Do not draw the head, face or hair. The hat must be sized and shaped exactly as if it were
+worn on the head in P02B, in the same 4 views and the same 2x2 order:
+top-left SW, top-right SE, bottom-left W, bottom-right NE. Back views show the back of the hat (no front gem/face).
+Same scale in all cells. Flat solid #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P04F] SAVE AS: P04F_helm_mossback.png
+SIZE: 1024x1024
+
+PROMPT:
+Headgear item for Kaelrin, using my attached head image (P02B) as the exact size and angle reference.
+Item: a full helmet carved from the Mossback Boar's stone hide: grey stone plates, moss and leaves on top, two small glowing-amber tusks at the cheeks, open face.
+How it is worn: covers the whole head and all hair; only the face is visible in front views.
+Draw ONLY THE HAT. Do not draw the head, face or hair. The hat must be sized and shaped exactly as if it were
+worn on the head in P02B, in the same 4 views and the same 2x2 order:
+top-left SW, top-right SE, bottom-left W, bottom-right NE. Back views show the back of the hat (no front gem/face).
+Same scale in all cells. Flat solid #FF00FF background. Follow all global rules.

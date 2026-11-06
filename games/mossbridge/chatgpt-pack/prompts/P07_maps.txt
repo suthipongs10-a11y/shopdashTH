@@ -1,0 +1,26 @@
+P07 — Maps WITHOUT perspective (orthographic)      (2 images)
+ใช้ทำ: แผนที่ที่เดินได้จริง (ภาพ REF_02 มี perspective ไกลเล็กใกล้ใหญ่ ตัวละครเลยต้องย่อขยายตาม)
+แมพไม่ต้องใช้พื้นชมพู
+=====================================================================
+[P07A] SAVE AS: P07A_map_town_square.png
+SIZE: 1536x1024
+
+PROMPT:
+Game map background of the town of Mossbridge, matching the buildings, colors and mood of REF_02, but drawn as a
+TOP-DOWN 3/4 ORTHOGRAPHIC game map: NO perspective at all. Objects far away are exactly the same size as near ones,
+all vertical lines are perfectly vertical, the cobblestones are the same size everywhere.
+Layout: a wide open cobblestone plaza in the center (large empty walkable area), market stalls and the blacksmith
+along the left edge, a turquoise brook with a stone arch bridge on the right side, a path leaving to the top
+toward the castle gate. Paths at least 3 character-widths wide.
+Even golden-hour lighting across the whole image. No characters, no creatures, no UI, no text, no vignette.
+
+=====================================================================
+[P07B] SAVE AS: P07B_map_meadow.png
+SIZE: 1536x1024
+
+PROMPT:
+Second map, same orthographic top-down 3/4 rules as the town map (no perspective, uniform scale):
+"Mossbridge Meadow", the hunting field across the bridge. A large open grassy area in the middle (walkable),
+a dirt path crossing from the left edge to the top-right, big oak trees and mossy boulders along the edges,
+a glowing teal rune stone near the top, clusters of lavender and mushrooms, a small pond in a corner.
+Even golden-hour lighting. No characters, no creatures, no UI, no text, no vignette.

@@ -1,0 +1,28 @@
+P08 — Props and icons      (2 images)
+=====================================================================
+[P08A] SAVE AS: P08A_props_sheet.png
+SIZE: 1536x1024
+
+PROMPT:
+Prop sheet for the Mossbridge map, same 3/4 orthographic camera and style as REF_02.
+4x3 grid, one object per cell, each object standing on an invisible flat ground line at the bottom of its cell:
+street lantern on a wooden post, wooden barrel, crate of red apples, notice board, flower pot with yellow flowers,
+mossy boulder, tree stump, small market stall with teal-and-cream striped awning, wooden fence segment with rope,
+stone bridge pillar with lantern, signpost, bush with lavender.
+Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P08B] SAVE AS: P08B_icons_skills_items.png
+SIZE: 1024x1024
+
+PROMPT:
+Game icon set, 4x4 grid, one icon per cell, each icon centered, bold readable shapes, slight dynamic angle,
+painted in the same style as REF_01's skill bar.
+Row 1 (skills, on rounded-square colored backgrounds like REF_01's hotbar):
+ 1 Tidecleave: a teal water slash spiral; 2 Mossquake: a green-gold ground slam with cracks;
+ 3 Gale Dash: white wind speed lines with an arrow; 4 Verdant Mend: a glowing green leaf with a plus.
+Row 2: 5 red healing potion; 6 blue mana potion; 7 refined copper ore; 8 glowing Mossback tusk.
+Row 3: 9 purple witch hat; 10 brass goggles; 11 brass crown; 12 sprout-leaf headband.
+Row 4: 13 Sproutling jelly drop; 14 Capling mushroom cap; 15 gold coin pouch; 16 quest scroll.
+Rows 2–4 have NO background tile (transparent-looking, i.e. flat magenta #FF00FF behind them).
+Flat solid magenta #FF00FF everywhere outside the row-1 tiles. No text, no numbers.

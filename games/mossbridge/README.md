@@ -39,7 +39,10 @@ cd demo && python3 -m http.server 8000   # แล้วเปิด http://local
 - "ปรับตำแหน่ง (Fit)" = ขยับหมวกด้วยลูกศร แล้ว Export JSON
 - "ใช้รูปของคุณ" = อัปโหลด PNG จาก ChatGPT มาลองใส่ตัวละครได้เลย
 
-### 2) ล้างภาพจาก ChatGPT
+### 2) ชุดคำสั่งสร้างภาพสำหรับ ChatGPT
+`Mossbridge_ChatGPT_Pack.zip` (ต้นฉบับอยู่ใน `chatgpt-pack/`): prompt 24 ภาพเรียงตามความสำคัญ + ภาพอ้างอิง + วิธีใช้ภาษาไทย (`00_README_TH.md`)
+
+### 3) ล้างภาพจาก ChatGPT
 ```bash
 pip install pillow numpy
 python3 tools/sprite_clean.py art/reference/03_sprite_atlas_original.png -o art/samples \

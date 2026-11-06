@@ -1,0 +1,18 @@
+P01 — Kaelrin full body, EMPTY HANDS, 4 views          (1 image)
+ใช้ทำ: ตัวละครหลักในเดโมแบบขอบสะอาด (อาวุธจะใส่ด้วยโค้ดจาก P03)
+=====================================================================
+SAVE AS: P01_kaelrin_body_empty_hands.png
+SIZE: 1024x1024 (square)
+
+PROMPT:
+Character sprite sheet of Kaelrin, exactly as in REF_03 (same face, teal spiky hair, teal leather armor with
+brass trim and shoulder pads, dark teal scarf, brown belt with pouch, armored boots).
+IMPORTANT: his hands are EMPTY. No weapon and no tool anywhere. His right hand is a closed fist held at the same
+place where he grips the weapon in REF_03 (as if holding an invisible handle). His left hand is relaxed.
+2x2 grid, same scale in every cell, feet on the same baseline:
+- top-left: view SW (front three-quarter, facing down-left), pose of REF_03 view 1
+- top-right: view SE (front three-quarter, facing down-right), pose of REF_03 view 2
+- bottom-left: view W (side, facing left), pose of REF_03 view 3
+- bottom-right: view NE (back three-quarter, facing up-right), pose of REF_03 view 4
+Relaxed standing pose, legs slightly apart so both legs are clearly separated.
+Flat solid magenta #FF00FF background. Follow all global rules.

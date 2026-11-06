@@ -1,0 +1,125 @@
+{
+ "version": 1,
+ "expected_files": [
+  {
+   "prompt_file": "prompts/P01_kaelrin_body_empty_hands.txt",
+   "save_as": "P01_kaelrin_body_empty_hands.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P02_kaelrin_headless_body_and_heads.txt",
+   "save_as": "P02A_kaelrin_body_headless.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P02_kaelrin_headless_body_and_heads.txt",
+   "save_as": "P02B_kaelrin_head_hair_full.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P02_kaelrin_headless_body_and_heads.txt",
+   "save_as": "P02C_kaelrin_head_hair_capped.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P03_kaelrin_weapon.txt",
+   "save_as": "P03_weapon_brass_pickblade.png",
+   "size": "1024x1536"
+  },
+  {
+   "prompt_file": "prompts/P04_headgear_hats.txt",
+   "save_as": "P04A_hat_witch.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P04_headgear_hats.txt",
+   "save_as": "P04B_hat_beanie.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P04_headgear_hats.txt",
+   "save_as": "P04C_hat_crown.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P04_headgear_hats.txt",
+   "save_as": "P04D_hat_sprout.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P04_headgear_hats.txt",
+   "save_as": "P04E_hat_catears.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P04_headgear_hats.txt",
+   "save_as": "P04F_helm_mossback.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P05_face_accessories.txt",
+   "save_as": "P05A_mid_goggles.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P05_face_accessories.txt",
+   "save_as": "P05B_mid_glasses.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P05_face_accessories.txt",
+   "save_as": "P05C_low_scarf_mask.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P06_monsters.txt",
+   "save_as": "P06A_sproutling_2views.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P06_monsters.txt",
+   "save_as": "P06B_mossback_boar_2views.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P06_monsters.txt",
+   "save_as": "P06C_capling_2views.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P07_maps.txt",
+   "save_as": "P07A_map_town_square.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P07_maps.txt",
+   "save_as": "P07B_map_meadow.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P08_props_and_icons.txt",
+   "save_as": "P08A_props_sheet.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P08_props_and_icons.txt",
+   "save_as": "P08B_icons_skills_items.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P09_effects.txt",
+   "save_as": "P09A_fx_slash_arc_8frames.png",
+   "size": "1536x1024"
+  },
+  {
+   "prompt_file": "prompts/P09_effects.txt",
+   "save_as": "P09B_fx_water_vortex.png",
+   "size": "1024x1024"
+  },
+  {
+   "prompt_file": "prompts/P09_effects.txt",
+   "save_as": "P09C_fx_ground_shockwave_8frames.png",
+   "size": "1536x1024"
+  }
+ ]
+}

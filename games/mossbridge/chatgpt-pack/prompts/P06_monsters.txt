@@ -1,0 +1,38 @@
+P06 — Monsters, front + back views      (3 images)
+ใช้ทำ: มอนในเดโม (ตอนนี้มีแค่มุมหน้า เดินหนีกล้องแล้วดูแปลก) + มอนใหม่ 1 ตัว
+=====================================================================
+[P06A] SAVE AS: P06A_sproutling_2views.png
+SIZE: 1536x1024
+
+PROMPT:
+The Sproutling slime from REF_05 (green jelly blob with two leaves on top, cute face), exactly the same design.
+Two views side by side, same scale, same baseline:
+- left: front three-quarter view, facing down-left (SW), happy face.
+- right: back three-quarter view, facing up-right (NE): back of the jelly, leaves visible, no face.
+Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P06B] SAVE AS: P06B_mossback_boar_2views.png
+SIZE: 1536x1024
+
+PROMPT:
+The Mossback Boar boss from REF_06 (huge boar made of grey stone plates, moss and leaves on its back,
+amber rune on the flank, golden tusks), exactly the same design.
+Two views side by side, same scale, same baseline:
+- left: front three-quarter view, facing down-left (SW), as in REF_06.
+- right: back three-quarter view, facing up-right (NE): rump, stone spikes along the spine, tail, rune on the flank.
+IMPORTANT: no glow outside the body (the tusks and rune may be bright amber but must not emit light around them).
+All four legs clearly visible and separated. Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P06C] SAVE AS: P06C_capling_2views.png
+SIZE: 1536x1024
+
+PROMPT:
+New monster for the same game: "Capling", a small walking mushroom creature (about knee-high to Kaelrin),
+moss-green spotted cap, cream stem body, tiny leaf arms, stubby feet, sleepy grumpy eyes, a tiny glowing lantern-berry
+hanging from the cap rim. Same style as REF_04.
+Two views side by side, same scale, same baseline:
+- left: front three-quarter, facing down-left (SW).
+- right: back three-quarter, facing up-right (NE).
+Flat solid magenta #FF00FF background. Follow all global rules.
