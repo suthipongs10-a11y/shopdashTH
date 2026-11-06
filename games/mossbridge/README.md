@@ -3,6 +3,8 @@
 เกม MMORPG สไตล์ chibi hand-painted โลก cozy fantasy ระบบเด่นคือ **ใส่หมวก/ของสวมหัวแล้วเห็นบนตัวละครจริง** (กลไกแบบ Ragnarok Online: paper-doll 3 ช่อง บน/กลาง/ล่าง)
 ภาพทั้งหมดจะสร้างด้วย ChatGPT ตามสเปคในโฟลเดอร์นี้
 
+> สำหรับ Claude ที่จะทำงานต่อ: อ่าน [`CLAUDE.md`](CLAUDE.md) ก่อน
+>
 > โฟลเดอร์นี้ไม่เกี่ยวกับระบบ ShopDash ใน repo เดียวกัน ไม่ถูก build/deploy ไปกับ ShopDash (`tsconfig.json` ที่ root exclude `games/` แล้ว)
 
 ## คำตอบสั้น: ทำได้ไหม ยากแค่ไหน

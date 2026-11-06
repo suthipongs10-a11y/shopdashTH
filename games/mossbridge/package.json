@@ -1,0 +1,16 @@
+{
+  "name": "mossbridge",
+  "private": true,
+  "description": "Mossbridge MMORPG prototype (separate from ShopDash)",
+  "scripts": {
+    "serve": "python3 -m http.server 8000 --directory demo",
+    "qa:frames": "node tools/qa/frames.js",
+    "qa:sheet": "python3 tools/qa/sheet.py",
+    "qa:sim": "node tools/qa/sim.js",
+    "qa:video": "node tools/qa/video.js",
+    "assets": "python3 tools/build_demo_assets.py"
+  },
+  "devDependencies": {
+    "playwright": "1.48.2"
+  }
+}
