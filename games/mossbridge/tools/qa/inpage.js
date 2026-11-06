@@ -63,7 +63,7 @@ function sim() {
   const onErr = e => errors.push(String(e.message || e));
   window.addEventListener("error", onErr);
   try {
-    g.step(.1); g.hero.path = g.findPath(g.hero.x, g.hero.y, 1200, 320);
+    g.step(.1); { const m0 = g.mobs.find(m => !m.boss); g.hero.path = g.findPath(g.hero.x, g.hero.y, m0.x, m0.y); }
     for (let sec = 0; sec < 90; sec++) {
       if (!g.hero.target || g.hero.target.dead) { const live = g.mobs.filter(m => !m.dead).sort((a, b) => Math.hypot(a.x - g.hero.x, a.y - g.hero.y) - Math.hypot(b.x - g.hero.x, b.y - g.hero.y)); g.hero.target = live.find(m => !m.boss) || live[0]; }
       if (sec % 3 === 0) g.useSkill(sec % 4);

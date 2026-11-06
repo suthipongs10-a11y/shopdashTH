@@ -39,8 +39,13 @@ await Promise.race([Promise.all([document.fonts.load('500 15px Mitr'), document.
 PIXI.Assets.setPreferences({ preferWorkers: false });
 const man = await (await fetch(A + "manifest.json")).json();
 const RIG = await (await fetch("rigs/kaelrin.json")).json();   // hero skeleton + cut pieces (rig.js)
+// map data (walk areas, spawns, scale): maps/*.json from tools/build_map.py; old maps carry none
+const MAPD = man.map.data ? await (await fetch(man.map.data)).json() : {};
 const urls = [A + man.map.file];
 for (const v of Object.values(RIG.views)) urls.push(A + v.atlas, A + v.head.file, A + v.weapon.file);
+const GEAR = man.gear || { items: {}, capped: {} };          // headgear from tools/build_headgear.py
+for (const f of Object.values(GEAR.capped)) urls.push(A + f);
+for (const it of Object.values(GEAR.items)) for (const f of Object.values(it.views)) urls.push(A + f);
 for (const m of Object.values(man.mobs)) urls.push(A + m.file);
 for (const f of Object.values(man.fx || {})) urls.push(A + f.file);
 const T = await PIXI.Assets.load([...new Set(urls)]);
@@ -64,10 +69,11 @@ const textLayer = new PIXI.Container();
 world.addChild(ground, groundFx, actorLayer, fxLayer, ambLayer, textLayer);
 
 /* fake perspective: the painting shrinks things toward the top */
-const depthScale = y => clamp(0.58 * (0.45 + 0.55 * y / 700), 0.33, 0.72);
+const depthScale = MAPD.scale ? () => MAPD.scale                      // orthographic map: one size everywhere
+  : y => clamp(0.58 * (0.45 + 0.55 * y / 700), 0.33, 0.72);
 
 /* ------------------------------------------------------------------ walkable areas (map pixels) */
-const WALK = [
+const WALK = MAPD.walk || [
   // town plaza
   [[395,640],[470,600],[560,585],[650,560],[745,530],[800,512],[860,532],[930,560],[995,615],[1045,670],[1060,760],[960,790],[870,800],[848,941],[470,941],[445,860],[420,760],[400,690]],
   // ramp + bridge deck
@@ -325,7 +331,7 @@ class Hero {
     this.views = {}; this.cur = null; this.fade = null; this.key = null;
     this.loco = new MossRig.Locomotion(RIG);
     this.springs = { hair: new MossRig.Spring(110, 7, .8, 12), scarf: new MossRig.Spring(170, 12, .45, 5) };
-    this.x = 640; this.y = 720; this.flip = false; this.lastSide = -1; this.scale = depthScale(this.y);
+    [this.x, this.y] = MAPD.heroStart || [640, 720]; this.flip = false; this.lastSide = -1; this.scale = depthScale(this.y);
     this.setFacing("sw");
     this.trail = new Trail();
     this.maxHp = 9842; this.hp = 9842; this.maxMp = 1620; this.mp = 1620; this.dead = false;
@@ -336,8 +342,9 @@ class Hero {
   rigView(key) {
     if (!this.views[key]) {
       const [v, flip] = FACING[key], V = RIG.views[v];
-      const rv = new MossRig.RigView(RIG, v, { atlas: tex(V.atlas), head: tex(V.head.file), weapon: tex(V.weapon.file) }, flip);
+      const rv = new MossRig.RigView(RIG, v, { atlas: tex(V.atlas), head: tex(V.head.file), headCapped: GEAR.capped[v] ? tex(GEAR.capped[v]) : null, weapon: tex(V.weapon.file) }, flip);
       rv.container.visible = false; this.body.addChild(rv.container); this.views[key] = rv;
+      this.applyGear(rv);
     }
     return this.views[key];
   }
@@ -357,6 +364,14 @@ class Hero {
       this.loco.trigger("turn");
     }
   }
+  /* headgear: this.worn = { top, mid, low } item ids (or null) */
+  applyGear(rv) {
+    for (const slot of ["top", "mid", "low"]) {
+      const it = GEAR.items[this.worn && this.worn[slot]];
+      rv.setGear(slot, it ? tex(it.views[rv.skel.name]) : null, it && it.hair);
+    }
+  }
+  wear(slot, id) { this.worn = { ...(this.worn || {}), [slot]: id }; for (const rv of Object.values(this.views)) this.applyGear(rv); }
   endFade() { const f = this.fade; if (!f) return; f.from.container.visible = false; f.from.container.filters = null; this.cur.container.filters = null; this.fade = null; }
   face(dx, dy) {
     if (Math.abs(dx) < .01 && Math.abs(dy) < .01) return;
@@ -658,9 +673,9 @@ class Mossback extends MeshActor {
 /* ------------------------------------------------------------------ actors */
 const hero = new Hero();
 const mobs = [];
-const SLIME_SPOTS = [[1110, 270], [1210, 300], [1300, 230], [1380, 330], [1500, 360], [1560, 300], [1040, 290]];
+const SLIME_SPOTS = MAPD.slimes || [[1110, 270], [1210, 300], [1300, 230], [1380, 330], [1500, 360], [1560, 300], [1040, 290]];
 for (const [x, y] of SLIME_SPOTS) mobs.push(new Sproutling(x, y));
-const boss = new Mossback(1470, 300); mobs.push(boss);
+const boss = new Mossback(...(MAPD.boss || [1470, 300])); mobs.push(boss);
 
 /* keep monsters from stacking on each other / on the hero */
 function separate(dt) {
@@ -766,7 +781,7 @@ function hurtHero(amount, src, dir) {
   if (hero.hp <= 0) {
     hero.hp = 0; hero.dead = true; hero.target = null; hero.path = [];
     banner("คุณหมดสติ", "กำลังกลับไปที่จัตุรัส Mossbridge…");
-    later(3, () => { hero.dead = false; hero.hp = hero.maxHp; hero.mp = hero.maxMp; hero.x = 640; hero.y = 720; hero.loco.reset(); hero.invuln = 2; hero.root.alpha = 1; ring(hero.x, hero.y, { tint: 0x8ff5e4, s1: 1.4, life: .8 }); });
+    later(3, () => { hero.dead = false; hero.hp = hero.maxHp; hero.mp = hero.maxMp; [hero.x, hero.y] = MAPD.heroStart || [640, 720]; hero.loco.reset(); hero.invuln = 2; hero.root.alpha = 1; ring(hero.x, hero.y, { tint: 0x8ff5e4, s1: 1.4, life: .8 }); });
   }
 }
 
@@ -922,7 +937,7 @@ for (let i = 0; i < 46; i++) {
   s.x = rand(0, MAP_W); s.y = rand(0, MAP_H); const b = rand(.08, .18); s.scale.set(b); ambLayer.addChild(s);
   AMB.push({ s, b, ph: rand(0, TAU), vx: rand(-6, 6), vy: rand(-8, -2) });
 }
-const WATER = [[620, 440], [700, 470], [1110, 520], [1240, 560], [1350, 620], [1480, 700], [1560, 760], [1450, 820], [580, 330]];
+const WATER = MAPD.water || [[620, 440], [700, 470], [1110, 520], [1240, 560], [1350, 620], [1480, 700], [1560, 760], [1450, 820], [580, 330]];
 
 /* ------------------------------------------------------------------ input */
 app.stage.eventMode = "static"; app.stage.hitArea = app.screen;
@@ -959,6 +974,7 @@ addEventListener("keydown", e => {
   if (n !== undefined) useSkill(n);
   if (e.code === "Space") { e.preventDefault(); const m = nearestMob(420); if (m) hero.target = m; }
   if (e.code === "KeyG") debugWalk.visible = !debugWalk.visible;
+  if (e.code === "KeyH" && !e.repeat) toggleGear();
   if (e.code === "KeyR" && !e.repeat) { hero.runMode = !hero.runMode; log(`<span class="w">[ระบบ] ${hero.runMode ? "วิ่ง" : "เดิน"}</span>`); }
   if (/^Arrow/.test(e.code)) e.preventDefault();
 });
@@ -999,6 +1015,34 @@ SKILLS.forEach((S, i) => {
 });
 function flashSlot(i) { const b = hotbar.children[i]; b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 120); }
 $("helpBtn").addEventListener("click", () => { const h = $("help"); h.hidden = !h.hidden; $("helpBtn").setAttribute("aria-expanded", String(!h.hidden)); });
+/* headgear try-on: one row per slot, the choice is remembered in this browser */
+const GEAR_KEY = "mossbridge.worn";
+function toggleGear(open) {
+  const g = $("gear"); g.hidden = open === undefined ? !g.hidden : !open; $("gearBtn").setAttribute("aria-expanded", String(!g.hidden));
+  if (!g.hidden) { $("help").hidden = true; $("helpBtn").setAttribute("aria-expanded", "false"); }
+}
+function buildGearPanel() {
+  for (const row of document.querySelectorAll("#gear .items")) {
+    const slot = row.dataset.slot; row.innerHTML = "";
+    const opts = [[null, { name: "ไม่ใส่" }], ...Object.entries(GEAR.items).filter(([, it]) => it.slot === slot)];
+    for (const [id, it] of opts) {
+      const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-label", it.name);
+      if (id) b.style.backgroundImage = `url(${A + it.icon})`; else b.textContent = "ไม่ใส่";
+      b.setAttribute("aria-pressed", String((hero.worn && hero.worn[slot] || null) === id));
+      b.addEventListener("pointerdown", e => e.stopPropagation());
+      b.addEventListener("click", () => {
+        hero.wear(slot, id); buildGearPanel(); $("gearName").textContent = id ? it.name : "";
+        try { localStorage.setItem(GEAR_KEY, JSON.stringify(hero.worn)); } catch (e) { /* private mode: not remembered */ }
+        if (id) ring(hero.x, hero.y, { tint: 0xffe7a8, s0: .2, s1: .7, life: .35 });
+      });
+      row.appendChild(b);
+    }
+  }
+}
+try { const w = JSON.parse(localStorage.getItem(GEAR_KEY) || "null"); if (w) for (const k of ["top", "mid", "low"]) if (w[k] in GEAR.items) hero.wear(k, w[k]); } catch (e) { /* ignore */ }
+buildGearPanel();
+$("gearBtn").addEventListener("click", () => toggleGear());
+$("gear").addEventListener("pointerdown", e => e.stopPropagation());
 
 const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 const [faceImg, mapImg] = await Promise.all([loadImg(A + man.hero.se.head), loadImg(A + man.map.file)]);

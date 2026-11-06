@@ -12,7 +12,9 @@
     "qa:rig": "node tools/qa/rig_check.js",
     "assets": "python3 tools/build_demo_assets.py",
     "rig": "python3 tools/build_kaelrin_rig.py",
-    "fx": "python3 tools/build_fx_assets.py"
+    "fx": "python3 tools/build_fx_assets.py",
+    "gear": "python3 tools/build_headgear.py",
+    "map": "python3 tools/build_map.py"
   },
   "devDependencies": {
     "playwright": "1.48.2"

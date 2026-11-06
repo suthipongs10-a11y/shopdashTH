@@ -89,6 +89,16 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
 #help b { color: var(--text); font-weight: 600; }
 #help ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 2px; }
 
+/* headgear try-on panel */
+#gear { right: max(10px, env(safe-area-inset-right, 0px)); bottom: calc(66px + env(safe-area-inset-bottom, 0px)); padding: 10px 12px 12px; width: 300px; pointer-events: auto; display: grid; gap: 8px; }
+#gear h3 { margin: 0; font: 500 15px/1.2 var(--font-display); color: var(--gold); }
+#gear h4 { margin: 2px 0 0; font: 500 12px/1.2 var(--font-display); color: var(--muted); letter-spacing: .04em; }
+#gear .items { display: flex; flex-wrap: wrap; gap: 6px; }
+#gear .items button { width: 52px; height: 52px; border-radius: 10px; border: 1.5px solid var(--brass-dim); background: #2a1e14 center/80% no-repeat; cursor: pointer; padding: 0; color: var(--muted); font: 500 11px var(--font-display); }
+#gear .items button[aria-pressed="true"] { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(60,192,173,.45); }
+#gear .items button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+#gear .name { font-size: 12.5px; color: var(--text); min-height: 1.4em; }
+
 #banner { top: 30%; left: 0; right: 0; text-align: center; font: 600 clamp(28px, 6vw, 56px)/1.1 var(--font-display); color: var(--gold); text-shadow: 0 3px 0 #5a3410, 0 0 24px rgba(255,190,80,.6); opacity: 0; transition: opacity .4s, transform .4s; transform: scale(.9); }
 #banner.show { opacity: 1; transform: none; }
 #banner small { display: block; font-size: .38em; color: var(--text); text-shadow: 0 2px 4px #000; margin-top: 6px; }
@@ -108,6 +118,7 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
   #hotbar { gap: 6px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
   #menu { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
   #help { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); }
+  #gear { bottom: calc(136px + env(safe-area-inset-bottom, 0px)); width: auto; left: max(10px, env(safe-area-inset-left, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) { #log div { animation: none; } }
 </style>
@@ -147,6 +158,7 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
 <div class="hud" id="hotbar" role="toolbar" aria-label="สกิล"></div>
 
 <div class="hud" id="menu">
+  <button id="gearBtn" aria-expanded="false" aria-controls="gear" title="หมวกและของสวมหัว (H)">👒</button>
   <button id="helpBtn" aria-expanded="true" aria-controls="help" title="วิธีเล่น">?</button>
 </div>
 <div class="hud panel" id="help">
@@ -155,9 +167,17 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
     <li>คลิก/แตะพื้น = เดิน • กดค้างเพื่อเดินตาม</li>
     <li>คลิกมอนสเตอร์ = ตีอัตโนมัติ (คอมโบ 3 จังหวะ)</li>
     <li>WASD / ลูกศร = เดิน • Space = ตีตัวใกล้สุด</li>
-    <li>R = สลับวิ่ง/เดิน</li>
+    <li>R = สลับวิ่ง/เดิน • H = ลองใส่หมวก</li>
     <li>1–4 = สกิล • 5 = ยาฟื้นฟู</li>
   </ul>
+</div>
+
+<div class="hud panel" id="gear" hidden>
+  <h3>ลองใส่หมวก</h3>
+  <h4>หมวก / ที่คาดผม</h4><div class="items" data-slot="top"></div>
+  <h4>แว่น</h4><div class="items" data-slot="mid"></div>
+  <h4>ผ้าปิดหน้า</h4><div class="items" data-slot="low"></div>
+  <div class="name" id="gearName"></div>
 </div>
 
 <div class="hud" id="banner"></div>

@@ -8,7 +8,7 @@ const path = require('path');
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, recordVideo: { dir: path.join(OUT, 'video'), size: { width: 1280, height: 720 } } });
   const page = await ctx.newPage();
   await page.goto(BASE + 'index.html'); await page.waitForFunction(() => window.__mossbridge);
-  await page.evaluate(() => { const g = window.__mossbridge; g.hero.x = 1180; g.hero.y = 330; });
+  await page.evaluate(() => { const g = window.__mossbridge; const m0 = g.mobs.find(m => !m.boss); g.hero.x = m0.x - 120; g.hero.y = m0.y + 40; });
   await page.waitForTimeout(1500);
   await page.evaluate(() => { const g = window.__mossbridge; g.hero.target = g.mobs.find(m => !m.boss && !m.dead); });
   await page.waitForTimeout(3000);

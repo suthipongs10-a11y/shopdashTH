@@ -18,16 +18,17 @@
 - ภาพทั้งหมดสร้างด้วย **ChatGPT** (บนแอปเดสก์ท็อปให้ Claude เปิด chatgpt.com ผ่านเบราว์เซอร์แล้วสั่งเอง ดู §4)
 - สื่อสารกับเจ้าของเป็นภาษาไทย ส่วนโค้ด ชื่อไฟล์ และ commit message เป็นภาษาอังกฤษ
 
-## 2. สถานะปัจจุบัน (2026-11-06, หลัง backlog 2 + 3)
+## 2. สถานะปัจจุบัน (2026-11-06, v0.5)
 
 | ส่วน | สถานะ | ที่อยู่ |
 |---|---|---|
 | เอกสารออกแบบ 01–06 | เสร็จ | `docs/` |
 | Headgear Lab (ต้นแบบระบบหมวก 3 ช่อง) | เสร็จ ภาพ placeholder วาดด้วยโค้ด | `prototype/headgear-lab/index.html` |
-| **เดโมเล่นได้ v0.4** | เสร็จ ฮีโร่เป็น **skeletal rig แยกชิ้น** (แขน 2 ข้าง, ขา 2 ข้าง, ลำตัว, หัว, อาวุธ) + IK เท้าที่ล็อกกับพื้น + ท่ายืน/เดิน/วิ่ง/ออกตัว/หยุด/เปลี่ยนทิศ (v0.3) + **คอมโบ 3 จังหวะ, 4 สกิล, ท่าโดนตี ทำใหม่บน rig** + รอยดาบ/คลื่นน้ำ/แรงกระแทกจากภาพ P09 + ไอคอนสกิล P08B + กล้องซูมออกกว้างขึ้น (v0.4, 2026-11-06) | `demo/index.html` + `demo/game.js` + `demo/rig.js` |
+| **เดโมเล่นได้ v0.5** | ท่ายืนถือดาบพร้อมสู้ + กำด้ามเต็มมือ, ท่าเดินตัวตรงเด้ง (แก้ "เดินเหมือนเจ็บก้น"), ฟันอยู่กับที่แบบเกม MMORPG คลาสสิก, **ลองใส่หมวก/แว่น/ผ้าปิดหน้าได้ (ปุ่ม 👒 หรือ H)**, **แมพใหม่ จัตุรัส → สะพาน → ทุ่งหญ้า** จากภาพ P07A/B (2026-11-06) | `demo/` |
+| v0.4 (เจ้าของตรวจผ่าน) | เสร็จ ฮีโร่เป็น **skeletal rig แยกชิ้น** (แขน 2 ข้าง, ขา 2 ข้าง, ลำตัว, หัว, อาวุธ) + IK เท้าที่ล็อกกับพื้น + ท่ายืน/เดิน/วิ่ง/ออกตัว/หยุด/เปลี่ยนทิศ (v0.3) + **คอมโบ 3 จังหวะ, 4 สกิล, ท่าโดนตี ทำใหม่บน rig** + รอยดาบ/คลื่นน้ำ/แรงกระแทกจากภาพ P09 + ไอคอนสกิล P08B + กล้องซูมออกกว้างขึ้น (v0.4, 2026-11-06) | `demo/index.html` + `demo/game.js` + `demo/rig.js` |
 | Rig ของ Kaelrin | เสร็จ 4 มุม (+ กลับภาพ E, NW): ข้อต่อ, รอยตัดชิ้น, คลิป motion ในไฟล์เดียว | `demo/rigs/kaelrin.json` + ชิ้นภาพ `demo/assets/kaelrin_{view}_parts.png` (สร้างด้วย `tools/build_kaelrin_rig.py`) |
 | **Rig Editor** | เสร็จ หน้าเดียว: ลากข้อต่อ/รอยตัด, ลากกระดูกให้ขยับ, scrub timeline + กราฟคีย์, export JSON | `demo/rig-editor.html` (เปิดผ่าน `npm run serve` → `/rig-editor.html`) |
-| ชุดคำสั่งสร้างภาพ ChatGPT (24 ภาพ) | **สั่งครบแล้ว** (2026-11-06): P01–P03 ล้างแล้ว · P08B (ไอคอน) + P09A–C (เอฟเฟกต์) ใช้ในเดโมแล้ว · P04–P07, P08A ยังไม่ล้าง (ภาพดิบอยู่ `art/raw/` ของ checkout หลัก) | `chatgpt-pack/` + `Mossbridge_ChatGPT_Pack.zip` |
+| ชุดคำสั่งสร้างภาพ ChatGPT (24 ภาพ) | **สั่งครบแล้ว** (2026-11-06): ใช้ในเดโมแล้ว P01–P05, P07A/B, P08B, P09A–C · ยังไม่ใช้ P06 (มอนมุมหลัง), P08A (ของประดับ) — ภาพดิบอยู่ `art/raw/` ของ checkout หลัก | `chatgpt-pack/` + `Mossbridge_ChatGPT_Pack.zip` |
 | ชิ้นส่วน Kaelrin ที่ล้างแล้ว | เสร็จ: ตัวเต็ม/ตัวไม่มีหัว 4 มุม, หัวผมปกติ/ผมยุบ 4 มุม, อาวุธ 2 ด้าน + จุดยึด | `art/samples/kaelrin/` (สร้างด้วย `tools/build_kaelrin_parts.py`) |
 | เครื่องมือล้างภาพ AI | เสร็จ (+ `--edge-despill 3` แก้ขอบชมพูจากพื้นม่วง) | `tools/sprite_clean.py` |
 | เครื่องมือเตรียม asset ของเดโม | เสร็จ (อ่านชิ้นส่วนจาก `art/samples/kaelrin/`) + เอฟเฟกต์/ไอคอนจาก P08B, P09 | `tools/build_demo_assets.py` + `tools/build_fx_assets.py` |
@@ -53,10 +54,13 @@ npm run qa:video            # อัดวิดีโอเล่นจริ�
 npm run qa:rig              # ตรวจ rig แบบไม่ใช้เบราว์เซอร์: ท่าพักตรงภาพวาด, เท้าไม่ลื่น 12 ทิศ x เดิน/วิ่ง, เท้ากลับที่หลังหยุด
 npm run rig                 # ตัดชิ้นส่วนใหม่จาก demo/rigs/kaelrin.json (ต้องรันทุกครั้งที่แก้รอยตัด/fill)
 npm run fx                  # เอฟเฟกต์ + ไอคอน จาก art/raw/P08B, P09A-C -> demo/assets/fx_*.png, icon_*.png
+npm run gear                # หมวก/แว่น/ผ้าปิดหน้า จาก art/raw/P04, P05 -> demo/assets/gear_*.png (+ qa-out/headgear_check.png)
+npm run map                 # แมพ P07A + P07B ต่อกัน -> demo/assets/map_town_meadow.jpg + demo/maps/mossbridge.json
 ```
 - **ไม่มี Playwright?** `npm run qa:serve` (เสิร์ฟ demo + `/__qa/*` + บันทึกภาพลง `qa-out/`) แล้วเปิดเกมในเบราว์เซอร์ใดก็ได้ (รวมถึงเบราว์เซอร์ในแอปแม้แผงถูกซ่อน) รัน `await import('/__qa/inpage.js')` ในหน้า → `__qa.walk('sw', 8, .07)` แล้ว `__qa.save('ชื่อ')` ได้ contact sheet ที่ `qa-out/ชื่อ.png`; `__qa.sim()` = qa:sim; `__qa.film(...)` = เฟรมวิดีโอ 30 fps แล้วต่อเป็น mp4 ด้วย ffmpeg (ดูหัวไฟล์ `tools/qa/inpage.js`)
 - Rig Editor: `http://localhost:8000/rig-editor.html` (โหมด "โครง/ชิ้นส่วน" แก้ข้อต่อ+รอยตัด, โหมด "ท่าทาง" แก้คลิป) → Export JSON ไปแทน `demo/rigs/kaelrin.json` → ถ้าแก้รอยตัดให้รัน `npm run rig`
-- ในเกม กด **R** สลับวิ่ง/เดิน · มุมกล้องปรับที่ `CAM_WIDE` ใน game.js (ค่าน้อย = เห็นแมพกว้างขึ้น)
+- ในเกม กด **R** สลับวิ่ง/เดิน · **H** (หรือปุ่ม 👒) ลองใส่หมวก · มุมกล้องปรับที่ `CAM_WIDE` ใน game.js (ค่าน้อย = เห็นแมพกว้างขึ้น)
+- แมพ: ข้อมูลอยู่ `demo/maps/mossbridge.json` (พื้นที่เดิน, จุดเกิดฮีโร่/สไลม์/บอส, ประกายน้ำ, `scale` = ขนาดตัวละครคงที่เพราะแมพมุมตรง) แก้จุดได้ใน `tools/build_map.py` · กด **G** ดูพื้นที่เดินได้
 - เครื่องที่ไม่มี GPU ให้ตั้ง `SOFTWARE_GL=1` และถ้าโหลด CDN ไม่ได้ให้ตั้ง `PIXI_LOCAL=/path/pixi.min.js`
 - `window.__mossbridge.step(sec, fps)` หยุด ticker แล้วเดินเกมแบบกำหนดเวลาได้แน่นอน ใช้จับเฟรมเพื่อตรวจท่าทาง
   เพราะถ้าจับภาพตามเวลาจริงบนเครื่องช้า เฟรมจะไม่ตรงจังหวะ
@@ -99,6 +103,8 @@ npm run fx                  # เอฟเฟกต์ + ไอคอน จา�
 - **Locomotion (`MossRig.Locomotion`):** เท้าเก็บเป็นพิกัดโลก — เท้าที่แตะพื้นไม่ขยับเลย, เท้าที่ยกเหวี่ยงไปจุดลงที่ทำนายจากความเร็ว → ก้าว×จังหวะ = ความเร็วจริงเสมอ; เดิน/วิ่ง blend ตามความเร็ว (`motion.walk/run`: speed, cadence, swing, lift + แทร็กลำตัว/แขน), ยืน = `motion.idle`, ออกตัว/หยุด/เปลี่ยนทิศ = คลิปเสริมสั้น ๆ (`motion.start/stop/turn`); หยุดแล้วเท้าที่ค้างจะก้าวตามมาเอง (settle)
 - **ฮีโร่ในเกม (`Hero` ใน game.js):** ความเร็วเร่ง 0.12 วิ / ชะลอก่อนถึงจุดหมาย; เปลี่ยนมุมกล้อง = cross-fade 70 ms + squash; จุดยืนของแต่ละมุม `views.{v}.root` = กึ่งกลางระหว่างเท้า (ภาพไม่กระโดดตอนหมุน); R = สลับวิ่ง/เดิน
 - **ท่าโจมตี/สกิล/โดนตี (v0.4):** คลิปใน `motion.actions` (slash1–3, tidecleave, mossquake, galedash, mend, hurt) เป็นค่า channel จริงทับท่ายืน · คีย์ใส่ easing ได้ `[t, ค่า, "in"|"out"|"io"|"lin"]` (ตีเร็วใช้ "in") · `step` = ตัวพุ่งไปข้างหน้า, `footRF/footLF` วัดจากจุดเริ่มท่า (เท้าที่ค่าไม่เปลี่ยน = เหยียบอยู่กับที่ระหว่างพุ่ง) · `spin` = หมุนตัวผ่านภาพทุกมุม (Tidecleave) · `hits` = เวลาโดน, `smear` = รอยดาบ P09A, `kick` = กระตุกผม/ผ้าพันคอ · อาวุธ **อยู่ใต้กำปั้นตลอด** และยกไปหลังหัว (มุมที่แขนถืออาวุธอยู่หลังตัว) จึงไม่พาดหน้าแล้ว
+- **ท่าพร้อมสู้ (v0.5):** `motion.stance` (แขนถือดาบยกนิดหน่อย มือซ้ายตั้งการ์ด) + `views.{v}.stance` (มุมข้อมือที่ทำให้ดาบชี้ขึ้นไปข้างหน้าในแต่ละมุมกล้อง) บวกทับทุกท่ายืน/เดิน/วิ่ง; ท่าโจมตีออกจาก stance ใน 0.1 วิแรกและกลับเข้าใน 0.15 วิสุดท้าย · จุดจับอาวุธ `views.{v}.weapon.grip` = กึ่งกลางกำปั้น, `weaponGrip` = กึ่งกลางด้ามที่พันหนัง (กำปั้นคลุมทั้งด้าม)
+- **หมวก (v0.5):** `RigView.setGear(slot, texture, hair)` ช่อง top/mid/low เป็น mesh บนแคนวาสหัว ใช้จุดเดียวกับหัว (ขยับตามหัว+ผม) · หมวกที่ `hair: "capped"` สลับหัวเป็นผมยุบ (P02C) · `Hero.wear(slot, id)` + แผงเลือกใน index.html (จำไว้ใน localStorage)
 - **ความหมายของ channel เหมือนกันทุกมุม:** `armXSwing` + = มือไปข้างหน้า (π/2 = ชี้ตรงไปหน้า, π = ชูเหนือหัว), `armXBend` + = งอศอก, `lean` + = เอนหน้า, `head` + = ก้มหัว, `weaponRot` + = ปลายดาบเงยไปข้างหน้า (ดูหัวไฟล์ rig.js)
 มอนสเตอร์ยังเป็นแบบเดิม: `Sproutling.render` (ยุบ/ยืด/สั่น) และ `Mossback.render` (ขา 4 ข้างแบบเฉือนภาพ + หัวเอียง)
 
@@ -158,9 +164,9 @@ npm run fx                  # เอฟเฟกต์ + ไอคอน จา�
 1. ~~สั่งภาพ P01–P03 → ล้าง → เปลี่ยนเดโมเป็นตัวที่หัวแยก + อาวุธแยก (ยังใช้ mesh เดิมได้ชั่วคราว)~~ **เสร็จ 2026-11-06** (ดู `docs/06-demo-notes.md` §v0.2)
 2. ~~ทำ Rig Editor + rig ของ Kaelrin (§5.1) + IK เท้า + ท่า idle/walk/run-stop/turn ตามเกณฑ์ §5.2~~ **เสร็จ 2026-11-06** (ดู `docs/06-demo-notes.md` §v0.3)
 3. ~~ท่าโจมตี 3 จังหวะ + 4 สกิลบน rig ใหม่ + secondary motion (ผม, ผ้าพันคอ)~~ **เสร็จ 2026-11-06 เจ้าของตรวจแล้ว "ผ่านแล้ว"** (ดู `docs/06-demo-notes.md` §v0.4) — ที่ยังเหลือ: ท่าตาย/ฟื้น (§5.2), สะดุ้งตามทิศที่โดนจริง (ตอนนี้ถอยหลังตามทิศที่หัน + ผลักตามทิศที่โดน)
-4. ต่อระบบหมวก: ภาพ P04/P05 + ย้ายตรรกะจาก Headgear Lab มาใส่ที่ bone `head` + เมนูเปลี่ยนหมวกในเดโม
+4. ~~ต่อระบบหมวก: ภาพ P04/P05 + ใส่ที่ bone `head` + เมนูเปลี่ยนหมวกในเดโม~~ **ทำแล้ว v0.5 (2026-11-06)** — ที่เหลือ: **ชุด (outfit)** ยังไม่มีภาพ ต้องสั่ง ChatGPT วาดตัวไม่มีหัวชุดอื่นในท่าเดียวกับ P02A แล้วตัดชิ้นด้วย `build_kaelrin_rig.py` (รอยตัดเดิมใช้ได้ถ้าท่าตรงกัน); รูปโปรไฟล์ HUD ยังไม่แสดงหมวก
 5. มอนสเตอร์ตาม §5.3 (สไลม์ soft-body, หมูป่า rig, Capling ตัวใหม่) + ภาพมุมหลัง P06
-6. แมพ orthographic (P07) + ชั้นฉากหน้าบังตัวละคร + ย้ายพื้นที่เดินไปใช้ Tiled
+6. แมพ orthographic (P07) + ชั้นฉากหน้าบังตัวละคร + ย้ายพื้นที่เดินไปใช้ Tiled — **แมพทำแล้ว v0.5** (P07A+B ต่อกันเป็นจัตุรัส→สะพาน→ทุ่งหญ้า); ที่เหลือ: ชั้นฉากหน้า (ต้นไม้/หลังคาบังตัวละคร), Tiled
 7. ไอคอนจริง (P08B) + เอฟเฟกต์จากภาพ (P09) แทนเอฟเฟกต์ที่วาดด้วยโค้ด — **บางส่วนเสร็จ v0.4:** ไอคอนสกิล+ยา, รอยดาบ, คลื่นน้ำ Tidecleave, แรงกระแทก Mossquake; ที่เหลือ: ไอคอนไอเท็มอื่น, ประกายโดนตี/ฮีล ยังวาดด้วยโค้ด
 8. ย้ายเดโมเป็นโปรเจ็ค TypeScript + Vite (`client/`) แล้วเริ่ม M2 multiplayer (Colyseus) ตาม `docs/05`
 
@@ -185,6 +191,7 @@ games/mossbridge/
   demo/rig.js                runtime ของ rig: RigSkeleton (IK), RigView (PixiJS mesh), Locomotion, Spring, แทร็กคีย์เฟรม
   demo/rigs/kaelrin.json     rig ของ Kaelrin: ข้อต่อ/รอยตัด/root/fwd/right ต่อมุม + กระดูก + motion (idle/walk/run/start/stop/turn)
   demo/rig-editor.html       Rig Editor (ใช้ rig.js ตัวเดียวกับเกม)
+  demo/maps/mossbridge.json  ข้อมูลแมพ (สร้างด้วย tools/build_map.py)
   prototype/headgear-lab/    ต้นแบบระบบหมวก
   chatgpt-pack/              คำสั่งสร้างภาพ + refs (zip อยู่ที่ Mossbridge_ChatGPT_Pack.zip)
   art/reference/             ภาพต้นแบบจากเจ้าของ (concept, environment, sprite atlas)
@@ -196,5 +203,7 @@ games/mossbridge/
   tools/build_demo_assets.py คัดลอกชิ้นส่วนฮีโร่ + จุดยึด/มุมอาวุธ + เตรียม asset เดโม
   tools/build_kaelrin_rig.py ตัดตัวไม่มีหัวเป็นชิ้น rig + เติมส่วนที่ถูกบัง → kaelrin_{view}_parts.png (+ --debug ภาพตรวจ)
   tools/build_fx_assets.py   P09A–C → fx_slash/quake/vortex.png (จัดเฟรมให้ตรงกัน), P08B → icon_*.png + "fx"/"icons" ใน manifest
+  tools/build_headgear.py    P04A–F, P05A–C → gear_{id}_{view}.png บนแคนวาสหัว (transform เดียวกับหัว + FIT ต่อชิ้น) + "gear" ใน manifest
+  tools/build_map.py         P07A + P07B → map_town_meadow.jpg + demo/maps/mossbridge.json (พื้นที่เดิน/จุดเกิด วาดตามกริด)
   tools/qa/                  frames.js, sheet.py, sim.js, video.js (Playwright) · rig_check.js (node ล้วน) · serve.js + inpage.js (QA ในเบราว์เซอร์ใดก็ได้)
 ```

@@ -219,7 +219,14 @@ class RigView {
     this.slots = {};
     const byName = {}; for (const s of this.V.slots) byName[s.name] = s;
     for (const name of this.V.drawOrder) {
-      if (name === "head") { this.head = this.makeHead(tex.head); this.container.addChild(this.head.mesh); continue; }
+      if (name === "head") {
+        this.head = this.makeHead(tex.head); this.headTex = { full: tex.head, capped: tex.headCapped || tex.head };
+        this.container.addChild(this.head.mesh);
+        // headgear (low = mask, mid = glasses, top = hat): meshes on the head canvas, drawn over the head
+        this.gear = {};
+        for (const slot of ["low", "mid", "top"]) { const m = new PIXI.SimplePlane(tex.head, 9, 9); m.visible = false; this.gear[slot] = m; this.container.addChild(m); }
+        continue;
+      }
       if (name === "weapon") {
         const w = this.V.weapon; this.weapon = new PIXI.Sprite(tex.weapon);
         this.weapon.anchor.set(w.weaponGrip[0] / tex.weapon.width, w.weaponGrip[1] / tex.weapon.height);
@@ -256,6 +263,13 @@ class RigView {
     for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) { const x = c * texture.width / 8, y = r * texture.height / 8; rest.push([x - pv[0], y - pv[1], smooth(pv[1] - 55, pv[1] - 150, y)]); }
     return { mesh, rest };
   }
+  /* wear an item: slot "top" | "mid" | "low", texture on the 256x256 head canvas (null = none).
+     hair "capped" swaps the head to the pressed-flat hair drawn for hats */
+  setGear(slot, texture, hair) {
+    const m = this.gear && this.gear[slot]; if (!m) return;
+    m.visible = !!texture; if (texture) m.texture = texture;
+    if (slot === "top") this.head.mesh.texture = hair === "capped" ? this.headTex.capped : this.headTex.full;
+  }
   /* draw at pose P. springs: { hair: [dx,dy], scarf: [dx,dy] } in view px. returns solve result */
   update(P, springs = {}) {
     const res = this.skel.solve(P), { J, frames } = res, O = this.skel.origin;
@@ -283,6 +297,10 @@ class RigView {
         const g = G(n[0] + X * c - Y * s, n[1] + X * s + Y * c); d[i * 2] = g[0]; d[i * 2 + 1] = g[1];
       });
       buf.update();
+      for (const slot in this.gear) {          // gear shares the head's vertices (same canvas)
+        const m = this.gear[slot]; if (!m.visible) continue;
+        const gb = m.geometry.getBuffer("aVertexPosition"); if (gb.data.length === d.length) { gb.data.set(d); gb.update(); }
+      }
     }
     // weapon: grip follows the forearm of its hand
     if (this.weapon) {
@@ -308,7 +326,7 @@ class RigView {
     const PIXI = global.PIXI, c = new PIXI.Container();
     c.position.copyFrom(this.container.position); c.scale.copyFrom(this.container.scale);
     for (const ch of this.container.children) {
-      if (ch === this.weapon) continue;
+      if (ch === this.weapon || !ch.visible) continue;
       const g = ch.geometry, m = new PIXI.SimpleMesh(ch.texture, Float32Array.from(g.getBuffer("aVertexPosition").data), Float32Array.from(g.getBuffer("aTextureCoord").data), Uint16Array.from(g.getIndex().data));
       c.addChild(m);
     }

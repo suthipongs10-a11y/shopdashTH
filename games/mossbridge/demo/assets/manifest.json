@@ -162,11 +162,12 @@
   }
  },
  "map": {
-  "file": "map_mossbridge.jpg",
+  "file": "map_town_meadow.jpg",
   "size": [
-   1672,
-   941
-  ]
+   3072,
+   964
+  ],
+  "data": "maps/mossbridge.json"
  },
  "fx": {
   "slash": {
@@ -218,5 +219,131 @@
   "dash": "icon_dash.png",
   "mend": "icon_mend.png",
   "potion": "icon_potion.png"
+ },
+ "gear": {
+  "canvas": [
+   256,
+   256
+  ],
+  "pivot": [
+   128,
+   200
+  ],
+  "capped": {
+   "sw": "hero_sw_head_capped.png",
+   "se": "hero_se_head_capped.png",
+   "w": "hero_w_head_capped.png",
+   "ne": "hero_ne_head_capped.png"
+  },
+  "items": {
+   "hat_witch": {
+    "slot": "top",
+    "name": "\u0e2b\u0e21\u0e27\u0e01\u0e41\u0e21\u0e48\u0e21\u0e14\u0e21\u0e48\u0e27\u0e07",
+    "hair": "capped",
+    "views": {
+     "sw": "gear_hat_witch_sw.png",
+     "se": "gear_hat_witch_se.png",
+     "w": "gear_hat_witch_w.png",
+     "ne": "gear_hat_witch_ne.png"
+    },
+    "icon": "gear_hat_witch_icon.png"
+   },
+   "hat_beanie": {
+    "slot": "top",
+    "name": "\u0e2b\u0e21\u0e27\u0e01\u0e44\u0e2b\u0e21\u0e1e\u0e23\u0e21",
+    "hair": "capped",
+    "views": {
+     "sw": "gear_hat_beanie_sw.png",
+     "se": "gear_hat_beanie_se.png",
+     "w": "gear_hat_beanie_w.png",
+     "ne": "gear_hat_beanie_ne.png"
+    },
+    "icon": "gear_hat_beanie_icon.png"
+   },
+   "hat_crown": {
+    "slot": "top",
+    "name": "\u0e21\u0e07\u0e01\u0e38\u0e0e\u0e17\u0e2d\u0e07\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e07",
+    "hair": "full",
+    "views": {
+     "sw": "gear_hat_crown_sw.png",
+     "se": "gear_hat_crown_se.png",
+     "w": "gear_hat_crown_w.png",
+     "ne": "gear_hat_crown_ne.png"
+    },
+    "icon": "gear_hat_crown_icon.png"
+   },
+   "hat_sprout": {
+    "slot": "top",
+    "name": "\u0e15\u0e49\u0e19\u0e2d\u0e48\u0e2d\u0e19\u0e2a\u0e44\u0e25\u0e21\u0e4c",
+    "hair": "full",
+    "views": {
+     "sw": "gear_hat_sprout_sw.png",
+     "se": "gear_hat_sprout_se.png",
+     "w": "gear_hat_sprout_w.png",
+     "ne": "gear_hat_sprout_ne.png"
+    },
+    "icon": "gear_hat_sprout_icon.png"
+   },
+   "hat_catears": {
+    "slot": "top",
+    "name": "\u0e17\u0e35\u0e48\u0e04\u0e32\u0e14\u0e2b\u0e39\u0e41\u0e21\u0e27",
+    "hair": "full",
+    "views": {
+     "sw": "gear_hat_catears_sw.png",
+     "se": "gear_hat_catears_se.png",
+     "w": "gear_hat_catears_w.png",
+     "ne": "gear_hat_catears_ne.png"
+    },
+    "icon": "gear_hat_catears_icon.png"
+   },
+   "helm_mossback": {
+    "slot": "top",
+    "name": "\u0e2b\u0e21\u0e27\u0e01\u0e40\u0e01\u0e23\u0e32\u0e30\u0e2b\u0e21\u0e39\u0e1b\u0e48\u0e32\u0e21\u0e2d\u0e2a",
+    "hair": "capped",
+    "views": {
+     "sw": "gear_helm_mossback_sw.png",
+     "se": "gear_helm_mossback_se.png",
+     "w": "gear_helm_mossback_w.png",
+     "ne": "gear_helm_mossback_ne.png"
+    },
+    "icon": "gear_helm_mossback_icon.png"
+   },
+   "mid_goggles": {
+    "slot": "mid",
+    "name": "\u0e41\u0e27\u0e48\u0e19\u0e01\u0e31\u0e19\u0e25\u0e21\u0e0a\u0e48\u0e32\u0e07\u0e15\u0e35\u0e40\u0e2b\u0e25\u0e47\u0e01",
+    "hair": "full",
+    "views": {
+     "sw": "gear_mid_goggles_sw.png",
+     "se": "gear_mid_goggles_se.png",
+     "w": "gear_mid_goggles_w.png",
+     "ne": "gear_mid_goggles_ne.png"
+    },
+    "icon": "gear_mid_goggles_icon.png"
+   },
+   "mid_glasses": {
+    "slot": "mid",
+    "name": "\u0e41\u0e27\u0e48\u0e19\u0e01\u0e25\u0e21\u0e19\u0e31\u0e01\u0e1b\u0e23\u0e32\u0e0a\u0e0d\u0e4c",
+    "hair": "full",
+    "views": {
+     "sw": "gear_mid_glasses_sw.png",
+     "se": "gear_mid_glasses_se.png",
+     "w": "gear_mid_glasses_w.png",
+     "ne": "gear_mid_glasses_ne.png"
+    },
+    "icon": "gear_mid_glasses_icon.png"
+   },
+   "low_scarf": {
+    "slot": "low",
+    "name": "\u0e1c\u0e49\u0e32\u0e1b\u0e34\u0e14\u0e1b\u0e32\u0e01\u0e19\u0e31\u0e01\u0e40\u0e14\u0e34\u0e19\u0e17\u0e32\u0e07",
+    "hair": "full",
+    "views": {
+     "sw": "gear_low_scarf_sw.png",
+     "se": "gear_low_scarf_se.png",
+     "w": "gear_low_scarf_w.png",
+     "ne": "gear_low_scarf_ne.png"
+    },
+    "icon": "gear_low_scarf_icon.png"
+   }
+  }
  }
 }
