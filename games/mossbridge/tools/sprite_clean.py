@@ -76,6 +76,46 @@ def clean_alpha(alpha: np.ndarray, lo: int, hi: int) -> np.ndarray:
     return np.clip(a, 0, 255).astype(np.uint8)
 
 
+def remove_spill(rgb: np.ndarray, alpha: np.ndarray, key: tuple[int, int, int], px: int,
+                 pocket: float | None = 0.40) -> tuple[np.ndarray, np.ndarray]:
+    """Fix the key-color tint the chroma key leaves behind. Returns (rgb, alpha).
+
+    1. Pockets: small gaps (between arm and body) where the AI painted the background in shadow,
+       e.g. (143,15,97) on a magenta key. They are far from the key color so the keyer keeps them.
+       A pixel is a pocket when its tint ratio m = (min(H) - max(L)) / max(R,G,B) > `pocket`;
+       alpha fades from 1 at m = pocket to 0 at m = pocket + 0.15. Normal colors stay below 0.30
+       (purple-blue shadows ~0.25, dark outlines ~0.1, skin < 0). None disables this step.
+    2. Edges: AI images blend the dark outline into the background, so the outermost outline
+       pixels are opaque but tinted and show as a pink ring. Within `px` of any transparent or
+       pocket pixel, spill = min(H) - max(L) is subtracted from H where it is > 0.
+    H / L are the key's high / low channels (magenta: H = R,B and L = G)."""
+    if px <= 0:
+        return rgb, alpha
+    hi_ch = [i for i in range(3) if key[i] >= 128]
+    lo_ch = [i for i in range(3) if key[i] < 128]
+    if not hi_ch or not lo_ch:
+        return rgb, alpha
+    out = rgb.astype(np.int16)
+    alpha = alpha.copy()
+    spill = out[..., hi_ch].min(axis=2) - out[..., lo_ch].max(axis=2)
+    if pocket is not None:
+        m = spill / np.maximum(out.max(axis=2), 1)
+        keep = np.clip((pocket + 0.15 - m) / 0.15, 0.0, 1.0)
+        alpha = np.where(m > pocket, (alpha * keep).astype(np.uint8), alpha)
+    clear = alpha == 0
+    seed = clear | ((alpha < 255) & (spill > 0))
+    near = seed.copy()
+    for _ in range(px):
+        grown = near.copy()
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            grown |= np.roll(np.roll(near, dy, 0), dx, 1)
+        near = grown
+    fix = near & ~clear & (spill > 0)
+    for i in hi_ch:
+        out[..., i][fix] -= spill[fix]
+    return np.clip(out, 0, 255).astype(np.uint8), alpha
+
+
 def defringe(rgb: np.ndarray, alpha: np.ndarray, iterations: int = 3) -> np.ndarray:
     """Give semi/fully transparent pixels the average color of nearby opaque pixels."""
     rgb = rgb.astype(np.float32).copy()
@@ -181,6 +221,9 @@ def main() -> int:
     ap.add_argument("--merge-gap", type=int, default=24, help="merge islands closer than this many px")
     ap.add_argument("--min-area", type=int, default=2500, help="ignore islands smaller than this (px^2)")
     ap.add_argument("--no-slice", action="store_true", help="treat the whole image as one sprite")
+    ap.add_argument("--edge-despill", type=int, default=0,
+                    help="remove key-color tint within N px of the edge and key out shaded background "
+                         "pockets (pink ring fix; try 3). 0 = off")
     args = ap.parse_args()
 
     src = Image.open(args.input)
@@ -188,13 +231,14 @@ def main() -> int:
     rgba = np.array(src.convert("RGBA"))
     rgb, alpha = rgba[..., :3], rgba[..., 3]
 
+    key = hex_to_rgb(args.key or "#FF00FF")
     if args.key or not has_alpha:
-        key = hex_to_rgb(args.key or "#FF00FF")
         lo, hi = (float(v) for v in args.key_tol.split(","))
         rgb, alpha = key_to_alpha(rgb, key, lo, hi)
 
     a_lo, a_hi = (int(v) for v in args.alpha.split(","))
     alpha = clean_alpha(alpha, a_lo, a_hi)
+    rgb, alpha = remove_spill(rgb, alpha, key, args.edge_despill)
     rgb = defringe(rgb, alpha)
 
     cw, ch = parse_pair(args.canvas, "x")

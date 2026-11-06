@@ -1,0 +1,107 @@
+{
+ "source": {
+  "body_full": "P01_kaelrin_body_empty_hands.png",
+  "body_headless": "P02A_kaelrin_body_headless.png",
+  "head_full": "P02B_kaelrin_head_hair_full.png",
+  "head_capped": "P02C_kaelrin_head_hair_capped.png",
+  "weapon": "P03_weapon_brass_pickblade.png"
+ },
+ "body": {
+  "canvas": [
+   320,
+   320
+  ],
+  "feet": [
+   160,
+   300
+  ],
+  "scale": 0.51485
+ },
+ "head": {
+  "canvas": [
+   256,
+   256
+  ],
+  "pivot": [
+   128,
+   200
+  ],
+  "scale": 0.24327
+ },
+ "views": {
+  "sw": {
+   "body_full": "body_full_sw.png",
+   "body_headless": "body_headless_sw.png",
+   "head_full": "head_full_sw.png",
+   "head_capped": "head_capped_sw.png",
+   "neck": [
+    125.8,
+    116.2
+   ]
+  },
+  "se": {
+   "body_full": "body_full_se.png",
+   "body_headless": "body_headless_se.png",
+   "head_full": "head_full_se.png",
+   "head_capped": "head_capped_se.png",
+   "neck": [
+    200.4,
+    114.7
+   ]
+  },
+  "w": {
+   "body_full": "body_full_w.png",
+   "body_headless": "body_headless_w.png",
+   "head_full": "head_full_w.png",
+   "head_capped": "head_capped_w.png",
+   "neck": [
+    151.2,
+    111.6
+   ]
+  },
+  "ne": {
+   "body_full": "body_full_ne.png",
+   "body_headless": "body_headless_ne.png",
+   "head_full": "head_full_ne.png",
+   "head_capped": "head_capped_ne.png",
+   "neck": [
+    125.7,
+    115.7
+   ]
+  }
+ },
+ "weapon": {
+  "scale": 0.17261,
+  "note": "blade points down; a = hook on the left, b = hook on the right",
+  "a": {
+   "file": "weapon_a.png",
+   "size": [
+    67,
+    158
+   ],
+   "grip": [
+    45.6,
+    29.7
+   ],
+   "tip": [
+    43.4,
+    154.0
+   ]
+  },
+  "b": {
+   "file": "weapon_b.png",
+   "size": [
+    67,
+    159
+   ],
+   "grip": [
+    20.8,
+    29.8
+   ],
+   "tip": [
+    23.0,
+    154.2
+   ]
+  }
+ }
+}

@@ -2,7 +2,6 @@
  "hero": {
   "sw": {
    "body": "hero_sw_body.png",
-   "weapon": "hero_sw_weapon.png",
    "size": [
     320,
     320
@@ -11,18 +10,32 @@
     160,
     300
    ],
-   "grip": [
+   "head": "hero_sw_head.png",
+   "headPivot": [
     128,
     200
    ],
+   "neck": [
+    125.8,
+    116.2
+   ],
+   "grip": [
+    73,
+    190
+   ],
+   "weapon": "hero_weapon_a.png",
    "weaponGrip": [
-    64,
-    37
-   ]
+    45.6,
+    29.7
+   ],
+   "weaponTip": [
+    43.4,
+    154.0
+   ],
+   "weaponAngle": 39
   },
   "se": {
    "body": "hero_se_body.png",
-   "weapon": "hero_se_weapon.png",
    "size": [
     320,
     320
@@ -31,18 +44,32 @@
     160,
     300
    ],
-   "grip": [
-    183,
-    222
+   "head": "hero_se_head.png",
+   "headPivot": [
+    128,
+    200
    ],
+   "neck": [
+    200.4,
+    114.7
+   ],
+   "grip": [
+    184,
+    198
+   ],
+   "weapon": "hero_weapon_b.png",
    "weaponGrip": [
-    23,
-    62
-   ]
+    20.8,
+    29.8
+   ],
+   "weaponTip": [
+    23.0,
+    154.2
+   ],
+   "weaponAngle": -42
   },
   "w": {
    "body": "hero_w_body.png",
-   "weapon": "hero_w_weapon.png",
    "size": [
     320,
     320
@@ -51,18 +78,32 @@
     160,
     300
    ],
-   "grip": [
-    124,
-    168
+   "head": "hero_w_head.png",
+   "headPivot": [
+    128,
+    200
    ],
+   "neck": [
+    151.2,
+    111.6
+   ],
+   "grip": [
+    95,
+    163
+   ],
+   "weapon": "hero_weapon_a.png",
    "weaponGrip": [
-    50,
-    37
-   ]
+    45.6,
+    29.7
+   ],
+   "weaponTip": [
+    43.4,
+    154.0
+   ],
+   "weaponAngle": 34
   },
   "ne": {
    "body": "hero_ne_body.png",
-   "weapon": "hero_ne_weapon.png",
    "size": [
     320,
     320
@@ -71,14 +112,29 @@
     160,
     300
    ],
-   "grip": [
-    194,
-    224
+   "head": "hero_ne_head.png",
+   "headPivot": [
+    128,
+    200
    ],
+   "neck": [
+    125.7,
+    115.7
+   ],
+   "grip": [
+    174,
+    190
+   ],
+   "weapon": "hero_weapon_b.png",
    "weaponGrip": [
-    22,
-    42
-   ]
+    20.8,
+    29.8
+   ],
+   "weaponTip": [
+    23.0,
+    154.2
+   ],
+   "weaponAngle": -37
   }
  },
  "mobs": {

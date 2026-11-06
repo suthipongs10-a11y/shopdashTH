@@ -2,8 +2,10 @@
  *
  * Rendering: PixiJS 7. Every character is ONE painted image per view, animated by
  * deforming a mesh (SimplePlane) every frame — the Spine-style approach that keeps
- * AI-painted art perfectly consistent while still moving smoothly. The hero's weapon
- * was cut into its own sprite (tools/build_demo_assets.py) so it can swing freely.
+ * AI-painted art perfectly consistent while still moving smoothly. The hero is painted
+ * in separate parts (tools/build_kaelrin_parts.py): a headless body (the mesh), a head
+ * sprite pinned to the deformed neck (headgear will sit on it), and a weapon sprite
+ * pinned to the deformed right fist so it can swing freely.
  *
  * Coordinates: world = pixels of the map painting (1672 x 941). Actors use a fake
  * perspective scale (smaller near the top of the painting) to match the art.
@@ -38,9 +40,9 @@ await Promise.race([Promise.all([document.fonts.load('500 15px Mitr'), document.
 PIXI.Assets.setPreferences({ preferWorkers: false });
 const man = await (await fetch(A + "manifest.json")).json();
 const urls = [A + man.map.file];
-for (const v of Object.values(man.hero)) urls.push(A + v.body, A + v.weapon);
+for (const v of Object.values(man.hero)) urls.push(A + v.body, A + v.head, A + v.weapon);
 for (const m of Object.values(man.mobs)) urls.push(A + m.file);
-const T = await PIXI.Assets.load(urls);
+const T = await PIXI.Assets.load([...new Set(urls)]);
 const tex = f => T[A + f];
 
 const MAP_W = man.map.size[0], MAP_H = man.map.size[1];
@@ -291,12 +293,13 @@ class MeshActor {
 }
 
 /* ------------------------------------------------------------------ hero */
-// per view rig landmarks in texture pixels (320x320, feet at 160,300)
+// per view rig landmarks in texture pixels (320x320, feet at 160,300). split = x between the
+// legs, hipY = just above the crotch. neckY comes from the manifest (top of the neck stump).
 const RIG = {
-  sw: { s: -1, fwd: [-.8, .6], hipY: 214, split: 180, neckY: 150, tip: [64, 278] },
-  se: { s: 1, fwd: [.8, .6], hipY: 220, split: 136, neckY: 150, tip: [250, 296] },
-  w:  { s: -1, fwd: [-1, .05], hipY: 214, split: 158, neckY: 146, tip: [76, 240] },
-  ne: { s: 1, fwd: [.8, -.6], hipY: 224, split: 140, neckY: 150, tip: [250, 298] },
+  sw: { s: -1, fwd: [-.8, .6], hipY: 222, split: 128 },
+  se: { s: 1, fwd: [.8, .6], hipY: 222, split: 192 },
+  w:  { s: -1, fwd: [-1, .05], hipY: 224, split: 148 },
+  ne: { s: 1, fwd: [.8, -.6], hipY: 226, split: 125 },
 };
 const POSE0 = { air: 0, bob: 0, lean: 0, squash: 1, raise: 0, reachF: 0, reachU: 0, head: 0, legA: 0, legB: 0, liftA: 0, liftB: 0, step: 0, spin: 0 };
 
@@ -352,6 +355,7 @@ class Hero extends MeshActor {
   constructor() {
     const v = man.hero.sw;
     super(tex(v.body), 22, 22, v.feet);
+    this.head = new PIXI.Sprite(tex(v.head)); this.root.addChild(this.head);
     this.weapon = new PIXI.Sprite(tex(v.weapon)); this.root.addChild(this.weapon);
     this.view = "sw"; this.setView("sw");
     this.trail = new Trail();
@@ -365,10 +369,15 @@ class Hero extends MeshActor {
     if (this.viewSet === v) return; this.viewSet = v;
     const m = man.hero[v];
     this.plane.texture = tex(m.body); this.setRest(tex(m.body));
+    this.head.texture = tex(m.head);
+    this.head.anchor.set(m.headPivot[0] / tex(m.head).width, m.headPivot[1] / tex(m.head).height);
+    this.neck = m.neck;
     this.weapon.texture = tex(m.weapon);
     this.weapon.anchor.set(m.weaponGrip[0] / tex(m.weapon).width, m.weaponGrip[1] / tex(m.weapon).height);
-    this.grip = m.grip; this.rig = RIG[v];
-    const t = this.rig.tip; this.tipLocal = [t[0] - m.grip[0], t[1] - m.grip[1]];
+    this.grip = m.grip; this.rig = { ...RIG[v], neckY: m.neck[1] };
+    // the weapon is painted blade-down; each view holds it at a resting angle
+    const a0 = m.weaponAngle * Math.PI / 180, tx = m.weaponTip[0] - m.weaponGrip[0], ty = m.weaponTip[1] - m.weaponGrip[1];
+    this.weaponAngle = a0; this.tipLocal = [tx * Math.cos(a0) - ty * Math.sin(a0), tx * Math.sin(a0) + ty * Math.cos(a0)];
   }
   face(dx, dy) {
     if (Math.abs(dx) < .01 && Math.abs(dy) < .01) return;
@@ -486,11 +495,17 @@ class Hero extends MeshActor {
     const gp = this.deform(g[0], g[1], P, 1);
     this.weapon.x = gp[0] - this.feet[0]; this.weapon.y = gp[1] - this.feet[1];
     const rot = -this.rig.s * P.raise + P.lean * this.rig.s * .6 + (P.spin || 0) * this.rig.s;
-    this.weapon.rotation = rot; this.weapon.scale.set(1, P.squash < 1 ? 1 : 1);
+    this.weapon.rotation = this.weaponAngle + rot;
+    // head: pinned to the deformed neck, turns with the upper body lean + head tilt, squashes with the body
+    const np = this.deform(this.neck[0], this.neck[1], P, 0);
+    this.head.x = np[0] - this.feet[0]; this.head.y = np[1] - this.feet[1];
+    this.head.rotation = (P.lean + P.head) * this.rig.s;
+    this.head.scale.set(1 + (1 - P.squash) * .7, P.squash);
     // shadow shrinks while airborne
     const air = clamp(P.air / 90, 0, 1); this.shadow.scale.set(1 - air * .45, 1 - air * .45); this.shadow.alpha = 1 - air * .5;
     this.place();
     this.setFlash(Math.max(0, this.flashAmt - dt * 5));
+    this.head.filters = this.plane.filters;
     // trail from the blade tip (world coords)
     const tipX = this.tipLocal[0] * Math.cos(rot) - this.tipLocal[1] * Math.sin(rot) + this.weapon.x;
     const tipY = this.tipLocal[0] * Math.sin(rot) + this.tipLocal[1] * Math.cos(rot) + this.weapon.y;
@@ -876,10 +891,14 @@ function useSkill(i) {
 }
 function nearestMob(r) { let best = null, bd = r; for (const m of mobs) { if (m.dead) continue; const d = Math.hypot(m.x - hero.x, (m.y - hero.y) * 1.25); if (d < bd) { bd = d; best = m; } } return best; }
 function ghost(h) {
-  const s = new PIXI.Sprite(h.plane.texture); s.anchor.set(h.feet[0] / h.w, h.feet[1] / h.h);
-  s.x = h.x; s.y = h.y; s.scale.set(h.flip ? -h.scale : h.scale, h.scale); s.tint = 0x6ff0e0; s.alpha = .5; s.blendMode = PIXI.BLEND_MODES.ADD;
+  const s = new PIXI.Container();
+  const body = new PIXI.Sprite(h.plane.texture); body.anchor.set(h.feet[0] / h.w, h.feet[1] / h.h);
+  const head = new PIXI.Sprite(h.head.texture); head.anchor.copyFrom(h.head.anchor);
+  head.position.copyFrom(h.head.position); head.rotation = h.head.rotation; head.scale.copyFrom(h.head.scale);
+  for (const p of [body, head]) { p.tint = 0x6ff0e0; p.blendMode = PIXI.BLEND_MODES.ADD; s.addChild(p); }
+  s.x = h.x; s.y = h.y; s.scale.set(h.flip ? -h.scale : h.scale, h.scale); s.alpha = .5;
   actorLayer.addChild(s); s.zIndex = h.y - 1;
-  effects.push({ t: 0, update(dt) { this.t += dt; s.alpha = .5 * (1 - this.t / .3); if (this.t > .3) { s.destroy(); return false; } return true; } });
+  effects.push({ t: 0, update(dt) { this.t += dt; s.alpha = .5 * (1 - this.t / .3); if (this.t > .3) { s.destroy({ children: true }); return false; } return true; } });
 }
 
 /* ------------------------------------------------------------------ ambience: pollen, fireflies, water glints */
@@ -966,9 +985,9 @@ function flashSlot(i) { const b = hotbar.children[i]; b.classList.add("flash"); 
 $("helpBtn").addEventListener("click", () => { const h = $("help"); h.hidden = !h.hidden; $("helpBtn").setAttribute("aria-expanded", String(!h.hidden)); });
 
 const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
-const [faceImg, mapImg] = await Promise.all([loadImg(A + man.hero.se.body), loadImg(A + man.map.file)]);
-// portrait: crop the hero's face from the painted view
-if (faceImg) { const g = $("portrait").getContext("2d"); g.fillStyle = "#30483a"; g.fillRect(0, 0, 116, 116); g.drawImage(faceImg, 85, 45, 120, 120, -2, 4, 120, 120); }
+const [faceImg, mapImg] = await Promise.all([loadImg(A + man.hero.se.head), loadImg(A + man.map.file)]);
+// portrait: the hero's SE head (256x256 head canvas, the head sits around y 135-231)
+if (faceImg) { const g = $("portrait").getContext("2d"); g.fillStyle = "#30483a"; g.fillRect(0, 0, 116, 116); g.drawImage(faceImg, 66, 128, 112, 112, 2, 6, 112, 112); }
 
 // minimap
 const mm = $("minimap"), mg = mm.getContext("2d");

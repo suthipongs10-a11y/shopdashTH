@@ -24,10 +24,11 @@
 |---|---|---|
 | เอกสารออกแบบ 01–06 | เสร็จ | `docs/` |
 | Headgear Lab (ต้นแบบระบบหมวก 3 ช่อง) | เสร็จ ภาพ placeholder วาดด้วยโค้ด | `prototype/headgear-lab/index.html` |
-| **เดโมเล่นได้ v0.1** | เสร็จ ใช้ภาพที่แนบมาตอนแรกเท่านั้น | `demo/index.html` + `demo/game.js` |
-| ชุดคำสั่งสร้างภาพ ChatGPT (24 ภาพ) | เขียนเสร็จ **ยังไม่ได้สั่งภาพ** | `chatgpt-pack/` + `Mossbridge_ChatGPT_Pack.zip` |
-| เครื่องมือล้างภาพ AI | เสร็จ | `tools/sprite_clean.py` |
-| เครื่องมือเตรียม asset ของเดโม | เสร็จ | `tools/build_demo_assets.py` |
+| **เดโมเล่นได้ v0.2** | เสร็จ ฮีโร่เป็น **ตัวไม่มีหัว (mesh) + หัวแยก + อาวุธแยก** จากภาพ P01–P03 | `demo/index.html` + `demo/game.js` |
+| ชุดคำสั่งสร้างภาพ ChatGPT (24 ภาพ) | **P01–P03 สั่งและล้างแล้ว** (2026-11-06) · P04–P09 ยังไม่สั่ง | `chatgpt-pack/` + `Mossbridge_ChatGPT_Pack.zip` |
+| ชิ้นส่วน Kaelrin ที่ล้างแล้ว | เสร็จ: ตัวเต็ม/ตัวไม่มีหัว 4 มุม, หัวผมปกติ/ผมยุบ 4 มุม, อาวุธ 2 ด้าน + จุดยึด | `art/samples/kaelrin/` (สร้างด้วย `tools/build_kaelrin_parts.py`) |
+| เครื่องมือล้างภาพ AI | เสร็จ (+ `--edge-despill 3` แก้ขอบชมพูจากพื้นม่วง) | `tools/sprite_clean.py` |
+| เครื่องมือเตรียม asset ของเดโม | เสร็จ (อ่านชิ้นส่วนจาก `art/samples/kaelrin/`) | `tools/build_demo_assets.py` |
 | สคริปต์ QA (เฟรม, จำลองการสู้, วิดีโอ) | เสร็จ | `tools/qa/` |
 | เซิร์ฟเวอร์ multiplayer | ยังไม่เริ่ม (milestone M2) | `docs/05-game-architecture.md` |
 
@@ -60,6 +61,8 @@ npm run qa:video            # อัดวิดีโอเล่นจริ�
 
 ขั้นตอนเมื่อใช้ Claude in Chrome / เบราว์เซอร์ในแอป:
 1. เปิดแท็บใหม่ไปที่ chatgpt.com ให้เจ้าของ login เอง (ห้ามขอรหัสผ่าน ห้ามพิมพ์รหัสแทน)
+   - ใช้บัญชี **Plus** (บัญชี Free สร้างภาพได้ราว 3 ภาพ/วัน และแนบไฟล์ได้น้อย ทำ P01–P03 ไม่จบในวันเดียว)
+   - เครื่องมือแนบไฟล์ของ Claude in Chrome อ่านได้เฉพาะไฟล์ในโฟลเดอร์ของ session ถ้าแนบจาก `chatgpt-pack/refs/` ไม่ได้ ให้คัดลอกไป scratchpad ก่อน
 2. เริ่มแชทใหม่ แนบรูปทุกไฟล์ใน `chatgpt-pack/refs/` ถ้าเครื่องมือเบราว์เซอร์แนบไฟล์จากเครื่องไม่ได้ ให้ขอเจ้าของลากรูปใส่แชทเอง
 3. วางข้อความจาก `01_START_HERE_for_ChatGPT.md` รอ ChatGPT ตอบ "Ready"
 4. ส่ง prompt ทีละภาพตามลำดับ **P01 → P02 → P03 ก่อน** (สำคัญที่สุด) 1 ข้อความต่อ 1 ภาพ
@@ -67,7 +70,9 @@ npm run qa:video            # อัดวิดีโอเล่นจริ�
 6. ดาวน์โหลดภาพเป็น PNG ขนาดเต็ม ตั้งชื่อตาม `SAVE AS:` แล้วเก็บใน `art/raw/` (โฟลเดอร์นี้อยู่ใน .gitignore)
    - ถ้าปุ่มดาวน์โหลดใช้ไม่ได้ ให้รัน JavaScript ในหน้า: `fetch(img.src)` → blob → สร้าง `<a download>` แล้วคลิก จากนั้นย้ายไฟล์จาก Downloads มาที่ `art/raw/`
    - ถ้ายังไม่ได้ ให้ขอเจ้าของกดดาวน์โหลดเอง
-7. ล้างภาพ: `python3 tools/sprite_clean.py art/raw/<file>.png -o art/out/<name> --key "#FF00FF" ...` (หมวกสีม่วงใช้ `--key "#00FF00"`) ดูตัวเลือกใน docstring ของไฟล์
+7. ล้างภาพ: `python3 tools/sprite_clean.py art/raw/<file>.png -o art/out/<name> --key "#FF00FF" --edge-despill 3 ...` (หมวกสีม่วงใช้ `--key "#00FF00"`) ดูตัวเลือกใน docstring ของไฟล์
+   - `--edge-despill 3` จำเป็นกับภาพจาก ChatGPT: เส้นขอบเข้มผสมกับพื้นม่วงจนเป็นวงชมพูรอบตัว และช่องว่างแคบ ๆ (ระหว่างแขนกับลำตัว) ถูกวาดเป็นม่วงเข้ม
+   - ภาพ P01–P03 ล้างด้วย `python3 tools/build_kaelrin_parts.py` (จับคู่หัว P02B กับหัวใน P01 ให้ขนาด/ตำแหน่งตรง) แล้ว `python3 tools/build_demo_assets.py`
 8. commit ภาพที่ผ่านแล้ว (ไม่ใช่ภาพดิบ) ไว้ใต้ `demo/assets/` หรือ `art/samples/`
 
 **กฎภาพ** (ละเอียดใน `docs/02-art-style-guide.md`, `docs/03-sprite-spec.md`):
@@ -79,10 +84,12 @@ npm run qa:video            # อัดวิดีโอเล่นจริ�
 ## 5. งานหลัก: แอนิเมชันให้เนียน (ลำดับที่แนะนำ)
 
 ### 5.0 ตอนนี้ทำงานอย่างไร (ต้องเข้าใจก่อนแก้)
-`demo/game.js` ใช้ **mesh deformation บนภาพวาดภาพเดียวต่อมุม** (`PIXI.SimplePlane` 22×22 จุด)
+`demo/game.js` ใช้ **mesh deformation บนภาพตัวไม่มีหัว 1 ภาพต่อมุม** (`PIXI.SimplePlane` 22×22 จุด)
 ทุกเฟรมคำนวณตำแหน่งจุดจาก pose ไม่กี่ค่า (`POSE0`: air, bob, lean, squash, raise, spin, reachF/U, head, legA/B, liftA/B, step)
 ท่าต่าง ๆ อยู่ใน `CLIPS` (keyframe + easing) และ blend กับท่าเดิน/ยืนใน `Hero.update`
-จุดสำคัญต่อมุมอยู่ใน `RIG` (hipY, split, neckY, tip) อาวุธถูกตัดเป็น sprite แยก (`tools/build_demo_assets.py`)
+จุดสำคัญต่อมุมอยู่ใน `RIG` (hipY, split) + manifest (neck, grip, มุมพักอาวุธ `weaponAngle`)
+หัวเป็น sprite แยก ปักที่จุดคอหลัง deform (หมุนตาม lean + head, ยุบตาม squash) → หมวกจะเสียบที่หัวนี้
+อาวุธเป็นภาพเดียว (`hero_weapon_a/b.png` ด้านตะขอซ้าย/ขวา) ปักที่กำปั้นขวาแล้วหมุนตามมุมพักของแต่ละมุมกล้อง
 มอนสเตอร์: `Sproutling.render` (ยุบ/ยืด/สั่น) และ `Mossback.render` (ขา 4 ข้างแบบเฉือนภาพ + หัวเอียง)
 
 **จุดอ่อนที่เจ้าของเห็น:** ขาแค่ "เฉือน" ไม่งอเข่า, แขนข้างไม่ถืออาวุธไม่แกว่ง, เท้าลื่นไถลบนพื้น, หมูป่าเดินเหมือนภาพกระดิก, สไลม์กระโดดแข็ง ๆ, เปลี่ยนทิศแล้วภาพเปลี่ยนทันทีแบบกระตุก
@@ -138,7 +145,7 @@ npm run qa:video            # อัดวิดีโอเล่นจริ�
 
 ## 6. Backlog (ทำจากบนลงล่าง)
 
-1. สั่งภาพ P01–P03 → ล้าง → เปลี่ยนเดโมเป็นตัวที่หัวแยก + อาวุธแยก (ยังใช้ mesh เดิมได้ชั่วคราว)
+1. ~~สั่งภาพ P01–P03 → ล้าง → เปลี่ยนเดโมเป็นตัวที่หัวแยก + อาวุธแยก (ยังใช้ mesh เดิมได้ชั่วคราว)~~ **เสร็จ 2026-11-06** (ดู `docs/06-demo-notes.md` §v0.2)
 2. ทำ Rig Editor + rig ของ Kaelrin (§5.1) + IK เท้า + ท่า idle/walk/run-stop/turn ตามเกณฑ์ §5.2
 3. ท่าโจมตี 3 จังหวะ + 4 สกิลบน rig ใหม่ + secondary motion (ผม, ผ้าพันคอ)
 4. ต่อระบบหมวก: ภาพ P04/P05 + ย้ายตรรกะจาก Headgear Lab มาใส่ที่ bone `head` + เมนูเปลี่ยนหมวกในเดโม
@@ -168,9 +175,11 @@ games/mossbridge/
   prototype/headgear-lab/    ต้นแบบระบบหมวก
   chatgpt-pack/              คำสั่งสร้างภาพ + refs (zip อยู่ที่ Mossbridge_ChatGPT_Pack.zip)
   art/reference/             ภาพต้นแบบจากเจ้าของ (concept, environment, sprite atlas)
-  art/samples/               sprite ที่ล้างแล้วจาก atlas (ชื่อไฟล์ hero_* เดาทิศผิด ดูทิศจริงใน tools/build_demo_assets.py)
+  art/samples/               sprite ที่ล้างแล้วจาก atlas (ชื่อไฟล์ hero_* เดาทิศผิด และเลิกใช้ในเดโมแล้ว)
+  art/samples/kaelrin/       ชิ้นส่วน Kaelrin จาก P01–P03: body_full/headless, head_full/capped, weapon_a/b + manifest
   art/raw/                   ภาพดิบจาก ChatGPT (ไม่ commit)
   tools/sprite_clean.py      ล้างพื้นหลัง/ขอบ, ตัดชีต, จัดลงแคนวาส + pivot
-  tools/build_demo_assets.py ตัดอาวุธออกจากภาพฮีโร่ + เตรียม asset เดโม
+  tools/build_kaelrin_parts.py  ล้าง P01–P03 เป็นชิ้นส่วน Kaelrin (จับคู่หัวกับตัวให้ตรง P01)
+  tools/build_demo_assets.py คัดลอกชิ้นส่วนฮีโร่ + จุดยึด/มุมอาวุธ + เตรียม asset เดโม
   tools/qa/                  frames.js, sheet.py, sim.js, video.js
 ```
