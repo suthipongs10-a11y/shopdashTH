@@ -59,6 +59,8 @@
 
 ตรวจแล้ว: contact sheet คอมโบ 6 ทิศ + 4 สกิล, qa:sim ในหน้า 90 วินาที ไม่มี error ฆ่าบอสได้, `npm run qa:rig` ผ่าน, วิดีโอต่อสู้ 13 วินาที (30 fps) ทั้งความเร็วจริงและช้า 3 เท่า
 
+**เจ้าของเล่นเดโม v0.4 (artifact version 3) แล้วตอบว่า "ผ่านแล้ว" (2026-11-06)**
+
 ## v0.3 (2026-11-06): skeletal rig + IK เท้า + Rig Editor (backlog 2)
 
 ไฟล์: `demo/rig.js` (runtime), `demo/rigs/kaelrin.json` (ข้อมูล), `demo/rig-editor.html` (เครื่องมือ), `tools/build_kaelrin_rig.py` (ตัดชิ้น)
