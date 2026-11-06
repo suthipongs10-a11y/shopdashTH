@@ -1,0 +1,65 @@
+P11 — PILOT: Kaelrin animation frames, view SW, full body with sword      (3 images)
+ใช้ทำ: ทดลองฮีโร่แบบเฟรม (docs/07) ทิศเดียวก่อน — ถ้าผ่านจะสั่งทิศ S, W, NW, N ต่อ
+วิธีใช้: ส่งในแชท ChatGPT เดิมที่มี refs + P01 + P03 อยู่แล้ว (ถ้าแชทใหม่ ให้แนบ REF_03, P01, P03 และวาง 01_START_HERE ก่อน)
+ส่งทีละช่อง 1 ข้อความ = 1 ภาพ · ส่ง P11A ก่อน แล้ว P11B, P11C ให้อ้างถึง P11A (ทำให้หน้าตาเหมือนกันทุกชีต)
+
+=====================================================================
+[P11A] SAVE AS: P11A_hero_sw_idle4.png
+SIZE: 1024x1024 (square)
+
+PROMPT:
+Animation sprite sheet of Kaelrin, exactly as in REF_03 and my P01 image (same face, teal spiky hair, teal leather armor
+with brass trim and shoulder pads, dark teal scarf, brown belt with pouch, armored boots). He holds the brass pick-blade
+from my P03 image in his RIGHT hand; the fist is fully wrapped around the leather grip.
+Every frame is view SW (front three-quarter, facing down-left), the same camera as REF_03 view 1.
+4 frames in a 2x2 grid, read left to right, top to bottom — a looping READY-STANCE breathing cycle:
+1. ready stance: knees slightly bent, feet shoulder-width apart, sword held in front of him at waist height with the tip
+   pointing forward and slightly up, left hand a loose fist near the chest;
+2. inhale: chest and shoulders rise a little, sword tip rises a little;
+3. top of the breath: like frame 2, hair tips and scarf ends lift slightly;
+4. exhale: back toward frame 1, shoulders lower.
+The changes between frames are SMALL (a few pixels) so the loop is smooth. Same character, same size (about two thirds
+of the cell height), same position in the cell, feet on the same baseline in every cell; only the pose changes.
+No motion lines, no glow, no effects, no ground shadow. Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P11B] SAVE AS: P11B_hero_sw_walk8.png
+SIZE: 1536x1024 (landscape)
+
+PROMPT:
+Walk-cycle sprite sheet of the same Kaelrin as in my P11A image (same face, hair, armor, scarf, the same brass pick-blade
+in his RIGHT hand with the fist wrapped around the grip), the same size as in P11A.
+Every frame is view SW (front three-quarter, facing down-left).
+8 frames in a 4x2 grid, read left to right, top to bottom, one full looping walk cycle (frame 8 flows back into frame 1):
+1. contact: right foot forward with the heel touching the ground, left foot behind on its toes, left arm forward;
+2. down: weight on the right leg, knee bent, body at its lowest;
+3. passing: left leg passes the right leg, body rising;
+4. up: body at its highest, left foot lifting forward;
+5. contact: left foot forward with the heel touching the ground, right foot behind on its toes, right arm forward;
+6. down: weight on the left leg, knee bent, body at its lowest;
+7. passing: right leg passes the left leg, body rising;
+8. up: body at its highest, right foot lifting forward.
+Upright posture with a slight forward lean, a small up-and-down bob, knees clearly bending. The sword stays in the right
+hand, relaxed, blade pointing down and slightly back, swinging a little with the arm. The left arm swings opposite to
+the legs. He walks IN PLACE: the feet stay around the middle of each cell, nothing slides sideways.
+Same size and baseline in every cell; only the pose changes. No motion lines, no glow, no effects, no ground shadow.
+Flat solid magenta #FF00FF background. Follow all global rules.
+
+=====================================================================
+[P11C] SAVE AS: P11C_hero_sw_attack6.png
+SIZE: 1536x1024 (landscape)
+
+PROMPT:
+One-handed sword attack sprite sheet of the same Kaelrin as in my P11A image (same face, hair, armor, scarf, the same
+brass pick-blade in his RIGHT hand with the fist wrapped around the grip), the same size as in P11A.
+Every frame is view SW (front three-quarter, facing down-left).
+6 frames in a 3x2 grid, read left to right, top to bottom:
+1. ready stance, like P11A frame 1;
+2. wind-up: body twists back, the sword is raised high behind his right shoulder, weight on the back foot;
+3. strike: a fast diagonal downward slash toward the lower left, the front foot steps forward;
+4. impact: the blade fully extended forward and down at hip height, the body leaning into the hit;
+5. follow-through: the sword continues past, low on his left side;
+6. recover: coming back toward the ready stance.
+Strong, readable poses with clear silhouettes. The character stays inside each cell, feet on the same baseline
+(the front foot may step forward). No slash trail, no smear, no glow, no effects, no ground shadow — the game draws them.
+Same size in every cell. Flat solid magenta #FF00FF background. Follow all global rules.
