@@ -3,7 +3,7 @@
 - Phase 1–5 ครบ: tag `phase-5-done` 🎉 (MVP + v1.1)
 - **โดเมนจริงของแพลตฟอร์ม: `shopdashth.com`** (ตั้งใน `ROOT_DOMAIN` — เดิมเอกสารใช้ shopdash.co)
 - Last session: 2026-07-17
-- Side project (ไม่ใช่ ShopDash): `games/mossbridge/` เกม MMORPG — M0 เสร็จ 2026-11-06 (เอกสารออกแบบ + sprite_clean.py + Headgear Lab) ดู `games/mossbridge/README.md`
+- Side project (ไม่ใช่ ShopDash): `games/mossbridge/` เกม MMORPG — M0 เสร็จ + เดโมเล่นได้ v0.1 (2026-11-06) ดู `games/mossbridge/README.md`
 
 ## Done (Phase 7 ต่อ — ช่วงเปิดตัวใช้ฟรี ไม่จำกัดเวลา, 2026-07-17 ตามคำสั่งเจ้าของ)
 - [x] **Favicon/ไอคอนแบรนด์ (2026-07-30)**: โลโก้ถุงช้อปปิ้ง + dash เหลืองบนพื้น indigo — `app/icon.svg` (ต้นฉบับ) + png/apple-icon/favicon.ico สร้างด้วย `scripts/gen-brand-icon.mjs` (แก้โลโก้ = แก้ svg แล้วรันใหม่) Next ฝัง <head> ให้อัตโนมัติทุก host

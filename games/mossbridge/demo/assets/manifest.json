@@ -1,0 +1,115 @@
+{
+ "hero": {
+  "sw": {
+   "body": "hero_sw_body.png",
+   "weapon": "hero_sw_weapon.png",
+   "size": [
+    320,
+    320
+   ],
+   "feet": [
+    160,
+    300
+   ],
+   "grip": [
+    128,
+    200
+   ],
+   "weaponGrip": [
+    64,
+    37
+   ]
+  },
+  "se": {
+   "body": "hero_se_body.png",
+   "weapon": "hero_se_weapon.png",
+   "size": [
+    320,
+    320
+   ],
+   "feet": [
+    160,
+    300
+   ],
+   "grip": [
+    183,
+    222
+   ],
+   "weaponGrip": [
+    23,
+    62
+   ]
+  },
+  "w": {
+   "body": "hero_w_body.png",
+   "weapon": "hero_w_weapon.png",
+   "size": [
+    320,
+    320
+   ],
+   "feet": [
+    160,
+    300
+   ],
+   "grip": [
+    124,
+    168
+   ],
+   "weaponGrip": [
+    50,
+    37
+   ]
+  },
+  "ne": {
+   "body": "hero_ne_body.png",
+   "weapon": "hero_ne_weapon.png",
+   "size": [
+    320,
+    320
+   ],
+   "feet": [
+    160,
+    300
+   ],
+   "grip": [
+    194,
+    224
+   ],
+   "weaponGrip": [
+    22,
+    42
+   ]
+  }
+ },
+ "mobs": {
+  "sproutling": {
+   "file": "mob_sproutling.png",
+   "size": [
+    114,
+    140
+   ],
+   "feet": [
+    57,
+    130
+   ]
+  },
+  "mossback": {
+   "file": "mob_mossback.png",
+   "size": [
+    235,
+    250
+   ],
+   "feet": [
+    117,
+    240
+   ]
+  }
+ },
+ "map": {
+  "file": "map_mossbridge.jpg",
+  "size": [
+   1672,
+   941
+  ]
+ }
+}

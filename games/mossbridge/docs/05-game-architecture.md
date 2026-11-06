@@ -4,7 +4,7 @@
 
 | ชั้น | เทคโนโลยี | เหตุผล |
 |---|---|---|
-| Client | **Phaser (TypeScript) + Vite** | เกม 2D บนเบราว์เซอร์ เล่นได้ทั้ง PC/มือถือโดยไม่ต้องติดตั้ง; มี Container (ซ้อนเลเยอร์), tint (ย้อมสีผม), tween, กล้อง, input ครบ; ภาษาเดียวกับ ShopDash |
+| Client | **PixiJS (TypeScript) + Vite** | เกม 2D บนเบราว์เซอร์ เล่นได้ทั้ง PC/มือถือ; **เปลี่ยนจาก Phaser (2026-11-06)** เพราะเดโมพิสูจน์แล้วว่าแอนิเมชันที่เนียนกับภาพ AI ต้องใช้ mesh deformation (`SimplePlane`) ซึ่ง PixiJS ทำได้ตรงและเบากว่า (ดู `06-demo-notes.md`) |
 | Game server | **Node.js + Colyseus** | ห้อง (room) ต่อแผนที่, sync state อัตโนมัติ (schema delta), reconnect, matchmaking ในตัว — ประหยัดงาน network หลายเดือน |
 | Database | **PostgreSQL** (ใช้ Supabase ได้ เพราะคุ้นอยู่แล้ว) | บัญชี ตัวละคร กระเป๋า; transaction สำหรับเทรด/ซื้อขาย |
 | ข้อมูลเกม (ไอเท็ม มอน สกิล แผนที่) | ไฟล์ JSON ใน repo (`shared/data/`) + ตรวจด้วย zod ตอนเซิร์ฟเวอร์บูต | แก้บาลานซ์ = แก้ไฟล์ + commit มีประวัติ |
@@ -17,7 +17,7 @@
 ## 2. ภาพรวมระบบ
 
 ```
- Browser (Phaser client)                         VPS
+ Browser (PixiJS client)                         VPS
 ┌──────────────────────────┐   WSS    ┌─────────────────────────────────┐
 │ Scenes: Boot→Login→World │◀───────▶│ Colyseus                         │
 │  PaperDoll renderer      │  state   │  LobbyRoom (เลือกตัวละคร)         │
@@ -53,7 +53,7 @@ class Look extends Schema {
 }
 ```
 เปลี่ยนหมวก 1 ใบ → ส่งแค่ field เดียว (2 byte) ไปให้ทุกคนที่เห็น client เปิด `shared/data/headgear.json` หา `viewId` → ได้ path ภาพ + `fit` + `hair` → PaperDoll วาดใหม่
-**ตรรกะ PaperDoll ใน client ย้ายจาก `prototype/headgear-lab` (ฟังก์ชัน `drawChar`) ไปเป็นคลาส Phaser Container ได้ตรง ๆ**
+**ตรรกะ PaperDoll ใน client ย้ายจาก `prototype/headgear-lab` (ฟังก์ชัน `drawChar`) ไปเป็นคลาส PixiJS Container ได้ตรง ๆ**
 
 ## 4. โครงโฟลเดอร์เป้าหมาย
 
@@ -67,7 +67,7 @@ games/mossbridge/
     data/                   items.json, headgear.json, hair.json, mobs.json, skills.json, maps/*.json
     schema/                 Colyseus state classes
     rules/                  สูตรดาเมจ, EXP table (เซิร์ฟเวอร์ใช้คำนวณ, client ใช้แสดง)
-  client/                   (M1) Phaser + Vite
+  client/                   (M1) PixiJS + Vite
     src/scenes/             Boot, Login, CharSelect, World, UI
     src/render/PaperDoll.ts
     src/net/                Colyseus client, interpolation
@@ -121,7 +121,7 @@ audit_log     (id bigserial, character_id, action text, detail jsonb, at timesta
 - [x] Headgear Lab: 3 ช่องหมวก, hair mode full/capped/hidden, 4 ทิศ (2 วาด + 2 กลับด้าน), เดิน, fit editor, อัปโหลด PNG, export JSON
 
 ### M1 — Client เดินได้คนเดียว + ภาพจริงชุดแรก
-- Phaser + Vite ใน `client/`, ย้าย PaperDoll จาก lab เป็นคลาส
+- PixiJS + Vite ใน `client/`, ย้ายโค้ดจาก `demo/game.js` (mesh rig) + PaperDoll จาก lab มาเป็นโมดูล TypeScript
 - แผนที่ทดสอบจาก Tiled (ภาพพื้น + กริดชน 32 px) คลิกเดินด้วย A*, y-sort, ชั้น overlay บังตัวละคร
 - ภาพจริงชุดแรกตาม backlog `04 §11` ข้อ 1–5
 - **DoD:** เดินรอบแผนที่ไม่ทะลุน้ำ/กำแพง, ใส่ถอดหมวก 6 ใบ × ทรงผม 3 ทรง ครบ 4 ทิศไม่มีผมทะลุ, 60 fps บนมือถือระดับกลาง
