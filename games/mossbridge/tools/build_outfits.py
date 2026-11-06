@@ -26,10 +26,11 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import build_kaelrin_parts as kp  # noqa: E402
 import build_kaelrin_rig as kr  # noqa: E402
 
-OUTFITS = [  # id, sheet in art/raw, Thai name
-    ("ranger", "P10A_outfit_ranger.png", "ชุดพรานป่ามอส"),
-    ("knight", "P10B_outfit_knight.png", "ชุดองครักษ์ทองเหลือง"),
-    ("festival", "P10C_outfit_festival.png", "ชุดเทศกาลโคมไฟ"),
+OUTFITS = [  # id, sheet in art/raw, Thai name, exact = painted over P02A with ChatGPT's image edit
+    ("ranger", "P10A_outfit_ranger.png", "ชุดพรานป่ามอส", False),
+    ("knight", "P10B_outfit_knight.png", "ชุดองครักษ์ทองเหลือง", False),
+    # the edit keeps P02A's placement exactly; its slimmer cloth would fool the overlap search
+    ("festival", "P10C_outfit_festival.png", "ชุดเทศกาลโคมไฟ", True),
 ]
 BASE_NAME = "ชุดนักผจญภัย (เดิม)"
 VIEWS = list(kp.VIEWS)
@@ -97,7 +98,7 @@ def main():
     rig = json.load(open(kr.RIG, encoding="utf-8"))
     rig.setdefault("outfits", {"base": {"name": BASE_NAME, "icon": "outfit_base_icon.png"}})
     check = []
-    for gid, sheet, name in OUTFITS:
+    for gid, sheet, name, exact in OUTFITS:
         if gid not in want:
             continue
         path = os.path.join(kp.RAW, sheet)
@@ -108,7 +109,11 @@ def main():
         row = []
         for v in VIEWS:
             target = np.array(Image.open(kr.SRC.format(v)))[..., 3] > 128
-            sc, k, dx, dy = align(kp.cell(img, v), s, offs[v], target)
+            if exact:
+                m = kp.place(kp.cell(img, v), s, offs[v], kp.BODY_CANVAS)[..., 3] > 128
+                sc, k, dx, dy = iou(m, target), 1.0, 0, 0
+            else:
+                sc, k, dx, dy = align(kp.cell(img, v), s, offs[v], target)
             a = kp.FEET
             o = (a[0] + (offs[v][0] - a[0]) * k + dx, a[1] + (offs[v][1] - a[1]) * k + dy)
             body = kp.place(kp.cell(img, v), s * k, o, kp.BODY_CANVAS, f"{gid}_{v}")
