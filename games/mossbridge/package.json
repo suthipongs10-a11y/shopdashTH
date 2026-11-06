@@ -15,7 +15,8 @@
     "fx": "python3 tools/build_fx_assets.py",
     "gear": "python3 tools/build_headgear.py",
     "map": "python3 tools/build_map.py",
-    "outfits": "python3 tools/build_outfits.py"
+    "outfits": "python3 tools/build_outfits.py",
+    "frames": "python3 tools/build_hero_frames.py"
   },
   "devDependencies": {
     "playwright": "1.48.2"

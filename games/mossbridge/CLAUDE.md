@@ -32,7 +32,7 @@
 
 | ส่วน | สถานะ | ที่อยู่ |
 |---|---|---|
-| **แผนใหม่: ฮีโร่แบบเฟรม** | สเปคเสร็จ + prompt pilot P11A–C (ทิศ SW: ยืน 4 / เดิน 8 / ฟัน 6 เฟรม) **รอเจ้าของสั่ง ChatGPT** (2026-11-06) | `docs/07-sprite-frames.md` + `chatgpt-pack/prompts/P11_hero_frames_pilot.txt` |
+| **แผนใหม่: ฮีโร่แบบเฟรม** | สเปคเสร็จ + prompt pilot P11A–C (ทิศ SW: ยืน 4 / เดิน 8 / ฟัน 6 เฟรม) **รอเจ้าของสั่ง ChatGPT** · เครื่องมือตัดเฟรม + GIF/contact sheet ตรวจ **พร้อมแล้ว** (ทดสอบกับ P01/P02A, รอชีตจริง) (2026-11-06) | `docs/07-sprite-frames.md` + `chatgpt-pack/prompts/P11_hero_frames_pilot.txt` + `tools/build_hero_frames.py` |
 | เอกสารออกแบบ 01–07 | เสร็จ | `docs/` |
 | Headgear Lab (ต้นแบบระบบหมวก 3 ช่อง) | เสร็จ ภาพ placeholder วาดด้วยโค้ด | `prototype/headgear-lab/index.html` |
 | **เดโมเล่นได้ v0.6 (เจ้าของตรวจผ่าน)** | v0.5 + **เปลี่ยนชุดได้ 4 ชุด** (เดิม, พรานป่ามอส, องครักษ์ทองเหลือง, เทศกาลโคมไฟ) จากภาพ P10A–C ในแผง 👒 (2026-11-06) — เจ้าของ: "ผ่านแล้ว" (ชุด/หมวก) แต่การถือดาบและการเดินของ rig ยังไม่ผ่าน → §5.A | `demo/` |
@@ -70,6 +70,8 @@ npm run fx                  # เอฟเฟกต์ + ไอคอน จา�
 npm run gear                # หมวก/แว่น/ผ้าปิดหน้า จาก art/raw/P04, P05 -> demo/assets/gear_*.png (+ qa-out/headgear_check.png)
 npm run outfits             # ชุด P10A-C -> จัดให้ทับท่า P02A + ตัดชิ้น rig -> kaelrin_{view}_parts_{id}.png (+ qa-out/outfits_check.png)
 npm run map                 # แมพ P07A + P07B ต่อกัน -> demo/assets/map_town_meadow.jpg + demo/maps/mossbridge.json
+npm run frames              # ฮีโร่แบบเฟรม: ชีต P.._hero_* ใน art/raw -> demo/assets/kaelrin_{dir}_frames.png + demo/sprites/kaelrin.json (+ GIF/ชีตตรวจใน qa-out/hero_frames/)
+python3 tools/build_hero_frames.py --check art/inbox/<ไฟล์>.png   # ตรวจชีตฮีโร่ใหม่ก่อนรับ (ไม่เขียนลง demo/)
 ```
 - **ไม่มี Playwright?** `npm run qa:serve` (เสิร์ฟ demo + `/__qa/*` + บันทึกภาพลง `qa-out/`) แล้วเปิดเกมในเบราว์เซอร์ใดก็ได้ (รวมถึงเบราว์เซอร์ในแอปแม้แผงถูกซ่อน) รัน `await import('/__qa/inpage.js')` ในหน้า → `__qa.walk('sw', 8, .07)` แล้ว `__qa.save('ชื่อ')` ได้ contact sheet ที่ `qa-out/ชื่อ.png`; `__qa.sim()` = qa:sim; `__qa.film(...)` = เฟรมวิดีโอ 30 fps แล้วต่อเป็น mp4 ด้วย ffmpeg (ดูหัวไฟล์ `tools/qa/inpage.js`)
 - Rig Editor: `http://localhost:8000/rig-editor.html` (โหมด "โครง/ชิ้นส่วน" แก้ข้อต่อ+รอยตัด, โหมด "ท่าทาง" แก้คลิป) → Export JSON ไปแทน `demo/rigs/kaelrin.json` → ถ้าแก้รอยตัดให้รัน `npm run rig`
@@ -95,6 +97,7 @@ npm run map                 # แมพ P07A + P07B ต่อกัน -> demo/a
 2. **ส่งในแชทให้เจ้าของ** 1 กล่องโค้ดต่อ 1 ภาพ (กล่องละ prompt ล้วน ๆ ให้กดคัดลอกได้) + บอก `SAVE AS:` และ branch ที่ต้องอัปโหลดภาพเข้า + commit/push ไฟล์ prompt
 3. เจ้าของสั่งในแชท ChatGPT เดิม ("Acknowledge Readiness" มีต้นแบบครบ) แล้ว**อัปโหลดภาพเข้า `games/mossbridge/art/inbox/`** บน GitHub (หรือแนบในแชท Claude เพื่อให้ดูเร็ว ๆ)
 4. **เมื่อเจ้าของบอกว่าอัปโหลดแล้ว:** `git pull` → เปิดดูทุกภาพด้วยตา (Read รูปได้) เทียบกฎภาพด้านล่าง + เกณฑ์ของ prompt นั้น
+   - ชีตฮีโร่แบบเฟรม (P11+): รัน `python3 tools/build_hero_frames.py --check art/inbox/<ไฟล์>` แล้วดู `qa-out/hero_frames/*_sheet.png` + `report.txt` (บรรทัด `!` = ปัญหา) และส่ง GIF ให้เจ้าของดูด้วย SendUserFile
    - ไม่ผ่าน → เขียนประโยคแก้ (ภาษาอังกฤษ สั้น ชี้จุดผิด) ให้เจ้าของวางต่อในแชท ChatGPT เดิม ห้ามรับภาพผิดมาแก้เองด้วยโค้ด
    - ผ่าน → `git mv art/inbox/<ไฟล์> art/raw/<SAVE AS>` แล้วล้าง/สร้าง asset ด้วยเครื่องมือใน `tools/` → อัปเดตเดโม → commit
 5. ชื่อไฟล์ไม่ตรง SAVE AS ก็ได้ ให้ดูจากเนื้อภาพ/commit message ว่าเป็นภาพไหน แล้วเปลี่ยนชื่อตอนย้าย
@@ -183,8 +186,8 @@ npm run map                 # แมพ P07A + P07B ต่อกัน -> demo/a
 ## 6. Backlog (ทำจากบนลงล่าง)
 
 **ใหม่ (2026-11-06) — ฮีโร่แบบเฟรม (`docs/07`):**
-- **A1. Pilot ทิศ SW:** ส่ง prompt `P11A–C` ให้เจ้าของ (ยืน 4 / เดิน 8 / ฟัน 6 เฟรม ตัวเต็มมีหัว) → รับภาพจาก `art/inbox/` → ตรวจ (ขนาด/เส้นฐานเท่ากันทุกช่อง, หน้าตาตรง P01, ดาบอยู่ในมือขวา, ไม่มีเอฟเฟกต์) → ทำ GIF/contact sheet ให้เจ้าของดู → **เจ้าของตัดสินว่าใช่ก่อนทำต่อ**
-- **A2. เครื่องมือ** `tools/build_hero_frames.py` (ตัดช่อง, key, หา feet/neck/tip, สเกลต่อทิศ, atlas + `demo/sprites/kaelrin.json`) + `SpriteHero` ในเกม (เปิดด้วย flag, เดินเลื่อนเฟรมตามระยะทาง) ใช้ทิศ SW ก่อน ทิศอื่นใช้ rig ชั่วคราว
+- **A1. Pilot ทิศ SW:** (prompt ส่งให้เจ้าของแล้ว 2026-11-06 รอภาพใน `art/inbox/`) ส่ง prompt `P11A–C` ให้เจ้าของ (ยืน 4 / เดิน 8 / ฟัน 6 เฟรม ตัวเต็มมีหัว) → รับภาพจาก `art/inbox/` → ตรวจ (ขนาด/เส้นฐานเท่ากันทุกช่อง, หน้าตาตรง P01, ดาบอยู่ในมือขวา, ไม่มีเอฟเฟกต์) → ทำ GIF/contact sheet ให้เจ้าของดู → **เจ้าของตัดสินว่าใช่ก่อนทำต่อ**
+- **A2. เครื่องมือ** ~~`tools/build_hero_frames.py` (ตัดช่อง, key, หา feet/neck/tip, สเกลต่อชีต, atlas + `demo/sprites/kaelrin.json`, GIF ตรวจ)~~ **ทำแล้ว 2026-11-06** (`docs/07` §7; ค่า `ALIGN`/`STRIDE` ต้องจูนอีกครั้งเมื่อได้ชีตจริง) + `SpriteHero` ในเกม (ยังไม่ทำ — รอเจ้าของตัดสิน pilot) (เปิดด้วย flag, เดินเลื่อนเฟรมตามระยะทาง) ใช้ทิศ SW ก่อน ทิศอื่นใช้ rig ชั่วคราว
 - **A3. ผลิตครบ 5 ทิศ:** prompt P12+ สำหรับ S, W, NW, N (idle/walk/attack) + หัว 5 ทิศ ผมปกติ/ผมยุบ → ตัวไม่มีหัวด้วย Edit ของ ChatGPT บนชีตที่ผ่านแล้ว → หัว + หมวกปักที่ `neck`
 - **A4. ท่าเพิ่ม:** hurt 2, die 4 (+ ลุก), cast 4, คอมโบ attack2/attack3 · ชุด P10 แบบเฟรม (Edit ชีตเดิม "repaint only the clothing")
 - **A5.** เลิกใช้ rig กับฮีโร่เมื่อเฟรมครบ (เก็บ rig ไว้ใช้กับมอนสเตอร์/ทางสำรอง)
@@ -243,5 +246,6 @@ games/mossbridge/
   tools/build_headgear.py    P04A–F, P05A–C → gear_{id}_{view}.png บนแคนวาสหัว (transform เดียวกับหัว + FIT ต่อชิ้น) + "gear" ใน manifest
   tools/build_outfits.py     P10A–C → ชุดที่จัดทับท่า P02A + ชิ้น rig ต่อชุด + ไอคอน
   tools/build_map.py         P07A + P07B → map_town_meadow.jpg + demo/maps/mossbridge.json (พื้นที่เดิน/จุดเกิด วาดตามกริด)
+  tools/build_hero_frames.py ชีตฮีโร่แบบเฟรม (P11+) → atlas ต่อทิศ + demo/sprites/kaelrin.json + GIF/contact sheet ตรวจ (--check = ตรวจอย่างเดียว)
   tools/qa/                  frames.js, sheet.py, sim.js, video.js (Playwright) · rig_check.js (node ล้วน) · serve.js + inpage.js (QA ในเบราว์เซอร์ใดก็ได้)
 ```
