@@ -5,7 +5,7 @@ build_hero_frames.py — ChatGPT animation sheets of Kaelrin -> per-frame sprite
 One sheet = one action x one direction, frames in an equal grid read left->right, top->bottom on
 flat magenta. File names (chatgpt-pack SAVE AS):  P{nn}{X}_hero_{dir}_{action}{frames}[_{layer}].png
   e.g. P12A_hero_sw_hold3.png (3 ways to hold the sword), P12B_hero_sw_walk8.png, P12C_hero_sw_walk4.png
-  dir    s | sw | w | nw | n          (se, e, ne are mirrored in the game)
+  dir    s | sw | w | nw | n | ne | e | se   (a missing se / e / ne is mirrored from sw / w / nw in the game)
   layer  full (default: whole body with head) | body (headless body, from a ChatGPT edit of the full sheet)
   An action with a digit (attack2) needs a dash before the frame count: hero_sw_attack2-6.png
 
@@ -31,6 +31,7 @@ Outputs
   QA (always): qa-out/hero_frames/
     {dir}_{action}.gif        the animation at game timing (walk on a moving ground grid: feet must stick)
     {dir}_{action}_sheet.png  frames on the baseline with feet + / tip o / neck x, onion skin, numbers
+    {action}_compass.gif      every direction of an action at once, laid out like a compass
     report.txt                the numbers below, per frame
 
 Usage (from games/mossbridge)
@@ -69,9 +70,10 @@ ALPHA = (40, 200)
 EDGE_DESPILL = 3
 MIN_PIECE = 0.002            # pieces smaller than this fraction of the cell area are specks
 
-DIRS = ("s", "sw", "w", "nw", "n")
-MIRROR = {"se": "sw", "e": "w", "ne": "nw"}
-SCREEN_DIR = {"s": (0, 1), "sw": (-1, 1), "w": (-1, 0), "nw": (-1, -1), "n": (0, -1)}  # facing on screen (game: atan2 on screen)
+DIRS = ("s", "sw", "w", "nw", "n", "ne", "e", "se")   # 5 are enough (the rest mirror), all 8 may be drawn
+MIRROR = {"se": "sw", "e": "w", "ne": "nw"}            # used only for directions that have no sheet of their own
+SCREEN_DIR = {"s": (0, 1), "sw": (-1, 1), "w": (-1, 0), "nw": (-1, -1), "n": (0, -1),
+              "ne": (1, -1), "e": (1, 0), "se": (1, 1)}  # facing on screen (game: atan2 on screen)
 
 HEIGHT = 260                 # idle figure height in game px (same as the rig hero)
 PAD = 2                      # transparent border around every trimmed frame in the atlas
@@ -98,8 +100,8 @@ STRIDE = {}                  # dir -> game px travelled per walk cycle (8 frames
 STRIDE_K = 0.45
 WALK_SPEED = 130             # game.js WALK_SPEED (px/s) -> walk GIF timing
 
-NAME_RE = re.compile(r"^P(\d+)([A-Z]?)_hero_(s|sw|w|nw|n)_([a-z]+\d?)-?(\d+)(?:_(full|body))?\.png$", re.I)
-NAME_RE_DASH = re.compile(r"^P(\d+)([A-Z]?)_hero_(s|sw|w|nw|n)_([a-z]+\d*)-(\d+)(?:_(full|body))?\.png$", re.I)
+NAME_RE = re.compile(r"^P(\d+)([A-Z]?)_hero_(sw|se|nw|ne|s|w|n|e)_([a-z]+\d?)-?(\d+)(?:_(full|body))?\.png$", re.I)
+NAME_RE_DASH = re.compile(r"^P(\d+)([A-Z]?)_hero_(sw|se|nw|ne|s|w|n|e)_([a-z]+\d*)-(\d+)(?:_(full|body))?\.png$", re.I)
 
 
 # ---------------------------------------------------------------- loading
@@ -470,6 +472,57 @@ def qa_gif(res, path, stride):
     imgs[0].save(path, save_all=True, append_images=imgs[1:], duration=ms_, loop=0, optimize=True)
 
 
+COMPASS = [["nw", "n", "ne"], ["w", None, "e"], ["sw", "s", "se"]]
+
+
+def qa_compass(by_dir, path, action):
+    """every direction of one action playing together, laid out like a compass (mirrors fill missing dirs)"""
+    frames = {}
+    for d, res in by_dir.items():
+        frames[d] = (res["frames"], False)
+    for d, src in MIRROR.items():
+        if d not in frames and src in frames:
+            frames[d] = (frames[src][0], True)
+    allf = [fr for fl, _ in frames.values() for fr in fl]
+    l, r, t, b = extent(allf)
+    cw = max(l, r) * 2
+    ch = t + b
+    n = max(len(fl) for fl, _ in frames.values())
+    any_res = next(iter(by_dir.values()))
+    tim = TIMING.get(action, {})
+    if action == "walk":
+        durs = [STRIDE.get(any_res["meta"]["dir"], STRIDE_K * HEIGHT) / n / WALK_SPEED] * n
+    else:
+        durs = tim.get("durations") or [0.1] * n
+    imgs = []
+    for i in range(n * (2 if tim.get("loop") else 1)):
+        can = Image.new("RGBA", (cw * 3, ch * 3), BG + (255,))
+        d = ImageDraw.Draw(can)
+        for ry, row in enumerate(COMPASS):
+            for rx, dname in enumerate(row):
+                ox, oy = rx * cw, ry * ch
+                if dname is None:
+                    d.text((ox + cw // 2 - 30, oy + ch // 2), f"{action} x{n}", fill=(255, 255, 255))
+                    continue
+                d.line([(ox + 10, oy + t), (ox + cw - 10, oy + t)], fill=GROUND, width=2)
+                d.text((ox + 6, oy + 4), dname.upper() + (" (mirror)" if dname in frames and frames[dname][1] else ""), fill=(255, 255, 255))
+                if dname not in frames:
+                    d.text((ox + 6, oy + 20), "missing", fill=(255, 160, 160))
+                    continue
+                fl, flip = frames[dname]
+                fr = fl[i % len(fl)]
+                img = Image.fromarray(fr["img"])
+                px, py = fr["pivot"]
+                if flip:
+                    img = img.transpose(Image.FLIP_LEFT_RIGHT)
+                    px = img.width - px
+                can.alpha_composite(img, (round(ox + cw / 2 - px), round(oy + t - py)))
+                d.text((ox + cw - 24, oy + 4), str(i % len(fl) + 1), fill=(255, 230, 120))
+        imgs.append(can.convert("RGB"))
+    ms = [max(20, round(durs[i % n] * 1000)) for i in range(len(imgs))]
+    imgs[0].save(path, save_all=True, append_images=imgs[1:], duration=ms, loop=0, optimize=True)
+
+
 # ---------------------------------------------------------------- atlas
 
 def pack(entries):
@@ -593,6 +646,10 @@ def main():
         base = f"{m0['dir']}_{m0['action']}" + ("" if m0["layer"] == "full" else f"_{m0['layer']}")
         qa_sheet(res, os.path.join(QA, base + "_sheet.png"))
         qa_gif(res, os.path.join(QA, base + ".gif"), STRIDE.get(m0["dir"], STRIDE_K * HEIGHT))
+    for act in sorted({r["meta"]["action"] for r in results if r["meta"]["layer"] == "full"}):
+        by_dir = {r["meta"]["dir"]: r for r in results if r["meta"]["action"] == act and r["meta"]["layer"] == "full"}
+        if len(by_dir) > 1:
+            qa_compass(by_dir, os.path.join(QA, f"{act}_compass.gif"), act)
 
     with open(os.path.join(QA, "report.txt"), "w") as f:
         f.write("\n".join(lines) + "\n")
@@ -602,7 +659,7 @@ def main():
     if args.check:
         return 0
     os.makedirs(SPRITES, exist_ok=True)
-    data = {"version": 1, "height": HEIGHT, "mirror": MIRROR, "screenDir": SCREEN_DIR, "dirs": {}}
+    data = {"version": 1, "height": HEIGHT, "mirror": {}, "screenDir": SCREEN_DIR, "dirs": {}}
     for d in DIRS:
         per = {}
         for res in results:
@@ -611,6 +668,7 @@ def main():
                 per[key] = res
         if per:
             data["dirs"][d] = write_dir(d, per)
+    data["mirror"] = {k: v for k, v in MIRROR.items() if k not in data["dirs"] and v in data["dirs"]}
     with open(os.path.join(SPRITES, "kaelrin.json"), "w") as f:
         json.dump(data, f, indent=1)
     print(f"wrote demo/sprites/kaelrin.json + {len(data['dirs'])} atlas(es) in demo/assets/")

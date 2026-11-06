@@ -49,6 +49,7 @@
 | เดินแล้วตัวเอนหลัง/ก้นยื่น ("เจ็บก้น") | `He leans back like he is sitting. Keep him upright: hips under the shoulders, chest up, a very slight forward lean. Redo.` |
 | เฟรมเดินคล้ายกันเกินไป ขาไม่ขยับ | `The frames are too similar. In CONTACT frames the legs are wide apart, in PASSING frames one leg swings past the other under the body. Redo.` |
 | จำนวน/ลำดับเฟรมผิด | `There must be exactly 8 frames in a 4x2 grid in this order: contact, down, passing, up, contact, down, passing, up (the legs swap after frame 4).` |
+| **ขาไม่สลับ**: เฟรม 1 กับ 3 ขาข้างเดิมอยู่หน้า (เดินกะเผลก) | `Frames 1 and 3 show the SAME leg in front, so he limps. Redraw frame 3 as frame 1 with the two legs swapped: the leg that is in front goes behind and the leg behind comes to the front. Frame 4 is frame 2 with the legs swapped (the other foot lifted). Do not mirror the picture: the sword stays in his right hand, same place. The free arm swings opposite to the legs. Keep everything else identical.` |
 | ตัวไหลออกข้าง ไม่เดินอยู่กับที่ | `He must walk in place: his body stays in the middle of each cell.` |
 | มีเส้นความเร็ว ฝุ่น แสง ตัวเลข ตัวอักษร | `Remove all motion lines, dust, glow, numbers and text.` |
 | พื้นหลังไม่ใช่ม่วงเรียบ | `Redo it with ONE flat solid magenta #FF00FF background, no floor, no shadow.` |
