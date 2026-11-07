@@ -76,7 +76,7 @@ SCREEN_DIR = {"s": (0, 1), "sw": (-1, 1), "w": (-1, 0), "nw": (-1, -1), "n": (0,
               "ne": (1, -1), "e": (1, 0), "se": (1, 1)}  # facing on screen (game: atan2 on screen)
 
 HEIGHT = 260                 # idle figure height in game px (same as the rig hero)
-PAD = 2                      # transparent border around every trimmed frame in the atlas
+PAD = 4                      # transparent border around every trimmed frame in the atlas (mipmaps must not bleed)
 ATLAS_W = 2048
 
 GRID = {1: (1, 1), 2: (2, 1), 3: (3, 1), 4: (2, 2), 6: (3, 2), 8: (4, 2)}
@@ -96,9 +96,12 @@ TIMING = {   # docs/07 §4 (idle slowed to a 1.6 s breath, §5.2 asks for 1.5-2 
     "die": {"loop": False, "durations": [0.12, 0.12, 0.12, 0.6]},
     "cast": {"loop": False, "durations": [0.12, 0.12, 0.12, 0.12]},
 }
-STRIDE = {}                  # dir -> game px travelled per walk cycle (8 frames); default STRIDE_K * HEIGHT
-STRIDE_K = 0.45
+STRIDE = {}                  # dir -> game px travelled per walk cycle (both steps); default STRIDE_K * HEIGHT
+STRIDE_K = 0.55             # 143 px: 1.8 steps/s at WALK_SPEED, like the rig walk
 WALK_SPEED = 130             # game.js WALK_SPEED (px/s) -> walk GIF timing
+STAND_FRAME = {4: 1, 8: 2}   # walk frame shown while standing until there is an idle sheet: PASSING (legs together)
+                             # = frame 2 of a 4-frame cycle, frame 3 of an 8-frame cycle (prompt order); feet spread
+                             # does not work for it (front/back views spread the legs up-down)
 
 NAME_RE = re.compile(r"^P(\d+)([A-Z]?)_hero_(sw|se|nw|ne|s|w|n|e)_([a-z]+\d?)-?(\d+)(?:_(full|body))?\.png$", re.I)
 NAME_RE_DASH = re.compile(r"^P(\d+)([A-Z]?)_hero_(sw|se|nw|ne|s|w|n|e)_([a-z]+\d*)-(\d+)(?:_(full|body))?\.png$", re.I)
@@ -245,6 +248,8 @@ def measure(rgba, box, layer):
     hgt = y1 - y0
     band = a[y1 - max(3, int(hgt * 0.05)):y1] > 128
     feet_x = float(np.nonzero(band)[1].mean())
+    low = np.nonzero((a[y1 - max(4, int(hgt * 0.12)):y1] > 128).any(axis=0))[0]
+    feet_w = int(low.max() - low.min() + 1)        # spread of the feet: smallest = legs together
     st = steel_mask(rgba[..., :3], a)
     body = (a > 128) & ~st
     by, bx = np.nonzero(body)
@@ -270,7 +275,7 @@ def measure(rgba, box, layer):
     if layer == "body":
         band = a[y0:y0 + 10] > 128
         neck = (float(np.nonzero(band)[1].mean()), float(y0))
-    return {"bbox": (int(x0), int(y0), int(x1), int(y1)), "h": int(hgt), "feet_x": feet_x, "bottom": float(y1),
+    return {"bbox": (int(x0), int(y0), int(x1), int(y1)), "h": int(hgt), "feet_x": feet_x, "feet_w": feet_w, "bottom": float(y1),
             "head": head, "head_area": head_area, "tip": tip, "neck": neck, "cell": box,
             "hist": hist(rgba[..., :3], a)}
 
@@ -565,6 +570,7 @@ def write_dir(d, results):
         t = dict(TIMING.get(act, {"loop": False, "durations": [0.1] * len(frs)}))
         if act == "walk":
             t["stride"] = STRIDE.get(d, round(STRIDE_K * HEIGHT))
+            t["stand"] = STAND_FRAME.get(len(frs), 0)   # pose while standing (no idle sheet yet): a passing frame
         out["actions"][a] = {**t, "layer": res["meta"]["layer"], "source": res["meta"]["file"], "frames": frs}
     return out
 

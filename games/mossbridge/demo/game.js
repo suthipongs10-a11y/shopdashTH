@@ -6,6 +6,10 @@
  * fist. Monsters are still ONE painted image per view, animated by deforming a mesh
  * (SimplePlane) every frame. Both keep the AI-painted art perfectly consistent.
  *
+ * Frame hero (docs/07): when sprites/kaelrin.json exists (tools/build_hero_frames.py) the hero can be
+ * drawn from painted frames instead (8 directions, walk frames advance with the distance walked);
+ * the rig keeps running underneath for attacks/effects. Toggle with F or the 🎞️ button.
+ *
  * Coordinates: world = pixels of the map painting (1672 x 941). Actors use a fake
  * perspective scale (smaller near the top of the painting) to match the art.
  */
@@ -39,6 +43,8 @@ await Promise.race([Promise.all([document.fonts.load('500 15px Mitr'), document.
 PIXI.Assets.setPreferences({ preferWorkers: false });
 const man = await (await fetch(A + "manifest.json")).json();
 const RIG = await (await fetch("rigs/kaelrin.json")).json();   // hero skeleton + cut pieces (rig.js)
+// frame hero (painted frames per direction, tools/build_hero_frames.py): optional, the rig is the fallback
+const SPR = await fetch("sprites/kaelrin.json").then(r => (r.ok ? r.json() : null)).catch(() => null);
 // map data (walk areas, spawns, scale): maps/*.json from tools/build_map.py; old maps carry none
 const MAPD = man.map.data ? await (await fetch(man.map.data)).json() : {};
 const urls = [A + man.map.file];
@@ -51,8 +57,16 @@ for (const f of Object.values(GEAR.capped)) urls.push(A + f);
 for (const it of Object.values(GEAR.items)) for (const f of Object.values(it.views)) urls.push(A + f);
 for (const m of Object.values(man.mobs)) urls.push(A + m.file);
 for (const f of Object.values(man.fx || {})) urls.push(A + f.file);
+if (SPR) for (const d of Object.values(SPR.dirs)) urls.push(A + d.atlas);
 const T = await PIXI.Assets.load([...new Set(urls)]);
 const tex = f => T[A + f];
+/* hero frames: HF[dir][action] = { ...action from sprites/kaelrin.json, tex: [frame textures] } */
+const HF = {};
+if (SPR) for (const [d, D] of Object.entries(SPR.dirs)) {
+  const base = tex(D.atlas).baseTexture; HF[d] = {};
+  for (const [a, act] of Object.entries(D.actions)) HF[d][a] = { ...act, tex: act.frames.map(f => new PIXI.Texture(base, new PIXI.Rectangle(...f.rect))) };
+}
+const DIR8 = ["e", "se", "s", "sw", "w", "nw", "n", "ne"];   // screen angle / 45 deg -> painted direction
 /* effect frames from the ChatGPT sheets (tools/build_fx_assets.py); black = transparent with ADD */
 const FXF = {};
 for (const [k, f] of Object.entries(man.fx || {})) {
@@ -328,7 +342,9 @@ class Hero {
     this.root = new PIXI.Container();
     this.shadow = new PIXI.Graphics(); this.shadow.beginFill(0x0d1406, .35); this.shadow.drawEllipse(0, 0, 50, 15); this.shadow.endFill();
     this.body = new PIXI.Container();
-    this.root.addChild(this.shadow, this.body);
+    this.frameBody = new PIXI.Container(); this.frameSpr = new PIXI.Sprite(); this.frameBody.addChild(this.frameSpr);   // frame hero
+    this.frameBody.visible = false; this.useFrames = false; this.dir8 = "sw"; this.walkPhase = 0;
+    this.root.addChild(this.shadow, this.body, this.frameBody);
     actorLayer.addChild(this.root);
     this.flash = new PIXI.ColorMatrixFilter(); this.flashAmt = 0; this.flashTint = false;
     this.views = {}; this.cur = null; this.fade = null; this.key = null;
@@ -387,6 +403,7 @@ class Hero {
   face(dx, dy) {
     if (Math.abs(dx) < .01 && Math.abs(dy) < .01) return;
     const a = Math.atan2(dy, dx) * 180 / Math.PI; // screen angle
+    this.dir8 = DIR8[((Math.round(a / 45) % 8) + 8) % 8];         // frame hero: all 8 directions
     if (Math.abs(dx) > .2 * Math.hypot(dx, dy)) this.lastSide = Math.sign(dx);
     let key;
     if (a > -22.5 && a <= 22.5) key = "e";
@@ -409,13 +426,36 @@ class Hero {
   busy() { return this.action && this.action.t < this.action.clip.dur; }
   setFlash(a) {
     this.flashAmt = a;
-    if (a <= .01) { this.body.filters = null; this.flashTint = false; return; }
+    if (a <= .01) { this.body.filters = null; this.frameBody.filters = null; this.flashTint = false; return; }
     this.flash.matrix = this.flashTint
       ? [1, 0, 0, 0, a * .6, 0, 1 - a * .5, 0, 0, 0, 0, 0, 1 - a * .5, 0, 0, 0, 0, 0, 1, 0]     // hurt: red
       : [1 - a * .2, 0, 0, 0, a * .9, 0, 1 - a * .2, 0, 0, a * .9, 0, 0, 1 - a * .2, 0, a * .9, 0, 0, 0, 1, 0];
     if (!this.body.filters) this.body.filters = [this.flash];
+    if (!this.frameBody.filters) this.frameBody.filters = [this.flash];
   }
   place() { const s = depthScale(this.y); this.scale = s; this.root.x = this.x; this.root.y = this.y; this.root.zIndex = this.y; this.root.scale.set(s, s); }
+  /* frame hero on/off: the rig stays alive underneath (attacks, effects) but is hidden */
+  setFrames(on) {
+    this.useFrames = !!(on && SPR && Object.keys(HF).length);
+    this.body.visible = !this.useFrames; this.frameBody.visible = this.useFrames;
+    return this.useFrames;
+  }
+  /* pick the painted frame: walk frames advance with the distance walked (stride = view px per cycle),
+     standing / acting shows the walk's standing frame until there are idle and attack sheets */
+  updateFrames(moved) {
+    let d = this.dir8, flip = false;
+    if (!HF[d] && SPR.mirror && HF[SPR.mirror[d]]) { d = SPR.mirror[d]; flip = true; }
+    const W = HF[d] && HF[d].walk; if (!W) return;
+    const n = W.tex.length, walking = moved > .02 && !this.busy() && !this.dead;
+    let f = W.stand || 0;
+    if (walking) { this.walkPhase = (this.walkPhase + moved / (W.stride * this.scale)) % 1; f = Math.floor(this.walkPhase * n) % n; }
+    else this.walkPhase = 0;                                       // the next walk starts on frame 1 (contact)
+    const fr = W.frames[f];
+    this.frameSpr.texture = W.tex[f];
+    this.frameSpr.anchor.set(fr.pivot[0] / fr.rect[2], fr.pivot[1] / fr.rect[3]);
+    this.frameSpr.scale.set(flip ? -1 : 1, 1);
+    this.frame = { dir: d, flip, action: "walk", index: f };       // for QA
+  }
 
   /* action clip values -> rig pose over the locomotion pose (channels the clip has replace it) */
   actionPose(vals, loco, lunge, clip, t) {
@@ -500,6 +540,7 @@ class Hero {
     // shadow shrinks while airborne
     const air = clamp(P.air / 90, 0, 1); this.shadow.scale.set(1 - air * .45, 1 - air * .45); this.shadow.alpha = 1 - air * .5;
     this.place();
+    if (this.useFrames) this.updateFrames(Math.hypot(this.x - px, this.y - py));
     if (this.flashAmt > 0) this.setFlash(Math.max(0, this.flashAmt - dt * 5));
     // trail from the blade tip (world coords)
     const toWorld = p => [this.x + (p[0] - O[0]) * sxs * this.scale, this.y + (p[1] - O[1]) * this.scale];
@@ -986,6 +1027,7 @@ addEventListener("keydown", e => {
   if (e.code === "Space") { e.preventDefault(); const m = nearestMob(420); if (m) hero.target = m; }
   if (e.code === "KeyG") debugWalk.visible = !debugWalk.visible;
   if (e.code === "KeyH" && !e.repeat) toggleGear();
+  if (e.code === "KeyF" && !e.repeat) toggleFrames();
   if (e.code === "KeyR" && !e.repeat) { hero.runMode = !hero.runMode; log(`<span class="w">[ระบบ] ${hero.runMode ? "วิ่ง" : "เดิน"}</span>`); }
   if (/^Arrow/.test(e.code)) e.preventDefault();
 });
@@ -1068,6 +1110,22 @@ function buildGearPanel() {
 try { const w = JSON.parse(localStorage.getItem(GEAR_KEY) || "null"); if (w) for (const k of ["top", "mid", "low"]) if (w[k] in GEAR.items) hero.wear(k, w[k]); hero.setOutfit(localStorage.getItem(GEAR_KEY + ".outfit")); } catch (e) { /* ignore */ }
 buildGearPanel();
 $("gearBtn").addEventListener("click", () => toggleGear());
+/* frame hero vs rig hero (F / 🎞️): remembered in this browser; frames walk by default (the sheets are walk cycles) */
+const FRAMES_KEY = "mossbridge.heroFrames";
+function toggleFrames(on) {
+  const want = on === undefined ? !hero.useFrames : on, got = hero.setFrames(want);
+  if (!SPR) { $("heroBtn").hidden = true; return; }
+  $("heroBtn").setAttribute("aria-pressed", String(got));
+  if (on === undefined) {
+    hero.runMode = !got;
+    log(`<span class="w">[ระบบ] ${got ? "ฮีโร่แบบเฟรม (ภาพวาดทุกท่า) • เดิน" : "ฮีโร่แบบ rig (ของเดิม) • วิ่ง"}</span>`);
+    try { localStorage.setItem(FRAMES_KEY, got ? "1" : "0"); } catch (e) { /* not remembered */ }
+  }
+}
+{ let pref = "1"; try { pref = localStorage.getItem(FRAMES_KEY) ?? "1"; } catch (e) { /* default */ }
+  toggleFrames(pref === "1"); if (hero.useFrames) hero.runMode = false; }
+$("heroBtn").addEventListener("click", () => toggleFrames());
+$("heroBtn").addEventListener("pointerdown", e => e.stopPropagation());
 $("gear").addEventListener("pointerdown", e => e.stopPropagation());
 
 const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
@@ -1151,7 +1209,7 @@ log(`<span class="g">[Guild] Riven: Bridge looks clear on west side.</span>`);
 log(`[General] ยินดีต้อนรับสู่ Mossbridge — ข้ามสะพานไปทุ่งหญ้าทางขวาเพื่อตามล่าสไลม์และหมูป่ามอส`);
 $("loading").classList.add("gone");
 // test hook: deterministic stepping (used by the screenshot scripts; harmless in play)
-window.__mossbridge = { hero, mobs, boss, useSkill, findPath, walkable, cam, app,
+window.__mossbridge = { hero, mobs, boss, useSkill, findPath, walkable, cam, app, toggleFrames,
   step(sec, fps = 60) { app.ticker.stop(); for (let i = 0; i < Math.round(sec * fps); i++) frame(1 / fps); app.render(); },
   resume() { app.ticker.start(); } };
 setTimeout(() => { const h = $("help"); if (!h.hidden) { h.hidden = true; $("helpBtn").setAttribute("aria-expanded", "false"); } }, 9000);

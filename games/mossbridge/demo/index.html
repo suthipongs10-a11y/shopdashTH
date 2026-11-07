@@ -85,11 +85,13 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
 /* menu buttons / help */
 #menu { right: max(10px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; pointer-events: auto; }
 #menu button { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--brass); background: var(--panel-solid); color: var(--text); font: 600 16px var(--font-display); cursor: pointer; }
+#menu button[aria-pressed="true"] { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(60,192,173,.45); }
 #help { right: max(10px, env(safe-area-inset-right, 0px)); bottom: calc(66px + env(safe-area-inset-bottom, 0px)); padding: 10px 14px; width: 270px; font-size: 13px; color: var(--muted); }
 #help b { color: var(--text); font-weight: 600; }
 #help ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 2px; }
 
 /* headgear try-on panel */
+.hud[hidden] { display: none !important; }   /* panels with display:grid/flex must still obey hidden */
 #gear { right: max(10px, env(safe-area-inset-right, 0px)); bottom: calc(66px + env(safe-area-inset-bottom, 0px)); padding: 10px 12px 12px; width: 300px; pointer-events: auto; display: grid; gap: 8px; }
 #gear h3 { margin: 0; font: 500 15px/1.2 var(--font-display); color: var(--gold); }
 #gear h4 { margin: 2px 0 0; font: 500 12px/1.2 var(--font-display); color: var(--muted); letter-spacing: .04em; }
@@ -158,6 +160,7 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
 <div class="hud" id="hotbar" role="toolbar" aria-label="สกิล"></div>
 
 <div class="hud" id="menu">
+  <button id="heroBtn" aria-pressed="false" title="ฮีโร่แบบเฟรม / แบบเดิม (F)" aria-label="สลับฮีโร่แบบเฟรม">🎞️</button>
   <button id="gearBtn" aria-expanded="false" aria-controls="gear" title="ชุดและหมวก (H)">👒</button>
   <button id="helpBtn" aria-expanded="true" aria-controls="help" title="วิธีเล่น">?</button>
 </div>
@@ -168,6 +171,7 @@ body { margin: 0; background: var(--ink); color: var(--text); font: 14px/1.45 va
     <li>คลิกมอนสเตอร์ = ตีอัตโนมัติ (คอมโบ 3 จังหวะ)</li>
     <li>WASD / ลูกศร = เดิน • Space = ตีตัวใกล้สุด</li>
     <li>R = สลับวิ่ง/เดิน • H = ลองใส่ชุดและหมวก</li>
+    <li>F หรือ 🎞️ = สลับฮีโร่แบบเฟรม (ภาพวาดใหม่) / แบบเดิม</li>
     <li>1–4 = สกิล • 5 = ยาฟื้นฟู</li>
   </ul>
 </div>
