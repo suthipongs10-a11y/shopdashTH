@@ -10,8 +10,12 @@ const Y_SQUASH := 0.62
 const DEF_K := 400.0
 const MAP_SIZE := Vector2(3600.0, 2400.0)
 
-## Hotbar order. Index 0 is the basic attack; 1-4 are bound to Q, E, R, F.
-const SKILL_ORDER: Array[String] = ["attack", "wave", "aegis", "whirl", "lion"]
+## Hotbar order. Index 0 is the basic attack; the rest follow SKILL_KEYS.
+const SKILL_ORDER: Array[String] = ["attack", "wave", "aegis", "whirl", "lion", "cross", "banner"]
+## Input action for each entry of SKILL_ORDER after the basic attack.
+const SKILL_ACTIONS: Array[String] = [
+	"skill_q", "skill_e", "skill_r", "skill_f", "skill_1", "skill_2",
+]
 
 const SKILLS := {
 	"attack": {
@@ -34,6 +38,14 @@ const SKILLS := {
 		"name": "คำรามสิงห์ทอง", "short": "สิงห์ทอง", "key": "F",
 		"mult": 2.6, "cd": 35.0, "sp": 60.0, "color": Color(1.0, 0.72, 0.22),
 	},
+	"cross": {
+		"name": "กางเขนศักดิ์สิทธิ์", "short": "กางเขน", "key": "1",
+		"mult": 1.7, "cd": 6.0, "sp": 22.0, "color": Color(1.0, 0.86, 0.45),
+	},
+	"banner": {
+		"name": "ธงศักดิ์สิทธิ์", "short": "ธงทอง", "key": "2",
+		"mult": 1.2, "cd": 45.0, "sp": 70.0, "color": Color(1.0, 0.8, 0.35),
+	},
 }
 
 const MONSTERS := {
@@ -43,6 +55,8 @@ const MONSTERS := {
 		"def": 60.0, "speed": 70.0, "radius": 34.0,
 		"aggro": 620.0, "range": 34.0, "windup": 0.6, "cooldown": 1.6,
 		"xp": 22, "gold": 6, "color": Color(0.62, 0.45, 0.42),
+		# Chance that a slam leaves a burning patch on the ground.
+		"fire_chance": 0.8,
 	},
 	"imp": {
 		"name": "อิมป์เถ้าธุลี", "shape": "round",

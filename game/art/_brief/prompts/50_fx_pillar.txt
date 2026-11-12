@@ -1,0 +1,26 @@
+OUTPUT FILE NAME: fx_pillar.png
+ATTACH WITH THIS PROMPT: nothing
+
+Create a visual effect for a 2D action RPG: A pillar of holy light striking down from the sky.
+
+CONTENT:
+- A tall narrow beam of white-gold light, brightest in the middle with soft glowing edges,
+  small sparkles and motes of light along it.
+- The beam runs from the top edge down to about 90% of the height and flares out into a bright
+  splash where it hits the ground. It is about 30% of the canvas width.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (single image):
+- Portrait canvas, aspect ratio 2:3 (1024x1536).
+- The effect is centred and nothing touches the canvas edges unless stated.
+- No text, labels, border or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)

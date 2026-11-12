@@ -1,0 +1,26 @@
+OUTPUT FILE NAME: fx_cross.png
+ATTACH WITH THIS PROMPT: nothing
+
+Create a visual effect for a 2D action RPG: A holy cross flare that strikes enemies.
+
+CONTENT:
+- A bright white-gold four-pointed cross-shaped star of light.
+- The vertical ray is much longer than the horizontal ray: the vertical ray reaches almost to the top
+  and bottom edges, the horizontal ray reaches about 70% of the width.
+- Very thin, sharp rays with a soft golden bloom, a small blinding core, faint diagonal glints.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (single image):
+- Square canvas, 1:1 (1024x1024).
+- The effect is centred and nothing touches the canvas edges unless stated.
+- No text, labels, border or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)

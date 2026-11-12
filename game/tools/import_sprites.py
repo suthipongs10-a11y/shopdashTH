@@ -12,7 +12,7 @@ What it does per sprite sheet:
   3. Scales all frames of a character to the same body height, puts the feet on one baseline
      and centres the feet horizontally. Hop frames keep their lift above the ground.
   4. Writes <anim>.png (5 direction rows x N frame columns, 256 px cells) and sheet.cfg.
-Also copies the ground painting and the lion spirit effect, and slices the skill icon sheet.
+Also copies the ground painting, converts effect art (fx_*.png, lion_spirit.png) into\nart/fx/ strips with a .cfg each, and slices the skill icon sheet.
 
 Requires numpy, scipy and Pillow.
 """
@@ -68,7 +68,29 @@ CHARACTERS = {
     },
 }
 
-ICON_NAMES = ["attack", "wave", "aegis", "whirl", "lion", "potion"]
+# 3x3 icon sheet (brief v3) and the older 3x2 sheet.
+ICON_NAMES_3X3 = ["attack", "wave", "aegis", "whirl", "lion", "cross", "banner", "potion", "potion_sp"]
+ICON_NAMES_3X2 = ["attack", "wave", "aegis", "whirl", "lion", "potion"]
+
+# Raw file -> (game name, layout, fps, blend). "add" art is painted on black and drawn additively.
+FX_SPECS = {
+    "fx_slash.png": ("slash", "grid", 24, "add"),
+    "fx_hit.png": ("hit", "grid", 24, "add"),
+    "fx_explosion.png": ("explosion", "grid", 14, "add"),
+    "fx_fire.png": ("fire", "grid", 10, "add"),
+    "fx_smoke.png": ("smoke", "grid", 8, "mix"),
+    "fx_bubble.png": ("bubble", "single", 1, "add"),
+    "fx_guard.png": ("guard", "single", 1, "add"),
+    "fx_cross.png": ("cross", "single", 1, "add"),
+    "fx_ring.png": ("ring", "single", 1, "add"),
+    "fx_pillar.png": ("pillar", "single", 1, "add"),
+    "fx_crest.png": ("crest", "single", 1, "add"),
+    "lion_spirit.png": ("lion_spirit", "single", 1, "add"),
+}
+FX_CELL = 320
+FX_SINGLE_MAX = 640
+# Pixels darker than this on additive art are pushed to pure black (removes grey haze).
+BLACK_FLOOR = 14
 
 
 def load_rgba(path: str) -> np.ndarray:
@@ -236,6 +258,45 @@ def preview(sheet: Image.Image, path: str) -> None:
     bg.convert("RGB").save(path, quality=88)
 
 
+def fx_pixels(img: Image.Image, blend: str) -> Image.Image:
+    """Prepares one effect frame: additive art gets a black floor, other art gets a real alpha."""
+    if blend == "add":
+        rgb = np.array(img.convert("RGB")).astype(np.int16)
+        rgb = np.clip((rgb - BLACK_FLOOR) * 255 / (255 - BLACK_FLOOR), 0, 255).astype(np.uint8)
+        return Image.fromarray(rgb, "RGB").convert("RGBA")
+    arr = np.array(img.convert("RGBA"))
+    if (arr[..., 3] < 40).mean() > 0.2:
+        return Image.fromarray(arr, "RGBA")
+    rgb = arr[..., :3].astype(np.int16)
+    green = (rgb[..., 1] > rgb[..., 0] + 50) & (rgb[..., 1] > rgb[..., 2] + 50)
+    arr[..., 3] = np.where(green, 0, 255).astype(np.uint8)
+    return Image.fromarray(arr, "RGBA")
+
+
+def import_fx(path: str, name: str, layout: str, fps: int, blend: str) -> None:
+    src = Image.open(path)
+    if layout == "grid":
+        cols, rows = 3, 2
+        w, h = src.width / cols, src.height / rows
+        strip = Image.new("RGBA", (FX_CELL * cols * rows, FX_CELL), (0, 0, 0, 0))
+        for i in range(cols * rows):
+            r, c = divmod(i, cols)
+            cell = src.crop((round(c * w), round(r * h), round((c + 1) * w), round((r + 1) * h)))
+            cell = fx_pixels(cell, blend).resize((FX_CELL, FX_CELL), Image.LANCZOS)
+            strip.paste(cell, (i * FX_CELL, 0))
+        out, frames = strip, cols * rows
+    else:
+        out = fx_pixels(src, blend)
+        out.thumbnail((FX_SINGLE_MAX, FX_SINGLE_MAX), Image.LANCZOS)
+        frames = 1
+    dst_dir = os.path.join(GAME_DIR, "art/fx")
+    os.makedirs(dst_dir, exist_ok=True)
+    out.save(os.path.join(dst_dir, f"{name}.png"))
+    with open(os.path.join(dst_dir, f"{name}.cfg"), "w", encoding="utf-8") as f:
+        f.write(f"[fx]\nframes={frames}\nfps={fps}\nblend=\"{blend}\"\n")
+    print(f"fx/{name}.png  {frames} frame(s), {blend}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
@@ -275,23 +336,22 @@ def main() -> None:
         Image.open(ground_src).convert("RGB").save(dst)
         print("maps/volcano/ground.png")
 
-    lion_src = os.path.join(args.src, "lion_spirit.png")
-    if os.path.exists(lion_src):
-        dst = os.path.join(GAME_DIR, "art/fx/lion_spirit.png")
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        lion = Image.open(lion_src).convert("RGB")
-        lion.thumbnail((768, 768), Image.LANCZOS)
-        lion.save(dst)
-        print("fx/lion_spirit.png")
+    for raw, spec in FX_SPECS.items():
+        path = os.path.join(args.src, raw)
+        if os.path.exists(path):
+            import_fx(path, *spec)
 
     icons_src = os.path.join(args.src, "icons_skills.png")
     if os.path.exists(icons_src):
         sheet = Image.open(icons_src).convert("RGB")
         dst_dir = os.path.join(GAME_DIR, "art/ui/skills")
         os.makedirs(dst_dir, exist_ok=True)
-        w, h = sheet.width / 3, sheet.height / 2
+        square = abs(sheet.width - sheet.height) < sheet.width * 0.1
+        names = ICON_NAMES_3X3 if square else ICON_NAMES_3X2
+        rows = 3 if square else 2
+        w, h = sheet.width / 3, sheet.height / rows
         inset = 0.03
-        for i, name in enumerate(ICON_NAMES):
+        for i, name in enumerate(names):
             r, c = divmod(i, 3)
             box = (
                 round(c * w + w * inset), round(r * h + h * inset),

@@ -12,6 +12,7 @@ const MAX_PLAYER_DIST := 1100.0
 var world: Node2D
 var player: Player
 var fx_layer: Node
+var ground_layer: Node
 
 var _timer := 0.5
 
@@ -39,6 +40,7 @@ func spawn_pack() -> void:
 		var m := Monster.new()
 		m.setup(kind, player.level, player)
 		m.fx_layer = fx_layer
+		m.ground_layer = ground_layer
 		var jitter := Vector2(randf_range(-90.0, 90.0), randf_range(-60.0, 60.0))
 		m.position = (center + jitter).clamp(margin, GameData.MAP_SIZE - margin)
 		m.died.connect(_on_monster_died)

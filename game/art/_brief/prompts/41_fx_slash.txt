@@ -1,0 +1,31 @@
+OUTPUT FILE NAME: fx_slash.png
+ATTACH WITH THIS PROMPT: templates/template_fx_3x2.png
+
+Create a visual effect for a 2D action RPG: A sword slash crescent, the light trail left by a very fast longsword swing.
+
+CONTENT:
+- A thick curved crescent of white light with ice-blue edges and a soft blue glow.
+- The crescent bulges toward the RIGHT side of the cell: its convex edge faces right and its two
+  thin tips point to the upper-left and lower-left. Every frame keeps this orientation.
+- Frame 1: a thin bright sliver appears. Frame 2: the arc grows. Frame 3: full, brightest crescent
+  with sparkles at the tips. Frame 4: the crescent widens slightly. Frame 5: it fades and breaks into
+  fine light streaks. Frame 6: faint wisps only.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (animated effect, 6 frames):
+- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square cells.
+- Frames run left to right, top row first: frame 1 top-left ... frame 6 bottom-right.
+- The attached template_fx_3x2.png shows the layout. Use it ONLY to place the frames; do NOT copy its
+  lines, numbers or white background.
+- The effect stays centred on the same spot in every cell and never crosses into a neighbouring cell.
+- No text, numbers, labels, borders, grid lines or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)

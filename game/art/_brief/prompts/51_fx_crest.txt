@@ -1,0 +1,25 @@
+OUTPUT FILE NAME: fx_crest.png
+ATTACH WITH THIS PROMPT: nothing
+
+Create a visual effect for a 2D action RPG: A glowing golden heraldic crest summoned by the knight's ultimate skill.
+
+CONTENT:
+- A large ornate shield emblem made of golden light and gold metal, with a roaring lion head at
+  its centre and wing-like flourishes on both sides, light rays radiating behind it.
+- Front view, centred, fills about 85% of the canvas.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (single image):
+- Portrait canvas, aspect ratio 2:3 (1024x1536).
+- The effect is centred and nothing touches the canvas edges unless stated.
+- No text, labels, border or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)

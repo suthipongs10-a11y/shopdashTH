@@ -1,15 +1,14 @@
-# Sprite asset job: start here (version 2, dark fantasy)
+# Asset job: start here (version 3: dark fantasy characters + skill effects)
 
-You are producing 2D sprite assets for an action RPG. Everything you need is in this pack.
-The person talking to you is the game's owner. They will download each image you make and pass it
-to the game's developer, who slices and aligns the sheets. Work in the order below.
+You are producing 2D art for an action RPG: character sprite sheets, skill effects and icons.
+Everything you need is in this pack. The person talking to you is the game's owner. They download
+each image and pass it to the game's developer, who slices and aligns everything.
 
 ## How to work
 
 1. Generate ONE asset at a time, in the order of the table. Use the full text of that asset's prompt
    file in `prompts/` as the image prompt. Do not shorten or paraphrase it.
-2. Use the reference images named in the prompt file's `ATTACH WITH THIS PROMPT` line:
-   the layout templates in `templates/`, and the character's concept image once it is approved.
+2. Attach the reference images named in the prompt file's `ATTACH WITH THIS PROMPT` line.
 3. After each image, state the output file name and wait. Continue only when the owner says "next".
    If the owner asks for a fix, regenerate that same asset.
 4. Keep every character identical to its approved concept image in all later sheets.
@@ -30,22 +29,40 @@ to the game's developer, who slices and aligns the sheets. Work in the order bel
 | 9 | `prompts/31_imp_walk.txt` | `imp_walk.png` | `imp_concept.png`, `template_sheet_5x4.png` |
 | 10 | `prompts/32_imp_attack.txt` | `imp_attack.png` | `imp_concept.png`, `template_sheet_5x4.png` |
 | 11 | `prompts/40_fx_lion_spirit.txt` | `lion_spirit.png` | none |
-| 12 | `prompts/50_icons_skills.txt` | `icons_skills.png` | `warden_concept.png` |
+| 12 | `prompts/41_fx_slash.txt` | `fx_slash.png` | `template_fx_3x2.png` |
+| 13 | `prompts/42_fx_hit.txt` | `fx_hit.png` | `template_fx_3x2.png` |
+| 14 | `prompts/43_fx_explosion.txt` | `fx_explosion.png` | `template_fx_3x2.png` |
+| 15 | `prompts/44_fx_fire.txt` | `fx_fire.png` | `template_fx_3x2.png` |
+| 16 | `prompts/45_fx_smoke.txt` | `fx_smoke.png` | `template_fx_3x2.png` |
+| 17 | `prompts/46_fx_bubble.txt` | `fx_bubble.png` | none |
+| 18 | `prompts/47_fx_guard.txt` | `fx_guard.png` | none |
+| 19 | `prompts/48_fx_cross.txt` | `fx_cross.png` | none |
+| 20 | `prompts/49_fx_ring.txt` | `fx_ring.png` | none |
+| 21 | `prompts/50_fx_pillar.txt` | `fx_pillar.png` | none |
+| 22 | `prompts/51_fx_crest.txt` | `fx_crest.png` | none |
+| 23 | `prompts/60_icons_skills.txt` | `icons_skills.png` | `warden_concept.png` |
 
 ## Art direction
 
-Dark high fantasy, mysterious and powerful. Heroic semi-realistic proportions (about 5 heads tall),
-never cute or chibi. Every prompt file repeats the full style block; follow it exactly.
+Characters: dark high fantasy, mysterious and powerful, heroic semi-realistic proportions (about
+5 heads tall), never cute or chibi. Effects: bright, glowing, painted magic on a pure black
+background. Every prompt file repeats the full style block; follow it exactly.
 
-## Rules that apply to every sprite sheet
+## Rules for character sprite sheets
 
 - The templates show layout only. Never reproduce their grid lines, labels, arrows, ovals or white background.
 - Transparent background. If you cannot produce transparency, use flat pure green `#00FF00`.
-- No ground shadows, no effects (trails, glows, sparks), no text, no borders, no watermark.
+- No ground shadows, no spell effects, no text, no borders, no watermark. Glow that belongs to the
+  character (energy wings, eyes, magma) is part of the design.
 - Same character size and the same foot baseline in every cell. Nothing crosses a cell boundary.
-- PNG output at the largest resolution available for the requested aspect ratio.
 
-## If a 20-pose sheet comes out inconsistent
+## Rules for effects
+
+- Pure flat black background (`#000000`), except `fx_smoke.png` (transparent or flat green).
+- Animated effects: 6 frames in a 3 x 2 grid, centred on the same spot in every cell.
+- No text, labels or grid lines.
+
+## If a 20-pose character sheet comes out inconsistent
 
 Tell the owner, then split that sheet into five images, one per direction row. Each image is a
 landscape 3:2 canvas with a single row of the 4 frames, using the same prompt text but only the

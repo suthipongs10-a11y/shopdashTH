@@ -42,6 +42,7 @@ func _ready() -> void:
 	spawner.world = world
 	spawner.player = _player
 	spawner.fx_layer = _top_fx
+	spawner.ground_layer = ground_fx
 	add_child(spawner)
 	spawner.monster_killed.connect(_on_monster_killed)
 	spawner.prefill(5)
@@ -66,6 +67,8 @@ func _setup_input() -> void:
 	_add_keys("skill_e", [KEY_E])
 	_add_keys("skill_r", [KEY_R])
 	_add_keys("skill_f", [KEY_F])
+	_add_keys("skill_1", [KEY_1])
+	_add_keys("skill_2", [KEY_2])
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	InputMap.action_add_event("attack", click)

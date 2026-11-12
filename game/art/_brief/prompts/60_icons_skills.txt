@@ -1,21 +1,24 @@
 OUTPUT FILE NAME: icons_skills.png
 ATTACH WITH THIS PROMPT: the approved warden_concept.png (for colours only)
 
-Create a sheet of 6 skill icons for a dark fantasy action RPG.
+Create a sheet of 9 skill and item icons for a dark fantasy action RPG.
 
 LAYOUT:
-- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square icons.
+- Square canvas, 1:1 (1024x1024). A grid of 3 columns x 3 rows = 9 equal square icons.
 - Each icon fills its whole cell edge to edge. No frames, no borders, no gaps, no text.
 
-ICONS, left to right, top row then bottom row:
+ICONS, left to right, top row first:
 1. Sword Slash: a black longsword with a faint blue edge cutting diagonally, on a dark slate background.
 2. Triple Blade Wave: three crescents of blue light flying forward in a fan, on a deep navy background.
 3. Aegis: a translucent glowing bubble shield with a gold lion emblem at its centre, on a dark teal background.
 4. Blade Storm: a sword spinning in a circle leaving white ring trails, on a dark steel-blue background.
 5. Golden Lion Roar: a roaring lion head made of golden fire, on a deep crimson background.
-6. Healing Potion: a round glass bottle of glowing red liquid with a cork, on a dark background.
+6. Holy Cross: a white-gold cross-shaped flare of light striking down, on a dark purple background.
+7. Sacred Banner: a radiant golden heraldic crest with a lion emblem and light rays, on a deep orange background.
+8. Health Potion: a round glass bottle of glowing red liquid with a cork, on a dark background.
+9. Mana Potion: a round glass bottle of glowing blue liquid with a cork, on a dark background.
 
 STYLE:
 - Hand-painted dark fantasy game icons, bold shapes that read clearly at 64x64 pixels, strong
-  contrast, glowing accents. Same painting style and lighting (from the top-left) for all six.
+  contrast, glowing accents. Same painting style and lighting (from the top-left) for all nine.
 - Output: PNG.

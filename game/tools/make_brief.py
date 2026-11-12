@@ -194,6 +194,133 @@ ANIMATION: {label}, 4 frames.
         n += 1
     num += 10
 
+FX_STYLE = """FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery."""
+
+FX_BLACK = """- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)"""
+
+FX_GRID = """LAYOUT (animated effect, 6 frames):
+- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square cells.
+- Frames run left to right, top row first: frame 1 top-left ... frame 6 bottom-right.
+- The attached template_fx_3x2.png shows the layout. Use it ONLY to place the frames; do NOT copy its
+  lines, numbers or white background.
+- The effect stays centred on the same spot in every cell and never crosses into a neighbouring cell.
+- No text, numbers, labels, borders, grid lines or watermark.
+- Output: PNG."""
+
+FX_SINGLE = """LAYOUT (single image):
+- {canvas}
+- The effect is centred and nothing touches the canvas edges unless stated.
+- No text, labels, border or watermark.
+- Output: PNG."""
+
+FX = [
+    ("41_fx_slash.txt", "fx_slash.png", "grid", "black",
+     "A sword slash crescent, the light trail left by a very fast longsword swing.",
+     """- A thick curved crescent of white light with ice-blue edges and a soft blue glow.
+- The crescent bulges toward the RIGHT side of the cell: its convex edge faces right and its two
+  thin tips point to the upper-left and lower-left. Every frame keeps this orientation.
+- Frame 1: a thin bright sliver appears. Frame 2: the arc grows. Frame 3: full, brightest crescent
+  with sparkles at the tips. Frame 4: the crescent widens slightly. Frame 5: it fades and breaks into
+  fine light streaks. Frame 6: faint wisps only."""),
+    ("42_fx_hit.txt", "fx_hit.png", "grid", "black",
+     "An impact spark when a sword hits an enemy.",
+     """- A bright four-pointed white star with a gold glow at its centre, sharp needles of light
+  radiating outward and small flying sparks.
+- Frame 1: small flash. Frame 2: large star burst. Frame 3: peak, long thin needles.
+  Frame 4: needles thinning. Frame 5: fading sparks. Frame 6: last tiny sparks."""),
+    ("43_fx_explosion.txt", "fx_explosion.png", "grid", "black",
+     "A radiant golden holy explosion for powerful skills.",
+     """- A blinding white-gold core, a ring of golden light expanding outward, long light rays shooting
+  out, curling golden flames and sparks.
+- Frame 1: the core ignites. Frame 2: core swells, first rays. Frame 3: peak, biggest and brightest,
+  long rays. Frame 4: ring expands, core fading. Frame 5: flames and sparks drifting outward.
+  Frame 6: faint embers and a thin fading ring.
+- At its peak the explosion fills about 90% of the cell."""),
+    ("44_fx_fire.txt", "fx_fire.png", "grid", "black",
+     "A small fire burning on the ground, seen from the game's three-quarter top-down camera.",
+     """- A cluster of 3 to 5 tongues of orange-yellow flame with a white-yellow base, rising upward.
+- A seamless 6-frame loop: the flames flicker and sway; frame 6 must flow smoothly back into frame 1.
+- The base of the fire sits on the same spot in every frame, about 15% above the bottom of the cell.
+  The flames reach about 70% of the cell height."""),
+    ("45_fx_smoke.txt", "fx_smoke.png", "grid", "transparent",
+     "A puff of smoke and dust rising and dissipating.",
+     """- Soft painted grey-brown smoke cloud.
+- Frame 1: a small dense puff near the bottom of the cell. Frames 2-4: it billows upward and grows.
+  Frames 5-6: large thin wisps fading away."""),
+    ("46_fx_bubble.txt", "fx_bubble.png", "single", "black",
+     "A spherical magic barrier bubble that surrounds a knight.",
+     """- A perfectly round sphere of pale blue-white light, seen front-on, like a soap bubble or glass orb.
+- The inside is almost completely transparent (black). A bright rim of light along the edge,
+  a soft curved highlight on the upper left like light on glass, a faint hexagon shimmer pattern,
+  a few tiny sparkles.
+- The sphere fills about 90% of the canvas."""),
+    ("47_fx_guard.txt", "fx_guard.png", "single", "black",
+     "A small floating guardian shield made of light that orbits the knight.",
+     """- A kite-shaped heraldic shield made of translucent golden light, with a small lion-head emblem,
+  glowing edges and a soft golden aura. Front view.
+- Fills about 80% of the canvas."""),
+    ("48_fx_cross.txt", "fx_cross.png", "single", "black",
+     "A holy cross flare that strikes enemies.",
+     """- A bright white-gold four-pointed cross-shaped star of light.
+- The vertical ray is much longer than the horizontal ray: the vertical ray reaches almost to the top
+  and bottom edges, the horizontal ray reaches about 70% of the width.
+- Very thin, sharp rays with a soft golden bloom, a small blinding core, faint diagonal glints."""),
+    ("49_fx_ring.txt", "fx_ring.png", "single", "black",
+     "A magic rune circle placed on the ground under a spell.",
+     """- Seen from DIRECTLY ABOVE: a perfectly round circle, NOT in perspective (the game tilts it).
+- Two concentric thin glowing golden rings with a band of runic symbols between them, a few small
+  diamond ornaments around the outside, soft golden glow.
+- The centre is empty black. The circle fills about 95% of the canvas."""),
+    ("50_fx_pillar.txt", "fx_pillar.png", "single-portrait", "black",
+     "A pillar of holy light striking down from the sky.",
+     """- A tall narrow beam of white-gold light, brightest in the middle with soft glowing edges,
+  small sparkles and motes of light along it.
+- The beam runs from the top edge down to about 90% of the height and flares out into a bright
+  splash where it hits the ground. It is about 30% of the canvas width."""),
+    ("51_fx_crest.txt", "fx_crest.png", "single-portrait", "black",
+     "A glowing golden heraldic crest summoned by the knight's ultimate skill.",
+     """- A large ornate shield emblem made of golden light and gold metal, with a roaring lion head at
+  its centre and wing-like flourishes on both sides, light rays radiating behind it.
+- Front view, centred, fills about 85% of the canvas."""),
+]
+
+for fname, out_name, kind, bg, title, body in FX:
+    if kind == "grid":
+        layout = FX_GRID
+        attach = "templates/template_fx_3x2.png"
+    else:
+        canvas = ("Portrait canvas, aspect ratio 2:3 (1024x1536)." if kind == "single-portrait"
+                  else "Square canvas, 1:1 (1024x1024).")
+        layout = FX_SINGLE.format(canvas=canvas)
+        attach = "nothing"
+    if bg == "black":
+        background = FX_BLACK
+    else:
+        background = ("- Background: fully transparent. If transparency is not possible, use one flat pure "
+                      "green (#00FF00)\n  with no gradient.")
+    write(fname, f"""
+OUTPUT FILE NAME: {out_name}
+ATTACH WITH THIS PROMPT: {attach}
+
+Create a visual effect for a 2D action RPG: {title}
+
+CONTENT:
+{body}
+
+{FX_STYLE}
+
+{layout}
+
+BACKGROUND:
+{background}
+""")
+    ORDER.append((fname, out_name, "fx"))
+
 write("40_fx_lion_spirit.txt", """
 OUTPUT FILE NAME: lion_spirit.png
 ATTACH WITH THIS PROMPT: nothing
@@ -215,32 +342,35 @@ HARD RULES:
 - Square canvas, 1:1, at the largest resolution available (1024x1024 minimum).
 - Output: PNG.
 """)
-ORDER.append(("40_fx_lion_spirit.txt", "lion_spirit.png", "fx"))
+ORDER.insert(len(ORDER) - len(FX), ("40_fx_lion_spirit.txt", "lion_spirit.png", "fx"))
 
-write("50_icons_skills.txt", """
+write("60_icons_skills.txt", """
 OUTPUT FILE NAME: icons_skills.png
 ATTACH WITH THIS PROMPT: the approved warden_concept.png (for colours only)
 
-Create a sheet of 6 skill icons for a dark fantasy action RPG.
+Create a sheet of 9 skill and item icons for a dark fantasy action RPG.
 
 LAYOUT:
-- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square icons.
+- Square canvas, 1:1 (1024x1024). A grid of 3 columns x 3 rows = 9 equal square icons.
 - Each icon fills its whole cell edge to edge. No frames, no borders, no gaps, no text.
 
-ICONS, left to right, top row then bottom row:
+ICONS, left to right, top row first:
 1. Sword Slash: a black longsword with a faint blue edge cutting diagonally, on a dark slate background.
 2. Triple Blade Wave: three crescents of blue light flying forward in a fan, on a deep navy background.
 3. Aegis: a translucent glowing bubble shield with a gold lion emblem at its centre, on a dark teal background.
 4. Blade Storm: a sword spinning in a circle leaving white ring trails, on a dark steel-blue background.
 5. Golden Lion Roar: a roaring lion head made of golden fire, on a deep crimson background.
-6. Healing Potion: a round glass bottle of glowing red liquid with a cork, on a dark background.
+6. Holy Cross: a white-gold cross-shaped flare of light striking down, on a dark purple background.
+7. Sacred Banner: a radiant golden heraldic crest with a lion emblem and light rays, on a deep orange background.
+8. Health Potion: a round glass bottle of glowing red liquid with a cork, on a dark background.
+9. Mana Potion: a round glass bottle of glowing blue liquid with a cork, on a dark background.
 
 STYLE:
 - Hand-painted dark fantasy game icons, bold shapes that read clearly at 64x64 pixels, strong
-  contrast, glowing accents. Same painting style and lighting (from the top-left) for all six.
+  contrast, glowing accents. Same painting style and lighting (from the top-left) for all nine.
 - Output: PNG.
 """)
-ORDER.append(("50_icons_skills.txt", "icons_skills.png", "icons"))
+ORDER.append(("60_icons_skills.txt", "icons_skills.png", "icons"))
 
 # ---------------------------------------------------------------- templates
 font = ImageFont.truetype(FONT, 20)
@@ -288,6 +418,20 @@ for i, v in enumerate(views):
     d.ellipse([cx + ax * 90 - 10, my + ay * 56 - 10, cx + ax * 90 + 10, my + ay * 56 + 10], fill=(240, 170, 20))
     d.text((x0 + 12, 12), v, font=font, fill=(40, 40, 40))
 img.save(os.path.join(OUT, "templates", "template_turnaround.png"))
+
+W, H = 1536, 1024
+img = Image.new("RGB", (W, H), "white")
+d = ImageDraw.Draw(img)
+big = ImageFont.truetype(FONT, 64)
+for i in range(6):
+    r, c = divmod(i, 3)
+    x0, y0 = c * 512, r * 512
+    d.rectangle([x0, y0, x0 + 511, y0 + 511], outline=(200, 60, 60), width=3)
+    d.ellipse([x0 + 56, y0 + 56, x0 + 456, y0 + 456], outline=(170, 170, 170), width=3)
+    d.line([x0 + 236, y0 + 256, x0 + 276, y0 + 256], fill=(240, 170, 20), width=4)
+    d.line([x0 + 256, y0 + 236, x0 + 256, y0 + 276], fill=(240, 170, 20), width=4)
+    d.text((x0 + 16, y0 + 8), f"FRAME {i + 1}", font=big, fill=(40, 40, 40))
+img.save(os.path.join(OUT, "templates", "template_fx_3x2.png"))
 
 for row in ORDER:
     print("|".join(row))

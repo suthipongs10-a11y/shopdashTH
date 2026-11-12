@@ -26,6 +26,8 @@ var body_shape := "round"
 var state: State = State.WANDER
 
 var fx_layer: Node
+var ground_layer: Node
+var fire_chance := 0.0
 
 var _player: Player
 var _sheet: SheetSprite
@@ -61,6 +63,7 @@ func setup(kind_id: String, monster_level: int, player: Player) -> void:
 	attack_cooldown = float(d["cooldown"])
 	xp_reward = int(d["xp"])
 	gold_reward = int(d["gold"])
+	fire_chance = float(d.get("fire_chance", 0.0))
 	body_color = d["color"]
 
 
@@ -144,10 +147,27 @@ func _think(delta: float) -> Vector2:
 				# The player can dodge by stepping out of reach during the wind-up.
 				if player_alive and dist <= reach * 1.35:
 					_player.take_damage(attack_power)
+				if randf() < fire_chance:
+					_leave_fire()
 				_cooldown_left = attack_cooldown
 				state = State.CHASE
 			return Vector2.ZERO
 	return Vector2.ZERO
+
+
+func _leave_fire() -> void:
+	if ground_layer == null or not is_instance_valid(_player):
+		return
+	var toward := GameData.to_ground(_player.global_position - global_position).normalized()
+	var patch := FirePatch.new()
+	patch.player = _player
+	patch.top_fx = fx_layer
+	patch.damage = int(attack_power * 0.15)
+	patch.position = global_position + GameData.to_screen(toward * (attack_range + body_radius))
+	ground_layer.add_child(patch)
+	if fx_layer != null:
+		Fx.burst(fx_layer, patch.position + Vector2(0.0, -10.0), Color(0.5, 0.45, 0.42, 0.7), 6,
+			90.0, 0.7, 50.0, Vector2(0.0, -60.0), false)
 
 
 ## knock is a ground-plane velocity impulse; stun is in seconds.

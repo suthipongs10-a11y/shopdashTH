@@ -1,0 +1,31 @@
+OUTPUT FILE NAME: fx_explosion.png
+ATTACH WITH THIS PROMPT: templates/template_fx_3x2.png
+
+Create a visual effect for a 2D action RPG: A radiant golden holy explosion for powerful skills.
+
+CONTENT:
+- A blinding white-gold core, a ring of golden light expanding outward, long light rays shooting
+  out, curling golden flames and sparks.
+- Frame 1: the core ignites. Frame 2: core swells, first rays. Frame 3: peak, biggest and brightest,
+  long rays. Frame 4: ring expands, core fading. Frame 5: flames and sparks drifting outward.
+  Frame 6: faint embers and a thin fading ring.
+- At its peak the explosion fills about 90% of the cell.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (animated effect, 6 frames):
+- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square cells.
+- Frames run left to right, top row first: frame 1 top-left ... frame 6 bottom-right.
+- The attached template_fx_3x2.png shows the layout. Use it ONLY to place the frames; do NOT copy its
+  lines, numbers or white background.
+- The effect stays centred on the same spot in every cell and never crosses into a neighbouring cell.
+- No text, numbers, labels, borders, grid lines or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)

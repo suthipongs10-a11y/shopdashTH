@@ -19,6 +19,7 @@ const AEGIS_BLOCK := 0.7
 const WHIRL_TIME := 1.6
 const WHIRL_TICKS := 8
 const WHIRL_MOVE := 0.7
+const CROSS_RANGE := 320.0
 const RESPAWN_DELAY := 3.0
 ## Max hit-spark effects per physics frame, so huge packs do not flood the scene.
 const HIT_FX_PER_FRAME := 10
@@ -113,7 +114,8 @@ func _ready() -> void:
 
 func _recalc_stats() -> void:
 	max_hp = 8400.0 + 1600.0 * (level - 1)
-	max_sp = 90.0 + 12.0 * (level - 1)
+	# Generous SP so skills can be chained like the reference clip; potions come with items.
+	max_sp = 300.0 + 20.0 * (level - 1)
 	attack_power = 800.0 + 180.0 * (level - 1)
 	defense = 15.0 + 4.0 * (level - 1)
 	_name_label.text = "%s  Lv.%d" % [char_name, level]
@@ -138,7 +140,7 @@ func _physics_process(delta: float) -> void:
 	for id in cooldowns:
 		cooldowns[id] = maxf(0.0, cooldowns[id] - delta)
 	hp = minf(max_hp, hp + max_hp * 0.008 * delta)
-	sp = minf(max_sp, sp + max_sp * 0.03 * delta)
+	sp = minf(max_sp, sp + max_sp * 0.06 * delta)
 
 	var to_aim := input.aim_vector(self)
 	if to_aim.length() > 4.0:
@@ -188,9 +190,8 @@ func _animate(delta: float) -> void:
 func _handle_actions() -> void:
 	if input.is_pressed("attack"):
 		_try_use("attack")
-	var slots := ["skill_q", "skill_e", "skill_r", "skill_f"]
-	for i in slots.size():
-		if input.is_pressed(slots[i]):
+	for i in GameData.SKILL_ACTIONS.size():
+		if input.is_pressed(GameData.SKILL_ACTIONS[i]):
 			_try_use(GameData.SKILL_ORDER[i + 1])
 
 
@@ -210,7 +211,8 @@ func _try_use(id: String) -> void:
 	if id != "attack":
 		tally = SkillTally.new()
 		tally.anchor = self
-		tally.color = Color(1.0, 0.5, 0.65) if id == "lion" else Color(1.0, 0.85, 0.3)
+		var big := id in ["lion", "banner"]
+		tally.color = Color(1.0, 0.5, 0.65) if big else Color(1.0, 0.85, 0.3)
 		top_fx.add_child(tally)
 		SkillCallout.spawn(top_fx, self, String(data["name"]), color)
 	match id:
@@ -224,6 +226,10 @@ func _try_use(id: String) -> void:
 			_do_whirl(mult, color, tally)
 		"lion":
 			_do_lion(mult, color, tally)
+		"cross":
+			_do_cross(mult, color, tally)
+		"banner":
+			_do_banner(mult, color, tally)
 
 
 ## Basic attack: a cone in front of the player.
@@ -340,6 +346,37 @@ func _do_lion(mult: float, color: Color, tally: SkillTally) -> void:
 	ground_fx.add_child(pulse)
 
 
+## 1: a holy cross of light strikes the aim point twice.
+func _do_cross(mult: float, color: Color, tally: SkillTally) -> void:
+	var offset := input.aim_vector(self).limit_length(CROSS_RANGE)
+	var pulse := _new_pulse(AoePulse.Style.CROSS, 150.0, mult, color)
+	pulse.ticks = 2
+	pulse.interval = 0.22
+	pulse.delay = 0.3
+	pulse.knock = 90.0
+	pulse.shake = 6.0
+	pulse.tally = tally
+	pulse.position = global_position + GameData.to_screen(offset)
+	ground_fx.add_child(pulse)
+
+
+## 2: second ultimate. A golden crest rises, then five radiant blasts around the warden.
+func _do_banner(mult: float, color: Color, tally: SkillTally) -> void:
+	var crest := CrestFx.new()
+	crest.color = color
+	crest.position = global_position
+	top_fx.add_child(crest)
+	var pulse := _new_pulse(AoePulse.Style.BANNER, 330.0, mult, color)
+	pulse.ticks = 5
+	pulse.interval = 0.22
+	pulse.delay = CrestFx.RISE
+	pulse.knock = 120.0
+	pulse.shake = 14.0
+	pulse.tally = tally
+	pulse.position = global_position
+	ground_fx.add_child(pulse)
+
+
 func _new_pulse(style: AoePulse.Style, radius: float, mult: float, color: Color) -> AoePulse:
 	var pulse := AoePulse.new()
 	pulse.player = self
@@ -375,15 +412,23 @@ func strike(
 		tally.add(dmg)
 	if _hit_fx_budget > 0:
 		_hit_fx_budget -= 1
-		var spark := Color(1.0, 0.75, 0.3) if is_crit else Color(1.0, 0.95, 0.75)
-		var jitter := Vector2(randf_range(-10.0, 10.0), randf_range(-10.0, 10.0))
-		Fx.flash(top_fx, body, spark, 52.0 if is_crit else 32.0, 0.16)
-		Fx.burst(top_fx, body, spark, 7 if is_crit else 4, 300.0, 0.28, 11.0)
-		if is_crit or randf() < 0.35:
-			Fx.sparkle(top_fx, body + jitter, Color(1.0, 0.95, 0.8), 70.0 if is_crit else 42.0)
+		_hit_effect(body, is_crit)
 	if is_crit:
 		shake(3.0)
 	target_hit.emit(m)
+
+
+func _hit_effect(at: Vector2, is_crit: bool) -> void:
+	var jitter := Vector2(randf_range(-12.0, 12.0), randf_range(-12.0, 12.0))
+	var fx := FxSprite.play(top_fx, "hit", at + jitter, 150.0 if is_crit else 100.0)
+	if fx != null:
+		fx.rotation = randf() * TAU
+		return
+	var spark := Color(1.0, 0.75, 0.3) if is_crit else Color(1.0, 0.95, 0.75)
+	Fx.flash(top_fx, at, spark, 52.0 if is_crit else 32.0, 0.16)
+	Fx.burst(top_fx, at, spark, 7 if is_crit else 4, 300.0, 0.28, 11.0)
+	if is_crit or randf() < 0.35:
+		Fx.sparkle(top_fx, at + jitter, Color(1.0, 0.95, 0.8), 70.0 if is_crit else 42.0)
 
 
 func take_damage(raw: int) -> void:
@@ -412,7 +457,8 @@ func gain_rewards(xp_amount: int, gold_amount: int) -> void:
 		hp = max_hp
 		sp = max_sp
 		var gold_light := Color(1.0, 0.85, 0.4)
-		Fx.pillar(top_fx, global_position, gold_light, 150.0, 560.0, 0.8)
+		if FxSprite.play(top_fx, "pillar", global_position + Vector2(0.0, -240.0), 520.0, 0.8) == null:
+			Fx.pillar(top_fx, global_position, gold_light, 150.0, 560.0, 0.8)
 		Fx.ring(ground_fx, global_position, gold_light, 200.0, 0.6, 8.0)
 		Fx.burst(top_fx, global_position + Vector2(0.0, -40.0), gold_light, 24, 260.0, 0.9, 14.0,
 			Vector2(0.0, -200.0))

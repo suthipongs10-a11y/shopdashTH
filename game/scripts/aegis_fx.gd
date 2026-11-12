@@ -1,6 +1,8 @@
 class_name AegisFx
 extends Node2D
-## Translucent bubble shield around the warden. Ripples when hit, pops when it ends.
+## Translucent bubble shield around the warden with small golden shields orbiting it.
+## Ripples when hit, pops when it ends. Uses art/fx/bubble.png and art/fx/guard.png when
+## present, otherwise draws both.
 
 const RADIUS := 78.0
 const CENTER := Vector2(0.0, -58.0)
@@ -11,10 +13,21 @@ var color := Color(0.7, 0.88, 1.0)
 var _age := 0.0
 var _ripple := 0.0
 var _popping := -1.0
+var _bubble: FxSprite
+var _guards: Array[FxSprite] = []
 
 
 func _ready() -> void:
 	z_index = 1
+	_bubble = FxSprite.play(self, "bubble", CENTER, RADIUS * 2.3, 9999.0)
+	if _bubble != null:
+		_bubble.fade_out = 0.0
+	for i in 3:
+		var g := FxSprite.play(self, "guard", CENTER, 46.0, 9999.0)
+		if g == null:
+			break
+		g.fade_out = 0.0
+		_guards.append(g)
 
 
 func ripple() -> void:
@@ -26,7 +39,8 @@ func pop() -> void:
 	if _popping >= 0.0:
 		return
 	_popping = 0.0
-	Fx.flash(get_parent(), global_position + CENTER, Color(1.0, 1.0, 1.0), RADIUS * 1.6, 0.3)
+	if FxSprite.play(get_parent(), "explosion", global_position + CENTER, RADIUS * 3.2) == null:
+		Fx.flash(get_parent(), global_position + CENTER, Color(1.0, 1.0, 1.0), RADIUS * 1.6, 0.3)
 	Fx.burst(get_parent(), global_position + CENTER, color, 18, 420.0, 0.45, 13.0)
 
 
@@ -49,6 +63,16 @@ func _draw() -> void:
 	var fade := 1.0 - maxf(_popping, 0.0)
 	var r := RADIUS * (0.6 + 0.4 * appear) * grow
 	var pulse := 0.5 + 0.5 * sin(_age * 5.0)
+	if _bubble != null:
+		_bubble.scale = _bubble._base_scale * (r / RADIUS)
+		_bubble.modulate = Color(1.0, 1.0, 1.0, (0.85 + 0.15 * _ripple) * fade)
+	for i in _guards.size():
+		# Orbit on a tilted ring; shields behind the bubble are dimmer.
+		var a := _age * 1.8 + TAU * float(i) / float(_guards.size())
+		_guards[i].position = CENTER + Vector2(cos(a) * r * 1.05, sin(a) * r * 0.35)
+		_guards[i].modulate = Color(1.0, 1.0, 1.0, (0.55 + 0.45 * sin(a)) * fade)
+	if _bubble != null:
+		return
 	# Body of the bubble.
 	draw_circle(CENTER, r, Color(color, (0.12 + 0.12 * _ripple) * fade))
 	# Rim: a few concentric strokes fading inward.

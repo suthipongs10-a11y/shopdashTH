@@ -1,0 +1,25 @@
+OUTPUT FILE NAME: fx_guard.png
+ATTACH WITH THIS PROMPT: nothing
+
+Create a visual effect for a 2D action RPG: A small floating guardian shield made of light that orbits the knight.
+
+CONTENT:
+- A kite-shaped heraldic shield made of translucent golden light, with a small lion-head emblem,
+  glowing edges and a soft golden aura. Front view.
+- Fills about 80% of the canvas.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (single image):
+- Square canvas, 1:1 (1024x1024).
+- The effect is centred and nothing touches the canvas edges unless stated.
+- No text, labels, border or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: pure flat black (#000000) everywhere outside the effect. No gradient, no vignette,
+  no grey haze. (The game blends effects additively, so black becomes invisible.)

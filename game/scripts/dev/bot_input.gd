@@ -39,8 +39,11 @@ func aim_vector(player: Player) -> Vector2:
 func is_pressed(action: String) -> bool:
 	if not is_instance_valid(_target) or _player == null:
 		return false
-	# Save SP for the ultimate whenever it is off cooldown, so footage shows every skill.
-	var saving := float(_player.cooldowns["lion"]) <= 0.0
-	if saving and action in ["skill_q", "skill_e", "skill_r"]:
-		return false
+	# Hold the small skills only while an ultimate is ready and nearly affordable,
+	# so footage shows both ultimates without starving everything else.
+	for ult in ["lion", "banner"]:
+		var cost := float(GameData.SKILLS[ult]["sp"])
+		var ready := float(_player.cooldowns[ult]) <= 0.0
+		if ready and _player.sp < cost and _player.sp > cost * 0.5:
+			return action in ["attack", "skill_f", "skill_2"]
 	return true

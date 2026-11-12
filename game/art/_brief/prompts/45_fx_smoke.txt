@@ -1,0 +1,28 @@
+OUTPUT FILE NAME: fx_smoke.png
+ATTACH WITH THIS PROMPT: templates/template_fx_3x2.png
+
+Create a visual effect for a 2D action RPG: A puff of smoke and dust rising and dissipating.
+
+CONTENT:
+- Soft painted grey-brown smoke cloud.
+- Frame 1: a small dense puff near the bottom of the cell. Frames 2-4: it billows upward and grows.
+  Frames 5-6: large thin wisps fading away.
+
+FX STYLE (same for every effect):
+- Hand-painted glowing magic visual effect for a dark fantasy isometric MMORPG.
+- Blinding white-hot core, saturated coloured glow around it, soft bloom, crisp painted energy shapes
+  and fine sparks. Bright, dramatic and powerful.
+- NOT pixel art, NOT a 3D render, NOT a photo. No characters, no ground, no scenery.
+
+LAYOUT (animated effect, 6 frames):
+- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square cells.
+- Frames run left to right, top row first: frame 1 top-left ... frame 6 bottom-right.
+- The attached template_fx_3x2.png shows the layout. Use it ONLY to place the frames; do NOT copy its
+  lines, numbers or white background.
+- The effect stays centred on the same spot in every cell and never crosses into a neighbouring cell.
+- No text, numbers, labels, borders, grid lines or watermark.
+- Output: PNG.
+
+BACKGROUND:
+- Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00)
+  with no gradient.
