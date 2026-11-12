@@ -4,7 +4,8 @@ extends Sprite2D
 ## The importer writes art/fx/<name>.cfg with the frame layout ([fx] frames, fps, blend).
 ## Images on black are drawn additively (black disappears); others use normal blending.
 ## Effects whose art is missing are skipped: play() returns null and callers fall back to
-## the procedural effects in Fx.
+## the procedural effects in Fx / Vfx.
+## White-on-black art (as in EggPact) is tinted per skill with the tint argument.
 
 const DIR := "res://art/fx/"
 
@@ -25,6 +26,9 @@ var spin := 0.0
 var hold_frame := -1
 
 var _info: Dictionary
+## Ground effects live in a holder squashed onto the floor, so the sprite itself can spin
+## flat on the ground without the ellipse tilting.
+var _holder: Node2D
 var _t := 0.0
 var _base_scale := Vector2.ONE
 
@@ -59,7 +63,7 @@ static func _load(fx_name: String) -> Dictionary:
 ## Spawns the effect. height: on-screen height in pixels. ground: squash it to lie on the floor.
 static func play(
 		parent: Node, fx_name: String, at: Vector2, height: float, duration: float = -1.0,
-		ground: bool = false
+		ground: bool = false, tint: Color = Color.WHITE
 ) -> FxSprite:
 	var info := _load(fx_name)
 	if info.is_empty() or parent == null:
@@ -71,24 +75,39 @@ static func play(
 	var cell: Vector2 = info["cell"]
 	s.region_rect = Rect2(Vector2.ZERO, cell)
 	var k := height / cell.y
-	s._base_scale = Vector2(k, k * (GameData.Y_SQUASH if ground else 1.0))
+	s._base_scale = Vector2(k, k)
 	s.scale = s._base_scale
+	s.modulate = Color(tint, 1.0)
 	if info["add"]:
 		s.material = Fx.additive()
 	var frames := int(info["frames"])
 	s.life = duration if duration > 0.0 else maxf(0.15, frames / float(info["fps"]))
-	s.position = at
-	parent.add_child(s)
+	if ground:
+		s._holder = Node2D.new()
+		s._holder.position = at
+		s._holder.scale = Vector2(1.0, GameData.Y_SQUASH)
+		parent.add_child(s._holder)
+		s._holder.add_child(s)
+	else:
+		s.position = at
+		parent.add_child(s)
 	return s
 
 
 func _process(delta: float) -> void:
 	_t += delta
 	if _t >= life:
-		queue_free()
+		if _holder != null:
+			_holder.queue_free()
+		else:
+			queue_free()
 		return
 	if is_instance_valid(follow):
-		global_position = follow.global_position + follow_offset
+		var target := follow.global_position + follow_offset
+		if _holder != null:
+			_holder.global_position = target
+		else:
+			global_position = target
 	var frames := int(_info["frames"])
 	var frame := int(_t * float(_info["fps"]))
 	frame = frame % frames if loop else mini(frame, frames - 1)

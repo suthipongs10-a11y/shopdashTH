@@ -275,6 +275,19 @@ static func ring(
 static func slash(at: Vector2, z: float, dir: Vector2, palette: Dictionary, s: float = 1.0) -> void:
 	if instance == null:
 		return
+	# Painted crescent (EggPact's fx_kagul_slash) when available, else two drawn arcs.
+	var painted := FxSprite.play(instance, "slash", Vector2(at.x, at.y - z), 130.0 * s, 0.24,
+		false, palette["core"])
+	if painted != null:
+		painted.rotation = dir.angle()
+		painted.flip_v = randf() < 0.5
+		painted.grow_from = 0.7
+		painted.grow_to = 1.15
+		painted.fade_in = 0.02
+		painted.fade_out = 0.16
+		burst(at, z, 12, palette["aura"], 380.0 * s, 14.0, 0.35)
+		burst(at, z, 6, palette["hot"], 280.0, 9.0, 0.28)
+		return
 	var base := dir.angle()
 	for layer in [[70.0, 16.0, 0.28, -0.9, palette["aura"]], [58.0, 6.0, 0.22, -0.7, palette["hot"]]]:
 		var p := VfxParticle.new()

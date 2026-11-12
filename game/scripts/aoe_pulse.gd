@@ -36,14 +36,14 @@ var _ring: FxSprite
 
 func _ready() -> void:
 	_total_delay = delay
-	if style in [Style.CIRCLE, Style.ROAR, Style.CROSS, Style.BANNER]:
+	if style in [Style.CIRCLE, Style.ROAR, Style.CROSS, Style.BANNER, Style.DRAGON]:
 		var life := delay + interval * float(ticks) + 0.4
-		_ring = FxSprite.play(self, "ring", Vector2.ZERO, radius * 2.1, life, true)
+		_ring = FxSprite.play(self, "ring", Vector2.ZERO, radius * 2.1, life, true, _rune_tint())
 		if _ring != null:
-			_ring.hold_frame = 0
 			_ring.grow_from = 0.4
 			_ring.grow_to = 1.0
 			_ring.fade_out = 0.35
+			_ring.spin = 0.8
 
 
 func _process(delta: float) -> void:
@@ -114,6 +114,12 @@ func _fire_visuals() -> void:
 	var here := global_position
 	match style:
 		Style.SHOCK:
+			var wave := FxSprite.play(get_parent(), "shock_ring", here, radius * 2.4, 0.45, true,
+				palette["aura"])
+			if wave != null:
+				wave.grow_from = 0.3
+				wave.grow_to = 1.0
+				wave.spin = 1.5
 			Vfx.ring(here, 10.0, radius * 1.15, palette["aura"], 0.4, 10.0)
 			Vfx.ring(here, 6.0, radius * 0.8, palette["hot"], 0.3, 4.0)
 			Vfx.burst(here, 30.0, 26, palette["aura"], 420.0, 18.0, 0.5)
@@ -130,6 +136,7 @@ func _fire_visuals() -> void:
 		Style.ROAR:
 			Juice.flash(0.22, palette["aura"])
 			_painted_ring(here, radius * 2.6, 0.5)
+			_explode(here + Vector2(0.0, -60.0), radius * 1.4)
 			Vfx.ring(here, 20.0, radius * 1.2, palette["aura"], 0.5, 14.0)
 			Vfx.ring(here, 10.0, radius * 0.8, palette["hot"], 0.35, 6.0)
 			Vfx.burst(here, 60.0, 50, palette["aura"], 620.0, 30.0, 0.7)
@@ -147,11 +154,33 @@ func _fire_visuals() -> void:
 			else:
 				Vfx.twinkle(here, 90.0, radius * 1.5, palette["core"], 0.5)
 				Vfx.twinkle(here, 90.0, radius * 0.9, Color.WHITE, 0.35)
-			Vfx.beam(here, 50.0, palette["aura"], 0.5)
+			var ray := FxSprite.play(top_fx, "pillar", here + Vector2(0.0, -180.0), 420.0, 0.5, false,
+				palette["aura"])
+			if ray == null:
+				Vfx.beam(here, 50.0, palette["aura"], 0.5)
+			else:
+				ray.grow_from = 1.3
+				ray.grow_to = 0.8
+			var dawn := FxSprite.play(top_fx, "dawn", here + Vector2(0.0, -10.0), radius * 0.9, 0.45,
+				false, palette["aura"])
+			if dawn != null:
+				dawn.grow_from = 0.6
+				dawn.grow_to = 1.4
 			Vfx.ring(here, 10.0, radius * 1.1, palette["aura"], 0.45, 8.0)
 			Vfx.burst(here, 40.0, 24, palette["aura"], 360.0, 16.0, 0.55)
 		Style.DRAGON:
 			Juice.flash(0.35, palette["aura"])
+			_explode(here + Vector2(0.0, -60.0), radius * 1.6)
+			var flames := FxSprite.play(get_parent(), "flame_ring", here + Vector2(0.0, -40.0),
+				radius * 1.3, 0.9, false, palette["aura"])
+			if flames != null:
+				flames.grow_from = 0.5
+				flames.grow_to = 1.15
+			var sun := FxSprite.play(top_fx, "sun", here + Vector2(0.0, -70.0), radius * 0.9, 0.5)
+			if sun != null:
+				sun.grow_from = 0.3
+				sun.grow_to = 1.4
+				sun.spin = 2.0
 			Vfx.ring(here, 20.0, radius * 1.3, palette["aura"], 0.6, 16.0)
 			Vfx.ring(here, 10.0, radius * 0.9, palette["hot"], 0.4, 8.0)
 			Vfx.burst(here, 40.0, 60, palette["aura"], 700.0, 30.0, 0.7)
@@ -165,6 +194,7 @@ func _fire_visuals() -> void:
 		Style.BANNER:
 			Juice.flash(0.2, palette["aura"])
 			_painted_ring(here, radius * 2.4, 0.5)
+			_explode(here + Vector2(0.0, -60.0), radius * 1.2)
 			Vfx.ring(here, 20.0, radius * 1.15, palette["aura"], 0.5, 12.0)
 			Vfx.burst(here, 60.0, 40, palette["aura"], 560.0, 24.0, 0.6)
 			# Gold and blue spiral streaks, like the reference clip's big finisher.
@@ -174,27 +204,38 @@ func _fire_visuals() -> void:
 			for i in 3:
 				var spot := here + GameData.to_screen(Vector2.from_angle(randf() * TAU)
 					* randf_range(0.3, 0.95) * radius)
-				Vfx.beam(spot, 36.0, palette["aura"], 0.4)
+				if FxSprite.play(top_fx, "pillar", spot + Vector2(0.0, -150.0), 320.0, 0.4, false,
+						palette["aura"]) == null:
+					Vfx.beam(spot, 36.0, palette["aura"], 0.4)
 				Vfx.ring(spot, 6.0, 70.0, palette["hot"], 0.3, 4.0)
 
 
 ## Expanding painted ring on the ground. Returns false when there is no ring art.
 func _painted_ring(at: Vector2, size: float, life: float) -> bool:
-	var r := FxSprite.play(get_parent(), "ring", at, size, life, true)
+	var r := FxSprite.play(get_parent(), "ring", at, size, life, true, _rune_tint())
 	if r == null:
 		return false
-	r.hold_frame = 0
 	r.grow_from = 0.3
 	r.grow_to = 1.0
+	r.spin = 1.2
 	return true
+
+
+## Rune circles read better a little paler than the aura colour on the warm ground.
+func _rune_tint() -> Color:
+	var aura: Color = palette["aura"]
+	return aura.lerp(Color.WHITE, 0.35)
 
 
 ## Painted explosion. Returns false when there is no explosion art.
 func _explode(at: Vector2, size: float) -> bool:
-	var e := FxSprite.play(top_fx, "explosion", at, size)
+	var e := FxSprite.play(top_fx, "explosion", at, size, 0.45)
 	if e == null:
 		return false
 	e.rotation = randf_range(-0.3, 0.3)
+	e.grow_from = 0.4
+	e.grow_to = 1.2
+	e.fade_out = 0.3
 	return true
 
 

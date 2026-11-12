@@ -9,6 +9,8 @@ var anchor: Node2D
 var title := ""
 var color := Color(1.0, 0.8, 0.3)
 var total := 1.0
+## Draw the rune circle; off when a painted circle is shown instead.
+var draw_circle := true
 
 var _t := 0.0
 
@@ -28,6 +30,12 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var k := clampf(_t / total, 0.0, 1.0)
+	if draw_circle:
+		_draw_rune_circle(k)
+	_draw_bar(k)
+
+
+func _draw_rune_circle(k: float) -> void:
 	# Rune circle on the ground, drawn squashed to lie flat.
 	var r := 70.0 + 110.0 * k
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, GameData.Y_SQUASH))
@@ -43,6 +51,9 @@ func _draw() -> void:
 			pts.append(Vector2.from_angle(-_t * 1.5 + TAU * j / 3.0 + (PI if i == 1 else 0.0)) * r * 0.8)
 		draw_polyline(pts, Color(color, 0.7), 2.0)
 	draw_set_transform(Vector2.ZERO)
+
+
+func _draw_bar(k: float) -> void:
 	# Bar and skill name over the head.
 	var top := Vector2(-WIDTH * 0.5, -178.0)
 	draw_rect(Rect2(top - Vector2(2, 2), Vector2(WIDTH + 4, 12)), Color(0, 0, 0, 0.7))

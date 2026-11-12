@@ -1,0 +1,27 @@
+OUTPUT FILE NAME: fx_dragon_tail.png
+ATTACH WITH THIS PROMPT: style_reference_lion.png (and, after the first piece, the approved fx_dragon_head.png)
+
+Create a 2D game visual-effect sprite: the TAIL END of the same golden dragon god.
+All three pieces (head, body section, tail) belong to ONE dragon and must look identical in style,
+colour, scale and lighting, so they join seamlessly into one body in the game.
+
+CONTENT:
+- The thick end of the tail is at the RIGHT edge of the canvas, cut cleanly and vertically, the
+  same thickness as the body section, so it attaches to the body.
+- The tail tapers towards the LEFT and ends in a large swirling tuft of golden flame.
+- Dorsal fins / flame crest along the TOP, pale belly scales along the BOTTOM, as on the body.
+- Vertically centred.
+
+STYLE (match the attached reference image style_reference_lion.png exactly):
+- A divine spirit creature made of white-gold light and golden flame, like the attached flaming lion:
+  pale ivory-white body with soft gold shading, golden flame tongues streaming from the mane and fins,
+  warm glowing highlights, small embers.
+- Hand-painted high-quality fantasy game VFX illustration, crisp edges, painterly detail.
+- NOT pixel art, NOT a 3D render, NOT a photo, NOT a cartoon.
+- Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00)
+  with no gradient, and do not use that green anywhere on the dragon.
+- No ground, no shadow, no scenery, no text, no border, no watermark.
+- Output: PNG.
+
+LAYOUT:
+- Landscape canvas, aspect ratio 3:2 (1536x1024).

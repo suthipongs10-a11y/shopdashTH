@@ -19,11 +19,11 @@ var _guards: Array[FxSprite] = []
 
 func _ready() -> void:
 	z_index = 1
-	_bubble = FxSprite.play(self, "bubble", CENTER, RADIUS * 2.3, 9999.0)
+	_bubble = FxSprite.play(self, "bubble", CENTER, RADIUS * 2.5, 9999.0, false, color)
 	if _bubble != null:
 		_bubble.fade_out = 0.0
 	for i in 3:
-		var g := FxSprite.play(self, "guard", CENTER, 46.0, 9999.0)
+		var g := FxSprite.play(self, "guard", CENTER, 46.0, 9999.0, false, color.lightened(0.4))
 		if g == null:
 			break
 		g.fade_out = 0.0
@@ -39,8 +39,12 @@ func pop() -> void:
 	if _popping >= 0.0:
 		return
 	_popping = 0.0
-	if FxSprite.play(get_parent(), "explosion", global_position + CENTER, RADIUS * 3.2) == null:
-		Fx.flash(get_parent(), global_position + CENTER, Color(1.0, 1.0, 1.0), RADIUS * 1.6, 0.3)
+	var wave := FxSprite.play(get_parent(), "shock_ring", global_position, RADIUS * 4.0, 0.4, true,
+		color)
+	if wave != null:
+		wave.grow_from = 0.4
+		wave.grow_to = 1.0
+	Fx.flash(get_parent(), global_position + CENTER, Color(1.0, 1.0, 1.0), RADIUS * 1.6, 0.3)
 	Fx.burst(get_parent(), global_position + CENTER, color, 18, 420.0, 0.45, 13.0)
 
 
@@ -65,12 +69,12 @@ func _draw() -> void:
 	var pulse := 0.5 + 0.5 * sin(_age * 5.0)
 	if _bubble != null:
 		_bubble.scale = _bubble._base_scale * (r / RADIUS)
-		_bubble.modulate = Color(1.0, 1.0, 1.0, (0.85 + 0.15 * _ripple) * fade)
+		_bubble.modulate = Color(color, (0.85 + 0.15 * _ripple) * fade)
 	for i in _guards.size():
 		# Orbit on a tilted ring; shields behind the bubble are dimmer.
 		var a := _age * 1.8 + TAU * float(i) / float(_guards.size())
 		_guards[i].position = CENTER + Vector2(cos(a) * r * 1.05, sin(a) * r * 0.35)
-		_guards[i].modulate = Color(1.0, 1.0, 1.0, (0.55 + 0.45 * sin(a)) * fade)
+		_guards[i].modulate = Color(color.lightened(0.4), (0.55 + 0.45 * sin(a)) * fade)
 	if _bubble != null:
 		return
 	# Body of the bubble.

@@ -3,6 +3,10 @@ extends Node2D
 ## Golden Dragon God, drawn entirely from glow particles in the EggPact style.
 ## A serpentine body follows the head's path: it coils around the caster, spirals up over
 ## their head, pauses with a roar, then dives onto the enemies and explodes.
+##
+## Painted pieces are used when present (art/fx/dragon_head.png, dragon_body.png,
+## dragon_tail.png, in the style of EggPact's flaming lion): they are chained along the same
+## path so the painted body still bends. Without them the dragon is drawn in code.
 
 signal impact(at: Vector2)
 
@@ -40,13 +44,22 @@ var _dot: Texture2D
 var _solid: Node2D
 ## Additive layer over the solid head: makes it glow instead of looking flat.
 var _shine: Node2D
+## Painted pieces (null when the art is missing).
+var _head_tex: Texture2D
+var _body_tex: Texture2D
+var _tail_tex: Texture2D
 
 
 func _ready() -> void:
 	add_to_group("dragon")
+	add_to_group("big_fx")
 	material = Fx.additive()
 	z_index = 21
 	_dot = Vfx.dot_texture()
+	for piece in ["head", "body", "tail"]:
+		var path := "res://art/fx/dragon_%s.png" % piece
+		if ResourceLoader.exists(path):
+			set("_%s_tex" % piece, load(path))
 	_solid = Node2D.new()
 	# Drawn over the body glow so the head stays readable.
 	_solid.show_behind_parent = false
@@ -207,6 +220,11 @@ func _draw() -> void:
 	var widths := PackedFloat32Array()
 	for i in pts.size():
 		widths.append(6.0 + 40.0 * pow(1.0 - float(i) / n, 0.8))
+	if _painted():
+		# Only a soft glow under the painted pieces.
+		for i in pts.size() - 1:
+			draw_line(pts[i], pts[i + 1], Color(aura, 0.35 * fade), widths[i] * 2.2)
+		return
 	for i in pts.size() - 1:
 		var w := widths[i]
 		draw_line(pts[i], pts[i + 1], Color(aura, 0.5 * fade), w * 1.5)
@@ -227,6 +245,43 @@ func _draw() -> void:
 				pts[i] + up * w * 0.4 - along * w * 0.45,
 			]), Color(core, 0.85 * fade))
 	_draw_head(pts, fade)
+
+
+func _painted() -> bool:
+	return _head_tex != null and _body_tex != null
+
+
+## Draws one painted piece centred at "at", its x axis along "along", scaled to "height".
+## Pieces facing left are mirrored vertically so the back (fins, mane) stays on top.
+func _piece(tex: Texture2D, at: Vector2, along: Vector2, height: float, fade: float,
+		length := 0.0) -> void:
+	var size := tex.get_size()
+	var k := height / size.y
+	var sx := (length / size.x) if length > 0.0 else k
+	var flip := -1.0 if along.x < 0.0 else 1.0
+	var xf := Transform2D(along.angle(), at) * Transform2D(0.0, Vector2(sx, k * flip), 0.0,
+		Vector2.ZERO)
+	_solid.draw_set_transform_matrix(xf)
+	_solid.draw_texture(tex, -size * 0.5, Color(1, 1, 1, fade))
+
+
+## Painted dragon: tail and body segments from the back forward, then the head on top.
+func _draw_painted(fade: float) -> void:
+	var pts := _body_points()
+	if pts.size() < 3:
+		return
+	var n := float(pts.size())
+	for i in range(pts.size() - 1, 0, -1):
+		var along := (pts[i - 1] - pts[i]).normalized()
+		var w := 6.0 + 40.0 * pow(1.0 - float(i) / n, 0.8)
+		var mid := (pts[i - 1] + pts[i]) * 0.5
+		if i == pts.size() - 1 and _tail_tex != null:
+			_piece(_tail_tex, mid, along, w * 3.0, fade, SEG_LEN * 3.0)
+		else:
+			_piece(_body_tex, mid, along, w * 2.4, fade, SEG_LEN * 1.9)
+	_piece(_head_tex, pts[0] + (pts[0] - pts[1]).normalized() * 30.0,
+		(pts[0] - pts[1]).normalized(), 130.0, fade)
+	_solid.draw_set_transform_matrix(Transform2D())
 
 
 ## Head frame: origin at the head point, x along the travel direction, y to the side.
@@ -270,6 +325,9 @@ func _draw_solid_head() -> void:
 	if _hist.size() < 2:
 		return
 	var fade := _fade()
+	if _painted():
+		_draw_painted(fade)
+		return
 	var gold := Color(0.95, 0.68, 0.16, fade)
 	var light := Color(1.0, 0.9, 0.55, fade)
 	var shade := Color(0.78, 0.42, 0.08, fade)
@@ -322,7 +380,7 @@ func _draw_solid_head() -> void:
 
 ## Soft light over the head and burning eyes, additive.
 func _draw_head_shine() -> void:
-	if _hist.size() < 2:
+	if _hist.size() < 2 or _painted():
 		return
 	var fade := _fade()
 	var aura: Color = palette["aura"]

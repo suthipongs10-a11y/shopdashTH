@@ -23,7 +23,8 @@ var _t := 0.0
 
 func _ready() -> void:
 	var screen_dir := GameData.to_screen(dir).normalized()
-	var fx := FxSprite.play(self, "slash", Vector2(0.0, -HEIGHT), RADIUS * 2.6, LIFE)
+	var fx := FxSprite.play(self, "slash", Vector2(0.0, -HEIGHT), RADIUS * 2.6, LIFE, false,
+		palette["core"])
 	if fx != null:
 		_painted = true
 		fx.hold_frame = 2

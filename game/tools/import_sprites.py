@@ -86,6 +86,10 @@ FX_SPECS = {
     "fx_pillar.png": ("pillar", "single", 1, "add"),
     "fx_crest.png": ("crest", "single", 1, "add"),
     "lion_spirit.png": ("lion_spirit", "single", 1, "add"),
+    # Painted dragon pieces (brief art/_brief_dragon/); chained along the path in game.
+    "fx_dragon_head.png": ("dragon_head", "single", 1, "mix"),
+    "fx_dragon_body.png": ("dragon_body", "single", 1, "mix"),
+    "fx_dragon_tail.png": ("dragon_tail", "single", 1, "mix"),
 }
 FX_CELL = 320
 FX_SINGLE_MAX = 640
@@ -261,7 +265,7 @@ def preview(sheet: Image.Image, path: str) -> None:
 def fx_pixels(img: Image.Image, blend: str) -> Image.Image:
     """Prepares one effect frame: additive art gets a black floor, other art gets a real alpha."""
     if blend == "add":
-        rgb = np.array(img.convert("RGB")).astype(np.int16)
+        rgb = np.array(img.convert("RGB")).astype(np.float32)
         rgb = np.clip((rgb - BLACK_FLOOR) * 255 / (255 - BLACK_FLOOR), 0, 255).astype(np.uint8)
         return Image.fromarray(rgb, "RGB").convert("RGBA")
     arr = np.array(img.convert("RGBA"))
@@ -287,6 +291,11 @@ def import_fx(path: str, name: str, layout: str, fps: int, blend: str) -> None:
         out, frames = strip, cols * rows
     else:
         out = fx_pixels(src, blend)
+        if blend == "mix":
+            # Trim transparent borders so chained pieces (dragon body) join without gaps.
+            box = out.getchannel("A").point(lambda v: 255 if v > 24 else 0).getbbox()
+            if box is not None:
+                out = out.crop(box)
         out.thumbnail((FX_SINGLE_MAX, FX_SINGLE_MAX), Image.LANCZOS)
         frames = 1
     dst_dir = os.path.join(GAME_DIR, "art/fx")

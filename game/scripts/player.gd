@@ -275,7 +275,19 @@ func _begin_cast(id: String, mult: float, palette: Dictionary, tally: SkillTally
 	bar.title = String(data["name"])
 	bar.color = palette["aura"]
 	bar.total = _cast_left
+	# EggPact's rune circle under the feet when available; the bar draws its own otherwise.
+	var aura: Color = palette["aura"]
+	var circle := FxSprite.play(ground_fx, "ring", global_position, 380.0, _cast_left + 0.3, true,
+		aura.lerp(Color.WHITE, 0.35))
+	if circle != null:
+		circle.follow = self
+		circle.grow_from = 0.35
+		circle.grow_to = 1.0
+		circle.spin = 1.2
+		circle.fade_out = 0.3
+		bar.draw_circle = false
 	top_fx.add_child(bar)
+	_converge(_cast_left, palette)
 	Juice.spotlight([self] as Array[Node2D], 0.55, 1.1)
 	Juice.cutin(String(data["name"]), palette["cut"], _sheet.portrait())
 
@@ -378,6 +390,20 @@ func _ultimate_intro(skill_name: String, palette: Dictionary) -> void:
 	Juice.cutin(skill_name, palette["cut"], _sheet.portrait())
 	_charge_left = ULT_CHARGE
 	_charge_pal = palette
+	_converge(ULT_CHARGE, palette)
+
+
+## Ring of inward arrows closing on the warden while a big skill charges.
+func _converge(seconds: float, palette: Dictionary) -> void:
+	var aura: Color = palette["aura"]
+	var ring := FxSprite.play(ground_fx, "converge", global_position, 420.0, seconds, true,
+		aura.lerp(Color.WHITE, 0.35))
+	if ring != null:
+		ring.follow = self
+		ring.grow_from = 1.3
+		ring.grow_to = 0.35
+		ring.spin = -2.5
+		ring.fade_in = 0.15
 
 
 ## Basic attack: a cone in front of the player. Lunges a little, leaves an afterimage and
@@ -505,6 +531,7 @@ func _do_lion(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	var lion := LionFx.new()
 	lion.color = palette["aura"]
 	lion.delay = ULT_CHARGE
+	lion.dir = GameData.to_screen(aim).normalized()
 	lion.position = global_position
 	top_fx.add_child(lion)
 	var pulse := _new_pulse(AoePulse.Style.ROAR, 300.0, mult, palette["aura"])
@@ -597,9 +624,13 @@ func strike(
 
 func _hit_effect(at: Vector2, is_crit: bool) -> void:
 	var jitter := Vector2(randf_range(-12.0, 12.0), randf_range(-12.0, 12.0))
-	var fx := FxSprite.play(top_fx, "hit", at + jitter, 150.0 if is_crit else 100.0)
+	var fx := FxSprite.play(top_fx, "hit", at + jitter, 120.0 if is_crit else 70.0, 0.2, false,
+		Color(1.0, 0.92, 0.6) if is_crit else Vfx.pal("steel")["core"])
 	if fx != null:
 		fx.rotation = randf() * TAU
+		fx.grow_from = 0.5
+		fx.grow_to = 1.1
+		fx.fade_out = 0.14
 		return
 	# "at" is a screen point on the body; Vfx works on the ground point plus a height.
 	var ground := at + Vector2(0.0, 50.0)
@@ -636,7 +667,10 @@ func gain_rewards(xp_amount: int, gold_amount: int) -> void:
 		hp = max_hp
 		sp = max_sp
 		var holy := Vfx.pal("holy")
-		Vfx.beam(global_position, 80.0, holy["aura"], 1.2)
+		var ray := FxSprite.play(top_fx, "pillar", global_position + Vector2(0.0, -200.0), 460.0, 1.1,
+			false, holy["aura"])
+		if ray == null:
+			Vfx.beam(global_position, 80.0, holy["aura"], 1.2)
 		Vfx.ring(global_position, 10.0, 200.0, holy["aura"], 0.8, 9.0)
 		Vfx.burst(global_position, 80.0, 30, holy["aura"], 300.0, 14.0, 0.9)
 		Juice.flash(0.15, holy["aura"])

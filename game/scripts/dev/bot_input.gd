@@ -42,6 +42,9 @@ func is_pressed(action: String) -> bool:
 	# Let the dragon finish its show before anything else is cast.
 	if not _player.get_tree().get_nodes_in_group("dragon").is_empty():
 		return action == "attack"
+	# One big effect at a time, so each ultimate reads clearly in footage.
+	if not _player.get_tree().get_nodes_in_group("big_fx").is_empty():
+		return action in ["attack", "skill_q", "skill_e", "skill_r"]
 	# Big skills first: when one is ready and affordable, press only that, so footage
 	# shows every ultimate; while one is nearly affordable, hold the small skills.
 	var ults := {"dragon": "skill_3", "lion": "skill_f", "banner": "skill_2"}

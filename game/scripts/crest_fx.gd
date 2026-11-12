@@ -16,8 +16,12 @@ var _sprite: FxSprite
 var _begun := false
 
 
+func _ready() -> void:
+	add_to_group("big_fx")
+
+
 func _begin() -> void:
-	_sprite = FxSprite.play(self, "crest", Vector2.ZERO, HEIGHT, LIFE)
+	_sprite = FxSprite.play(self, "crest", Vector2.ZERO, HEIGHT, LIFE, false, color)
 	if _sprite != null:
 		_sprite.fade_in = 0.2
 		_sprite.fade_out = 0.5
