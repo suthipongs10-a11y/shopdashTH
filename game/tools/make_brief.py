@@ -112,6 +112,35 @@ A confident, steady stride. The cape and wings trail slightly behind the directi
 - Frame 3: follow-through, sword fully extended to the far side, weight on the front foot.
 - Frame 4: recover, returning to the ready stance.
 The swing travels in the direction the character is facing in that row."""),
+            "bash": ("shield bash, plays once", """- Frame 1: brace, body turned sideways, shield pulled back to the chest, sword held low behind.
+- Frame 2: lunge, front foot stepping forward, shield driving forward at chest height.
+- Frame 3: impact, shield arm fully extended straight forward, body leaning into it, wings
+  flared wide behind, cape whipping back. This is the strongest pose of the set.
+- Frame 4: recover, shield returning towards the body.
+The shield always drives in the direction the character is facing in that row. Keep both feet
+on the ground in every frame (the game adds the lunge)."""),
+            "slam": ("leaping sword slam, plays once", """- Frame 1: crouch, knees bent deep, sword raised high above the head in the right hand,
+  shield on the left arm, wings spread to take off.
+- Frame 2: airborne pose, legs tucked, sword raised straight up overhead, shield held out,
+  wings fully spread (wing tips and sword tip still inside the cell). Draw the feet on the same baseline as the other frames: the game lifts the
+  character into the air itself.
+- Frame 3: impact, landed in a deep lunge, sword driven point-down into the ground in front of
+  the body, head lowered, wings swept forward, cape flying up.
+- Frame 4: recover, pulling the sword out of the ground and standing up.
+The slam lands in the direction the character is facing in that row."""),
+            "cast": ("summoning stance, loops", """- Frame 1: feet planted wide, sword raised straight up to the sky in the right hand, shield
+  arm held out to the side, head tilted up, wings spread wide.
+- Frame 2: same pose, wings a little higher, visor glowing brighter, cape lifting in an updraft.
+- Frame 3: same as frame 1.
+- Frame 4: same pose, wings a little lower, cape settling.
+A heroic summoning pose held while the warden calls the golden dragon. Only small changes
+between frames so it loops smoothly. The raised sword must stay inside the cell."""),
+            "guard": ("shield guard, plays once then holds", """- Frame 1: stepping into a guard, shield coming up.
+- Frame 2: full guard, shield raised in front of the chest and helmet, body braced low behind
+  it, sword held back ready, wings folded forward around the shoulders.
+- Frame 3: same as frame 2 with a slight push forward as if absorbing a blow.
+- Frame 4: same as frame 2.
+The shield faces the direction the character is facing in that row."""),
         },
     },
     "golem": {

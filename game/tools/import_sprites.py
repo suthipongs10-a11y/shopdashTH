@@ -44,6 +44,10 @@ CHARACTERS = {
             "idle": {"file": "warden_idle.png", "fps": 5},
             "walk": {"file": "warden_walk.png", "fps": 9},
             "attack": {"file": "warden_attack.png", "fps": 14},
+            "bash": {"file": "warden_bash.png", "fps": 12},
+            "slam": {"file": "warden_slam.png", "fps": 10},
+            "cast": {"file": "warden_cast.png", "fps": 6},
+            "guard": {"file": "warden_guard.png", "fps": 8},
         },
     },
     "golem": {
@@ -331,6 +335,12 @@ def main() -> None:
         fps = {}
         built = {}
         for anim, spec in ch["anims"].items():
+            sheet_file = spec["file"].replace("_row{row}", "")
+            row_file = sheet_file.replace(".png", "_row1.png")
+            if not any(os.path.exists(os.path.join(args.src, f)) for f in (sheet_file, row_file)):
+                print(f"{key}/{anim}: no {sheet_file} in the source folder, kept as it is")
+                fps[anim] = spec["fps"]
+                continue
             frames, per_row = load_anim(args.src, spec)
             sheet, scale, clipped = compose(frames, ch["fig_h"], spec.get("scale", 1.0), per_row)
             sheet.save(os.path.join(out_dir, f"{anim}.png"))

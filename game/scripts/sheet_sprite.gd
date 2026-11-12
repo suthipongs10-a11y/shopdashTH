@@ -4,8 +4,13 @@ extends Sprite2D
 ## One PNG per animation (idle.png, walk.png, attack.png): rows = directions, columns = frames.
 ## Optional sheet.cfg overrides the defaults. See ART_GUIDE.md for the exact format.
 
-const ANIM_NAMES: Array[String] = ["idle", "walk", "attack"]
-const DEFAULT_FPS := {"idle": 6.0, "walk": 10.0, "attack": 14.0}
+## bash: shield bash, slam: leaping sword slam, cast: sword raised to the sky, guard: shield up.
+## Missing animations fall back to the caller's choice (see Player._pose).
+const ANIM_NAMES: Array[String] = ["idle", "walk", "attack", "bash", "slam", "cast", "guard"]
+const DEFAULT_FPS := {
+	"idle": 6.0, "walk": 10.0, "attack": 14.0, "bash": 12.0, "slam": 10.0, "cast": 6.0,
+	"guard": 8.0,
+}
 ## Default on-screen height of one cell, in pixels.
 const DEFAULT_CELL_SCREEN_HEIGHT := 150.0
 const FLASH_SHADER := preload("res://shaders/flash.gdshader")
@@ -161,6 +166,10 @@ func ghost(color: Color, life: float = 0.25, strength: float = 0.4) -> void:
 
 
 ## Freeze on one frame of an animation until release(). Facing still updates.
+func has_anim(anim: String) -> bool:
+	return _anims.has(anim)
+
+
 func hold(anim: String, frame: int) -> void:
 	if _anims.has(anim):
 		_hold_anim = anim

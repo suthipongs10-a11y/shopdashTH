@@ -9,10 +9,15 @@ prompt files in order, one image per message. Each prompt says which files to at
 | 2 | prompts/11_warden_idle.txt | warden_idle.png |
 | 3 | prompts/12_warden_walk.txt | warden_walk.png |
 | 4 | prompts/13_warden_attack.txt | warden_attack.png |
-| 5 | prompts/14_warden_portrait.txt | warden_portrait.png |
+| 5 | prompts/18_warden_portrait.txt | warden_portrait.png |
+| 6 | prompts/14_warden_bash.txt | warden_bash.png |
+| 7 | prompts/15_warden_slam.txt | warden_slam.png |
+| 8 | prompts/16_warden_cast.txt | warden_cast.png |
+| 9 | prompts/17_warden_guard.txt | warden_guard.png |
 
-Step 1 is the design reference. Show it to the owner and wait for approval before steps 2 to 5,
-and attach the approved warden_concept.png to every later step.
+Step 1 is the design reference. Show it to the owner and wait for approval before the other
+steps, and attach the approved warden_concept.png to every later step.
+Steps 1 to 5 are done. Steps 6 to 9 are new skill poses: the same knight, same size, same rows.
 
 style_reference_knight.png is inspiration for the armour, helmet crest and cape only. Do not draw
 the dragon, the ice or the background from it, and do not copy its blue ice colours: the Warden is

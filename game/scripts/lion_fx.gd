@@ -17,6 +17,8 @@ var color := Color(1.0, 0.72, 0.22)
 var delay := 0.0
 ## Screen-space direction of the leap.
 var dir := Vector2.RIGHT
+## How far behind the caster the leap starts (negative: in front, e.g. out of the shield).
+var from_back := 170.0
 
 var _t := 0.0
 var _sprite: Sprite2D
@@ -70,7 +72,7 @@ func _process(delta: float) -> void:
 ## Bounding arc from behind the caster to well past them along dir.
 func _leap(delta: float) -> void:
 	var u := _t / LIFE
-	var start := -dir * 170.0 + Vector2(0.0, -70.0)
+	var start := -dir * from_back + Vector2(0.0, -70.0)
 	var finish := dir * 320.0 + Vector2(0.0, -110.0)
 	var pos := start.lerp(finish, 1.0 - pow(1.0 - u, 1.6)) + Vector2(0.0, -sin(u * PI) * 70.0)
 	_sprite.position = pos

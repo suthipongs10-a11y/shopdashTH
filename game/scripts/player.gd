@@ -22,6 +22,9 @@ const WHIRL_MOVE := 0.7
 const CROSS_RANGE := 320.0
 ## Length of the ultimate intro (dim, zoom, cut-in, charge) before the skill lands.
 const ULT_CHARGE := 0.9
+## Holy Cross leap: time in the air and peak height on screen.
+const LEAP_TIME := 0.42
+const LEAP_HEIGHT := 150.0
 const RESPAWN_DELAY := 3.0
 ## Max hit-spark effects per physics frame, so huge packs do not flood the scene.
 const HIT_FX_PER_FRAME := 10
@@ -80,6 +83,18 @@ var _cast_mult := 1.0
 var _cast_pal: Dictionary = {}
 var _cast_tally: SkillTally
 var _cast_fx: DragonFx
+var _leap_left := 0.0
+var _leap_from := Vector2.ZERO
+var _leap_to := Vector2.ZERO
+var _leap_mult := 1.0
+var _leap_pal: Dictionary = {}
+var _leap_tally: SkillTally
+## Pose held while an ultimate charges ("" = none); _charge_done runs when the charge ends.
+var _charge_pose := ""
+var _charge_done: Callable
+var _charge_tally: SkillTally
+## Seconds before a held pose is let go.
+var _pose_left := 0.0
 var _ghost_left := 0.0
 
 
@@ -170,6 +185,13 @@ func _physics_process(delta: float) -> void:
 	if _cast_left > 0.0:
 		move = Vector2.ZERO
 		_tick_cast(delta)
+	if _leap_left > 0.0:
+		move = Vector2.ZERO
+		_tick_leap(delta)
+	if _pose_left > 0.0:
+		_pose_left -= delta
+		if _pose_left <= 0.0 and _spin_left <= 0.0 and _cast_left <= 0.0 and _leap_left <= 0.0:
+			_sheet.release()
 	_moving = move.length() > 0.05
 	var speed := MOVE_SPEED * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
 	velocity = GameData.to_screen(move * speed)
@@ -187,7 +209,7 @@ func _physics_process(delta: float) -> void:
 			_sheet.ghost(Vfx.pal("steel")["aura"], 0.22)
 		if _spin_left <= 0.0:
 			_sheet.release()
-	elif _cast_left <= 0.0:
+	elif _cast_left <= 0.0 and _leap_left <= 0.0 and _charge_left <= 0.0:
 		_handle_actions()
 		if _aim_face_left > 0.0:
 			_face = aim
@@ -224,7 +246,8 @@ func _handle_actions() -> void:
 func _try_use(id: String) -> void:
 	var data: Dictionary = GameData.SKILLS[id]
 	var cost := float(data["sp"])
-	if float(cooldowns[id]) > 0.0 or sp < cost or _spin_left > 0.0 or _cast_left > 0.0:
+	if (float(cooldowns[id]) > 0.0 or sp < cost or _spin_left > 0.0 or _cast_left > 0.0
+			or _leap_left > 0.0):
 		return
 	sp -= cost
 	cooldowns[id] = float(data["cd"])
@@ -270,7 +293,7 @@ func _begin_cast(id: String, mult: float, palette: Dictionary, tally: SkillTally
 	_cast_mult = mult
 	_cast_pal = palette
 	_cast_tally = tally
-	_sheet.hold("attack", 0)
+	_pose("cast", 0, "attack", 0, 99.0)
 	var bar := CastBar.new()
 	bar.anchor = self
 	bar.title = String(data["name"])
@@ -309,6 +332,8 @@ func _tick_cast(delta: float) -> void:
 	_cast_left -= delta
 	_sheet.glow_amount = 1.0
 	_sheet.glow_color = _cast_pal["aura"]
+	if _sheet.has_anim("cast"):
+		_sheet.hold("cast", int(Time.get_ticks_msec() / 160.0) % 4)
 	Vfx.charge(global_position, 80.0, _cast_pal, 3, 170.0)
 	if randf() < 0.5:
 		var spot := GameData.to_screen(Vector2.from_angle(randf() * TAU) * randf_range(60, 170))
@@ -347,12 +372,7 @@ func _dragon_target() -> Vector2:
 func _dragon_impact(at: Vector2, mult: float, palette: Dictionary) -> void:
 	Juice.spotlight_end()
 	# The cast-time tally has usually faded by now; start a fresh one for the impact.
-	var tally: SkillTally = _cast_tally if is_instance_valid(_cast_tally) else null
-	if tally == null:
-		tally = SkillTally.new()
-		tally.anchor = self
-		tally.color = Color(1.0, 0.5, 0.65)
-		top_fx.add_child(tally)
+	var tally := _live_tally(_cast_tally)
 	var pulse := _new_pulse(AoePulse.Style.DRAGON, 300.0, mult, palette["aura"])
 	pulse.palette = palette
 	pulse.ticks = 3
@@ -378,8 +398,17 @@ func _tick_juice(delta: float) -> void:
 			Vfx.flame(body + Vector2(randf_range(-60, 60), randf_range(-8, 8)), _charge_pal["aura"],
 				randf_range(18, 30), randf_range(120, 260), randf_range(0.4, 0.7))
 		_sheet.squash = Vector2(1.0 + sin(Time.get_ticks_msec() * 0.04) * 0.015, 0.97)
+		if _charge_pose != "":
+			_pose(_charge_pose, int(Time.get_ticks_msec() / 160.0) % 4 if _charge_pose == "cast" else 0,
+				"attack", 0, 9.0)
 		if _charge_left <= 0.0:
 			Juice.spotlight_end()
+			_charge_pose = ""
+			_pose_left = 0.01
+			if _charge_done.is_valid():
+				var done := _charge_done
+				_charge_done = Callable()
+				done.call()
 	else:
 		_sheet.glow_amount = 0.3 + 0.2 * pulse
 		_sheet.glow_color = holy["aura"]
@@ -473,6 +502,7 @@ func _do_aegis(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	_aegis_fx.color = palette["aura"]
 	_aegis_fx.follow = self
 	top_fx.add_child(_aegis_fx)
+	_pose("guard", 1, "idle", 0, 0.45)
 	Juice.flash(0.15, palette["aura"])
 	Vfx.twinkle(global_position, 70.0, 110.0, Color(1.0, 0.9, 0.6), 0.5)
 	Vfx.ring(global_position, 20.0, 150.0, palette["aura"], 0.45, 9.0)
@@ -537,42 +567,138 @@ func _do_whirl(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 
 ## F: after the intro charge, a golden lion spirit rises and roars: three blasts around.
 func _do_lion(mult: float, palette: Dictionary, tally: SkillTally) -> void:
+	# Brace behind the shield through the intro, then bash: light bursts forward out of the
+	# shield and the golden lion leaps out of it.
+	var ground_dir := aim
+	_charge_pose = "bash"
+	_charge_tally = tally
+	# Do not bind the tally: it may be freed before the charge ends.
+	_charge_done = _lion_bash.bind(ground_dir, mult, palette)
+
+
+func _lion_bash(ground_dir: Vector2, mult: float, palette: Dictionary) -> void:
+	var tally := _live_tally(_charge_tally)
+	_face = ground_dir
+	_shield_bash(ground_dir, palette)
 	var lion := LionFx.new()
 	lion.color = palette["aura"]
-	lion.delay = ULT_CHARGE
-	lion.dir = GameData.to_screen(aim).normalized()
+	lion.dir = GameData.to_screen(ground_dir).normalized()
+	lion.from_back = -40.0
 	lion.position = global_position
 	top_fx.add_child(lion)
-	var pulse := _new_pulse(AoePulse.Style.ROAR, 300.0, mult, palette["aura"])
+	var pulse := _new_pulse(AoePulse.Style.ROAR, 280.0, mult, palette["aura"])
 	pulse.palette = palette
 	pulse.ticks = 3
 	pulse.interval = 0.26
-	pulse.delay = ULT_CHARGE + LionFx.ROAR_AT
-	pulse.knock = 260.0
+	pulse.delay = LionFx.ROAR_AT * 0.6
+	pulse.knock = 300.0
 	pulse.shake = 12.0
 	pulse.tally = tally
-	pulse.position = global_position
+	pulse.position = global_position + GameData.to_screen(ground_dir * 170.0)
 	ground_fx.add_child(pulse)
 
 
-## 1: a holy cross of light strikes the aim point twice.
+## Shield bash pose, a short lunge and a cone of light blasting forward out of the shield.
+func _shield_bash(ground_dir: Vector2, palette: Dictionary) -> void:
+	_pose("bash", 2, "attack", 2, 0.4)
+	if _sheet.has_anim("bash"):
+		_sheet.release()
+		_sheet.play_once("bash")
+	_sheet.squash = Vector2(1.2, 0.86)
+	_sheet.ghost(palette["aura"], 0.25, 0.6)
+	var d := GameData.to_screen(ground_dir).normalized()
+	global_position += d * 26.0
+	var front := global_position + d * 50.0
+	Juice.flash(0.2, palette["aura"])
+	Juice.hitstop(0.06)
+	shake(12.0)
+	var aura: Color = palette["aura"]
+	var burst := FxSprite.play(top_fx, "gold_burst", front + Vector2(0.0, -55.0), 170.0, 0.35,
+		false, aura)
+	if burst != null:
+		burst.grow_from = 0.4
+		burst.grow_to = 1.3
+		burst.spin = 3.0
+	var wave := FxSprite.play(ground_fx, "shock_ring", front + d * 60.0, 260.0, 0.45, true, aura)
+	if wave != null:
+		wave.grow_from = 0.3
+		wave.grow_to = 1.2
+	# The cone: fast streaks and glowing motes fanning out along the bash.
+	for i in 46:
+		var spread := randf_range(-0.55, 0.55)
+		var speed := randf_range(450.0, 1100.0)
+		var v := GameData.to_screen(ground_dir.rotated(spread) * speed)
+		var tint: Color = palette["core"] if randf() < 0.35 else aura
+		Vfx.glow(front, randf_range(30, 80), randf_range(4, 9), tint, randf_range(0.25, 0.5),
+			Vector3(v.x, v.y, randf_range(-60, 160)), 0.0,
+			Vfx.Kind.STREAK if i % 2 == 0 else Vfx.Kind.GLOW)
+	Vfx.burst(front, 50.0, 16, palette["hot"], 300.0, 12.0, 0.4)
+	Vfx.smoke(global_position, 10.0, 30.0, 90.0, Color(0.85, 0.75, 0.6), 0.6, 0.3)
+
+
+## 1: leap at the aim point with the sword raised and slam it into the ground; the holy
+## cross of light erupts where the warden lands.
 func _do_cross(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	var offset := input.aim_vector(self).limit_length(CROSS_RANGE)
-	var pulse := _new_pulse(AoePulse.Style.CROSS, 150.0, mult, palette["aura"])
+	var margin := Vector2(40.0, 40.0)
+	_leap_from = global_position
+	_leap_to = (global_position + GameData.to_screen(offset)).clamp(margin,
+		GameData.MAP_SIZE - margin)
+	_leap_left = LEAP_TIME
+	_leap_mult = mult
+	_leap_pal = palette
+	_leap_tally = tally
+	if offset.length() > 4.0:
+		_face = offset.normalized()
+	_pose("slam", 1, "attack", 0, LEAP_TIME + 0.1)
+	_sheet.squash = Vector2(1.25, 0.78)
+	Vfx.smoke(global_position, 6.0, 30.0, 80.0, Color(0.85, 0.75, 0.6), 0.6, 0.3)
+	Vfx.ring(global_position, 10.0, 70.0, palette["aura"], 0.3, 5.0)
+
+
+func _tick_leap(delta: float) -> void:
+	_leap_left -= delta
+	var u := clampf(1.0 - _leap_left / LEAP_TIME, 0.0, 1.0)
+	global_position = _leap_from.lerp(_leap_to, u * u * (3.0 - 2.0 * u))
+	_sheet.hop = -sin(u * PI) * LEAP_HEIGHT
+	_ghost_left -= delta
+	if _ghost_left <= 0.0:
+		_ghost_left = 0.05
+		_sheet.ghost(_leap_pal["aura"], 0.2, 0.45)
+	if _leap_left <= 0.0:
+		_land_slam()
+
+
+func _land_slam() -> void:
+	_sheet.hop = 0.0
+	_sheet.squash = Vector2(1.3, 0.74)
+	_pose("slam", 2, "attack", 2, 0.35)
+	var palette := _leap_pal
+	var aura: Color = palette["aura"]
+	shake(14.0)
+	Juice.hitstop(0.07)
+	var crack := FxSprite.play(ground_fx, "shock_ring", global_position, 300.0, 0.4, true, aura)
+	if crack != null:
+		crack.grow_from = 0.2
+		crack.grow_to = 1.1
+	Vfx.smoke(global_position, 10.0, 60.0, 140.0, Color(0.85, 0.75, 0.6), 0.8, 0.3)
+	Vfx.burst(global_position, 10.0, 30, aura, 520.0, 14.0, 0.5)
+	var pulse := _new_pulse(AoePulse.Style.CROSS, 170.0, _leap_mult, aura)
 	pulse.palette = palette
 	pulse.ticks = 2
 	pulse.interval = 0.22
-	pulse.delay = 0.3
-	pulse.knock = 90.0
+	pulse.knock = 160.0
+	pulse.stun = 0.4
 	pulse.shake = 6.0
-	pulse.tally = tally
-	pulse.position = global_position + GameData.to_screen(offset)
+	pulse.tally = _live_tally(_leap_tally)
+	pulse.position = global_position
 	ground_fx.add_child(pulse)
 
 
 ## 2: second ultimate. After the intro charge a golden crest rises, then five radiant
 ## blasts with lances of light raining on everything nearby.
 func _do_banner(mult: float, palette: Dictionary, tally: SkillTally) -> void:
+	_charge_pose = "cast"
 	var crest := CrestFx.new()
 	crest.color = palette["aura"]
 	crest.delay = ULT_CHARGE
@@ -690,6 +816,30 @@ func shake(amount: float) -> void:
 	_shake = maxf(_shake, amount)
 
 
+## The skill's damage tally if it is still on screen, else a fresh one (tallies fade out
+## after a second without hits, so delayed blasts often need a new one).
+func _live_tally(tally: Variant) -> SkillTally:
+	if is_instance_valid(tally):
+		return tally
+	var fresh := SkillTally.new()
+	fresh.anchor = self
+	fresh.color = Color(1.0, 0.85, 0.3)
+	top_fx.add_child(fresh)
+	return fresh
+
+
+## Holds a frame of a pose animation for some seconds; when the warden has no such sheet
+## yet, holds the fallback frame instead (e.g. the sword-raised attack frame).
+func _pose(anim: String, frame: int, fallback: String, fallback_frame: int, seconds: float) -> void:
+	if _sheet.has_anim(anim):
+		_sheet.hold(anim, frame)
+	elif fallback != "idle":
+		_sheet.hold(fallback, fallback_frame)
+	else:
+		_sheet.release()
+	_pose_left = seconds
+
+
 func _die() -> void:
 	dead = true
 	hp = 0.0
@@ -698,6 +848,10 @@ func _die() -> void:
 	if is_instance_valid(_cast_fx):
 		_cast_fx.queue_free()
 	_aegis_left = 0.0
+	_leap_left = 0.0
+	_charge_left = 0.0
+	_charge_pose = ""
+	_charge_done = Callable()
 	_sheet.release()
 	if is_instance_valid(_aegis_fx):
 		_aegis_fx.queue_free()
