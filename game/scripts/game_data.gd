@@ -40,15 +40,15 @@ const MONSTERS := {
 		"name": "โกเลมถ่านเพลิง", "shape": "block",
 		"hp": 260, "hp_per_level": 60, "atk": 28, "atk_per_level": 6,
 		"def": 60.0, "speed": 70.0, "radius": 26.0,
-		"aggro": 420.0, "range": 34.0, "windup": 0.6, "cooldown": 1.6,
-		"xp": 22, "gold": 6, "color": Color(0.5, 0.27, 0.2),
+		"aggro": 620.0, "range": 34.0, "windup": 0.6, "cooldown": 1.6,
+		"xp": 22, "gold": 6, "color": Color(0.62, 0.45, 0.42),
 	},
 	"imp": {
 		"name": "อิมป์เถ้าธุลี", "shape": "round",
 		"hp": 110, "hp_per_level": 25, "atk": 16, "atk_per_level": 4,
 		"def": 15.0, "speed": 150.0, "radius": 16.0,
-		"aggro": 520.0, "range": 28.0, "windup": 0.35, "cooldown": 1.1,
-		"xp": 10, "gold": 3, "color": Color(0.75, 0.3, 0.45),
+		"aggro": 720.0, "range": 28.0, "windup": 0.35, "cooldown": 1.1,
+		"xp": 10, "gold": 3, "color": Color(0.78, 0.36, 0.85),
 	},
 }
 

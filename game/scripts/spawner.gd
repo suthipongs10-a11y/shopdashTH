@@ -4,13 +4,14 @@ extends Node
 
 signal monster_killed(monster: Monster)
 
-const MAX_MONSTERS := 48
-const SPAWN_INTERVAL := 1.2
+const MAX_MONSTERS := 70
+const SPAWN_INTERVAL := 0.8
 const MIN_PLAYER_DIST := 520.0
 const MAX_PLAYER_DIST := 1100.0
 
 var world: Node2D
 var player: Player
+var fx_layer: Node
 
 var _timer := 0.5
 
@@ -31,12 +32,13 @@ func prefill(packs: int) -> void:
 
 func spawn_pack() -> void:
 	var kind := "imp" if randf() < 0.6 else "golem"
-	var count := randi_range(4, 7) if kind == "imp" else randi_range(2, 4)
+	var count := randi_range(6, 10) if kind == "imp" else randi_range(3, 5)
 	var center := _pick_point()
 	var margin := Vector2(60.0, 60.0)
 	for i in count:
 		var m := Monster.new()
 		m.setup(kind, player.level, player)
+		m.fx_layer = fx_layer
 		var jitter := Vector2(randf_range(-90.0, 90.0), randf_range(-60.0, 60.0))
 		m.position = (center + jitter).clamp(margin, GameData.MAP_SIZE - margin)
 		m.died.connect(_on_monster_died)

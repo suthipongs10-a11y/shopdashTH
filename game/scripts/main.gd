@@ -33,12 +33,15 @@ func _ready() -> void:
 	_player.ground_fx = ground_fx
 	_player.top_fx = _top_fx
 	_player.position = GameData.MAP_SIZE * 0.5
+	if "--autopilot" in OS.get_cmdline_user_args():
+		_player.input = BotInput.new()
 	world.add_child(_player)
 
 	var spawner := Spawner.new()
 	spawner.name = "Spawner"
 	spawner.world = world
 	spawner.player = _player
+	spawner.fx_layer = _top_fx
 	add_child(spawner)
 	spawner.monster_killed.connect(_on_monster_killed)
 	spawner.prefill(5)
@@ -84,7 +87,7 @@ func _on_monster_killed(monster: Monster) -> void:
 	var gold_gain := roundi(monster.gold_reward * bonus)
 	_player.gain_rewards(xp_gain, gold_gain)
 	var at := monster.global_position + Vector2(0.0, -monster.body_radius * 3.2)
-	DamageNumber.spawn_text(_top_fx, at, "+%d EXP" % xp_gain, 15, Color(0.6, 0.9, 1.0))
+	DamageNumber.spawn_text(_top_fx, at, "+%d EXP" % xp_gain, 13, Color(0.7, 0.95, 1.0, 0.85))
 
 
 func _on_leveled_up(new_level: int) -> void:

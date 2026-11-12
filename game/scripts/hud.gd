@@ -48,8 +48,10 @@ func _ready() -> void:
 	_banner.modulate.a = 0.0
 	_root.add_child(_banner)
 
-	_hint = _make_label(14, Color(1, 1, 1, 0.75))
-	_hint.text = "WASD เดิน  ·  คลิกซ้าย/Space ฟัน  ·  Q E R สกิล  ·  F ท่าไม้ตาย  ·  เมาส์เล็งทิศ"
+	_hint = _make_label(13, Color(1, 1, 1, 0.85))
+	_hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	_hint.add_theme_constant_override("outline_size", 4)
+	_hint.text = "WASD เดิน  ·  เมาส์เล็งทิศ  ·  คลิกซ้าย/Space ฟัน\nQ E R สกิล  ·  F ท่าไม้ตาย"
 	_root.add_child(_hint)
 
 	player.target_hit.connect(_on_target_hit)
@@ -90,7 +92,7 @@ func _process(delta: float) -> void:
 	_combo.position = Vector2(view.x - _combo.size.x - 28.0, view.y * 0.3)
 	_banner.position = Vector2(0.0, view.y * 0.2)
 	_banner.size = Vector2(view.x, 70.0)
-	_hint.position = Vector2(16.0, view.y - 30.0)
+	_hint.position = Vector2(16.0, view.y - 56.0)
 
 
 func show_banner(text: String, color: Color = Color.WHITE) -> void:
