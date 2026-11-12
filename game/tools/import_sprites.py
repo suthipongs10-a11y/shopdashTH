@@ -108,7 +108,10 @@ def foreground_mask(img: np.ndarray, cols: int, rows: int) -> np.ndarray:
     border = np.concatenate([rgb_all[0], rgb_all[-1], rgb_all[:, 0], rgb_all[:, -1]])
     br, bg_, bb = np.median(border, axis=0)
     if (alpha < 40).mean() > 0.3:
-        mask = alpha >= 128
+        # Some sheets come with a painted half-transparent haze or checkerboard around the
+        # figure; the figure itself is opaque, so cut higher when there is a lot of haze.
+        haze = ((alpha >= 40) & (alpha < 200)).mean() > 0.05
+        mask = alpha >= (230 if haze else 128)
     elif bg_ > 150 and br < 110 and bb < 110:
         # Green screen: drop strongly green pixels.
         r, g, b = rgb_all[..., 0], rgb_all[..., 1], rgb_all[..., 2]
@@ -182,8 +185,8 @@ def split_frames(img: np.ndarray, cols: int, rows: int) -> list:
     return out
 
 
-def load_anim(src: str, spec: dict) -> list:
-    """Frames as rows x cols of (crop, bottom_in_cell, cell_h)."""
+def load_anim(src: str, spec: dict) -> tuple:
+    """(frames as rows x cols of (crop, bottom_in_cell, cell_h), came_from_row_images)."""
     # Either one 5x4 sheet (warden_walk.png) or five single-row images (warden_walk_row1..5.png).
     name = spec["file"].replace("_row{row}", "")
     row_name = name.replace(".png", "_row{row}.png")
@@ -193,9 +196,9 @@ def load_anim(src: str, spec: dict) -> list:
         for r in range(1, ROWS + 1):
             img = load_rgba(os.path.join(src, row_name.format(row=r)))
             rows.append(split_frames(img, 4, 1)[0])
-        return rows
+        return rows, True
     img = load_rgba(os.path.join(src, name))
-    return split_frames(img, 4, ROWS)
+    return split_frames(img, 4, ROWS), False
 
 
 def feet_center_x(crop: np.ndarray) -> float:
@@ -208,13 +211,20 @@ def feet_center_x(crop: np.ndarray) -> float:
     return float(np.median(xs))
 
 
-def compose(frames: list, fig_h: int, multiplier: float = 1.0) -> tuple:
+def compose(frames: list, fig_h: int, multiplier: float = 1.0, per_row: bool = False) -> tuple:
+    """per_row: each row came from its own image, maybe drawn at another size, so scale rows apart."""
     heights = [crop.shape[0] for row in frames for crop, _, _ in row]
     scale = fig_h / float(np.median(heights)) * multiplier
+    row_scales = [
+        fig_h / float(np.median([crop.shape[0] for crop, _, _ in row])) * multiplier
+        if per_row else scale
+        for row in frames
+    ]
     cols = max(len(row) for row in frames)
     sheet = Image.new("RGBA", (CELL * cols, CELL * len(frames)), (0, 0, 0, 0))
     clipped = 0
     for r, row in enumerate(frames):
+        scale = row_scales[r]
         ground = max(b for _, b, _ in row)
         for c, (crop, bottom, cell_h) in enumerate(row):
             lift = ground - bottom
@@ -233,7 +243,7 @@ def compose(frames: list, fig_h: int, multiplier: float = 1.0) -> tuple:
             cell = Image.new("RGBA", (CELL, CELL), (0, 0, 0, 0))
             cell.paste(im, (x - c * CELL, y - r * CELL))
             sheet.paste(cell, (c * CELL, r * CELL))
-    return sheet, scale, clipped
+    return sheet, float(np.median(row_scales)), clipped
 
 
 def write_cfg(out_dir: str, screen_h: int, fig_h: int, fps: dict) -> None:
@@ -312,18 +322,21 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
     ap.add_argument("--preview")
+    ap.add_argument("--only", help="import just this character (e.g. warden)")
     args = ap.parse_args()
     if args.preview:
         os.makedirs(args.preview, exist_ok=True)
 
     for key, ch in CHARACTERS.items():
+        if args.only and key != args.only:
+            continue
         out_dir = os.path.join(GAME_DIR, ch["out"])
         os.makedirs(out_dir, exist_ok=True)
         fps = {}
         built = {}
         for anim, spec in ch["anims"].items():
-            frames = load_anim(args.src, spec)
-            sheet, scale, clipped = compose(frames, ch["fig_h"], spec.get("scale", 1.0))
+            frames, per_row = load_anim(args.src, spec)
+            sheet, scale, clipped = compose(frames, ch["fig_h"], spec.get("scale", 1.0), per_row)
             sheet.save(os.path.join(out_dir, f"{anim}.png"))
             built[anim] = sheet
             fps[anim] = spec["fps"]
@@ -341,6 +354,8 @@ def main() -> None:
         write_cfg(out_dir, ch["screen_h"], ch["fig_h"], fps)
 
     for key, ch in CHARACTERS.items():
+        if args.only and key != args.only:
+            continue
         # Optional painted bust for the ultimate cut-in banner.
         bust = os.path.join(args.src, f"{key}_portrait.png")
         if os.path.exists(bust):
