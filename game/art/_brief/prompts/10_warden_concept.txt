@@ -1,0 +1,35 @@
+OUTPUT FILE NAME: warden_concept.png
+ATTACH WITH THIS PROMPT: templates/template_turnaround.png
+
+Create a character turnaround sheet for a 2D game: the Warden (player character, a young knight).
+This image becomes the design reference for every later sprite of this character.
+
+CHARACTER - the Warden:
+- A young chibi knight with a friendly, determined face.
+- Short tousled ash-blond hair, bright blue eyes. No helmet.
+- Polished silver-blue plate armour with gold trim. Short crimson cape. Brown leather belt and boots.
+- Right hand: a straight longsword with a gold crossguard.
+- Left arm: a kite shield, royal blue with a gold crown emblem.
+
+STYLE (same for every asset in this project):
+- Hand-painted 2D game sprite illustration with chibi proportions: big head, small body, about 2.5 heads tall.
+- Clean dark-brown outline around the whole figure (not pure black), soft cel shading with 2-3 tones per colour.
+- Vivid, saturated, bright and cheerful colours. European high-fantasy theme.
+- Light comes from the top-left. Subtle rim light on the right side.
+- Crisp illustration. NOT pixel art, NOT a 3D render, NOT a photo.
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, like a classic isometric MMORPG.
+
+LAYOUT:
+- Landscape canvas, aspect ratio 3:2 (1536x1024, or larger at the same ratio).
+- One row of 5 full-body views of the SAME character, evenly spaced, same size, standing in a
+  relaxed ready pose, left to right:
+  1 FRONT (facing the viewer), 2 FRONT-LEFT (turned 45 degrees to the left),
+  3 LEFT (side profile facing left), 4 BACK-LEFT (three-quarter back, facing up-left), 5 BACK.
+- The attached template_turnaround.png shows this layout. Use it ONLY to place the views.
+  Do NOT copy its lines, labels or white background into the result.
+
+HARD RULES:
+- Identical design, colours and proportions in all 5 views.
+- Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00).
+- No ground shadow, no scenery, no text, no labels, no watermark.
+- Output: PNG.
