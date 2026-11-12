@@ -43,7 +43,9 @@ func _ready() -> void:
 	_player.top_fx = _top_fx
 	_player.position = GameData.MAP_SIZE * 0.5
 	if "--autopilot" in OS.get_cmdline_user_args():
-		_player.input = BotInput.new()
+		var bot := BotInput.new()
+		bot.demo = "--demo" in OS.get_cmdline_user_args()
+		_player.input = bot
 	world.add_child(_player)
 
 	var spawner := Spawner.new()
