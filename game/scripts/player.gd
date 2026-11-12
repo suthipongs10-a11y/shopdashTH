@@ -79,6 +79,7 @@ var _cast_id := ""
 var _cast_mult := 1.0
 var _cast_pal: Dictionary = {}
 var _cast_tally: SkillTally
+var _cast_fx: DragonFx
 var _ghost_left := 0.0
 
 
@@ -277,8 +278,11 @@ func _begin_cast(id: String, mult: float, palette: Dictionary, tally: SkillTally
 	bar.total = _cast_left
 	# EggPact's rune circle under the feet when available; the bar draws its own otherwise.
 	var aura: Color = palette["aura"]
-	var circle := FxSprite.play(ground_fx, "ring", global_position, 380.0, _cast_left + 0.3, true,
-		aura.lerp(Color.WHITE, 0.35))
+	var circle := FxSprite.play(ground_fx, "sigil", global_position, 400.0, _cast_left + 0.3, true,
+		aura.lerp(Color.WHITE, 0.25))
+	if circle == null:
+		circle = FxSprite.play(ground_fx, "ring", global_position, 380.0, _cast_left + 0.3, true,
+			aura.lerp(Color.WHITE, 0.35))
 	if circle != null:
 		circle.follow = self
 		circle.grow_from = 0.35
@@ -287,6 +291,15 @@ func _begin_cast(id: String, mult: float, palette: Dictionary, tally: SkillTally
 		circle.fade_out = 0.3
 		bar.draw_circle = false
 	top_fx.add_child(bar)
+	if id == "dragon":
+		# The dragon circles the warden through the chant, then rises and dives on release().
+		var dragon := DragonFx.new()
+		dragon.caster = self
+		dragon.palette = palette
+		dragon.choose_target = _dragon_target
+		dragon.impact.connect(_dragon_impact.bind(mult, palette))
+		top_fx.add_child(dragon)
+		_cast_fx = dragon
 	_converge(_cast_left, palette)
 	Juice.spotlight([self] as Array[Node2D], 0.55, 1.1)
 	Juice.cutin(String(data["name"]), palette["cut"], _sheet.portrait())
@@ -310,12 +323,8 @@ func _release_cast() -> void:
 	_sheet.play_once("attack")
 	match _cast_id:
 		"dragon":
-			var dragon := DragonFx.new()
-			dragon.caster = self
-			dragon.palette = _cast_pal
-			dragon.choose_target = _dragon_target
-			dragon.impact.connect(_dragon_impact.bind(_cast_mult, _cast_pal))
-			top_fx.add_child(dragon)
+			if is_instance_valid(_cast_fx):
+				_cast_fx.release()
 			Juice.flash(0.2, _cast_pal["aura"])
 			Vfx.ring(global_position, 20.0, 220.0, _cast_pal["aura"], 0.6, 10.0)
 			Vfx.burst(global_position, 80.0, 30, _cast_pal["aura"], 360.0, 16.0, 0.6)
@@ -686,6 +695,8 @@ func _die() -> void:
 	hp = 0.0
 	_spin_left = 0.0
 	_cast_left = 0.0
+	if is_instance_valid(_cast_fx):
+		_cast_fx.queue_free()
 	_aegis_left = 0.0
 	_sheet.release()
 	if is_instance_valid(_aegis_fx):

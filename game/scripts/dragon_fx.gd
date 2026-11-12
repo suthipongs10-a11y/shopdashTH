@@ -1,405 +1,315 @@
 class_name DragonFx
 extends Node2D
-## Golden Dragon God, drawn entirely from glow particles in the EggPact style.
-## A serpentine body follows the head's path: it coils around the caster, spirals up over
-## their head, pauses with a roar, then dives onto the enemies and explodes.
-##
-## Painted pieces are used when present (art/fx/dragon_head.png, dragon_body.png,
-## dragon_tail.png, in the style of EggPact's flaming lion): they are chained along the same
-## path so the painted body still bends. Without them the dragon is drawn in code.
+## Golden Dragon God, painted with EggPact's dragon art:
+##   ORBIT  while the warden chants, a golden dragon (dragon_fly) flies circles around them,
+##          passing behind them on the far side of the circle;
+##   RISE   on release a coiling dragon of light (dragon_coil) shoots up out of the warden;
+##   ROAR   the winged dragon god (dragon_wings) spreads its wings over their head, god rays
+##          turning behind it;
+##   DIVE   it streaks down onto the enemies (dragon_fly again, nose first) and explodes.
+## The caster starts it with the cast and calls release() when the chant ends.
 
 signal impact(at: Vector2)
 
-enum Phase { COIL, RISE, ROAR, DIVE, FADE }
+enum Phase { ORBIT, RISE, ROAR, DIVE, FADE }
 
-const SEGMENTS := 26
-## Screen distance between body segments; the body is laid along the head's recent path.
-const SEG_LEN := 17.0
-const HISTORY := 240
-const COIL_TIME := 1.6
-const RISE_TIME := 0.7
-const ROAR_TIME := 0.35
-const DIVE_TIME := 0.32
-const FADE_TIME := 0.6
-const COIL_RADIUS := 150.0
-const SKY := 230.0
-## Head drawing scale.
-const HEAD := 1.6
+const ORBIT_RADIUS := 150.0
+## Height of the flying dragon above the ground while it circles.
+const ORBIT_LIFT := 70.0
+## On-screen height of the painted dragons.
+const FLY_HEIGHT := 118.0
+const WINGS_HEIGHT := 250.0
+const COIL_HEIGHT := 360.0
+## Where the winged dragon hangs, above the caster's feet.
+const SKY := 250.0
+const RISE_TIME := 0.45
+const ROAR_TIME := 0.65
+const DIVE_TIME := 0.28
+const FADE_TIME := 0.5
+## z_index (absolute) when the flier passes behind the caster. The caster sits at
+## Juice.FOCUS_Z during the cast spotlight.
+const BEHIND_Z := Juice.FOCUS_Z - 1
+const FRONT_Z := 22
 
 var caster: Node2D
 var palette: Dictionary = Vfx.pal("dragon")
-## Ground point the dragon dives onto; chosen when the dive starts.
-var target := Vector2.ZERO
 ## Picks the dive target; set by the caster.
 var choose_target: Callable
+## Ground point the dragon dives onto; chosen when the dive starts.
+var target := Vector2.ZERO
 
-var _phase := Phase.COIL
+var _phase := Phase.ORBIT
 var _t := 0.0
 var _angle := 0.0
-## Head positions on the ground plane plus height: Vector3(x, y, z), newest last.
-var _hist: Array[Vector3] = []
-var _dive_from := Vector3.ZERO
-var _dot: Texture2D
-## Normal-blend layer over the body glow: gives the head a solid, readable silhouette.
-var _solid: Node2D
-## Additive layer over the solid head: makes it glow instead of looking flat.
-var _shine: Node2D
-## Painted pieces (null when the art is missing).
-var _head_tex: Texture2D
-var _body_tex: Texture2D
-var _tail_tex: Texture2D
+var _released := false
+var _trail_left := 0.0
+var _home := Vector2.ZERO
+var _dive_from := Vector2.ZERO
+var _fly: Sprite2D
+var _coil: Sprite2D
+var _wings: Sprite2D
+var _rays: Sprite2D
 
 
 func _ready() -> void:
 	add_to_group("dragon")
 	add_to_group("big_fx")
-	material = Fx.additive()
-	z_index = 21
-	_dot = Vfx.dot_texture()
-	for piece in ["head", "body", "tail"]:
-		var path := "res://art/fx/dragon_%s.png" % piece
-		if ResourceLoader.exists(path):
-			set("_%s_tex" % piece, load(path))
-	_solid = Node2D.new()
-	# Drawn over the body glow so the head stays readable.
-	_solid.show_behind_parent = false
-	_solid.draw.connect(_draw_solid_head)
-	add_child(_solid)
-	_shine = Node2D.new()
-	_shine.material = Fx.additive()
-	_shine.draw.connect(_draw_head_shine)
-	add_child(_shine)
 	_angle = randf() * TAU
-	_hist.append(_head_position())
+	_home = _caster_pos()
+	var aura: Color = palette["aura"]
+	_fly = _painted("dragon_fly", FLY_HEIGHT, 0.35)
+	_coil = _glow_sprite("dragon_coil", COIL_HEIGHT, aura.lerp(Color.WHITE, 0.25))
+	if _coil != null:
+		# Anchored at the bottom so it grows upward out of the caster.
+		_coil.offset = Vector2(0.0, -_coil.texture.get_height() * 0.5)
+	_rays = _glow_sprite("godrays", WINGS_HEIGHT * 1.9, aura)
+	_wings = _painted("dragon_wings", WINGS_HEIGHT, 0.3)
+	for s: Sprite2D in [_fly, _coil, _rays, _wings]:
+		if s != null:
+			s.visible = false
+
+
+## The chant is over: the dragon rises and dives.
+func release() -> void:
+	_released = true
 
 
 func _process(delta: float) -> void:
 	_t += delta
+	if _phase == Phase.ORBIT or _phase == Phase.RISE:
+		if not is_instance_valid(caster) or bool(caster.get("dead")):
+			queue_free()
+			return
+		_home = _caster_pos()
 	match _phase:
-		Phase.COIL:
-			if _t >= COIL_TIME:
-				_next(Phase.RISE)
+		Phase.ORBIT:
+			_tick_orbit(delta)
+			if _released:
+				_enter(Phase.RISE)
 		Phase.RISE:
+			_tick_rise()
 			if _t >= RISE_TIME:
-				_next(Phase.ROAR)
-				_roar()
+				_enter(Phase.ROAR)
 		Phase.ROAR:
+			_tick_roar()
 			if _t >= ROAR_TIME:
-				_next(Phase.DIVE)
-				_dive_from = _hist[-1]
-				target = choose_target.call() if choose_target.is_valid() else _center()
+				_enter(Phase.DIVE)
 		Phase.DIVE:
+			_tick_dive(delta)
 			if _t >= DIVE_TIME:
-				_next(Phase.FADE)
-				impact.emit(target)
+				_enter(Phase.FADE)
 		Phase.FADE:
+			_tick_fade()
 			if _t >= FADE_TIME:
 				queue_free()
-				return
-	if _phase != Phase.FADE:
-		_hist.append(_head_position())
-	else:
-		# The body keeps pouring into the impact point.
-		_hist.append(Vector3(target.x, target.y, 0.0))
-	if _hist.size() > HISTORY:
-		_hist.pop_front()
-	_trail()
-	queue_redraw()
-	_solid.queue_redraw()
-	_shine.queue_redraw()
 
 
-func _next(p: Phase) -> void:
-	_phase = p
+func _enter(next: Phase) -> void:
+	_phase = next
 	_t = 0.0
-
-
-func _center() -> Vector2:
-	return caster.global_position if is_instance_valid(caster) else global_position
-
-
-## Where the head is now, on the ground plane (x, y) plus height (z).
-func _head_position() -> Vector3:
-	var c := _center()
-	match _phase:
-		Phase.COIL:
-			# One and a quarter laps around the caster, bobbing and slowly climbing.
-			var u := _t / COIL_TIME
-			_angle += get_process_delta_time() * TAU * 1.25 / COIL_TIME
-			var ring := GameData.to_screen(Vector2.from_angle(_angle) * COIL_RADIUS)
-			return Vector3(c.x + ring.x, c.y + ring.y, 60.0 + 40.0 * u + 22.0 * sin(_t * 7.0))
+	var aura: Color = palette["aura"]
+	match next:
 		Phase.RISE:
-			# Tightening spiral up over the caster's head.
-			var u := _t / RISE_TIME
-			var e := u * u * (3.0 - 2.0 * u)
-			_angle += get_process_delta_time() * TAU * 1.6 / RISE_TIME
-			var r := lerpf(COIL_RADIUS, 36.0, e)
-			var ring := GameData.to_screen(Vector2.from_angle(_angle) * r)
-			return Vector3(c.x + ring.x, c.y + ring.y, lerpf(100.0, SKY, e))
+			if _coil != null:
+				_coil.visible = true
+				_coil.position = _home
+			Vfx.burst(_home, 40.0, 30, aura, 380.0, 14.0, 0.6)
+			Vfx.ring(_home, 20.0, 200.0, aura, 0.5, 10.0)
+			Juice.flash(0.15, aura)
 		Phase.ROAR:
-			_angle += get_process_delta_time() * 6.0
-			var ring := GameData.to_screen(Vector2.from_angle(_angle) * 30.0)
-			return Vector3(c.x + ring.x, c.y + ring.y, SKY + 10.0 * sin(_t * 30.0))
+			var sky := _home + Vector2(0.0, -SKY)
+			if _wings != null:
+				_wings.visible = true
+				_wings.position = sky
+			if _rays != null:
+				_rays.visible = true
+				_rays.position = sky
+			Juice.flash(0.28, aura)
+			Fx.streaks(get_parent(), sky, aura, 460.0, 22, 0.55, 1.2)
+			Vfx.burst(sky, 0.0, 40, aura, 520.0, 18.0, 0.7)
+			Vfx.burst(sky, 0.0, 20, palette["hot"], 320.0, 12.0, 0.5)
+			if caster != null and caster.has_method("shake"):
+				caster.shake(10.0)
 		Phase.DIVE:
-			var u := _t / DIVE_TIME
-			var e := u * u
-			return Vector3(lerpf(_dive_from.x, target.x, e), lerpf(_dive_from.y, target.y, e),
-				lerpf(_dive_from.z, 0.0, e))
-	return Vector3(target.x, target.y, 0.0)
+			target = choose_target.call() if choose_target.is_valid() else _home
+			_dive_from = _home + Vector2(0.0, -SKY)
+			if _wings != null:
+				_wings.visible = false
+			if _fly != null:
+				_fly.visible = true
+				_fly.z_as_relative = false
+				_fly.z_index = FRONT_Z
+				var dir := (target - _dive_from).normalized()
+				_fly.rotation = dir.angle()
+				_fly.flip_h = false
+				_fly.flip_v = dir.x < 0.0
+				_fly.scale = _fly.get_meta("base_scale") * 1.25
+				_sync_glow(_fly)
+				var trail := FxSprite.play(get_parent(), "trail", _dive_from.lerp(target, 0.5),
+					FLY_HEIGHT * 0.9, DIVE_TIME + 0.35, false, aura)
+				if trail != null:
+					trail.rotation = dir.angle()
+					var span := _dive_from.distance_to(target) / trail.texture.get_width()
+					trail._base_scale = Vector2(span * 1.1, trail._base_scale.y)
+					trail.grow_from = 1.0
+					trail.grow_to = 1.0
+					trail.fade_out = 0.3
+		Phase.FADE:
+			impact.emit(target)
+			# The dragon god's spirit flares over the blast.
+			var ghost := FxSprite.play(get_parent(), "dragon_wings", target + Vector2(0.0, -150.0),
+				WINGS_HEIGHT, 0.6)
+			if ghost != null:
+				ghost.material = Fx.additive()
+				ghost.modulate = Color(aura.lerp(Color.WHITE, 0.3), 1.0)
+				ghost.grow_from = 0.9
+				ghost.grow_to = 1.6
+				ghost.fade_in = 0.0
+				ghost.fade_out = 0.5
 
 
-func _roar() -> void:
-	var head := _hist[-1]
-	var at := Vector2(head.x, head.y)
-	Juice.flash(0.25, palette["aura"])
-	if is_instance_valid(caster) and caster.has_method("shake"):
-		caster.shake(9.0)
-	Vfx.twinkle(at, head.z, 150.0, palette["hot"], 0.5)
-	Vfx.burst(at, head.z, 40, palette["aura"], 520.0, 20.0, 0.6)
-	Vfx.ring(Vector2(at.x, at.y), 20.0, 260.0, palette["aura"], 0.6, 10.0)
-	Fx.streaks(get_parent(), Vector2(head.x, head.y - head.z), palette["aura"], 420.0, 22, 0.5, 1.2)
-
-
-## Embers shed by the body, and a bright wake behind the head.
-func _trail() -> void:
-	if _hist.is_empty() or _phase == Phase.FADE:
+func _tick_orbit(delta: float) -> void:
+	if _fly == null:
 		return
-	var head := _hist[-1]
-	Vfx.glow(Vector2(head.x, head.y), head.z, 30.0, palette["aura"], 0.3)
-	# Mane of fire streaming off the head.
-	Vfx.glow(Vector2(head.x + randf_range(-14, 14), head.y), head.z + randf_range(-6, 10),
-		randf_range(18, 28), palette["aura"], randf_range(0.25, 0.45),
-		Vector3(0, 0, randf_range(60, 140)), 0.0, Vfx.Kind.FLAME)
-	var recent := mini(_hist.size(), 70)
-	for i in 3:
-		var p := _hist[_hist.size() - 1 - randi() % recent]
-		Vfx.glow(Vector2(p.x + randf_range(-10, 10), p.y), p.z + randf_range(-10, 10),
-			randf_range(4, 9), palette["core"] if randf() < 0.4 else palette["aura"],
-			randf_range(0.4, 0.8), Vector3(randf_range(-20, 20), 0.0, randf_range(10, 50)))
+	var appear := clampf(_t / 0.3, 0.0, 1.0)
+	_angle += delta * TAU * 0.75 * (0.6 + 0.4 * appear)
+	var ground := Vector2.from_angle(_angle) * ORBIT_RADIUS
+	var bob := sin(_t * 5.0) * 8.0
+	_fly.visible = true
+	_fly.position = _home + GameData.to_screen(ground) + Vector2(0.0, -ORBIT_LIFT - bob)
+	# Heading along the circle; the art faces right, so mirror when flying left.
+	var heading := GameData.to_screen(Vector2.from_angle(_angle + PI * 0.5))
+	_fly.flip_h = heading.x < 0.0
+	_fly.flip_v = false
+	var tilt := clampf(heading.y / maxf(absf(heading.x), 0.2), -0.5, 0.5)
+	_fly.rotation = -tilt if _fly.flip_h else tilt
+	var depth := sin(_angle)
+	_fly.scale = _fly.get_meta("base_scale") * (0.88 + 0.14 * depth) * (0.4 + 0.6 * appear)
+	_fly.modulate.a = appear * (0.85 + 0.15 * depth)
+	_fly.z_index = FRONT_Z if depth >= 0.0 else BEHIND_Z
+	_sync_glow(_fly)
+	_sparkle_trail(_fly.position, delta)
 
 
-func _screen(p: Vector3) -> Vector2:
-	return Vector2(p.x, p.y - p.z) - global_position
+func _tick_rise() -> void:
+	var u := _t / RISE_TIME
+	# The flier swoops into the rising coil.
+	if _fly != null:
+		_fly.modulate.a = maxf(0.0, 1.0 - u * 3.0)
+		_fly.position = _fly.position.lerp(_home + Vector2(0.0, -60.0), 0.25)
+	if _coil != null:
+		_coil.position = _home
+		var grow := 1.0 - pow(1.0 - u, 3.0)
+		var base: Vector2 = _coil.get_meta("base_scale")
+		_coil.scale = Vector2(base.x * (0.7 + 0.3 * grow), base.y * grow)
+		_coil.modulate.a = 1.0
+	if _rays != null:
+		_rays.visible = true
+		_rays.position = _home + Vector2(0.0, -SKY)
+		_rays.modulate.a = u * 0.6
+		_rays.rotation += 0.01
 
 
-## Body points laid along the recent path, one every SEG_LEN screen pixels from the head.
-func _body_points() -> PackedVector2Array:
-	var pts := PackedVector2Array()
-	var prev := _screen(_hist[-1])
-	pts.append(prev)
-	var carry := 0.0
-	var i := _hist.size() - 2
-	while i >= 0 and pts.size() < SEGMENTS:
-		var p := _screen(_hist[i])
-		var d := prev.distance_to(p)
-		while d > 0.0 and carry + d >= SEG_LEN and pts.size() < SEGMENTS:
-			var t := (SEG_LEN - carry) / d
-			prev = prev.lerp(p, t)
-			pts.append(prev)
-			d = prev.distance_to(p)
-			carry = 0.0
-		carry += d
-		prev = p
-		i -= 1
-	return pts
+func _tick_roar() -> void:
+	var u := _t / ROAR_TIME
+	var sky := _home + Vector2(0.0, -SKY)
+	if _coil != null:
+		_coil.modulate.a = maxf(0.0, 1.0 - u * 2.5)
+	if _wings != null:
+		# Pops in with a little overshoot, then breathes while the god rays turn.
+		var pop := minf(_t / 0.22, 1.0)
+		var k := 0.3 + 0.7 * pop + sin(pop * PI) * 0.18
+		var base: Vector2 = _wings.get_meta("base_scale")
+		_wings.scale = base * k * (1.0 + 0.03 * sin(_t * 18.0))
+		_wings.position = sky + Vector2(0.0, -10.0 * u)
+		_wings.modulate.a = 1.0
+		var glow := _wings.get_child(0) as Sprite2D
+		glow.modulate.a = 0.25 + 0.45 * (1.0 - pop) + 0.15 * sin(_t * 14.0)
+	if _rays != null:
+		_rays.position = sky
+		_rays.rotation += 0.012
+		_rays.modulate.a = 0.6 + 0.3 * sin(_t * 10.0)
+	if randf() < 0.6:
+		Vfx.glow(sky + Vector2(randf_range(-160, 160), randf_range(-60, 60)), 0.0,
+			randf_range(5, 10), palette["core"], randf_range(0.4, 0.8), Vector3(0, 0, 60))
 
 
-func _draw() -> void:
-	if _hist.size() < 2:
+func _tick_dive(delta: float) -> void:
+	var u := _t / DIVE_TIME
+	var e := u * u
+	if _fly != null:
+		_fly.position = _dive_from.lerp(target + Vector2(0.0, -40.0), e)
+		_fly.modulate.a = 1.0
+		_sparkle_trail(_fly.position, delta)
+	if _rays != null:
+		_rays.modulate.a = maxf(0.0, _rays.modulate.a - delta * 4.0)
+
+
+func _tick_fade() -> void:
+	var u := _t / FADE_TIME
+	if _fly != null:
+		_fly.modulate.a = maxf(0.0, 1.0 - u * 4.0)
+	if _rays != null:
+		_rays.visible = false
+
+
+func _sparkle_trail(at: Vector2, delta: float) -> void:
+	_trail_left -= delta
+	if _trail_left > 0.0:
 		return
-	var fade := 1.0
-	if _phase == Phase.FADE:
-		fade = 1.0 - _t / FADE_TIME
-	var aura: Color = palette["aura"]
-	var core: Color = palette["core"]
-	var pts := _body_points()
-	if pts.size() < 2:
-		return
-	var n := float(pts.size())
-	# Thick neck tapering to a thin tail.
-	var widths := PackedFloat32Array()
-	for i in pts.size():
-		widths.append(6.0 + 40.0 * pow(1.0 - float(i) / n, 0.8))
-	if _painted():
-		# Only a soft glow under the painted pieces.
-		for i in pts.size() - 1:
-			draw_line(pts[i], pts[i + 1], Color(aura, 0.35 * fade), widths[i] * 2.2)
-		return
-	for i in pts.size() - 1:
-		var w := widths[i]
-		draw_line(pts[i], pts[i + 1], Color(aura, 0.5 * fade), w * 1.5)
-		draw_line(pts[i], pts[i + 1], Color(aura, 0.85 * fade), w * 0.9)
-		draw_line(pts[i], pts[i + 1], Color(core, 0.9 * fade), w * 0.35)
-	for i in pts.size():
-		_dot_at(pts[i], widths[i] * 1.2, Color(aura, 0.35 * fade))
-	# Dorsal fins every other segment, belly scales as bright ticks.
-	for i in range(1, pts.size() - 1):
-		var along := (pts[i - 1] - pts[i + 1]).normalized()
-		var up := along.orthogonal()
-		if up.y > 0.0:
-			up = -up
-		var w := widths[i]
-		if i % 2 == 1:
-			draw_colored_polygon(PackedVector2Array([
-				pts[i] + up * w * 0.4 + along * w * 0.35, pts[i] + up * w * 1.15 - along * w * 0.35,
-				pts[i] + up * w * 0.4 - along * w * 0.45,
-			]), Color(core, 0.85 * fade))
-	_draw_head(pts, fade)
+	_trail_left = 0.025
+	var tint: Color = palette["core"] if randf() < 0.4 else palette["aura"]
+	Vfx.glow(at + Vector2(randf_range(-20, 20), randf_range(-10, 10)), 0.0, randf_range(6, 12),
+		tint, randf_range(0.35, 0.7), Vector3(randf_range(-20, 20), 0.0, randf_range(10, 40)))
 
 
-func _painted() -> bool:
-	return _head_tex != null and _body_tex != null
+## The glow copy is a child sprite; flips are not inherited, so copy them.
+func _sync_glow(s: Sprite2D) -> void:
+	var g := s.get_child(0) as Sprite2D
+	g.flip_h = s.flip_h
+	g.flip_v = s.flip_v
 
 
-## Draws one painted piece centred at "at", its x axis along "along", scaled to "height".
-## Pieces facing left are mirrored vertically so the back (fins, mane) stays on top.
-func _piece(tex: Texture2D, at: Vector2, along: Vector2, height: float, fade: float,
-		length := 0.0) -> void:
-	var size := tex.get_size()
-	var k := height / size.y
-	var sx := (length / size.x) if length > 0.0 else k
-	var flip := -1.0 if along.x < 0.0 else 1.0
-	var xf := Transform2D(along.angle(), at) * Transform2D(0.0, Vector2(sx, k * flip), 0.0,
-		Vector2.ZERO)
-	_solid.draw_set_transform_matrix(xf)
-	_solid.draw_texture(tex, -size * 0.5, Color(1, 1, 1, fade))
+func _caster_pos() -> Vector2:
+	return caster.global_position if is_instance_valid(caster) else _home
 
 
-## Painted dragon: tail and body segments from the back forward, then the head on top.
-func _draw_painted(fade: float) -> void:
-	var pts := _body_points()
-	if pts.size() < 3:
-		return
-	var n := float(pts.size())
-	for i in range(pts.size() - 1, 0, -1):
-		var along := (pts[i - 1] - pts[i]).normalized()
-		var w := 6.0 + 40.0 * pow(1.0 - float(i) / n, 0.8)
-		var mid := (pts[i - 1] + pts[i]) * 0.5
-		if i == pts.size() - 1 and _tail_tex != null:
-			_piece(_tail_tex, mid, along, w * 3.0, fade, SEG_LEN * 3.0)
-		else:
-			_piece(_body_tex, mid, along, w * 2.4, fade, SEG_LEN * 1.9)
-	_piece(_head_tex, pts[0] + (pts[0] - pts[1]).normalized() * 30.0,
-		(pts[0] - pts[1]).normalized(), 130.0, fade)
-	_solid.draw_set_transform_matrix(Transform2D())
+## Painted RGBA art drawn normally, with an additive copy on top so it glows.
+func _painted(fx_name: String, height: float, glow: float) -> Sprite2D:
+	var path := FxSprite.DIR + fx_name + ".png"
+	if not ResourceLoader.exists(path):
+		return null
+	var tex: Texture2D = load(path)
+	var s := Sprite2D.new()
+	s.texture = tex
+	var k := height / tex.get_height()
+	s.set_meta("base_scale", Vector2(k, k))
+	s.scale = Vector2(k, k)
+	s.z_as_relative = false
+	s.z_index = FRONT_Z
+	var g := Sprite2D.new()
+	g.texture = tex
+	g.material = Fx.additive()
+	g.modulate = Color(1, 1, 1, glow)
+	s.add_child(g)
+	add_child(s)
+	return s
 
 
-## Head frame: origin at the head point, x along the travel direction, y to the side.
-func _head_frame() -> Transform2D:
-	var pts := _body_points()
-	if pts.size() < 2:
-		return Transform2D()
-	var along := (pts[0] - pts[1]).normalized()
-	return Transform2D(along * HEAD, along.orthogonal() * HEAD, pts[0])
-
-
-func _fade() -> float:
-	return 1.0 - _t / FADE_TIME if _phase == Phase.FADE else 1.0
-
-
-## Additive part of the head: glow, flame mane, burning eyes, whiskers.
-func _draw_head(pts: PackedVector2Array, fade: float) -> void:
-	var aura: Color = palette["aura"]
-	_dot_at(pts[0], 100.0, Color(aura, 0.4 * fade))
-	draw_set_transform_matrix(_head_frame())
-	for k in 7:
-		var a := (float(k) / 6.0 - 0.5) * 2.2
-		var dir := Vector2.LEFT.rotated(a)
-		var length := 44.0 + 16.0 * sin(_t * 18.0 + k)
-		draw_colored_polygon(PackedVector2Array([
-			Vector2(-14, 0) + dir.orthogonal() * 9.0, Vector2(-14, 0) + dir * length,
-			Vector2(-14, 0) - dir.orthogonal() * 9.0,
-		]), Color(aura.lerp(Color(1.0, 0.45, 0.1), 0.4), 0.7 * fade))
-	for s: float in [-1.0, 1.0]:
-		var whisker := PackedVector2Array()
-		for j in 8:
-			var u := j / 7.0
-			whisker.append(Vector2(54.0 - 80.0 * u, s * (8.0 + 34.0 * u + 10.0 * sin(u * 5.0 + _t * 8.0))))
-		draw_polyline(whisker, Color(aura, 0.8 * fade), 2.5)
-	_dot_at(Vector2(60, 0), 16.0, Color(1, 1, 1, 0.8 * fade))
-	draw_set_transform_matrix(Transform2D())
-
-
-## Solid part of the head (normal blending), drawn over the body glow.
-func _draw_solid_head() -> void:
-	if _hist.size() < 2:
-		return
-	var fade := _fade()
-	if _painted():
-		_draw_painted(fade)
-		return
-	var gold := Color(0.95, 0.68, 0.16, fade)
-	var light := Color(1.0, 0.9, 0.55, fade)
-	var shade := Color(0.78, 0.42, 0.08, fade)
-	var ink := Color(0.42, 0.18, 0.02, fade)
-	_solid.draw_set_transform_matrix(_head_frame())
-	# Horns: thick blades sweeping back past the skull.
-	for s: float in [-1.0, 1.0]:
-		var horn := PackedVector2Array([
-			Vector2(-2, s * 10.0), Vector2(-40, s * 30.0), Vector2(-80, s * 50.0),
-			Vector2(-44, s * 40.0), Vector2(-16, s * 26.0),
-		])
-		_solid.draw_colored_polygon(horn, light)
-		_outline(horn, ink, 2.0)
-	var skull := PackedVector2Array([
-		Vector2(-24, -20), Vector2(4, -23), Vector2(24, -15), Vector2(52, -9), Vector2(62, -2),
-		Vector2(62, 2), Vector2(52, 9), Vector2(24, 15), Vector2(4, 23), Vector2(-24, 20),
-		Vector2(-32, 0),
-	])
-	_solid.draw_colored_polygon(skull, gold)
-	# Cheek shadows give the head some volume.
-	for s: float in [-1.0, 1.0]:
-		_solid.draw_colored_polygon(PackedVector2Array([
-			Vector2(-22, s * 18.0), Vector2(6, s * 21.0), Vector2(26, s * 13.0), Vector2(4, s * 12.0),
-		]), shade)
-	# Brow ridge and snout highlight.
-	_solid.draw_colored_polygon(PackedVector2Array([
-		Vector2(-10, -8), Vector2(22, -6), Vector2(54, -2), Vector2(54, 2), Vector2(22, 6),
-		Vector2(-10, 8),
-	]), light)
-	_outline(skull, ink, 3.0)
-	# Open lower jaw with teeth.
-	var jaw := PackedVector2Array([Vector2(14, 12), Vector2(58, 18), Vector2(20, 26)])
-	_solid.draw_colored_polygon(jaw, shade)
-	_outline(jaw, ink, 2.0)
-	for k in 3:
-		var x := 26.0 + k * 9.0
-		_solid.draw_colored_polygon(PackedVector2Array([
-			Vector2(x, 9 + k), Vector2(x + 4, 9 + k), Vector2(x + 2, 15 + k),
-		]), Color(1, 1, 1, fade))
-	for s: float in [-1.0, 1.0]:
-		# Nostril and almond eye with a slit pupil.
-		_solid.draw_line(Vector2(52, s * 3.0), Vector2(57, s * 4.0), ink, 2.0)
-		var eye := PackedVector2Array([
-			Vector2(8, s * 9.0), Vector2(16, s * 13.0), Vector2(26, s * 10.0), Vector2(16, s * 8.0),
-		])
-		_solid.draw_colored_polygon(eye, Color(1.0, 0.95, 0.7, fade))
-		_solid.draw_line(Vector2(16, s * 8.5), Vector2(17, s * 12.5), ink, 2.0)
-	_solid.draw_set_transform_matrix(Transform2D())
-
-
-## Soft light over the head and burning eyes, additive.
-func _draw_head_shine() -> void:
-	if _hist.size() < 2 or _painted():
-		return
-	var fade := _fade()
-	var aura: Color = palette["aura"]
-	_shine.draw_set_transform_matrix(_head_frame())
-	_shine.draw_texture_rect(_dot, Rect2(Vector2(-36, -34), Vector2(104, 68)), false,
-		Color(aura, 0.35 * fade))
-	for s: float in [-1.0, 1.0]:
-		var e := Vector2(17, s * 10.5)
-		_shine.draw_texture_rect(_dot, Rect2(e - Vector2(12, 12), Vector2(24, 24)), false,
-			Color(1.0, 0.5, 0.15, fade))
-	_shine.draw_set_transform_matrix(Transform2D())
-
-
-func _outline(poly: PackedVector2Array, color: Color, width: float) -> void:
-	var ring := poly.duplicate()
-	ring.append(poly[0])
-	_solid.draw_polyline(ring, color, width)
-
-
-func _dot_at(pos: Vector2, radius: float, c: Color) -> void:
-	draw_texture_rect(_dot, Rect2(pos - Vector2(radius, radius), Vector2(radius, radius) * 2.0),
-		false, c)
+## White-on-black art drawn additively and tinted.
+func _glow_sprite(fx_name: String, height: float, tint: Color) -> Sprite2D:
+	var path := FxSprite.DIR + fx_name + ".png"
+	if not ResourceLoader.exists(path):
+		return null
+	var tex: Texture2D = load(path)
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.material = Fx.additive()
+	s.modulate = Color(tint, 1.0)
+	var k := height / tex.get_height()
+	s.set_meta("base_scale", Vector2(k, k))
+	s.scale = Vector2(k, k)
+	s.z_as_relative = false
+	s.z_index = FRONT_Z - 1
+	add_child(s)
+	return s

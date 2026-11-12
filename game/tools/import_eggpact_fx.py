@@ -35,6 +35,21 @@ MAPPING = {
     "fx_kagul_sun.png": ("sun", "mix", 640, 0),
     "fx_prot_tide_ring.png": ("shock_ring", "add", 640, 0),
     "fx_kagul_birth.png": ("dawn", "add", 768, 0),
+    # Second pack: the Golden Dragon God and holy light.
+    "fx_vk_dragon_light.png": ("dragon_fly", "mix", 1024, 0),
+    "fx_vk_dragon_light_wings.png": ("dragon_wings", "mix", 1024, 0),
+    "fx_s06_golden_dragon.png": ("dragon_coil", "add", 768, 0),
+    "wb_prize_burst.png": ("gold_burst", "add", 640, 0),
+    "lg_godrays.png": ("godrays", "add", 768, 0),
+    "lg_sigil.png": ("sigil", "add", 768, 0),
+    "fx_wb_nova.png": ("nova", "add", 640, 0),
+    "fx_phoenix_trail.png": ("trail", "add", 512, 0),
+    "fx_rebirth_pillar.png": ("light_column", "add", 512, 0),
+    # Holy Cross: an X flare turned upright into a cross, and falling spears of light.
+    "fx_s08_cross_slash.png": ("cross", "add", 640, 45),
+    "fx_light_spear.png": ("light_spear", "add", 512, 0),
+    "fx_holy_halo.png": ("halo", "add", 640, 0),
+    "fx_s07_asura_wheel.png": ("blade_wheel", "add", 640, 0),
 }
 
 

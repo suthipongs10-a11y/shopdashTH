@@ -32,10 +32,19 @@ var _total_delay := 0.0
 var _fade := 1.0
 ## Painted rune ring under circle-type skills (replaces the drawn magic circle).
 var _ring: FxSprite
+var _fired := 0
 
 
 func _ready() -> void:
 	_total_delay = delay
+	if style == Style.WHIRL:
+		# A spinning wheel of blades on the floor for the whole storm.
+		var wheel := FxSprite.play(self, "blade_wheel", Vector2.ZERO, radius * 2.3,
+			interval * float(ticks) + 0.2, true, palette["core"])
+		if wheel != null:
+			wheel.spin = 14.0
+			wheel.fade_in = 0.1
+			wheel.fade_out = 0.25
 	if style in [Style.CIRCLE, Style.ROAR, Style.CROSS, Style.BANNER, Style.DRAGON]:
 		var life := delay + interval * float(ticks) + 0.4
 		_ring = FxSprite.play(self, "ring", Vector2.ZERO, radius * 2.1, life, true, _rune_tint())
@@ -147,7 +156,8 @@ func _fire_visuals() -> void:
 			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), palette["aura"], radius * 2.4, 24, 0.5, 1.1)
 		Style.CROSS:
 			Juice.flash(0.1, palette["aura"])
-			var cross := FxSprite.play(top_fx, "cross", here + Vector2(0.0, -90.0), radius * 2.6, 0.5)
+			var cross := FxSprite.play(top_fx, "cross", here + Vector2(0.0, -90.0), radius * 2.6, 0.5,
+				false, (palette["aura"] as Color).lerp(Color.WHITE, 0.3))
 			if cross != null:
 				cross.grow_from = 0.5
 				cross.grow_to = 1.15
@@ -168,31 +178,53 @@ func _fire_visuals() -> void:
 				dawn.grow_to = 1.4
 			Vfx.ring(here, 10.0, radius * 1.1, palette["aura"], 0.45, 8.0)
 			Vfx.burst(here, 40.0, 24, palette["aura"], 360.0, 16.0, 0.55)
+			for i in 4:
+				_light_spear(here + GameData.to_screen(Vector2.from_angle(TAU * (i + randf()) / 4.0)
+					* randf_range(0.35, 0.85) * radius), 0.04 * i)
 		Style.DRAGON:
-			Juice.flash(0.35, palette["aura"])
-			_explode(here + Vector2(0.0, -60.0), radius * 1.6)
-			var flames := FxSprite.play(get_parent(), "flame_ring", here + Vector2(0.0, -40.0),
-				radius * 1.3, 0.9, false, palette["aura"])
-			if flames != null:
-				flames.grow_from = 0.5
-				flames.grow_to = 1.15
-			var sun := FxSprite.play(top_fx, "sun", here + Vector2(0.0, -70.0), radius * 0.9, 0.5)
-			if sun != null:
-				sun.grow_from = 0.3
-				sun.grow_to = 1.4
-				sun.spin = 2.0
-			Vfx.ring(here, 20.0, radius * 1.3, palette["aura"], 0.6, 16.0)
-			Vfx.ring(here, 10.0, radius * 0.9, palette["hot"], 0.4, 8.0)
-			Vfx.burst(here, 40.0, 60, palette["aura"], 700.0, 30.0, 0.7)
+			_fired += 1
+			var aura: Color = palette["aura"]
+			var burst := FxSprite.play(top_fx, "gold_burst", here + Vector2(0.0, -60.0),
+				radius * (1.8 if _fired == 1 else 1.1), 0.55, false, aura.lerp(Color.WHITE, 0.2))
+			if burst != null:
+				burst.grow_from = 0.3
+				burst.grow_to = 1.3
+				burst.spin = 1.5
+			Vfx.burst(here, 40.0, 30, palette["aura"], 600.0, 24.0, 0.6)
+			Vfx.ring(here, 20.0, radius * 1.2, palette["aura"], 0.5, 12.0)
+			if _fired > 1:
+				return
+			Juice.flash(0.35, aura)
+			_painted_ring(here, radius * 2.6, 0.7)
+			var nova := FxSprite.play(get_parent(), "nova", here, radius * 2.8, 0.6, true, aura)
+			if nova != null:
+				nova.grow_from = 0.2
+				nova.grow_to = 1.0
+				nova.spin = 0.8
+			var column := FxSprite.play(top_fx, "light_column", here + Vector2(0.0, -210.0), 460.0,
+				0.7, false, aura)
+			if column != null:
+				column.grow_from = 1.25
+				column.grow_to = 0.85
+			else:
+				Vfx.beam(here, 120.0, aura, 0.6)
+			var rays := FxSprite.play(top_fx, "godrays", here + Vector2(0.0, -70.0), radius * 2.4,
+				0.8, false, aura)
+			if rays != null:
+				rays.grow_from = 0.5
+				rays.grow_to = 1.2
+				rays.spin = 0.6
 			Vfx.burst(here, 40.0, 30, palette["hot"], 420.0, 16.0, 0.5)
-			Vfx.beam(here, 120.0, palette["aura"], 0.6)
-			for i in 18:
-				Vfx.flame(here + GameData.to_screen(Vector2.from_angle(TAU * i / 18.0) * radius * 0.55),
-					palette["aura"], randf_range(24, 40), randf_range(140, 280), randf_range(0.5, 0.9))
-			Vfx.smoke(here, 30.0, 80.0, 200.0, Color(0.3, 0.24, 0.16), 1.4, 0.35)
-			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), palette["aura"], radius * 2.6, 26, 0.55, 1.3)
+			Vfx.smoke(here, 30.0, 80.0, 200.0, Color(0.3, 0.24, 0.16), 1.2, 0.3)
+			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), aura, radius * 2.6, 26, 0.55, 1.3)
 		Style.BANNER:
 			Juice.flash(0.2, palette["aura"])
+			var halo := FxSprite.play(get_parent(), "halo", here, radius * 2.3, 0.6, true,
+				palette["aura"])
+			if halo != null:
+				halo.grow_from = 0.5
+				halo.grow_to = 1.1
+				halo.spin = -1.4
 			_painted_ring(here, radius * 2.4, 0.5)
 			_explode(here + Vector2(0.0, -60.0), radius * 1.2)
 			Vfx.ring(here, 20.0, radius * 1.15, palette["aura"], 0.5, 12.0)
@@ -208,6 +240,21 @@ func _fire_visuals() -> void:
 						palette["aura"]) == null:
 					Vfx.beam(spot, 36.0, palette["aura"], 0.4)
 				Vfx.ring(spot, 6.0, 70.0, palette["hot"], 0.3, 4.0)
+
+
+## A spear of light that drops out of the sky and stabs the ground.
+func _light_spear(at: Vector2, wait: float) -> void:
+	var spear := FxSprite.play(top_fx, "light_spear", at + Vector2(0.0, -320.0), 190.0, 0.4 + wait,
+		false, (palette["aura"] as Color).lerp(Color.WHITE, 0.4))
+	if spear == null:
+		return
+	spear.fade_in = 0.0
+	var tw := spear.create_tween()
+	tw.tween_interval(wait)
+	tw.tween_property(spear, "position", at + Vector2(0.0, -80.0), 0.12).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func() -> void:
+		Vfx.ring(at, 4.0, 50.0, palette["core"], 0.25, 4.0)
+		Vfx.burst(at, 10.0, 8, palette["aura"], 220.0, 8.0, 0.35))
 
 
 ## Expanding painted ring on the ground. Returns false when there is no ring art.

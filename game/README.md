@@ -61,7 +61,7 @@ scripts/
   aegis_fx.gd        ฟองโล่และโล่ทองลอยรอบตัว
   crest_fx.gd        ตราโล่ทองของธงศักดิ์สิทธิ์
   fire_patch.gd      กองไฟบนพื้นจากโกเลม
-  dragon_fx.gd       เทพมังกรทอง (วาดด้วยโค้ดทั้งตัว)
+  dragon_fx.gd       เทพมังกรทอง (ภาพวาด EggPact: บินวน ขดตัวพุ่งขึ้น กางปีก พุ่งลง)
   cast_bar.gd        แถบร่ายและวงเวทใต้เท้าตอนร่ายสกิล
   lion_fx.gd         วิญญาณสิงโตทอง (ใช้ art/fx/lion_spirit.png ถ้ามี)
   skill_callout.gd   ชื่อสกิลเหนือหัว

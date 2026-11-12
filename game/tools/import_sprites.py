@@ -86,10 +86,6 @@ FX_SPECS = {
     "fx_pillar.png": ("pillar", "single", 1, "add"),
     "fx_crest.png": ("crest", "single", 1, "add"),
     "lion_spirit.png": ("lion_spirit", "single", 1, "add"),
-    # Painted dragon pieces (brief art/_brief_dragon/); chained along the path in game.
-    "fx_dragon_head.png": ("dragon_head", "single", 1, "mix"),
-    "fx_dragon_body.png": ("dragon_body", "single", 1, "mix"),
-    "fx_dragon_tail.png": ("dragon_tail", "single", 1, "mix"),
 }
 FX_CELL = 320
 FX_SINGLE_MAX = 640
@@ -304,7 +300,7 @@ def import_fx(path: str, name: str, layout: str, fps: int, blend: str) -> None:
     else:
         out = fx_pixels(src, blend)
         if blend == "mix":
-            # Trim transparent borders so chained pieces (dragon body) join without gaps.
+            # Trim transparent borders so the art fills its sprite.
             box = out.getchannel("A").point(lambda v: 255 if v > 24 else 0).getbbox()
             if box is not None:
                 out = out.crop(box)
