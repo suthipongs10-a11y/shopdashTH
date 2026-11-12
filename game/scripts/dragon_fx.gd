@@ -117,7 +117,7 @@ func _enter(next: Phase) -> void:
 			Vfx.ring(_home, 20.0, 200.0, aura, 0.5, 10.0)
 			Juice.flash(0.15, aura)
 		Phase.ROAR:
-			var sky := _home + Vector2(0.0, -SKY)
+			var sky := _sky()
 			if _wings != null:
 				_wings.visible = true
 				_wings.position = sky
@@ -132,7 +132,7 @@ func _enter(next: Phase) -> void:
 				caster.shake(10.0)
 		Phase.DIVE:
 			target = choose_target.call() if choose_target.is_valid() else _home
-			_dive_from = _home + Vector2(0.0, -SKY)
+			_dive_from = _sky()
 			if _wings != null:
 				_wings.visible = false
 			if _fly != null:
@@ -205,14 +205,14 @@ func _tick_rise() -> void:
 		_coil.modulate.a = 1.0
 	if _rays != null:
 		_rays.visible = true
-		_rays.position = _home + Vector2(0.0, -SKY)
+		_rays.position = _sky()
 		_rays.modulate.a = u * 0.6
 		_rays.rotation += 0.01
 
 
 func _tick_roar() -> void:
 	var u := _t / ROAR_TIME
-	var sky := _home + Vector2(0.0, -SKY)
+	var sky := _sky()
 	if _coil != null:
 		_coil.modulate.a = maxf(0.0, 1.0 - u * 2.5)
 	if _wings != null:
@@ -261,6 +261,13 @@ func _sparkle_trail(at: Vector2, delta: float) -> void:
 	var tint: Color = palette["core"] if randf() < 0.4 else palette["aura"]
 	Vfx.glow(at + Vector2(randf_range(-20, 20), randf_range(-10, 10)), 0.0, randf_range(6, 12),
 		tint, randf_range(0.35, 0.7), Vector3(randf_range(-20, 20), 0.0, randf_range(10, 40)))
+
+
+## Over the caster's head, pushed down when that would put the wings off the top of the view.
+func _sky() -> Vector2:
+	var sky := _home + Vector2(0.0, -SKY)
+	var view := get_viewport().get_canvas_transform().affine_inverse() * Vector2.ZERO
+	return Vector2(sky.x, maxf(sky.y, view.y + WINGS_HEIGHT * 0.62))
 
 
 ## The glow copy is a child sprite; flips are not inherited, so copy them.

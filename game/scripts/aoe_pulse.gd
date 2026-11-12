@@ -185,18 +185,18 @@ func _fire_visuals() -> void:
 			_fired += 1
 			var aura: Color = palette["aura"]
 			var burst := FxSprite.play(top_fx, "gold_burst", here + Vector2(0.0, -60.0),
-				radius * (1.8 if _fired == 1 else 1.1), 0.55, false, aura.lerp(Color.WHITE, 0.2))
+				radius * (1.15 if _fired == 1 else 0.7), 0.45, false, aura * 0.75)
 			if burst != null:
 				burst.grow_from = 0.3
 				burst.grow_to = 1.3
 				burst.spin = 1.5
-			Vfx.burst(here, 40.0, 30, palette["aura"], 600.0, 24.0, 0.6)
+			Vfx.burst(here, 40.0, 24, palette["aura"], 600.0, 20.0, 0.55)
 			Vfx.ring(here, 20.0, radius * 1.2, palette["aura"], 0.5, 12.0)
 			if _fired > 1:
 				return
-			Juice.flash(0.35, aura)
+			Juice.flash(0.18, aura)
 			_painted_ring(here, radius * 2.6, 0.7)
-			var nova := FxSprite.play(get_parent(), "nova", here, radius * 2.8, 0.6, true, aura)
+			var nova := FxSprite.play(get_parent(), "nova", here, radius * 2.6, 0.6, true, aura * 0.8)
 			if nova != null:
 				nova.grow_from = 0.2
 				nova.grow_to = 1.0
@@ -208,13 +208,7 @@ func _fire_visuals() -> void:
 				column.grow_to = 0.85
 			else:
 				Vfx.beam(here, 120.0, aura, 0.6)
-			var rays := FxSprite.play(top_fx, "godrays", here + Vector2(0.0, -70.0), radius * 2.4,
-				0.8, false, aura)
-			if rays != null:
-				rays.grow_from = 0.5
-				rays.grow_to = 1.2
-				rays.spin = 0.6
-			Vfx.burst(here, 40.0, 30, palette["hot"], 420.0, 16.0, 0.5)
+			Vfx.burst(here, 40.0, 20, palette["hot"], 420.0, 14.0, 0.5)
 			Vfx.smoke(here, 30.0, 80.0, 200.0, Color(0.3, 0.24, 0.16), 1.2, 0.3)
 			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), aura, radius * 2.6, 26, 0.55, 1.3)
 		Style.BANNER:
