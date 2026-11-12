@@ -42,7 +42,7 @@ CHARACTERS = {
         "screen_h": 132,
         "anims": {
             "idle": {"file": "warden_idle.png", "fps": 5},
-            "walk": {"file": "warden_walk_row{row}.png", "fps": 9},
+            "walk": {"file": "warden_walk.png", "fps": 9},
             "attack": {"file": "warden_attack.png", "fps": 14},
         },
     },
@@ -51,7 +51,7 @@ CHARACTERS = {
         "fig_h": 186,
         "screen_h": 172,
         "anims": {
-            "walk": {"file": "golem_walk_row{row}.png", "fps": 6},
+            "walk": {"file": "golem_walk.png", "fps": 6},
             "attack": {"file": "golem_attack.png", "fps": 4.5},
         },
         "idle_from": ("walk", 1),
@@ -184,12 +184,14 @@ def split_frames(img: np.ndarray, cols: int, rows: int) -> list:
 
 def load_anim(src: str, spec: dict) -> list:
     """Frames as rows x cols of (crop, bottom_in_cell, cell_h)."""
-    name = spec["file"]
-    if "{row}" in name:
+    # Either one 5x4 sheet (warden_walk.png) or five single-row images (warden_walk_row1..5.png).
+    name = spec["file"].replace("_row{row}", "")
+    row_name = name.replace(".png", "_row{row}.png")
+    if not os.path.exists(os.path.join(src, name)) and os.path.exists(
+            os.path.join(src, row_name.format(row=1))):
         rows = []
         for r in range(1, ROWS + 1):
-            path = os.path.join(src, name.format(row=r))
-            img = load_rgba(path)
+            img = load_rgba(os.path.join(src, row_name.format(row=r)))
             rows.append(split_frames(img, 4, 1)[0])
         return rows
     img = load_rgba(os.path.join(src, name))
@@ -337,6 +339,20 @@ def main() -> None:
             fps["idle"] = 1
             print(f"{key}/idle.png  from {anim} frame {col + 1}")
         write_cfg(out_dir, ch["screen_h"], ch["fig_h"], fps)
+
+    for key, ch in CHARACTERS.items():
+        # Optional painted bust for the ultimate cut-in banner.
+        bust = os.path.join(args.src, f"{key}_portrait.png")
+        if os.path.exists(bust):
+            arr = load_rgba(bust)
+            arr[..., 3] = np.where(foreground_mask(arr, 1, 1), arr[..., 3], 0)
+            img = Image.fromarray(arr)
+            box = img.getchannel("A").point(lambda v: 255 if v > 24 else 0).getbbox()
+            if box is not None:
+                img = img.crop(box)
+            img.thumbnail((512, 512), Image.LANCZOS)
+            img.save(os.path.join(GAME_DIR, ch["out"], "portrait.png"))
+            print(f"{key}/portrait.png  {img.width}x{img.height}")
 
     ground_src = os.path.join(args.src, "map_volcano.png")
     if os.path.exists(ground_src):

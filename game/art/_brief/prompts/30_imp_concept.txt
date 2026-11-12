@@ -13,9 +13,9 @@ CHARACTER - the Cinder Fiend:
 STYLE (same for every asset in this project):
 - Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
   classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
-- Heroic semi-realistic anime proportions: a human is about 5 heads tall, with long legs and a
-  slim, athletic build. The head is small relative to the body.
-- Deep, rich colours with glowing accents (violet, gold, ember orange) against darker metals and
+- Heroic semi-realistic anime proportions: a human is about 6 heads tall, with long legs and an
+  athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (gold, violet, ember orange) and polished metals and
   fabrics. Strong rim light that separates the figure from any background.
 - Thin dark outline, painterly shading with crisp highlights on metal.
 - Light comes from the top-left.

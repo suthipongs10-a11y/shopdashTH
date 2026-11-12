@@ -1,0 +1,45 @@
+OUTPUT FILE NAME: warden_portrait.png
+ATTACH WITH THIS PROMPT: the approved warden_concept.png AND style_reference_knight.png
+
+Create a dramatic bust portrait of the Warden for the ultimate-skill cut-in banner of a 2D game.
+
+CHARACTER - the Warden:
+- A tall, heroic holy knight in full plate armour, about 6 heads tall, broad shoulders, long legs.
+  Powerful and noble, never cute. The face is completely hidden.
+- HELMET: a closed full helmet of polished silver with gold trim. A narrow T-shaped visor slit that
+  glows warm golden-white. A tall swept-back crest of layered silver-and-gold blade-like feathers
+  rises from the top and sweeps backward, with two short golden horn spikes at the temples.
+- ARMOUR: polished silver-white plate with ornate gold edging and engraved gold filigree. Large
+  layered pauldrons whose outer edges flare into crystalline golden feather spikes. A sculpted
+  breastplate with a glowing golden diamond gem in the centre and smaller gems on the shoulders.
+  Layered tassets over the hips, armoured gauntlets, pointed armoured greaves and sabatons.
+- CAPE: a long deep royal-blue cape with a thick gold border and gold corner ornaments, flowing
+  behind and out to the sides. A royal-blue tabard panel with gold trim hangs at the front.
+- WINGS: a pair of large angelic wings growing from the back, made of radiant golden-white light
+  feathers, layered like a real bird's wing, glowing brightest at the edges and tips with tiny
+  floating light motes. They are part of the character and appear in every pose. Keep them half
+  folded: the tips rise no higher than the top of the helmet crest and stay inside the cell.
+- Right hand: a long ornate knight's sword. Silver blade with a glowing golden-white fuller line,
+  a winged gold crossguard with a gem in the middle, a royal-blue grip.
+- Left arm: a silver kite shield with a gold border and a raised gold lion-head emblem.
+- Palette: silver-white, polished gold, royal blue, golden-white glow. No black armour, no red.
+- Design inspiration: the armour, helmet crest and cape of the attached style_reference_knight.png,
+  re-coloured to silver, gold and royal blue with golden light instead of ice. Use only the knight's
+  design. Ignore the dragon, the ice, the snowflakes and the background in that image.
+The design must match the attached warden_concept.png exactly.
+
+POSE AND FRAMING:
+- Head, shoulders and upper chest, turned three-quarters toward the LEFT edge of the image.
+- The glowing visor looks out of the image to the left. The helmet crest sweeps back to the right.
+- The tops of both light wings rise behind the shoulders, spread wide and glowing.
+- The sword hilt and crossguard may show at the bottom edge, nothing else of the weapon.
+- The figure fills about 85% of the canvas height. The top of the helmet crest does not touch the edge.
+
+STYLE:
+- The same hand-painted dark high-fantasy style as the concept, more detailed because it is shown large.
+- Strong golden rim light, glints on the metal, tiny light motes around the wings.
+- Square canvas, 1:1, 1024x1024 or larger.
+- Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00)
+  with no gradient, and do not use that green anywhere on the character.
+- No text, no frame, no border, no watermark.
+- Output: PNG.

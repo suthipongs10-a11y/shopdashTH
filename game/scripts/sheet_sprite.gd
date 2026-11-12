@@ -22,6 +22,7 @@ var squash := Vector2.ONE
 var hop := 0.0
 
 ## name -> {tex, rows, cols, cell: Vector2, fps}
+var _portrait: Texture2D
 var _anims := {}
 var _current := ""
 ## Animation that plays once and then returns to _current.
@@ -55,6 +56,9 @@ func load_dir(dir: String) -> bool:
 		cell_w = float(cfg.get_value("sheet", "cell_width", -1.0))
 		cell_h = float(cfg.get_value("sheet", "cell_height", -1.0))
 		_feet_from_bottom = float(cfg.get_value("sheet", "feet_from_bottom", -1.0))
+	var portrait_path := dir + "/portrait.png"
+	if ResourceLoader.exists(portrait_path):
+		_portrait = load(portrait_path)
 	for anim in ANIM_NAMES:
 		var path := "%s/%s.png" % [dir, anim]
 		if not ResourceLoader.exists(path):
@@ -107,7 +111,10 @@ func has_art() -> bool:
 
 
 ## Front-facing first idle frame, for the ultimate cut-in. Null without art.
+## The painted bust (portrait.png) when there is one, else the first idle frame.
 func portrait() -> Texture2D:
+	if _portrait != null:
+		return _portrait
 	if _anims.is_empty():
 		return null
 	var a: Dictionary = _anims[_resolve("idle")]

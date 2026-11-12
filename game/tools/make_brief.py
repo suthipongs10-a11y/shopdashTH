@@ -13,9 +13,9 @@ os.makedirs(os.path.join(OUT, "templates"), exist_ok=True)
 STYLE = """STYLE (same for every asset in this project):
 - Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
   classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
-- Heroic semi-realistic anime proportions: a human is about 5 heads tall, with long legs and a
-  slim, athletic build. The head is small relative to the body.
-- Deep, rich colours with glowing accents (violet, gold, ember orange) against darker metals and
+- Heroic semi-realistic anime proportions: a human is about 6 heads tall, with long legs and an
+  athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (gold, violet, ember orange) and polished metals and
   fabrics. Strong rim light that separates the figure from any background.
 - Thin dark outline, painterly shading with crisp highlights on metal.
 - Light comes from the top-left.
@@ -71,21 +71,35 @@ HARD RULES:
 
 CHARS = {
     "warden": {
-        "title": "the Warden (player character, a dark knight with glowing wings)",
+        "title": "the Warden (player character, a winged holy knight in full plate)",
         "desc": """CHARACTER - the Warden:
-- A young male knight with a calm, cold, mysterious expression. Silver-white hair, swept back,
-  falling to the neck. Pale violet glowing eyes. No helmet.
-- Dark gunmetal plate armour with fine gold filigree, a high collar and layered pauldrons.
-  Long tattered black-and-crimson cape. Dark leather gloves and armoured boots.
-- Large wings on his back made of translucent violet energy shaped like long feathers, glowing
-  brighter at the tips. The wings are part of the character and appear in every pose.
-  Keep the wings folded slightly so they stay inside the cell.
-- Right hand: a long straight sword with a black blade edged in faint blue light and a gold crossguard.
-- Left arm: a dark kite shield with a gold lion-head emblem.""",
+- A tall, heroic holy knight in full plate armour, about 6 heads tall, broad shoulders, long legs.
+  Powerful and noble, never cute. The face is completely hidden.
+- HELMET: a closed full helmet of polished silver with gold trim. A narrow T-shaped visor slit that
+  glows warm golden-white. A tall swept-back crest of layered silver-and-gold blade-like feathers
+  rises from the top and sweeps backward, with two short golden horn spikes at the temples.
+- ARMOUR: polished silver-white plate with ornate gold edging and engraved gold filigree. Large
+  layered pauldrons whose outer edges flare into crystalline golden feather spikes. A sculpted
+  breastplate with a glowing golden diamond gem in the centre and smaller gems on the shoulders.
+  Layered tassets over the hips, armoured gauntlets, pointed armoured greaves and sabatons.
+- CAPE: a long deep royal-blue cape with a thick gold border and gold corner ornaments, flowing
+  behind and out to the sides. A royal-blue tabard panel with gold trim hangs at the front.
+- WINGS: a pair of large angelic wings growing from the back, made of radiant golden-white light
+  feathers, layered like a real bird's wing, glowing brightest at the edges and tips with tiny
+  floating light motes. They are part of the character and appear in every pose. Keep them half
+  folded: the tips rise no higher than the top of the helmet crest and stay inside the cell.
+- Right hand: a long ornate knight's sword. Silver blade with a glowing golden-white fuller line,
+  a winged gold crossguard with a gem in the middle, a royal-blue grip.
+- Left arm: a silver kite shield with a gold border and a raised gold lion-head emblem.
+- Palette: silver-white, polished gold, royal blue, golden-white glow. No black armour, no red.
+- Design inspiration: the armour, helmet crest and cape of the attached style_reference_knight.png,
+  re-coloured to silver, gold and royal blue with golden light instead of ice. Use only the knight's
+  design. Ignore the dragon, the ice, the snowflakes and the background in that image.""",
         "fill": 62,
+        "extra_attach": " AND style_reference_knight.png",
         "anims": {
             "idle": ("idle stance, loops", """- Frame 1: ready stance, sword lowered diagonally, shield held in front, wings half folded.
-- Frame 2: slight inhale, chest and wings rise a little, wing tips glow brighter.
+- Frame 2: slight inhale, shoulders and wings rise a little, wing tips and visor glow brighter.
 - Frame 3: same as frame 1.
 - Frame 4: slight exhale, wings lower a little, cape sways."""),
             "walk": ("walk cycle, loops", """- Frame 1: left foot forward (contact), sword arm swings back.
@@ -158,7 +172,7 @@ for key, c in CHARS.items():
     out_name = f"{key}_concept.png"
     write(f"{num}_{key}_concept.txt", f"""
 OUTPUT FILE NAME: {out_name}
-ATTACH WITH THIS PROMPT: templates/template_turnaround.png
+ATTACH WITH THIS PROMPT: templates/template_turnaround.png{c.get('extra_attach', '')}
 
 Create a character turnaround sheet for a 2D game: {c['title']}.
 This image becomes the design reference for every later sprite of this character.
