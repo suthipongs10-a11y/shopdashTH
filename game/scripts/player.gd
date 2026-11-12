@@ -60,6 +60,7 @@ var _hurt_flash := 0.0
 var _swing := 0.0
 var _shake := 0.0
 var _hit_fx_budget := HIT_FX_PER_FRAME
+var _bash_tally: SkillTally
 
 
 func _ready() -> void:
@@ -106,9 +107,9 @@ func _ready() -> void:
 
 
 func _recalc_stats() -> void:
-	max_hp = 420.0 + 80.0 * (level - 1)
+	max_hp = 8400.0 + 1600.0 * (level - 1)
 	max_sp = 90.0 + 12.0 * (level - 1)
-	attack_power = 40.0 + 9.0 * (level - 1)
+	attack_power = 800.0 + 180.0 * (level - 1)
 	defense = 15.0 + 4.0 * (level - 1)
 	_name_label.text = "%s  Lv.%d" % [char_name, level]
 
@@ -203,18 +204,25 @@ func _try_use(id: String) -> void:
 	_sheet.play_once("attack")
 	var mult := float(data["mult"])
 	var color: Color = data["color"]
+	var tally: SkillTally = null
+	if id != "attack":
+		tally = SkillTally.new()
+		tally.anchor = self
+		tally.color = Color(1.0, 0.5, 0.65) if id == "judgment" else Color(1.0, 0.85, 0.3)
+		top_fx.add_child(tally)
 	match id:
 		"attack":
 			_do_attack(mult)
 		"wave":
-			_do_wave(mult, color)
+			_do_wave(mult, color, tally)
 		"bash":
 			_dash_left = DASH_TIME
 			_dash_dir = aim
+			_bash_tally = tally
 		"ring":
-			_do_ring(mult, color)
+			_do_ring(mult, color, tally)
 		"judgment":
-			_do_judgment(mult, color)
+			_do_judgment(mult, color, tally)
 
 
 ## Basic attack: a cone in front of the player.
@@ -239,10 +247,11 @@ func _do_attack(mult: float) -> void:
 
 
 ## Q: piercing projectile.
-func _do_wave(mult: float, color: Color) -> void:
+func _do_wave(mult: float, color: Color, tally: SkillTally) -> void:
 	_swing = 0.2
 	var wave := BladeWave.new()
 	wave.player = self
+	wave.tally = tally
 	wave.dir = aim
 	wave.mult = mult
 	wave.color = color
@@ -258,13 +267,15 @@ func _bash_impact() -> void:
 	pulse.knock = 320.0
 	pulse.stun = 1.0
 	pulse.shake = 7.0
+	pulse.tally = _bash_tally
 	pulse.position = global_position
 	ground_fx.add_child(pulse)
 
 
 ## R: rune circle that follows the player and ticks five times.
-func _do_ring(mult: float, color: Color) -> void:
+func _do_ring(mult: float, color: Color, tally: SkillTally) -> void:
 	var pulse := _new_pulse(AoePulse.Style.CIRCLE, 185.0, mult, color)
+	pulse.tally = tally
 	pulse.follow = self
 	pulse.ticks = 5
 	pulse.interval = 0.5
@@ -274,9 +285,10 @@ func _do_ring(mult: float, color: Color) -> void:
 
 
 ## F: delayed triple blast at the aim point (clamped to JUDGMENT_RANGE).
-func _do_judgment(mult: float, color: Color) -> void:
+func _do_judgment(mult: float, color: Color, tally: SkillTally) -> void:
 	var offset := input.aim_vector(self).limit_length(JUDGMENT_RANGE)
 	var pulse := _new_pulse(AoePulse.Style.JUDGMENT, 230.0, mult, color)
+	pulse.tally = tally
 	pulse.ticks = 3
 	pulse.interval = 0.24
 	pulse.delay = 0.6
@@ -299,7 +311,10 @@ func _new_pulse(style: AoePulse.Style, radius: float, mult: float, color: Color)
 
 ## Applies one hit to a monster using the shared damage formula:
 ## ATK x skill mult x (1 - DEF/(DEF+K)) x crit x combo bonus, with +/-10% variance.
-func strike(m: Monster, mult: float, knock: Vector2 = Vector2.ZERO, stun: float = 0.0) -> void:
+func strike(
+		m: Monster, mult: float, knock: Vector2 = Vector2.ZERO, stun: float = 0.0,
+		tally: SkillTally = null
+) -> void:
 	if m.state == Monster.State.DEAD:
 		return
 	var is_crit := randf() < crit_chance
@@ -311,13 +326,19 @@ func strike(m: Monster, mult: float, knock: Vector2 = Vector2.ZERO, stun: float 
 	var dmg := maxi(1, roundi(amount))
 	var body := m.global_position + Vector2(0.0, -m.body_radius * 1.2)
 	m.take_damage(dmg, knock, stun)
-	DamageNumber.spawn(top_fx, body + Vector2(0.0, -m.body_radius), dmg, is_crit)
+	var head := m.global_position + Vector2(0.0, -m.body_radius * 2.6 - 18.0)
+	DamageNumber.spawn(top_fx, head, dmg, is_crit, m.get_instance_id())
 	Combo.register_hit(dmg)
+	if tally != null and is_instance_valid(tally):
+		tally.add(dmg)
 	if _hit_fx_budget > 0:
 		_hit_fx_budget -= 1
 		var spark := Color(1.0, 0.75, 0.3) if is_crit else Color(1.0, 0.95, 0.75)
-		Fx.flash(top_fx, body, spark, 46.0 if is_crit else 30.0, 0.16)
+		var jitter := Vector2(randf_range(-10.0, 10.0), randf_range(-10.0, 10.0))
+		Fx.flash(top_fx, body, spark, 52.0 if is_crit else 32.0, 0.16)
 		Fx.burst(top_fx, body, spark, 7 if is_crit else 4, 300.0, 0.28, 11.0)
+		if is_crit or randf() < 0.35:
+			Fx.sparkle(top_fx, body + jitter, Color(1.0, 0.95, 0.8), 70.0 if is_crit else 42.0)
 	if is_crit:
 		shake(3.0)
 	target_hit.emit(m)
@@ -331,8 +352,7 @@ func take_damage(raw: int) -> void:
 	var dmg := maxi(1, roundi(reduced))
 	hp -= float(dmg)
 	_hurt_flash = 0.15
-	var at := global_position + Vector2(0.0, -80.0)
-	DamageNumber.spawn(top_fx, at, dmg, false, Color(1.0, 0.35, 0.3))
+	DamageNumber.spawn_hurt(top_fx, global_position + Vector2(0.0, -110.0), dmg)
 	if hp <= 0.0:
 		_die()
 

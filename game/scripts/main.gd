@@ -53,7 +53,6 @@ func _ready() -> void:
 
 	_player.leveled_up.connect(_on_leveled_up)
 	_player.died.connect(_on_player_died)
-	Combo.tier_up.connect(_on_combo_tier_up)
 
 
 ## Input actions are registered in code (physical keys, so they work on a Thai keyboard layout).
@@ -87,7 +86,7 @@ func _on_monster_killed(monster: Monster) -> void:
 	var gold_gain := roundi(monster.gold_reward * bonus)
 	_player.gain_rewards(xp_gain, gold_gain)
 	var at := monster.global_position + Vector2(0.0, -monster.body_radius * 3.2)
-	DamageNumber.spawn_text(_top_fx, at, "+%d EXP" % xp_gain, 13, Color(0.7, 0.95, 1.0, 0.85))
+	DamageNumber.spawn_text(_top_fx, at, "+%d EXP" % xp_gain, 20, Color(0.7, 0.95, 1.0))
 
 
 func _on_leveled_up(new_level: int) -> void:
@@ -97,7 +96,3 @@ func _on_leveled_up(new_level: int) -> void:
 func _on_player_died() -> void:
 	_hud.show_banner("คุณล้มลง... กำลังฟื้นคืนชีพ", Color(1.0, 0.4, 0.35))
 
-
-func _on_combo_tier_up(tier_index: int) -> void:
-	var tier: Dictionary = Combo.TIERS[tier_index]
-	_hud.show_banner("%s!" % String(tier["name"]), tier["color"])

@@ -21,6 +21,7 @@ var knock := 0.0
 var stun := 0.0
 var shake := 0.0
 var color := Color(1.0, 0.9, 0.5)
+var tally: SkillTally
 
 var _timer := 0.0
 var _age := 0.0
@@ -64,7 +65,7 @@ func _fire() -> void:
 		var push := Vector2.ZERO
 		if knock > 0.0:
 			push = (offset.normalized() if offset.length() > 1.0 else Vector2.RIGHT) * knock
-		player.strike(m, mult, push, stun)
+		player.strike(m, mult, push, stun, tally)
 	if shake > 0.0:
 		player.shake(shake)
 	_fire_visuals()
@@ -78,6 +79,8 @@ func _fire_visuals() -> void:
 			Fx.ring(get_parent(), here, color, radius, 0.35, 10.0)
 			Fx.flash(get_parent(), here, color, radius * 0.9, 0.3, true)
 			Fx.burst(top_fx, here + Vector2(0.0, -10.0), color, 16, 380.0, 0.4, 14.0)
+			Fx.streaks(top_fx, here + Vector2(0.0, -20.0), color, radius * 2.2, 12, 0.3, 0.2)
+			Fx.sparkle(top_fx, here + Vector2(0.0, -40.0), white, 120.0, 0.25)
 		Style.CIRCLE:
 			Fx.ring(get_parent(), here, color, radius, 0.4, 5.0)
 			Fx.burst(top_fx, here + Vector2(0.0, -20.0), color, 10, 160.0, 0.6, 12.0,
@@ -89,6 +92,8 @@ func _fire_visuals() -> void:
 			Fx.flash(get_parent(), here, color, radius * 1.5, 0.5, true)
 			Fx.ring(get_parent(), here, color, radius * 1.15, 0.45, 12.0)
 			Fx.burst(top_fx, here + Vector2(0.0, -20.0), color, 26, 520.0, 0.6, 16.0)
+			Fx.streaks(top_fx, here + Vector2(0.0, -30.0), color, radius * 3.2, 22, 0.5, 0.9)
+			Fx.sparkle(top_fx, here + Vector2(0.0, -60.0), white, 220.0, 0.3)
 
 
 func _draw() -> void:

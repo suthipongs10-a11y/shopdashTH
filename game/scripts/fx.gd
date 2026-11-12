@@ -126,6 +126,33 @@ static func burst(
 	p.finished.connect(p.queue_free)
 
 
+## Four-point star glint.
+static func sparkle(
+		parent: Node, at: Vector2, color: Color, size: float, life: float = 0.22
+) -> void:
+	var s := SparkleFx.new()
+	s.color = color
+	s.size = size
+	s.life = life
+	s.position = at
+	parent.add_child(s)
+
+
+## Radial light streaks bursting outward from a point.
+static func streaks(
+		parent: Node, at: Vector2, color: Color, radius: float, count: int = 18,
+		life: float = 0.45, spiral: float = 0.5
+) -> void:
+	var s := StreaksFx.new()
+	s.color = color
+	s.radius = radius
+	s.count = count
+	s.life = life
+	s.spiral = spiral
+	s.position = at
+	parent.add_child(s)
+
+
 ## Expanding shockwave ring on the ground.
 static func ring(
 		parent: Node, at: Vector2, color: Color, radius: float, life: float = 0.35,

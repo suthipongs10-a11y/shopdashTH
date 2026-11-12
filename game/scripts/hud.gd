@@ -90,7 +90,8 @@ func _process(delta: float) -> void:
 	_target_panel.position = Vector2((view.x - _target_panel.size.x) * 0.5, 14.0)
 	_hotbar.position = Vector2((view.x - _hotbar.size.x) * 0.5, view.y - _hotbar.size.y - 18.0)
 	_combo.position = Vector2(view.x - _combo.size.x - 28.0, view.y * 0.3)
-	_banner.position = Vector2(0.0, view.y * 0.2)
+	# Below the player, so it never covers the skill tallies above their head.
+	_banner.position = Vector2(0.0, view.y * 0.66)
 	_banner.size = Vector2(view.x, 70.0)
 	_hint.position = Vector2(16.0, view.y - 56.0)
 

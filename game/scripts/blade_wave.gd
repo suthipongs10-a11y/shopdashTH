@@ -11,6 +11,7 @@ var player: Player
 var dir := Vector2.RIGHT
 var mult := 1.0
 var color := Color(0.45, 0.75, 1.0)
+var tally: SkillTally
 
 var _left := LIFE
 var _already_hit := {}
@@ -33,7 +34,7 @@ func _physics_process(delta: float) -> void:
 			continue
 		if GameData.ground_dist(global_position, m.global_position) <= RADIUS + m.body_radius:
 			_already_hit[m.get_instance_id()] = true
-			player.strike(m, mult, dir * 160.0)
+			player.strike(m, mult, dir * 160.0, 0.0, tally)
 	queue_redraw()
 
 
