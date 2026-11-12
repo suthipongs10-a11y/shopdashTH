@@ -12,7 +12,7 @@ What it does per sprite sheet:
   3. Scales all frames of a character to the same body height, puts the feet on one baseline
      and centres the feet horizontally. Hop frames keep their lift above the ground.
   4. Writes <anim>.png (5 direction rows x N frame columns, 256 px cells) and sheet.cfg.
-Also copies the ground painting and slices the skill icon sheet.
+Also copies the ground painting and the lion spirit effect, and slices the skill icon sheet.
 
 Requires numpy, scipy and Pillow.
 """
@@ -39,7 +39,7 @@ CHARACTERS = {
     "warden": {
         "out": "art/characters/warden",
         "fig_h": 196,
-        "screen_h": 118,
+        "screen_h": 132,
         "anims": {
             "idle": {"file": "warden_idle.png", "fps": 5},
             "walk": {"file": "warden_walk_row{row}.png", "fps": 9},
@@ -49,7 +49,7 @@ CHARACTERS = {
     "golem": {
         "out": "art/monsters/golem",
         "fig_h": 186,
-        "screen_h": 132,
+        "screen_h": 172,
         "anims": {
             "walk": {"file": "golem_walk_row{row}.png", "fps": 6},
             "attack": {"file": "golem_attack.png", "fps": 4.5},
@@ -59,7 +59,7 @@ CHARACTERS = {
     "imp": {
         "out": "art/monsters/imp",
         "fig_h": 170,
-        "screen_h": 74,
+        "screen_h": 104,
         "anims": {
             "walk": {"file": "imp_walk.png", "fps": 8},
             "attack": {"file": "imp_attack.png", "fps": 7},
@@ -68,7 +68,7 @@ CHARACTERS = {
     },
 }
 
-ICON_NAMES = ["attack", "wave", "bash", "ring", "judgment", "potion"]
+ICON_NAMES = ["attack", "wave", "aegis", "whirl", "lion", "potion"]
 
 
 def load_rgba(path: str) -> np.ndarray:
@@ -78,8 +78,15 @@ def load_rgba(path: str) -> np.ndarray:
 def foreground_mask(img: np.ndarray, cols: int, rows: int) -> np.ndarray:
     """Boolean mask of character pixels."""
     alpha = img[..., 3]
+    rgb_all = img[..., :3].astype(np.int16)
+    border = np.concatenate([rgb_all[0], rgb_all[-1], rgb_all[:, 0], rgb_all[:, -1]])
+    br, bg_, bb = np.median(border, axis=0)
     if (alpha < 40).mean() > 0.3:
         mask = alpha >= 128
+    elif bg_ > 150 and br < 110 and bb < 110:
+        # Green screen: drop strongly green pixels.
+        r, g, b = rgb_all[..., 0], rgb_all[..., 1], rgb_all[..., 2]
+        mask = ~((g > r + 50) & (g > b + 50))
     else:
         # Opaque or hazy background: flood-fill light, unsaturated pixels from the borders.
         rgb = img[..., :3].astype(np.int16)
@@ -267,6 +274,15 @@ def main() -> None:
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         Image.open(ground_src).convert("RGB").save(dst)
         print("maps/volcano/ground.png")
+
+    lion_src = os.path.join(args.src, "lion_spirit.png")
+    if os.path.exists(lion_src):
+        dst = os.path.join(GAME_DIR, "art/fx/lion_spirit.png")
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        lion = Image.open(lion_src).convert("RGB")
+        lion.thumbnail((768, 768), Image.LANCZOS)
+        lion.save(dst)
+        print("fx/lion_spirit.png")
 
     icons_src = os.path.join(args.src, "icons_skills.png")
     if os.path.exists(icons_src):

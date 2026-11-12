@@ -1,0 +1,19 @@
+OUTPUT FILE NAME: lion_spirit.png
+ATTACH WITH THIS PROMPT: nothing
+
+Create a visual effect image for a 2D action RPG: a golden lion spirit summoned by a knight's ultimate skill.
+
+CONTENT:
+- The head and mane of a majestic lion, roaring with its mouth wide open, seen from the front and
+  slightly from below.
+- The lion is made entirely of golden fire and light: the mane is a burst of flames, the face is
+  glowing gold with white-hot highlights, the eyes burn white.
+- Sparks and small embers around the mane. Bright, intense and powerful.
+
+HARD RULES:
+- Background: pure flat black (#000000) everywhere outside the lion. No gradient, no vignette,
+  no ground, no scenery. (The game blends this image additively, so black becomes invisible.)
+- The lion is centred and fills about 85% of the canvas. Nothing touches the canvas edges.
+- No text, no border, no watermark.
+- Square canvas, 1:1, at the largest resolution available (1024x1024 minimum).
+- Output: PNG.

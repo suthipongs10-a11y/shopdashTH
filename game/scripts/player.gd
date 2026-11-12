@@ -13,9 +13,12 @@ const ART_DIR := "res://art/characters/warden"
 const MOVE_SPEED := 270.0
 const ATTACK_REACH := 112.0
 const ATTACK_CONE_DEG := 140.0
-const DASH_SPEED := 950.0
-const DASH_TIME := 0.16
-const JUDGMENT_RANGE := 340.0
+const AEGIS_TIME := 4.0
+## Share of incoming damage blocked while the aegis bubble is up.
+const AEGIS_BLOCK := 0.7
+const WHIRL_TIME := 1.6
+const WHIRL_TICKS := 8
+const WHIRL_MOVE := 0.7
 const RESPAWN_DELAY := 3.0
 ## Max hit-spark effects per physics frame, so huge packs do not flood the scene.
 const HIT_FX_PER_FRAME := 10
@@ -53,14 +56,16 @@ var _moving := false
 var _walk_t := 0.0
 var _dust_left := 0.0
 var _aim_face_left := 0.0
-var _dash_left := 0.0
-var _dash_dir := Vector2.ZERO
+var _aegis_left := 0.0
+var _aegis_fx: AegisFx
+var _aegis_tally: SkillTally
+var _spin_left := 0.0
+var _spin_angle := 0.0
 var _respawn_left := 0.0
 var _hurt_flash := 0.0
 var _swing := 0.0
 var _shake := 0.0
 var _hit_fx_budget := HIT_FX_PER_FRAME
-var _bash_tally: SkillTally
 
 
 func _ready() -> void:
@@ -139,22 +144,22 @@ func _physics_process(delta: float) -> void:
 	if to_aim.length() > 4.0:
 		aim = to_aim.normalized()
 
-	if _dash_left > 0.0:
-		_dash_left -= delta
-		_moving = true
-		_face = _dash_dir
-		velocity = GameData.to_screen(_dash_dir * DASH_SPEED)
-		move_and_slide()
-		Fx.flash(top_fx, global_position + Vector2(0.0, -40.0), Color(1.0, 0.8, 0.35, 0.6), 44.0, 0.2)
-		if _dash_left <= 0.0:
-			_bash_impact()
+	_tick_aegis(delta)
+	var move := input.move_vector(self)
+	_moving = move.length() > 0.05
+	var speed := MOVE_SPEED * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
+	velocity = GameData.to_screen(move * speed)
+	move_and_slide()
+	if _moving:
+		_face = move.normalized()
+	if _spin_left > 0.0:
+		# Spin: sweep the facing through every direction while holding the slash pose.
+		_spin_left -= delta
+		_spin_angle += delta * 16.0
+		_face = Vector2.from_angle(_spin_angle)
+		if _spin_left <= 0.0:
+			_sheet.release()
 	else:
-		var move := input.move_vector(self)
-		_moving = move.length() > 0.05
-		velocity = GameData.to_screen(move * MOVE_SPEED)
-		move_and_slide()
-		if _moving:
-			_face = move.normalized()
 		_handle_actions()
 		if _aim_face_left > 0.0:
 			_face = aim
@@ -183,20 +188,16 @@ func _animate(delta: float) -> void:
 func _handle_actions() -> void:
 	if input.is_pressed("attack"):
 		_try_use("attack")
-	if input.is_pressed("skill_wave"):
-		_try_use("wave")
-	if input.is_pressed("skill_bash"):
-		_try_use("bash")
-	if input.is_pressed("skill_ring"):
-		_try_use("ring")
-	if input.is_pressed("skill_judgment"):
-		_try_use("judgment")
+	var slots := ["skill_q", "skill_e", "skill_r", "skill_f"]
+	for i in slots.size():
+		if input.is_pressed(slots[i]):
+			_try_use(GameData.SKILL_ORDER[i + 1])
 
 
 func _try_use(id: String) -> void:
 	var data: Dictionary = GameData.SKILLS[id]
 	var cost := float(data["sp"])
-	if float(cooldowns[id]) > 0.0 or sp < cost or _dash_left > 0.0:
+	if float(cooldowns[id]) > 0.0 or sp < cost or _spin_left > 0.0:
 		return
 	sp -= cost
 	cooldowns[id] = float(data["cd"])
@@ -209,21 +210,20 @@ func _try_use(id: String) -> void:
 	if id != "attack":
 		tally = SkillTally.new()
 		tally.anchor = self
-		tally.color = Color(1.0, 0.5, 0.65) if id == "judgment" else Color(1.0, 0.85, 0.3)
+		tally.color = Color(1.0, 0.5, 0.65) if id == "lion" else Color(1.0, 0.85, 0.3)
 		top_fx.add_child(tally)
+		SkillCallout.spawn(top_fx, self, String(data["name"]), color)
 	match id:
 		"attack":
 			_do_attack(mult)
 		"wave":
 			_do_wave(mult, color, tally)
-		"bash":
-			_dash_left = DASH_TIME
-			_dash_dir = aim
-			_bash_tally = tally
-		"ring":
-			_do_ring(mult, color, tally)
-		"judgment":
-			_do_judgment(mult, color, tally)
+		"aegis":
+			_do_aegis(mult, color, tally)
+		"whirl":
+			_do_whirl(mult, color, tally)
+		"lion":
+			_do_lion(mult, color, tally)
 
 
 ## Basic attack: a cone in front of the player.
@@ -247,55 +247,96 @@ func _do_attack(mult: float) -> void:
 		strike(m, mult, aim * 120.0)
 
 
-## Q: piercing projectile.
+## Q: three piercing blade waves in a fan.
 func _do_wave(mult: float, color: Color, tally: SkillTally) -> void:
 	_swing = 0.2
-	var wave := BladeWave.new()
-	wave.player = self
-	wave.tally = tally
-	wave.dir = aim
-	wave.mult = mult
-	wave.color = color
-	wave.position = global_position
-	top_fx.add_child(wave)
-	Fx.flash(top_fx, global_position + Vector2(0.0, -30.0), color, 70.0, 0.2)
+	for spread in [-0.28, 0.0, 0.28]:
+		var wave := BladeWave.new()
+		wave.player = self
+		wave.tally = tally
+		wave.dir = aim.rotated(spread)
+		wave.mult = mult
+		wave.color = color
+		wave.position = global_position
+		top_fx.add_child(wave)
+	Fx.flash(top_fx, global_position + Vector2(0.0, -40.0), color, 90.0, 0.22)
 
 
-## E: called when the dash ends. Knocks back and stuns everything nearby.
-func _bash_impact() -> void:
-	var data: Dictionary = GameData.SKILLS["bash"]
-	var pulse := _new_pulse(AoePulse.Style.SHOCK, 140.0, float(data["mult"]), data["color"])
-	pulse.knock = 320.0
-	pulse.stun = 1.0
-	pulse.shake = 7.0
-	pulse.tally = _bash_tally
+## E: raise a bubble shield. Blocks most damage, shoves enemies away on cast,
+## and bursts outward when it ends.
+func _do_aegis(mult: float, color: Color, tally: SkillTally) -> void:
+	_aegis_left = AEGIS_TIME
+	_aegis_tally = tally
+	if is_instance_valid(_aegis_fx):
+		_aegis_fx.queue_free()
+	_aegis_fx = AegisFx.new()
+	_aegis_fx.color = color
+	_aegis_fx.follow = self
+	top_fx.add_child(_aegis_fx)
+	var body := global_position + Vector2(0.0, -60.0)
+	Fx.sparkle(top_fx, body, Color(1.0, 0.85, 0.4), 210.0, 0.4)
+	Fx.flash(top_fx, body, Color(1.0, 0.9, 0.6), 120.0, 0.3)
+	var pulse := _new_pulse(AoePulse.Style.SHOCK, 130.0, mult * 0.5, color)
+	pulse.knock = 360.0
+	pulse.stun = 0.6
+	pulse.shake = 5.0
+	pulse.tally = tally
 	pulse.position = global_position
 	ground_fx.add_child(pulse)
 
 
-## R: rune circle that follows the player and ticks five times.
-func _do_ring(mult: float, color: Color, tally: SkillTally) -> void:
-	var pulse := _new_pulse(AoePulse.Style.CIRCLE, 185.0, mult, color)
-	pulse.tally = tally
+func _tick_aegis(delta: float) -> void:
+	if _aegis_left <= 0.0:
+		return
+	_aegis_left -= delta
+	if _aegis_left > 0.0:
+		return
+	if is_instance_valid(_aegis_fx):
+		_aegis_fx.pop()
+	var data: Dictionary = GameData.SKILLS["aegis"]
+	var pulse := _new_pulse(AoePulse.Style.SHOCK, 190.0, float(data["mult"]), data["color"])
+	pulse.knock = 300.0
+	pulse.shake = 8.0
+	# The cast tally fades after a second without hits, so the burst usually gets a fresh one.
+	if not is_instance_valid(_aegis_tally):
+		_aegis_tally = SkillTally.new()
+		_aegis_tally.anchor = self
+		_aegis_tally.color = Color(1.0, 0.85, 0.3)
+		top_fx.add_child(_aegis_tally)
+	pulse.tally = _aegis_tally
+	pulse.position = global_position
+	ground_fx.add_child(pulse)
+
+
+## R: spin in place (still able to walk slowly), slashing everything around.
+func _do_whirl(mult: float, color: Color, tally: SkillTally) -> void:
+	_spin_left = WHIRL_TIME
+	_spin_angle = aim.angle()
+	_sheet.hold("attack", 2)
+	var pulse := _new_pulse(AoePulse.Style.WHIRL, 165.0, mult, color)
 	pulse.follow = self
-	pulse.ticks = 5
-	pulse.interval = 0.5
+	pulse.ticks = WHIRL_TICKS
+	pulse.interval = WHIRL_TIME / float(WHIRL_TICKS)
+	pulse.knock = 60.0
+	pulse.tally = tally
 	pulse.position = global_position
 	ground_fx.add_child(pulse)
-	Fx.pillar(top_fx, global_position, color, 120.0, 420.0, 0.5)
 
 
-## F: delayed triple blast at the aim point (clamped to JUDGMENT_RANGE).
-func _do_judgment(mult: float, color: Color, tally: SkillTally) -> void:
-	var offset := input.aim_vector(self).limit_length(JUDGMENT_RANGE)
-	var pulse := _new_pulse(AoePulse.Style.JUDGMENT, 230.0, mult, color)
-	pulse.tally = tally
+## F: a golden lion spirit rises behind the warden and roars: three blasts around them.
+func _do_lion(mult: float, color: Color, tally: SkillTally) -> void:
+	var lion := LionFx.new()
+	lion.color = color
+	lion.position = global_position
+	top_fx.add_child(lion)
+	var pulse := _new_pulse(AoePulse.Style.ROAR, 300.0, mult, color)
 	pulse.ticks = 3
-	pulse.interval = 0.24
-	pulse.delay = 0.6
-	pulse.knock = 80.0
-	pulse.shake = 11.0
-	pulse.position = global_position + GameData.to_screen(offset)
+	pulse.interval = 0.26
+	pulse.delay = LionFx.ROAR_AT
+	pulse.knock = 260.0
+	pulse.shake = 12.0
+	pulse.tally = tally
+	pulse.position = global_position
 	ground_fx.add_child(pulse)
 
 
@@ -346,10 +387,13 @@ func strike(
 
 
 func take_damage(raw: int) -> void:
-	# The shield-bash dash grants invulnerability.
-	if dead or _dash_left > 0.0:
+	if dead:
 		return
 	var reduced := float(raw) * (1.0 - defense / (defense + GameData.DEF_K))
+	if _aegis_left > 0.0:
+		reduced *= 1.0 - AEGIS_BLOCK
+		if is_instance_valid(_aegis_fx):
+			_aegis_fx.ripple()
 	var dmg := maxi(1, roundi(reduced))
 	hp -= float(dmg)
 	_hurt_flash = 0.15
@@ -382,7 +426,11 @@ func shake(amount: float) -> void:
 func _die() -> void:
 	dead = true
 	hp = 0.0
-	_dash_left = 0.0
+	_spin_left = 0.0
+	_aegis_left = 0.0
+	_sheet.release()
+	if is_instance_valid(_aegis_fx):
+		_aegis_fx.queue_free()
 	_respawn_left = RESPAWN_DELAY
 	velocity = Vector2.ZERO
 	Combo.reset()

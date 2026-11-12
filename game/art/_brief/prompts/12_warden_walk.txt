@@ -1,29 +1,37 @@
 OUTPUT FILE NAME: warden_walk.png
 ATTACH WITH THIS PROMPT: the approved warden_concept.png AND templates/template_sheet_5x4.png
 
-Create a 2D game sprite sheet of the Warden (player character, a young knight).
+Create a 2D game sprite sheet of the Warden (player character, a dark knight with glowing wings).
 
 CHARACTER - the Warden:
-- A young chibi knight with a friendly, determined face.
-- Short tousled ash-blond hair, bright blue eyes. No helmet.
-- Polished silver-blue plate armour with gold trim. Short crimson cape. Brown leather belt and boots.
-- Right hand: a straight longsword with a gold crossguard.
-- Left arm: a kite shield, royal blue with a gold crown emblem.
+- A young male knight with a calm, cold, mysterious expression. Silver-white hair, swept back,
+  falling to the neck. Pale violet glowing eyes. No helmet.
+- Dark gunmetal plate armour with fine gold filigree, a high collar and layered pauldrons.
+  Long tattered black-and-crimson cape. Dark leather gloves and armoured boots.
+- Large wings on his back made of translucent violet energy shaped like long feathers, glowing
+  brighter at the tips. The wings are part of the character and appear in every pose.
+  Keep the wings folded slightly so they stay inside the cell.
+- Right hand: a long straight sword with a black blade edged in faint blue light and a gold crossguard.
+- Left arm: a dark kite shield with a gold lion-head emblem.
 The design must match the attached warden_concept.png exactly.
 
 ANIMATION: walk cycle, loops, 4 frames.
-- Frame 1: left foot forward (contact), right arm with sword swings back.
+- Frame 1: left foot forward (contact), sword arm swings back.
 - Frame 2: legs passing under the body, body at its highest point.
 - Frame 3: right foot forward (contact), mirror of frame 1.
 - Frame 4: legs passing under the body again, body at its highest point.
-The cape trails behind the direction of travel.
+A confident, steady stride. The cape and wings trail slightly behind the direction of travel.
 
 STYLE (same for every asset in this project):
-- Hand-painted 2D game sprite illustration with chibi proportions: big head, small body, about 2.5 heads tall.
-- Clean dark-brown outline around the whole figure (not pure black), soft cel shading with 2-3 tones per colour.
-- Vivid, saturated, bright and cheerful colours. European high-fantasy theme.
-- Light comes from the top-left. Subtle rim light on the right side.
-- Crisp illustration. NOT pixel art, NOT a 3D render, NOT a photo.
+- Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
+  classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
+- Heroic semi-realistic anime proportions: a human is about 5 heads tall, with long legs and a
+  slim, athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (violet, gold, ember orange) against darker metals and
+  fabrics. Strong rim light that separates the figure from any background.
+- Thin dark outline, painterly shading with crisp highlights on metal.
+- Light comes from the top-left.
+- NOT pixel art, NOT a 3D render, NOT a photo.
 - Camera: three-quarter top-down view, pitched about 35-40 degrees downward, like a classic isometric MMORPG.
 
 LAYOUT:
@@ -42,7 +50,7 @@ ROWS = facing directions, top to bottom (5 rows):
 
 HARD RULES:
 - Exactly 20 poses, one per cell. Never leave a cell empty, never merge cells.
-- The character is the same size in every cell: about 70% of the cell height.
+- The character is the same size in every cell: about 62% of the cell height.
 - Feet rest on the same baseline in every cell, about 10% above the bottom edge of the cell.
 - The character is centred horizontally in its cell. Nothing may cross into a neighbouring cell,
   including weapons, capes, wings and tails.
@@ -50,6 +58,8 @@ HARD RULES:
 - Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00)
   with no gradient, and do not use that green anywhere on the character.
 - No ground shadow, no floor, no scenery.
-- No motion trails, no slash arcs, no glow, sparks or magic effects (the game draws those itself).
+- No motion trails, no slash arcs, no sparks or spell effects (the game draws those itself).
+  Glow that belongs to the character itself (energy wings, eyes, magma cracks, a glowing blade edge)
+  is part of the design and must be drawn.
 - No text, numbers, labels, borders, grid lines or watermark.
 - Output: PNG.

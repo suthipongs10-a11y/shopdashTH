@@ -4,7 +4,7 @@ extends Node2D
 ## Lives in the ground-effect layer; anything that rises above the ground (pillars,
 ## sparks) is spawned into top_fx so it draws over characters.
 
-enum Style { SHOCK, CIRCLE, JUDGMENT }
+enum Style { SHOCK, CIRCLE, WHIRL, ROAR }
 
 var player: Player
 var top_fx: Node
@@ -65,7 +65,7 @@ func _fire() -> void:
 		var push := Vector2.ZERO
 		if knock > 0.0:
 			push = (offset.normalized() if offset.length() > 1.0 else Vector2.RIGHT) * knock
-		player.strike(m, mult, push, stun, tally)
+		player.strike(m, mult, push, stun, tally if is_instance_valid(tally) else null)
 	if shake > 0.0:
 		player.shake(shake)
 	_fire_visuals()
@@ -85,15 +85,15 @@ func _fire_visuals() -> void:
 			Fx.ring(get_parent(), here, color, radius, 0.4, 5.0)
 			Fx.burst(top_fx, here + Vector2(0.0, -20.0), color, 10, 160.0, 0.6, 12.0,
 				Vector2(0.0, -260.0))
-		Style.JUDGMENT:
-			Fx.pillar(top_fx, here, color, radius * 1.5, 620.0, 0.45)
-			Fx.pillar(top_fx, here, white, radius * 0.6, 620.0, 0.3)
-			Fx.flash(top_fx, here + Vector2(0.0, -30.0), white, radius * 1.3, 0.3)
-			Fx.flash(get_parent(), here, color, radius * 1.5, 0.5, true)
-			Fx.ring(get_parent(), here, color, radius * 1.15, 0.45, 12.0)
-			Fx.burst(top_fx, here + Vector2(0.0, -20.0), color, 26, 520.0, 0.6, 16.0)
-			Fx.streaks(top_fx, here + Vector2(0.0, -30.0), color, radius * 3.2, 22, 0.5, 0.9)
-			Fx.sparkle(top_fx, here + Vector2(0.0, -60.0), white, 220.0, 0.3)
+		Style.WHIRL:
+			Fx.burst(top_fx, here + Vector2(0.0, -40.0), white, 5, 260.0, 0.25, 9.0)
+		Style.ROAR:
+			Fx.flash(top_fx, here + Vector2(0.0, -40.0), white, radius * 0.9, 0.3)
+			Fx.flash(get_parent(), here, color, radius * 1.3, 0.5, true)
+			Fx.ring(get_parent(), here, color, radius * 1.1, 0.5, 14.0)
+			Fx.ring(get_parent(), here, white, radius * 0.7, 0.35, 6.0)
+			Fx.burst(top_fx, here + Vector2(0.0, -30.0), color, 26, 560.0, 0.6, 16.0)
+			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), color, radius * 2.4, 24, 0.5, 1.1)
 
 
 func _draw() -> void:
@@ -102,12 +102,14 @@ func _draw() -> void:
 	if charging and _total_delay > 0.0:
 		grow = 1.0 - delay / _total_delay
 	var alpha := _fade * (0.55 if charging else 0.9)
-	var spin := _age * (2.4 if style == Style.JUDGMENT else 0.9)
+	var spin := _age * (2.4 if style == Style.ROAR else 0.9)
 	match style:
 		Style.SHOCK:
 			pass
-		Style.CIRCLE, Style.JUDGMENT:
+		Style.CIRCLE, Style.ROAR:
 			_draw_magic_circle(radius * (0.4 + 0.6 * grow), spin, alpha)
+		Style.WHIRL:
+			_draw_whirl(alpha)
 
 
 ## Rune circle lying on the ground: two rings, a rotating star and tick marks.
@@ -134,3 +136,22 @@ func _draw_magic_circle(r: float, spin: float, alpha: float) -> void:
 		var a := -spin * 0.5 + TAU * float(i) / 12.0
 		var d := Vector2.from_angle(a)
 		draw_line(GameData.to_screen(d * r * 0.9), GameData.to_screen(d * r), line, 2.0)
+
+
+## Spinning blade rings around the caster: three crescents at body height plus a faint
+## ground ring, each with a fading after-image.
+func _draw_whirl(alpha: float) -> void:
+	var lift := Vector2(0.0, -46.0)
+	draw_set_transform(Vector2.ZERO)
+	draw_polyline(GameData.ellipse_outline(radius, 48), Color(color, 0.35 * alpha), 3.0)
+	var spin := _age * 15.0
+	for blade in 3:
+		var base := spin + TAU * float(blade) / 3.0
+		for trail in 4:
+			var a := base - float(trail) * 0.22
+			var fade := alpha * (1.0 - float(trail) * 0.24)
+			draw_set_transform(lift)
+			Fx.draw_crescent(self, radius * 0.92, 26.0 - trail * 4.0, a, 0.75,
+				Color(color, 0.55 * fade))
+			Fx.draw_crescent(self, radius * 0.9, 9.0, a, 0.6, Color(1.0, 1.0, 1.0, 0.9 * fade))
+	draw_set_transform(Vector2.ZERO)

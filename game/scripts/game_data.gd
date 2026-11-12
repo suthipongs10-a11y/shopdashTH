@@ -10,7 +10,8 @@ const Y_SQUASH := 0.62
 const DEF_K := 400.0
 const MAP_SIZE := Vector2(3600.0, 2400.0)
 
-const SKILL_ORDER: Array[String] = ["attack", "wave", "bash", "ring", "judgment"]
+## Hotbar order. Index 0 is the basic attack; 1-4 are bound to Q, E, R, F.
+const SKILL_ORDER: Array[String] = ["attack", "wave", "aegis", "whirl", "lion"]
 
 const SKILLS := {
 	"attack": {
@@ -18,20 +19,20 @@ const SKILLS := {
 		"mult": 1.0, "cd": 0.4, "sp": 0.0, "color": Color(0.75, 0.78, 0.85),
 	},
 	"wave": {
-		"name": "คลื่นดาบ", "short": "คลื่นดาบ", "key": "Q",
-		"mult": 2.2, "cd": 3.0, "sp": 12.0, "color": Color(0.45, 0.75, 1.0),
+		"name": "คลื่นดาบสามสาย", "short": "คลื่นดาบ", "key": "Q",
+		"mult": 1.6, "cd": 3.0, "sp": 12.0, "color": Color(0.45, 0.75, 1.0),
 	},
-	"bash": {
-		"name": "โล่กระแทก", "short": "โล่กระแทก", "key": "E",
-		"mult": 1.8, "cd": 6.0, "sp": 18.0, "color": Color(0.95, 0.75, 0.3),
+	"aegis": {
+		"name": "โล่ประกาศิต", "short": "กางโล่", "key": "E",
+		"mult": 1.4, "cd": 12.0, "sp": 25.0, "color": Color(0.7, 0.88, 1.0),
 	},
-	"ring": {
-		"name": "วงแสงพิทักษ์", "short": "วงแสง", "key": "R",
-		"mult": 0.9, "cd": 10.0, "sp": 30.0, "color": Color(1.0, 0.92, 0.55),
+	"whirl": {
+		"name": "พายุดาบ", "short": "หมุนดาบ", "key": "R",
+		"mult": 0.55, "cd": 8.0, "sp": 30.0, "color": Color(0.85, 0.95, 1.0),
 	},
-	"judgment": {
-		"name": "พิพากษา", "short": "พิพากษา", "key": "F",
-		"mult": 3.0, "cd": 40.0, "sp": 60.0, "color": Color(1.0, 0.5, 0.25),
+	"lion": {
+		"name": "คำรามสิงห์ทอง", "short": "สิงห์ทอง", "key": "F",
+		"mult": 2.6, "cd": 35.0, "sp": 60.0, "color": Color(1.0, 0.72, 0.22),
 	},
 }
 

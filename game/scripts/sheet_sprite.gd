@@ -22,6 +22,9 @@ var _time := 0.0
 var _facing := Vector2.DOWN
 var _feet_from_bottom := -1.0
 var _flash_mat: ShaderMaterial
+## While set, show this animation's frame instead of playing (e.g. the slash pose while spinning).
+var _hold_anim := ""
+var _hold_frame := 0
 
 
 ## Loads every animation found in dir (e.g. "res://art/characters/warden").
@@ -86,6 +89,17 @@ func set_flash(amount: float) -> void:
 		_flash_mat.set_shader_parameter("flash", amount)
 
 
+## Freeze on one frame of an animation until release(). Facing still updates.
+func hold(anim: String, frame: int) -> void:
+	if _anims.has(anim):
+		_hold_anim = anim
+		_hold_frame = frame
+
+
+func release() -> void:
+	_hold_anim = ""
+
+
 func play(anim: String) -> void:
 	var resolved := _resolve(anim)
 	if resolved != _current:
@@ -130,6 +144,9 @@ func _process(delta: float) -> void:
 		cols = int(a["cols"])
 		frame = 0
 	frame = frame % cols
+	if _hold_anim != "":
+		a = _anims[_hold_anim]
+		frame = mini(_hold_frame, int(a["cols"]) - 1)
 
 	var picked := _pick_row(int(a["rows"]))
 	var cell: Vector2 = a["cell"]

@@ -40,7 +40,7 @@ func is_pressed(action: String) -> bool:
 	if not is_instance_valid(_target) or _player == null:
 		return false
 	# Save SP for the ultimate whenever it is off cooldown, so footage shows every skill.
-	var saving := float(_player.cooldowns["judgment"]) <= 0.0
-	if saving and action in ["skill_wave", "skill_bash", "skill_ring"]:
+	var saving := float(_player.cooldowns["lion"]) <= 0.0
+	if saving and action in ["skill_q", "skill_e", "skill_r"]:
 		return false
 	return true

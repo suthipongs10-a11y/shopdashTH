@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tocfbpibqbs8"
-path="res://.godot/imported/judgment.png-ec4ad16cf48113b6e9b7bce42ddf813b.ctex"
+uid="uid://c1rkm38nqp0ng"
+path="res://.godot/imported/aegis.png-87140ee4d3e18a8e4919000ec76f7465.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/ui/skills/judgment.png"
-dest_files=["res://.godot/imported/judgment.png-ec4ad16cf48113b6e9b7bce42ddf813b.ctex"]
+source_file="res://art/ui/skills/aegis.png"
+dest_files=["res://.godot/imported/aegis.png-87140ee4d3e18a8e4919000ec76f7465.ctex"]
 
 [params]
 

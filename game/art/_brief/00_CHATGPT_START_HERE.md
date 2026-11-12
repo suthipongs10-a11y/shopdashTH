@@ -1,4 +1,4 @@
-# Sprite asset job: start here
+# Sprite asset job: start here (version 2, dark fantasy)
 
 You are producing 2D sprite assets for an action RPG. Everything you need is in this pack.
 The person talking to you is the game's owner. They will download each image you make and pass it
@@ -29,8 +29,13 @@ to the game's developer, who slices and aligns the sheets. Work in the order bel
 | 8 | `prompts/30_imp_concept.txt` | `imp_concept.png` | `template_turnaround.png` |
 | 9 | `prompts/31_imp_walk.txt` | `imp_walk.png` | `imp_concept.png`, `template_sheet_5x4.png` |
 | 10 | `prompts/32_imp_attack.txt` | `imp_attack.png` | `imp_concept.png`, `template_sheet_5x4.png` |
-| 11 | `prompts/40_map_volcano.txt` | `map_volcano.png` | none |
-| 12 | `prompts/50_icons_skills_optional.txt` (optional) | `icons_skills.png` | `warden_concept.png` |
+| 11 | `prompts/40_fx_lion_spirit.txt` | `lion_spirit.png` | none |
+| 12 | `prompts/50_icons_skills.txt` | `icons_skills.png` | `warden_concept.png` |
+
+## Art direction
+
+Dark high fantasy, mysterious and powerful. Heroic semi-realistic proportions (about 5 heads tall),
+never cute or chibi. Every prompt file repeats the full style block; follow it exactly.
 
 ## Rules that apply to every sprite sheet
 

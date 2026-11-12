@@ -11,11 +11,15 @@ os.makedirs(os.path.join(OUT, "prompts"), exist_ok=True)
 os.makedirs(os.path.join(OUT, "templates"), exist_ok=True)
 
 STYLE = """STYLE (same for every asset in this project):
-- Hand-painted 2D game sprite illustration with chibi proportions: big head, small body, about 2.5 heads tall.
-- Clean dark-brown outline around the whole figure (not pure black), soft cel shading with 2-3 tones per colour.
-- Vivid, saturated, bright and cheerful colours. European high-fantasy theme.
-- Light comes from the top-left. Subtle rim light on the right side.
-- Crisp illustration. NOT pixel art, NOT a 3D render, NOT a photo.
+- Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
+  classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
+- Heroic semi-realistic anime proportions: a human is about 5 heads tall, with long legs and a
+  slim, athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (violet, gold, ember orange) against darker metals and
+  fabrics. Strong rim light that separates the figure from any background.
+- Thin dark outline, painterly shading with crisp highlights on metal.
+- Light comes from the top-left.
+- NOT pixel art, NOT a 3D render, NOT a photo.
 - Camera: three-quarter top-down view, pitched about 35-40 degrees downward, like a classic isometric MMORPG."""
 
 DIRECTIONS = """ROWS = facing directions, top to bottom (5 rows):
@@ -44,7 +48,9 @@ HARD RULES:
 - Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00)
   with no gradient, and do not use that green anywhere on the character.
 - No ground shadow, no floor, no scenery.
-- No motion trails, no slash arcs, no glow, sparks or magic effects (the game draws those itself).
+- No motion trails, no slash arcs, no sparks or spell effects (the game draws those itself).
+  Glow that belongs to the character itself (energy wings, eyes, magma cracks, a glowing blade edge)
+  is part of the design and must be drawn.
 - No text, numbers, labels, borders, grid lines or watermark.
 - Output: PNG."""
 
@@ -65,25 +71,29 @@ HARD RULES:
 
 CHARS = {
     "warden": {
-        "title": "the Warden (player character, a young knight)",
+        "title": "the Warden (player character, a dark knight with glowing wings)",
         "desc": """CHARACTER - the Warden:
-- A young chibi knight with a friendly, determined face.
-- Short tousled ash-blond hair, bright blue eyes. No helmet.
-- Polished silver-blue plate armour with gold trim. Short crimson cape. Brown leather belt and boots.
-- Right hand: a straight longsword with a gold crossguard.
-- Left arm: a kite shield, royal blue with a gold crown emblem.""",
-        "fill": 70,
+- A young male knight with a calm, cold, mysterious expression. Silver-white hair, swept back,
+  falling to the neck. Pale violet glowing eyes. No helmet.
+- Dark gunmetal plate armour with fine gold filigree, a high collar and layered pauldrons.
+  Long tattered black-and-crimson cape. Dark leather gloves and armoured boots.
+- Large wings on his back made of translucent violet energy shaped like long feathers, glowing
+  brighter at the tips. The wings are part of the character and appear in every pose.
+  Keep the wings folded slightly so they stay inside the cell.
+- Right hand: a long straight sword with a black blade edged in faint blue light and a gold crossguard.
+- Left arm: a dark kite shield with a gold lion-head emblem.""",
+        "fill": 62,
         "anims": {
-            "idle": ("idle stance, loops", """- Frame 1: neutral ready stance, sword lowered at the side, shield in front of the body.
-- Frame 2: slight inhale, shoulders and head rise a tiny bit, cape hangs straight.
+            "idle": ("idle stance, loops", """- Frame 1: ready stance, sword lowered diagonally, shield held in front, wings half folded.
+- Frame 2: slight inhale, chest and wings rise a little, wing tips glow brighter.
 - Frame 3: same as frame 1.
-- Frame 4: slight exhale, shoulders drop a tiny bit, cape sways a little."""),
-            "walk": ("walk cycle, loops", """- Frame 1: left foot forward (contact), right arm with sword swings back.
+- Frame 4: slight exhale, wings lower a little, cape sways."""),
+            "walk": ("walk cycle, loops", """- Frame 1: left foot forward (contact), sword arm swings back.
 - Frame 2: legs passing under the body, body at its highest point.
 - Frame 3: right foot forward (contact), mirror of frame 1.
 - Frame 4: legs passing under the body again, body at its highest point.
-The cape trails behind the direction of travel."""),
-            "attack": ("sword slash, plays once", """- Frame 1: wind-up, sword raised back over the shoulder, body twisted, shield pulled close.
+A confident, steady stride. The cape and wings trail slightly behind the direction of travel."""),
+            "attack": ("sword slash, plays once", """- Frame 1: wind-up, sword raised back over the shoulder, body twisted, wings spread wider.
 - Frame 2: mid-swing, sword cutting horizontally across the front of the body.
 - Frame 3: follow-through, sword fully extended to the far side, weight on the front foot.
 - Frame 4: recover, returning to the ready stance.
@@ -91,20 +101,21 @@ The swing travels in the direction the character is facing in that row."""),
         },
     },
     "golem": {
-        "title": "the Cinder Golem (monster)",
-        "desc": """CHARACTER - the Cinder Golem:
-- A stocky chibi rock golem, as tall as a knight but twice as wide. Cute but menacing, no gore.
-- Body made of stacked warm-grey basalt slabs. Bright orange lava glows through cracks on the chest and arms.
-- Two glowing amber eyes, no mouth. Oversized stone fists, short thick legs.
-- Small smouldering embers on the shoulders (part of the body, not a floating effect).""",
-        "fill": 75,
+        "title": "the Magma Golem (monster)",
+        "desc": """CHARACTER - the Magma Golem:
+- A towering, menacing golem, about 1.5 times as tall as a human knight, with a broad hunched torso.
+- Body made of jagged black basalt plates. Bright molten magma glows through deep cracks and
+  pools in a burning core in the chest.
+- Small head sunk between massive shoulders, two burning orange eyes.
+- Huge rock fists, thick legs. Heat haze and embers drift from the shoulders (part of the body).""",
+        "fill": 72,
         "anims": {
             "walk": ("heavy walk cycle, loops", """- Frame 1: left foot forward, body leaning to the left, arms hanging low.
 - Frame 2: both feet under the body, body upright.
 - Frame 3: right foot forward, body leaning to the right.
 - Frame 4: both feet under the body, body upright.
-A slow, heavy, lumbering stomp."""),
-            "attack": ("overhead fist smash, plays once", """- Frame 1: wind-up, both fists raised high above the head.
+A slow, heavy, crushing stride."""),
+            "attack": ("overhead fist smash, plays once", """- Frame 1: wind-up, both fists raised high above the head, magma core flaring.
 - Frame 2: fists swinging down in front of the body.
 - Frame 3: impact, fists on the ground in front of the feet, body bent forward.
 - Frame 4: recover, straightening up.
@@ -112,23 +123,24 @@ The smash lands in the direction the golem is facing in that row."""),
         },
     },
     "imp": {
-        "title": "the Ash Imp (monster)",
-        "desc": """CHARACTER - the Ash Imp:
-- A small mischievous imp with a round body and a toothy grin.
-- Vivid violet-purple skin, big yellow eyes, two short curved horns.
-- Tiny bat wings, a thin tail with a glowing ember at the tip, small claws.""",
-        "fill": 65,
+        "title": "the Cinder Fiend (monster)",
+        "desc": """CHARACTER - the Cinder Fiend:
+- A lean, hunched demon, a little shorter than a human. Menacing, not cute.
+- Charcoal-black skin with glowing ember cracks, long curved horns, a narrow face with glowing
+  orange eyes and sharp teeth.
+- Long thin arms with hooked claws, ragged bat wings, a whip-like tail ending in a small flame.""",
+        "fill": 62,
         "anims": {
-            "walk": ("bouncy hop cycle, loops", """- Frame 1: crouched on the ground, wings folded, about to hop.
-- Frame 2: pushing off, body stretched upward, wings opening.
-- Frame 3: top of the hop, feet off the ground, wings fully spread.
-- Frame 4: landing, body squashed slightly, wings folding.
-Keep the baseline where the feet touch the ground in frames 1 and 4."""),
-            "attack": ("claw swipe, plays once", """- Frame 1: wind-up, one clawed hand pulled back, body leaning back.
-- Frame 2: lunge forward, claw swiping across.
+            "walk": ("prowling walk cycle, loops", """- Frame 1: crouched low, left claw forward, wings folded.
+- Frame 2: body rising, legs passing, wings half open.
+- Frame 3: crouched low, right claw forward, mirror of frame 1.
+- Frame 4: body rising again, wings half open.
+A fast, predatory prowl. Keep the feet on the ground in every frame."""),
+            "attack": ("claw slash, plays once", """- Frame 1: wind-up, one clawed arm pulled back, wings flared.
+- Frame 2: lunge forward, claw slashing across.
 - Frame 3: follow-through, arm fully extended, body leaning forward.
-- Frame 4: recover, hopping back to a neutral pose.
-The swipe goes in the direction the imp is facing in that row."""),
+- Frame 4: recover to a crouch.
+The slash goes in the direction the fiend is facing in that row."""),
         },
     },
 }
@@ -182,58 +194,53 @@ ANIMATION: {label}, 4 frames.
         n += 1
     num += 10
 
-write("40_map_volcano.txt", """
-OUTPUT FILE NAME: map_volcano.png
+write("40_fx_lion_spirit.txt", """
+OUTPUT FILE NAME: lion_spirit.png
 ATTACH WITH THIS PROMPT: nothing
 
-Create the ground painting for a 2D action RPG field map: a sunlit volcanic highland.
+Create a visual effect image for a 2D action RPG: a golden lion spirit summoned by a knight's ultimate skill.
 
 CONTENT:
-- Warm terracotta and sandstone rock, broken into large cracked plates.
-- Thin glowing orange lava seams between some plates, and a few small lava pools (each smaller than 5% of the image).
-- Patches of green moss and short grass, scattered pebbles and small flat stones.
-- Variety across the map: a hotter area with more lava on one side, a greener calmer area on the other.
-- Bright daylight, saturated cheerful colours. Mid-tone overall so that bright spell effects stay visible on top.
-
-VIEW AND STYLE:
-- Seen from above at a three-quarter top-down angle, pitched about 35-40 degrees downward.
-- Hand-painted game background, crisp illustration. NOT pixel art, NOT a 3D render, NOT a photo.
-- Even lighting from the top-left, no strong cast shadows.
+- The head and mane of a majestic lion, roaring with its mouth wide open, seen from the front and
+  slightly from below.
+- The lion is made entirely of golden fire and light: the mane is a burst of flames, the face is
+  glowing gold with white-hot highlights, the eyes burn white.
+- Sparks and small embers around the mane. Bright, intense and powerful.
 
 HARD RULES:
-- Ground only. Nothing taller than knee height: no trees, pillars, buildings, cliffs, walls or large boulders.
-- No characters, creatures, items, text, UI, borders or watermark.
-- The painting fills the whole canvas edge to edge.
-- Landscape canvas, aspect ratio 3:2, at the largest resolution available (1536x1024 minimum).
+- Background: pure flat black (#000000) everywhere outside the lion. No gradient, no vignette,
+  no ground, no scenery. (The game blends this image additively, so black becomes invisible.)
+- The lion is centred and fills about 85% of the canvas. Nothing touches the canvas edges.
+- No text, no border, no watermark.
+- Square canvas, 1:1, at the largest resolution available (1024x1024 minimum).
 - Output: PNG.
 """)
-ORDER.append(("40_map_volcano.txt", "map_volcano.png", "map"))
+ORDER.append(("40_fx_lion_spirit.txt", "lion_spirit.png", "fx"))
 
-write("50_icons_skills_optional.txt", f"""
+write("50_icons_skills.txt", """
 OUTPUT FILE NAME: icons_skills.png
 ATTACH WITH THIS PROMPT: the approved warden_concept.png (for colours only)
-OPTIONAL ASSET: the game works without it.
 
-Create a sheet of 6 skill icons for a 2D fantasy action RPG.
+Create a sheet of 6 skill icons for a dark fantasy action RPG.
 
 LAYOUT:
 - Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal square icons.
 - Each icon fills its whole cell edge to edge. No frames, no borders, no gaps, no text.
 
 ICONS, left to right, top row then bottom row:
-1. Sword Slash: a silver longsword cutting diagonally, on a slate-blue background.
-2. Blade Wave: a crescent of light-blue energy flying forward, on a deep blue background.
-3. Shield Bash: a royal blue kite shield with a gold crown emblem ramming forward, on an amber background.
-4. Guardian Ring: a glowing golden rune circle on the ground seen from above, on a warm brown background.
-5. Judgment: a pillar of white-gold light striking down from the sky, on a deep orange background.
-6. Healing Potion: a round glass bottle of red liquid with a cork, on a dark teal background.
+1. Sword Slash: a black longsword with a faint blue edge cutting diagonally, on a dark slate background.
+2. Triple Blade Wave: three crescents of blue light flying forward in a fan, on a deep navy background.
+3. Aegis: a translucent glowing bubble shield with a gold lion emblem at its centre, on a dark teal background.
+4. Blade Storm: a sword spinning in a circle leaving white ring trails, on a dark steel-blue background.
+5. Golden Lion Roar: a roaring lion head made of golden fire, on a deep crimson background.
+6. Healing Potion: a round glass bottle of glowing red liquid with a cork, on a dark background.
 
 STYLE:
-- Hand-painted game icons, bold shapes that read clearly at 64x64 pixels, strong contrast, vivid colours.
-- Same painting style and lighting (from the top-left) for all six.
+- Hand-painted dark fantasy game icons, bold shapes that read clearly at 64x64 pixels, strong
+  contrast, glowing accents. Same painting style and lighting (from the top-left) for all six.
 - Output: PNG.
 """)
-ORDER.append(("50_icons_skills_optional.txt", "icons_skills.png", "icons"))
+ORDER.append(("50_icons_skills.txt", "icons_skills.png", "icons"))
 
 # ---------------------------------------------------------------- templates
 font = ImageFont.truetype(FONT, 20)

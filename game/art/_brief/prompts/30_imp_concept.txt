@@ -1,20 +1,25 @@
 OUTPUT FILE NAME: imp_concept.png
 ATTACH WITH THIS PROMPT: templates/template_turnaround.png
 
-Create a character turnaround sheet for a 2D game: the Ash Imp (monster).
+Create a character turnaround sheet for a 2D game: the Cinder Fiend (monster).
 This image becomes the design reference for every later sprite of this character.
 
-CHARACTER - the Ash Imp:
-- A small mischievous imp with a round body and a toothy grin.
-- Vivid violet-purple skin, big yellow eyes, two short curved horns.
-- Tiny bat wings, a thin tail with a glowing ember at the tip, small claws.
+CHARACTER - the Cinder Fiend:
+- A lean, hunched demon, a little shorter than a human. Menacing, not cute.
+- Charcoal-black skin with glowing ember cracks, long curved horns, a narrow face with glowing
+  orange eyes and sharp teeth.
+- Long thin arms with hooked claws, ragged bat wings, a whip-like tail ending in a small flame.
 
 STYLE (same for every asset in this project):
-- Hand-painted 2D game sprite illustration with chibi proportions: big head, small body, about 2.5 heads tall.
-- Clean dark-brown outline around the whole figure (not pure black), soft cel shading with 2-3 tones per colour.
-- Vivid, saturated, bright and cheerful colours. European high-fantasy theme.
-- Light comes from the top-left. Subtle rim light on the right side.
-- Crisp illustration. NOT pixel art, NOT a 3D render, NOT a photo.
+- Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
+  classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
+- Heroic semi-realistic anime proportions: a human is about 5 heads tall, with long legs and a
+  slim, athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (violet, gold, ember orange) against darker metals and
+  fabrics. Strong rim light that separates the figure from any background.
+- Thin dark outline, painterly shading with crisp highlights on metal.
+- Light comes from the top-left.
+- NOT pixel art, NOT a 3D render, NOT a photo.
 - Camera: three-quarter top-down view, pitched about 35-40 degrees downward, like a classic isometric MMORPG.
 
 LAYOUT:

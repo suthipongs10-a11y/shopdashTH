@@ -34,7 +34,7 @@ func _physics_process(delta: float) -> void:
 			continue
 		if GameData.ground_dist(global_position, m.global_position) <= RADIUS + m.body_radius:
 			_already_hit[m.get_instance_id()] = true
-			player.strike(m, mult, dir * 160.0, 0.0, tally)
+			player.strike(m, mult, dir * 160.0, 0.0, tally if is_instance_valid(tally) else null)
 	queue_redraw()
 
 
