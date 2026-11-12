@@ -23,6 +23,7 @@ var knock := 0.0
 var stun := 0.0
 var shake := 0.0
 var color := Color(1.0, 0.9, 0.5)
+var palette: Dictionary = Vfx.pal("holy")
 var tally: SkillTally
 
 var _timer := 0.0
@@ -67,6 +68,7 @@ func _process(delta: float) -> void:
 func _fire() -> void:
 	if not is_instance_valid(player):
 		return
+	var bursts := 0
 	for node in get_tree().get_nodes_in_group("monsters"):
 		var m := node as Monster
 		if m == null:
@@ -77,67 +79,91 @@ func _fire() -> void:
 		var push := Vector2.ZERO
 		if knock > 0.0:
 			push = (offset.normalized() if offset.length() > 1.0 else Vector2.RIGHT) * knock
+		# Every target gets its own impact, capped so huge packs stay readable.
+		if bursts < 8:
+			bursts += 1
+			_impact_on(m, offset)
 		player.strike(m, mult, push, stun, tally if is_instance_valid(tally) else null)
+	if bursts > 0 and style in [Style.ROAR, Style.BANNER, Style.CROSS]:
+		Juice.hitstop(0.06)
 	if shake > 0.0:
 		player.shake(shake)
 	_fire_visuals()
 
 
+## Per-target impact, EggPact style: melee skills slash, magic skills explode.
+func _impact_on(m: Monster, offset: Vector2) -> void:
+	var at := m.global_position
+	match style:
+		Style.WHIRL:
+			var tangent := GameData.to_screen(offset.orthogonal()).normalized()
+			Vfx.slash(at, m.visual_height() * 0.45, tangent, palette, 0.9)
+		Style.SHOCK:
+			Vfx.burst(at, 40.0, 8, palette["aura"], 320.0, 12.0, 0.4)
+		Style.CROSS:
+			Vfx.explode(at, palette, false)
+		Style.ROAR, Style.BANNER:
+			Vfx.explode(at, palette, true)
+			if style == Style.BANNER:
+				Vfx.beam(at, 34.0, palette["aura"], 0.45)
+		_:
+			Vfx.burst(at, 40.0, 6, palette["aura"], 260.0, 10.0, 0.35)
+
+
 func _fire_visuals() -> void:
 	var here := global_position
-	var white := Color(1.0, 1.0, 1.0)
-	var body := here + Vector2(0.0, -40.0)
 	match style:
 		Style.SHOCK:
-			if not _painted_ring(here, radius * 2.2, 0.35):
-				Fx.ring(get_parent(), here, color, radius, 0.35, 10.0)
-			Fx.flash(get_parent(), here, color, radius * 0.9, 0.3, true)
-			if not _explode(body, radius * 1.8):
-				Fx.burst(top_fx, body, color, 16, 380.0, 0.4, 14.0)
-				Fx.sparkle(top_fx, body, white, 120.0, 0.25)
-			Fx.streaks(top_fx, body, color, radius * 2.2, 12, 0.3, 0.2)
+			Vfx.ring(here, 10.0, radius * 1.15, palette["aura"], 0.4, 10.0)
+			Vfx.ring(here, 6.0, radius * 0.8, palette["hot"], 0.3, 4.0)
+			Vfx.burst(here, 30.0, 26, palette["aura"], 420.0, 18.0, 0.5)
+			Vfx.smoke(here, 20.0, 50.0, 110.0, Color(0.85, 0.78, 0.65), 0.9, 0.25)
 		Style.CIRCLE:
-			Fx.ring(get_parent(), here, color, radius, 0.4, 5.0)
-			Fx.burst(top_fx, here + Vector2(0.0, -20.0), color, 10, 160.0, 0.6, 12.0,
-				Vector2(0.0, -260.0))
+			Vfx.ring(here, radius * 0.4, radius, palette["aura"], 0.4, 5.0)
+			Vfx.burst(here, 20.0, 10, palette["core"], 160.0, 10.0, 0.6)
 		Style.WHIRL:
-			Fx.burst(top_fx, body, white, 5, 260.0, 0.25, 9.0)
+			Vfx.ring(here, radius * 0.5, radius * 1.05, palette["core"], 0.25, 4.0)
+			for i in 3:
+				var a := randf() * TAU
+				Vfx.slash(here + GameData.to_screen(Vector2.from_angle(a) * radius * 0.5), 46.0,
+					Vector2.from_angle(a + PI * 0.5), palette, 1.2)
 		Style.ROAR:
-			Fx.flash(get_parent(), here, color, radius * 1.3, 0.5, true)
+			Juice.flash(0.22, palette["aura"])
 			_painted_ring(here, radius * 2.6, 0.5)
-			Fx.ring(get_parent(), here, white, radius * 0.7, 0.35, 6.0)
-			if not _explode(body, radius * 1.6):
-				Fx.flash(top_fx, body, white, radius * 0.9, 0.3)
-				Fx.burst(top_fx, body, color, 26, 560.0, 0.6, 16.0)
-			Fx.streaks(top_fx, body, color, radius * 2.4, 24, 0.5, 1.1)
+			Vfx.ring(here, 20.0, radius * 1.2, palette["aura"], 0.5, 14.0)
+			Vfx.ring(here, 10.0, radius * 0.8, palette["hot"], 0.35, 6.0)
+			Vfx.burst(here, 60.0, 50, palette["aura"], 620.0, 30.0, 0.7)
+			Vfx.burst(here, 60.0, 24, palette["hot"], 380.0, 16.0, 0.45)
+			for i in 14:
+				Vfx.flame(here + GameData.to_screen(Vector2.from_angle(TAU * i / 14.0) * radius * 0.6),
+					palette["aura"], randf_range(22, 36), randf_range(120, 240), randf_range(0.5, 0.9))
+			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), palette["aura"], radius * 2.4, 24, 0.5, 1.1)
 		Style.CROSS:
+			Juice.flash(0.1, palette["aura"])
 			var cross := FxSprite.play(top_fx, "cross", here + Vector2(0.0, -90.0), radius * 2.6, 0.5)
 			if cross != null:
 				cross.grow_from = 0.5
 				cross.grow_to = 1.15
 			else:
-				Fx.sparkle(top_fx, here + Vector2(0.0, -90.0), Color(1.0, 0.9, 0.55), radius * 1.8,
-					0.45)
-				Fx.sparkle(top_fx, here + Vector2(0.0, -90.0), white, radius * 1.1, 0.35)
-			if FxSprite.play(top_fx, "pillar", here + Vector2(0.0, -200.0), 420.0, 0.45) == null:
-				Fx.pillar(top_fx, here, color, radius * 0.7, 420.0, 0.45)
-			Fx.flash(get_parent(), here, color, radius * 1.2, 0.4, true)
-			Fx.burst(top_fx, body, color, 14, 320.0, 0.5, 12.0, Vector2(0.0, -200.0))
+				Vfx.twinkle(here, 90.0, radius * 1.5, palette["core"], 0.5)
+				Vfx.twinkle(here, 90.0, radius * 0.9, Color.WHITE, 0.35)
+			Vfx.beam(here, 50.0, palette["aura"], 0.5)
+			Vfx.ring(here, 10.0, radius * 1.1, palette["aura"], 0.45, 8.0)
+			Vfx.burst(here, 40.0, 24, palette["aura"], 360.0, 16.0, 0.55)
 		Style.BANNER:
-			Fx.flash(get_parent(), here, color, radius * 1.3, 0.5, true)
+			Juice.flash(0.2, palette["aura"])
 			_painted_ring(here, radius * 2.4, 0.5)
-			if not _explode(body, radius * 1.5):
-				Fx.flash(top_fx, body, white, radius * 0.8, 0.3)
-				Fx.burst(top_fx, body, color, 22, 520.0, 0.6, 15.0)
+			Vfx.ring(here, 20.0, radius * 1.15, palette["aura"], 0.5, 12.0)
+			Vfx.burst(here, 60.0, 40, palette["aura"], 560.0, 24.0, 0.6)
 			# Gold and blue spiral streaks, like the reference clip's big finisher.
-			Fx.streaks(top_fx, body, color, radius * 2.6, 20, 0.55, 1.4)
-			Fx.streaks(top_fx, body, Color(0.55, 0.75, 1.0), radius * 2.2, 10, 0.55, -1.2)
-			# Lances of light landing around the blast.
+			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), palette["aura"], radius * 2.6, 20, 0.55, 1.4)
+			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), Color(0.55, 0.75, 1.0), radius * 2.2, 10,
+				0.55, -1.2)
 			for i in 3:
 				var spot := here + GameData.to_screen(Vector2.from_angle(randf() * TAU)
 					* randf_range(0.3, 0.95) * radius)
-				if FxSprite.play(top_fx, "pillar", spot + Vector2(0.0, -160.0), 320.0, 0.35) == null:
-					Fx.pillar(top_fx, spot, color, 46.0, 320.0, 0.35)
+				Vfx.beam(spot, 36.0, palette["aura"], 0.4)
+				Vfx.ring(spot, 6.0, 70.0, palette["hot"], 0.3, 4.0)
 
 
 ## Expanding painted ring on the ground. Returns false when there is no ring art.

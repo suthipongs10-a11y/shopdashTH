@@ -6,6 +6,8 @@ signal died(monster: Monster)
 
 enum State { WANDER, CHASE, WINDUP, DEAD }
 
+const DISSOLVE_TIME := 0.9
+
 var kind := ""
 var display_name := ""
 var level := 1
@@ -28,6 +30,9 @@ var state: State = State.WANDER
 var fx_layer: Node
 var ground_layer: Node
 var fire_chance := 0.0
+var palette: Dictionary = Vfx.pal("fire")
+
+var _death_t := 0.0
 
 var _player: Player
 var _sheet: SheetSprite
@@ -64,6 +69,7 @@ func setup(kind_id: String, monster_level: int, player: Player) -> void:
 	xp_reward = int(d["xp"])
 	gold_reward = int(d["gold"])
 	fire_chance = float(d.get("fire_chance", 0.0))
+	palette = Vfx.pal(String(d.get("pal", "fire")))
 	body_color = d["color"]
 
 
@@ -91,6 +97,7 @@ func visual_height() -> float:
 
 func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
+		_dissolve(delta)
 		return
 	_flash = maxf(0.0, _flash - delta)
 	_punch = maxf(0.0, _punch - delta)
@@ -177,6 +184,7 @@ func take_damage(amount: int, knock: Vector2 = Vector2.ZERO, stun: float = 0.0) 
 	hp = maxi(0, hp - amount)
 	_flash = 0.1
 	_punch = 0.14
+	_sheet.squash = Vector2(1.18, 0.86)
 	_knock += knock
 	if stun > 0.0:
 		_stun_left = maxf(_stun_left, stun)
@@ -195,16 +203,25 @@ func _die() -> void:
 	collision_mask = 0
 	died.emit(self)
 	queue_redraw()
-	if fx_layer != null:
-		var at := global_position + Vector2(0.0, -visual_height() * 0.45)
-		var size := maxf(body_radius * 3.0, visual_height() * 0.7)
-		Fx.flash(fx_layer, at, body_color.lightened(0.4), size, 0.3)
-		Fx.burst(fx_layer, at, body_color.lightened(0.3), 10, 240.0, 0.5, 18.0)
-	var tw := create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(self, "modulate:a", 0.0, 0.35)
-	tw.tween_property(self, "scale", Vector2(1.25, 0.6), 0.35)
-	tw.chain().tween_callback(queue_free)
+	Vfx.burst(global_position, visual_height() * 0.5, 26, palette["aura"], 280.0, 16.0, 0.8)
+
+
+## EggPact death: the body turns into its aura colour and fades while sparks rise from it.
+func _dissolve(delta: float) -> void:
+	_death_t += delta
+	var k := _death_t / DISSOLVE_TIME
+	if k >= 1.0:
+		queue_free()
+		return
+	modulate.a = 1.0 - k
+	if _sheet.has_art():
+		_sheet.set_flash(minf(1.0, _death_t * 1.5), palette["aura"])
+	else:
+		scale = Vector2(1.0 + 0.25 * k, 1.0 - 0.4 * k)
+	if randf() < delta * 30.0:
+		var h := visual_height()
+		Vfx.glow(global_position + Vector2(randf_range(-0.4, 0.4) * h, 0.0), randf_range(0.1, 0.9) * h,
+			randf_range(6, 12), palette["aura"], 0.8, Vector3(0, 0, randf_range(60, 120)))
 
 
 func _draw() -> void:
@@ -212,7 +229,7 @@ func _draw() -> void:
 	if _sheet.has_art():
 		var shadow := maxf(r * 1.1, visual_height() * 0.36)
 		draw_colored_polygon(GameData.ellipse_points(shadow, 24), Color(0.15, 0.05, 0.0, 0.32))
-		_sheet.set_flash(0.85 if _flash > 0.0 else 0.0)
+		_sheet.set_flash(clampf(_flash / 0.1, 0.0, 1.0) * 0.6)
 		_draw_hp_bar(r)
 		return
 	draw_colored_polygon(GameData.ellipse_points(r * 1.1, 20), Color(0, 0, 0, 0.3))

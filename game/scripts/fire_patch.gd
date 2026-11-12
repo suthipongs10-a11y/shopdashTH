@@ -14,7 +14,8 @@ var damage := 50
 
 var _t := 0.0
 var _tick := TICK
-var _flames: CPUParticles2D
+var _painted := false
+var _flame_left := 0.0
 
 
 func _ready() -> void:
@@ -29,27 +30,7 @@ func _ready() -> void:
 		f.fade_out = 0.5
 		f.flip_h = randf() < 0.5
 		painted += 1
-	if painted == 0:
-		_flames = CPUParticles2D.new()
-		_flames.material = Fx.additive()
-		_flames.texture = Fx.glow_texture()
-		_flames.amount = 26
-		_flames.lifetime = 0.7
-		_flames.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
-		_flames.emission_sphere_radius = radius * 0.8
-		_flames.scale = Vector2(1.0, GameData.Y_SQUASH)
-		_flames.direction = Vector2.UP
-		_flames.spread = 12.0
-		_flames.gravity = Vector2(0.0, -180.0)
-		_flames.initial_velocity_min = 20.0
-		_flames.initial_velocity_max = 60.0
-		_flames.scale_amount_min = 0.2
-		_flames.scale_amount_max = 0.45
-		var ramp := Gradient.new()
-		ramp.set_color(0, Color(1.0, 0.85, 0.3, 0.9))
-		ramp.set_color(1, Color(1.0, 0.25, 0.05, 0.0))
-		_flames.color_ramp = ramp
-		add_child(_flames)
+	_painted = painted > 0
 
 
 func _process(delta: float) -> void:
@@ -58,6 +39,15 @@ func _process(delta: float) -> void:
 		_puff()
 		queue_free()
 		return
+	if not _painted:
+		# EggPact ground fire: short-lived flame particles licking up from the patch.
+		_flame_left -= delta
+		while _flame_left <= 0.0:
+			_flame_left += 0.05
+			var spot := GameData.to_screen(Vector2.from_angle(randf() * TAU) * randf() * radius * 0.85)
+			var tint := Color("ff8a2a") if randf() < 0.7 else Color("ffcf5a")
+			Vfx.flame(global_position + spot, tint, randf_range(14, 26), randf_range(60, 140),
+				randf_range(0.35, 0.6))
 	_tick -= delta
 	if _tick <= 0.0:
 		_tick = TICK
@@ -71,8 +61,7 @@ func _puff() -> void:
 	var at := global_position + Vector2(0.0, -20.0)
 	var smoke := FxSprite.play(top_fx, "smoke", at, 130.0)
 	if smoke == null:
-		Fx.burst(top_fx, at, Color(0.45, 0.42, 0.4, 0.6), 6, 60.0, 0.9, 60.0, Vector2(0.0, -40.0),
-			false)
+		Vfx.smoke(global_position, 20.0, 40.0, 110.0, Color(0.3, 0.27, 0.25), 1.2, 0.35)
 
 
 func _draw() -> void:

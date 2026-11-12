@@ -20,6 +20,8 @@ const WHIRL_TIME := 1.6
 const WHIRL_TICKS := 8
 const WHIRL_MOVE := 0.7
 const CROSS_RANGE := 320.0
+## Length of the ultimate intro (dim, zoom, cut-in, charge) before the skill lands.
+const ULT_CHARGE := 0.9
 const RESPAWN_DELAY := 3.0
 ## Max hit-spark effects per physics frame, so huge packs do not flood the scene.
 const HIT_FX_PER_FRAME := 10
@@ -67,6 +69,11 @@ var _hurt_flash := 0.0
 var _swing := 0.0
 var _shake := 0.0
 var _hit_fx_budget := HIT_FX_PER_FRAME
+## Ultimate charge-up in progress: seconds left and its palette.
+var _charge_left := 0.0
+var _charge_pal: Dictionary = {}
+var _ember_left := 0.0
+var _ghost_left := 0.0
 
 
 func _ready() -> void:
@@ -112,6 +119,10 @@ func _ready() -> void:
 	sp = max_sp
 
 
+func get_camera() -> Camera2D:
+	return _camera
+
+
 func _recalc_stats() -> void:
 	max_hp = 8400.0 + 1600.0 * (level - 1)
 	# Generous SP so skills can be chained like the reference clip; potions come with items.
@@ -147,6 +158,7 @@ func _physics_process(delta: float) -> void:
 		aim = to_aim.normalized()
 
 	_tick_aegis(delta)
+	_tick_juice(delta)
 	var move := input.move_vector(self)
 	_moving = move.length() > 0.05
 	var speed := MOVE_SPEED * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
@@ -159,6 +171,10 @@ func _physics_process(delta: float) -> void:
 		_spin_left -= delta
 		_spin_angle += delta * 16.0
 		_face = Vector2.from_angle(_spin_angle)
+		_ghost_left -= delta
+		if _ghost_left <= 0.0:
+			_ghost_left = 0.06
+			_sheet.ghost(Vfx.pal("steel")["aura"], 0.22)
 		if _spin_left <= 0.0:
 			_sheet.release()
 	else:
@@ -178,8 +194,8 @@ func _animate(delta: float) -> void:
 		_dust_left -= delta
 		if _dust_left <= 0.0:
 			_dust_left = 0.2
-			Fx.burst(ground_fx, global_position, Color(1.0, 0.92, 0.8, 0.5), 3, 45.0, 0.45, 26.0,
-				Vector2(0.0, -40.0), false)
+			Vfx.smoke(global_position + Vector2(randf_range(-8, 8), 0.0), 4.0, 10.0, 22.0,
+				Color(0.85, 0.75, 0.6), 0.5, 0.35)
 	else:
 		_walk_t = 0.0
 	if _sheet.has_art():
@@ -206,7 +222,7 @@ func _try_use(id: String) -> void:
 	_face = aim
 	_sheet.play_once("attack")
 	var mult := float(data["mult"])
-	var color: Color = data["color"]
+	var palette := Vfx.pal(String(data.get("pal", "steel")))
 	var tally: SkillTally = null
 	if id != "attack":
 		tally = SkillTally.new()
@@ -214,33 +230,73 @@ func _try_use(id: String) -> void:
 		var big := id in ["lion", "banner"]
 		tally.color = Color(1.0, 0.5, 0.65) if big else Color(1.0, 0.85, 0.3)
 		top_fx.add_child(tally)
-		SkillCallout.spawn(top_fx, self, String(data["name"]), color)
+		SkillCallout.spawn(top_fx, self, String(data["name"]), palette["aura"])
 	match id:
 		"attack":
-			_do_attack(mult)
+			_do_attack(mult, palette)
 		"wave":
-			_do_wave(mult, color, tally)
+			_do_wave(mult, palette, tally)
 		"aegis":
-			_do_aegis(mult, color, tally)
+			_do_aegis(mult, palette, tally)
 		"whirl":
-			_do_whirl(mult, color, tally)
+			_do_whirl(mult, palette, tally)
 		"lion":
-			_do_lion(mult, color, tally)
+			_ultimate_intro(String(data["name"]), palette)
+			_do_lion(mult, palette, tally)
 		"cross":
-			_do_cross(mult, color, tally)
+			_do_cross(mult, palette, tally)
 		"banner":
-			_do_banner(mult, color, tally)
+			_ultimate_intro(String(data["name"]), palette)
+			_do_banner(mult, palette, tally)
 
 
-## Basic attack: a cone in front of the player.
-func _do_attack(mult: float) -> void:
+## Glow, embers and the ultimate charge-up.
+func _tick_juice(delta: float) -> void:
+	var holy := Vfx.pal("holy")
+	var body := global_position
+	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.004)
+	if _charge_left > 0.0:
+		_charge_left -= delta
+		_sheet.glow_amount = 1.0
+		_sheet.glow_color = _charge_pal["aura"]
+		Vfx.charge(body, 70.0, _charge_pal, 2, 140.0)
+		if randf() < 0.7:
+			Vfx.flame(body + Vector2(randf_range(-60, 60), randf_range(-8, 8)), _charge_pal["aura"],
+				randf_range(18, 30), randf_range(120, 260), randf_range(0.4, 0.7))
+		_sheet.squash = Vector2(1.0 + sin(Time.get_ticks_msec() * 0.04) * 0.015, 0.97)
+		if _charge_left <= 0.0:
+			Juice.spotlight_end()
+	else:
+		_sheet.glow_amount = 0.3 + 0.2 * pulse
+		_sheet.glow_color = holy["aura"]
+	# Embers drifting up around the warden, as on EggPact's high-star monsters.
+	_ember_left -= delta
+	while _ember_left <= 0.0:
+		_ember_left += 0.12
+		var at := body + Vector2(randf_range(-30, 30), randf_range(-5, 5))
+		var tint: Color = holy["core"] if randf() < 0.3 else holy["aura"]
+		Vfx.glow(at, randf_range(10, 90), randf_range(4, 8), tint, randf_range(0.6, 1.1),
+			Vector3(randf_range(-10, 10), 0.0, randf_range(30, 70)))
+
+
+## EggPact's ultimate intro: dim the world, zoom in on the caster, sweep the cut-in banner.
+func _ultimate_intro(skill_name: String, palette: Dictionary) -> void:
+	Juice.spotlight([self] as Array[Node2D], 0.62, 1.14)
+	Juice.cutin(skill_name, palette["cut"], _sheet.portrait())
+	_charge_left = ULT_CHARGE
+	_charge_pal = palette
+
+
+## Basic attack: a cone in front of the player. Lunges a little, leaves an afterimage and
+## slashes every target hit (EggPact's melee hit).
+func _do_attack(mult: float, palette: Dictionary) -> void:
 	_swing = 0.2
-	var fx := SlashFx.new()
-	fx.aim = aim
-	fx.reach = ATTACK_REACH
-	fx.position = global_position
-	top_fx.add_child(fx)
+	_sheet.squash = Vector2(1.15, 0.9)
+	_sheet.hop = -10.0
+	_sheet.ghost(palette["aura"], 0.18)
+	var screen_dir := GameData.to_screen(aim).normalized()
 	var half_cone := deg_to_rad(ATTACK_CONE_DEG * 0.5)
+	var hits := 0
 	for node in get_tree().get_nodes_in_group("monsters"):
 		var m := node as Monster
 		if m == null:
@@ -250,39 +306,56 @@ func _do_attack(mult: float) -> void:
 			continue
 		if offset.length() > m.body_radius and absf(aim.angle_to(offset)) > half_cone:
 			continue
+		if hits < 3:
+			Vfx.slash(m.global_position, m.visual_height() * 0.45, screen_dir, palette,
+				1.3 if m.kind == "golem" else 1.0)
+		hits += 1
 		strike(m, mult, aim * 120.0)
+	if hits > 0:
+		Juice.hitstop(0.05)
+	else:
+		Vfx.slash(global_position + screen_dir * ATTACK_REACH * 0.6, 50.0, screen_dir, palette, 0.8)
 
 
 ## Q: three piercing blade waves in a fan.
-func _do_wave(mult: float, color: Color, tally: SkillTally) -> void:
+func _do_wave(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	_swing = 0.2
+	_sheet.ghost(palette["aura"], 0.2)
 	for spread in [-0.28, 0.0, 0.28]:
 		var wave := BladeWave.new()
 		wave.player = self
 		wave.tally = tally
 		wave.dir = aim.rotated(spread)
 		wave.mult = mult
-		wave.color = color
+		wave.palette = palette
 		wave.position = global_position
 		top_fx.add_child(wave)
-	Fx.flash(top_fx, global_position + Vector2(0.0, -40.0), color, 90.0, 0.22)
+	Vfx.charge(global_position, 60.0, palette, 6, 90.0)
+	Vfx.ring(global_position, 10.0, 90.0, palette["core"], 0.3, 5.0)
 
 
 ## E: raise a bubble shield. Blocks most damage, shoves enemies away on cast,
 ## and bursts outward when it ends.
-func _do_aegis(mult: float, color: Color, tally: SkillTally) -> void:
+func _do_aegis(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	_aegis_left = AEGIS_TIME
 	_aegis_tally = tally
 	if is_instance_valid(_aegis_fx):
 		_aegis_fx.queue_free()
 	_aegis_fx = AegisFx.new()
-	_aegis_fx.color = color
+	_aegis_fx.color = palette["aura"]
 	_aegis_fx.follow = self
 	top_fx.add_child(_aegis_fx)
-	var body := global_position + Vector2(0.0, -60.0)
-	Fx.sparkle(top_fx, body, Color(1.0, 0.85, 0.4), 210.0, 0.4)
-	Fx.flash(top_fx, body, Color(1.0, 0.9, 0.6), 120.0, 0.3)
-	var pulse := _new_pulse(AoePulse.Style.SHOCK, 130.0, mult * 0.5, color)
+	Juice.flash(0.15, palette["aura"])
+	Vfx.twinkle(global_position, 70.0, 110.0, Color(1.0, 0.9, 0.6), 0.5)
+	Vfx.ring(global_position, 20.0, 150.0, palette["aura"], 0.45, 9.0)
+	Vfx.ring(global_position, 10.0, 100.0, palette["hot"], 0.3, 4.0)
+	Vfx.burst(global_position, 60.0, 24, palette["aura"], 380.0, 14.0, 0.5)
+	for i in 8:
+		var a := TAU * i / 8.0
+		Vfx.twinkle(global_position + GameData.to_screen(Vector2.from_angle(a) * 80.0),
+			randf_range(30, 110), randf_range(8, 14), palette["core"], randf_range(0.4, 0.8))
+	var pulse := _new_pulse(AoePulse.Style.SHOCK, 130.0, mult * 0.5, palette["aura"])
+	pulse.palette = palette
 	pulse.knock = 360.0
 	pulse.stun = 0.6
 	pulse.shake = 5.0
@@ -300,7 +373,11 @@ func _tick_aegis(delta: float) -> void:
 	if is_instance_valid(_aegis_fx):
 		_aegis_fx.pop()
 	var data: Dictionary = GameData.SKILLS["aegis"]
-	var pulse := _new_pulse(AoePulse.Style.SHOCK, 190.0, float(data["mult"]), data["color"])
+	var palette := Vfx.pal("aegis")
+	Vfx.explode(global_position, palette, true)
+	Juice.flash(0.12, palette["aura"])
+	var pulse := _new_pulse(AoePulse.Style.SHOCK, 190.0, float(data["mult"]), palette["aura"])
+	pulse.palette = palette
 	pulse.knock = 300.0
 	pulse.shake = 8.0
 	# The cast tally fades after a second without hits, so the burst usually gets a fresh one.
@@ -315,11 +392,12 @@ func _tick_aegis(delta: float) -> void:
 
 
 ## R: spin in place (still able to walk slowly), slashing everything around.
-func _do_whirl(mult: float, color: Color, tally: SkillTally) -> void:
+func _do_whirl(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	_spin_left = WHIRL_TIME
 	_spin_angle = aim.angle()
 	_sheet.hold("attack", 2)
-	var pulse := _new_pulse(AoePulse.Style.WHIRL, 165.0, mult, color)
+	var pulse := _new_pulse(AoePulse.Style.WHIRL, 165.0, mult, palette["aura"])
+	pulse.palette = palette
 	pulse.follow = self
 	pulse.ticks = WHIRL_TICKS
 	pulse.interval = WHIRL_TIME / float(WHIRL_TICKS)
@@ -329,16 +407,18 @@ func _do_whirl(mult: float, color: Color, tally: SkillTally) -> void:
 	ground_fx.add_child(pulse)
 
 
-## F: a golden lion spirit rises behind the warden and roars: three blasts around them.
-func _do_lion(mult: float, color: Color, tally: SkillTally) -> void:
+## F: after the intro charge, a golden lion spirit rises and roars: three blasts around.
+func _do_lion(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	var lion := LionFx.new()
-	lion.color = color
+	lion.color = palette["aura"]
+	lion.delay = ULT_CHARGE
 	lion.position = global_position
 	top_fx.add_child(lion)
-	var pulse := _new_pulse(AoePulse.Style.ROAR, 300.0, mult, color)
+	var pulse := _new_pulse(AoePulse.Style.ROAR, 300.0, mult, palette["aura"])
+	pulse.palette = palette
 	pulse.ticks = 3
 	pulse.interval = 0.26
-	pulse.delay = LionFx.ROAR_AT
+	pulse.delay = ULT_CHARGE + LionFx.ROAR_AT
 	pulse.knock = 260.0
 	pulse.shake = 12.0
 	pulse.tally = tally
@@ -347,9 +427,10 @@ func _do_lion(mult: float, color: Color, tally: SkillTally) -> void:
 
 
 ## 1: a holy cross of light strikes the aim point twice.
-func _do_cross(mult: float, color: Color, tally: SkillTally) -> void:
+func _do_cross(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	var offset := input.aim_vector(self).limit_length(CROSS_RANGE)
-	var pulse := _new_pulse(AoePulse.Style.CROSS, 150.0, mult, color)
+	var pulse := _new_pulse(AoePulse.Style.CROSS, 150.0, mult, palette["aura"])
+	pulse.palette = palette
 	pulse.ticks = 2
 	pulse.interval = 0.22
 	pulse.delay = 0.3
@@ -360,16 +441,19 @@ func _do_cross(mult: float, color: Color, tally: SkillTally) -> void:
 	ground_fx.add_child(pulse)
 
 
-## 2: second ultimate. A golden crest rises, then five radiant blasts around the warden.
-func _do_banner(mult: float, color: Color, tally: SkillTally) -> void:
+## 2: second ultimate. After the intro charge a golden crest rises, then five radiant
+## blasts with lances of light raining on everything nearby.
+func _do_banner(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	var crest := CrestFx.new()
-	crest.color = color
+	crest.color = palette["aura"]
+	crest.delay = ULT_CHARGE
 	crest.position = global_position
 	top_fx.add_child(crest)
-	var pulse := _new_pulse(AoePulse.Style.BANNER, 330.0, mult, color)
+	var pulse := _new_pulse(AoePulse.Style.BANNER, 330.0, mult, palette["aura"])
+	pulse.palette = palette
 	pulse.ticks = 5
 	pulse.interval = 0.22
-	pulse.delay = CrestFx.RISE
+	pulse.delay = ULT_CHARGE + CrestFx.RISE
 	pulse.knock = 120.0
 	pulse.shake = 14.0
 	pulse.tally = tally
@@ -424,11 +508,13 @@ func _hit_effect(at: Vector2, is_crit: bool) -> void:
 	if fx != null:
 		fx.rotation = randf() * TAU
 		return
-	var spark := Color(1.0, 0.75, 0.3) if is_crit else Color(1.0, 0.95, 0.75)
-	Fx.flash(top_fx, at, spark, 52.0 if is_crit else 32.0, 0.16)
-	Fx.burst(top_fx, at, spark, 7 if is_crit else 4, 300.0, 0.28, 11.0)
-	if is_crit or randf() < 0.35:
-		Fx.sparkle(top_fx, at + jitter, Color(1.0, 0.95, 0.8), 70.0 if is_crit else 42.0)
+	# "at" is a screen point on the body; Vfx works on the ground point plus a height.
+	var ground := at + Vector2(0.0, 50.0)
+	var steel := Vfx.pal("steel")
+	Vfx.glow(ground, 50.0, 46.0 if is_crit else 30.0, steel["aura"], 0.16)
+	Vfx.burst(ground, 50.0, 7 if is_crit else 4, steel["hot"], 300.0, 9.0, 0.3)
+	if is_crit:
+		Vfx.twinkle(ground + jitter, 50.0, 40.0, Color(1.0, 0.92, 0.6), 0.35)
 
 
 func take_damage(raw: int) -> void:
@@ -456,12 +542,11 @@ func gain_rewards(xp_amount: int, gold_amount: int) -> void:
 		_recalc_stats()
 		hp = max_hp
 		sp = max_sp
-		var gold_light := Color(1.0, 0.85, 0.4)
-		if FxSprite.play(top_fx, "pillar", global_position + Vector2(0.0, -240.0), 520.0, 0.8) == null:
-			Fx.pillar(top_fx, global_position, gold_light, 150.0, 560.0, 0.8)
-		Fx.ring(ground_fx, global_position, gold_light, 200.0, 0.6, 8.0)
-		Fx.burst(top_fx, global_position + Vector2(0.0, -40.0), gold_light, 24, 260.0, 0.9, 14.0,
-			Vector2(0.0, -200.0))
+		var holy := Vfx.pal("holy")
+		Vfx.beam(global_position, 80.0, holy["aura"], 1.2)
+		Vfx.ring(global_position, 10.0, 200.0, holy["aura"], 0.8, 9.0)
+		Vfx.burst(global_position, 80.0, 30, holy["aura"], 300.0, 14.0, 0.9)
+		Juice.flash(0.15, holy["aura"])
 		leveled_up.emit(level)
 
 

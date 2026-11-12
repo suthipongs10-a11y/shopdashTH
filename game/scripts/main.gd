@@ -28,6 +28,14 @@ func _ready() -> void:
 	_top_fx.z_index = 20
 	add_child(_top_fx)
 
+	# EggPact-style particles, the world dim used by ultimates, and screen-level juice.
+	var vfx := Vfx.new()
+	vfx.name = "Vfx"
+	add_child(vfx)
+	var dim := DimRect.new()
+	dim.name = "Dim"
+	add_child(dim)
+
 	_player = Player.new()
 	_player.name = "Player"
 	_player.ground_fx = ground_fx
@@ -47,8 +55,15 @@ func _ready() -> void:
 	spawner.monster_killed.connect(_on_monster_killed)
 	spawner.prefill(5)
 
+	var juice := Juice.new()
+	juice.name = "Juice"
+	juice.camera = _player.get_camera()
+	juice.dim_rect = dim
+	add_child(juice)
+
 	_hud = Hud.new()
 	_hud.name = "Hud"
+	_hud.layer = 10
 	_hud.player = _player
 	add_child(_hud)
 

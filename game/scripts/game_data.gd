@@ -20,31 +20,31 @@ const SKILL_ACTIONS: Array[String] = [
 const SKILLS := {
 	"attack": {
 		"name": "ฟันดาบ", "short": "ฟัน", "key": "คลิก",
-		"mult": 1.0, "cd": 0.4, "sp": 0.0, "color": Color(0.75, 0.78, 0.85),
+		"mult": 1.0, "cd": 0.4, "sp": 0.0, "pal": "steel", "color": Color(0.75, 0.78, 0.85),
 	},
 	"wave": {
 		"name": "คลื่นดาบสามสาย", "short": "คลื่นดาบ", "key": "Q",
-		"mult": 1.6, "cd": 3.0, "sp": 12.0, "color": Color(0.45, 0.75, 1.0),
+		"mult": 1.6, "cd": 3.0, "sp": 12.0, "pal": "steel", "color": Color(0.45, 0.75, 1.0),
 	},
 	"aegis": {
 		"name": "โล่ประกาศิต", "short": "กางโล่", "key": "E",
-		"mult": 1.4, "cd": 12.0, "sp": 25.0, "color": Color(0.7, 0.88, 1.0),
+		"mult": 1.4, "cd": 12.0, "sp": 25.0, "pal": "aegis", "color": Color(0.7, 0.88, 1.0),
 	},
 	"whirl": {
 		"name": "พายุดาบ", "short": "หมุนดาบ", "key": "R",
-		"mult": 0.55, "cd": 8.0, "sp": 30.0, "color": Color(0.85, 0.95, 1.0),
+		"mult": 0.55, "cd": 8.0, "sp": 30.0, "pal": "steel", "color": Color(0.85, 0.95, 1.0),
 	},
 	"lion": {
 		"name": "คำรามสิงห์ทอง", "short": "สิงห์ทอง", "key": "F",
-		"mult": 2.6, "cd": 35.0, "sp": 60.0, "color": Color(1.0, 0.72, 0.22),
+		"mult": 2.6, "cd": 35.0, "sp": 60.0, "pal": "fire", "color": Color(1.0, 0.72, 0.22),
 	},
 	"cross": {
 		"name": "กางเขนศักดิ์สิทธิ์", "short": "กางเขน", "key": "1",
-		"mult": 1.7, "cd": 6.0, "sp": 22.0, "color": Color(1.0, 0.86, 0.45),
+		"mult": 1.7, "cd": 6.0, "sp": 22.0, "pal": "holy", "color": Color(1.0, 0.86, 0.45),
 	},
 	"banner": {
 		"name": "ธงศักดิ์สิทธิ์", "short": "ธงทอง", "key": "2",
-		"mult": 1.2, "cd": 45.0, "sp": 70.0, "color": Color(1.0, 0.8, 0.35),
+		"mult": 1.2, "cd": 45.0, "sp": 70.0, "pal": "holy", "color": Color(1.0, 0.8, 0.35),
 	},
 }
 
@@ -54,7 +54,7 @@ const MONSTERS := {
 		"hp": 5200, "hp_per_level": 1200, "atk": 560, "atk_per_level": 120,
 		"def": 60.0, "speed": 70.0, "radius": 34.0,
 		"aggro": 620.0, "range": 34.0, "windup": 0.6, "cooldown": 1.6,
-		"xp": 22, "gold": 6, "color": Color(0.62, 0.45, 0.42),
+		"xp": 22, "gold": 6, "color": Color(0.62, 0.45, 0.42), "pal": "fire",
 		# Chance that a slam leaves a burning patch on the ground.
 		"fire_chance": 0.8,
 	},
@@ -63,7 +63,7 @@ const MONSTERS := {
 		"hp": 2200, "hp_per_level": 500, "atk": 320, "atk_per_level": 80,
 		"def": 15.0, "speed": 150.0, "radius": 20.0,
 		"aggro": 720.0, "range": 28.0, "windup": 0.35, "cooldown": 1.1,
-		"xp": 10, "gold": 3, "color": Color(0.78, 0.36, 0.85),
+		"xp": 10, "gold": 3, "color": Color(0.78, 0.36, 0.85), "pal": "dark",
 	},
 }
 

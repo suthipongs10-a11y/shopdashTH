@@ -8,20 +8,31 @@ const RISE := 0.6
 const HEIGHT := 190.0
 
 var color := Color(1.0, 0.8, 0.35)
+## Seconds to wait (ultimate intro) before the crest appears.
+var delay := 0.0
 
 var _t := 0.0
 var _sprite: FxSprite
+var _begun := false
 
 
-func _ready() -> void:
+func _begin() -> void:
 	_sprite = FxSprite.play(self, "crest", Vector2.ZERO, HEIGHT, LIFE)
 	if _sprite != null:
 		_sprite.fade_in = 0.2
 		_sprite.fade_out = 0.5
-	Fx.pillar(get_parent(), global_position, color, 160.0, 560.0, 0.8)
+	Vfx.beam(global_position, 110.0, color, 1.0)
+	Vfx.ring(global_position, 20.0, 240.0, color, 0.7, 10.0)
+	Vfx.burst(global_position, 200.0, 26, color, 260.0, 14.0, 0.8)
 
 
 func _process(delta: float) -> void:
+	if delay > 0.0:
+		delay -= delta
+		return
+	if not _begun:
+		_begun = true
+		_begin()
 	_t += delta
 	if _t >= LIFE:
 		queue_free()
@@ -34,7 +45,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	if _sprite != null:
+	if _sprite != null or delay > 0.0:
 		return
 	var k := clampf(_t / RISE, 0.0, 1.0)
 	var a := clampf(_t / 0.2, 0.0, 1.0) * clampf((LIFE - _t) / 0.5, 0.0, 1.0)

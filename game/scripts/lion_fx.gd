@@ -10,6 +10,8 @@ const LIFE := 1.7
 const HEIGHT := 300.0
 
 var color := Color(1.0, 0.72, 0.22)
+## Seconds to wait (ultimate intro) before the spirit starts to rise.
+var delay := 0.0
 
 var _t := 0.0
 var _sprite: Sprite2D
@@ -23,11 +25,19 @@ func _ready() -> void:
 		_sprite = Sprite2D.new()
 		_sprite.texture = load(ART)
 		_sprite.material = Fx.additive()
+		_sprite.visible = false
 		add_child(_sprite)
-	Fx.pillar(get_parent(), global_position, color, 140.0, 520.0, 0.6)
 
 
 func _process(delta: float) -> void:
+	if delay > 0.0:
+		delay -= delta
+		if delay <= 0.0:
+			Vfx.beam(global_position, 90.0, color, 0.8)
+			Vfx.ring(global_position, 20.0, 260.0, color, 0.7, 10.0)
+			if _sprite != null:
+				_sprite.visible = true
+		return
 	_t += delta
 	if _t >= LIFE:
 		queue_free()
@@ -60,7 +70,7 @@ func _alpha() -> float:
 
 
 func _draw() -> void:
-	if _sprite != null:
+	if _sprite != null or delay > 0.0:
 		return
 	# Placeholder: a ring of flame tongues (the mane) around a bright core, with two eyes.
 	var k := _rise()

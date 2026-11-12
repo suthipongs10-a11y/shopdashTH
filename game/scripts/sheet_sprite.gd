@@ -9,9 +9,17 @@ const DEFAULT_FPS := {"idle": 6.0, "walk": 10.0, "attack": 14.0}
 ## Default on-screen height of one cell, in pixels.
 const DEFAULT_CELL_SCREEN_HEIGHT := 150.0
 const FLASH_SHADER := preload("res://shaders/flash.gdshader")
+const SILHOUETTE := preload("res://shaders/silhouette.gdshader")
 
 ## Height of the drawn body on screen, in pixels (0 until art is loaded).
 var screen_height := 0.0
+## Outline glow strength (0 = off) and colour.
+var glow_amount := 0.0
+var glow_color := Color(1.0, 0.8, 0.4)
+## Squash and stretch multiplier; eases back to 1.
+var squash := Vector2.ONE
+## Vertical offset in screen pixels (negative = up), eases back to 0.
+var hop := 0.0
 
 ## name -> {tex, rows, cols, cell: Vector2, fps}
 var _anims := {}
@@ -25,6 +33,10 @@ var _flash_mat: ShaderMaterial
 ## While set, show this animation's frame instead of playing (e.g. the slash pose while spinning).
 var _hold_anim := ""
 var _hold_frame := 0
+var _base_scale := Vector2.ONE
+var _glow: Sprite2D
+var _glow_mat: ShaderMaterial
+var _breath := randf() * TAU
 
 
 ## Loads every animation found in dir (e.g. "res://art/characters/warden").
@@ -67,12 +79,23 @@ func load_dir(dir: String) -> bool:
 	if _feet_from_bottom < 0.0:
 		_feet_from_bottom = cell.y * 0.1
 	scale = Vector2(sheet_scale, sheet_scale)
+	_base_scale = scale
 	if body_height <= 0.0:
 		body_height = cell.y * 0.75
 	screen_height = body_height * sheet_scale
 	_flash_mat = ShaderMaterial.new()
 	_flash_mat.shader = FLASH_SHADER
 	material = _flash_mat
+	_glow = Sprite2D.new()
+	_glow.show_behind_parent = true
+	_glow.centered = false
+	_glow.region_enabled = true
+	_glow_mat = ShaderMaterial.new()
+	_glow_mat.shader = SILHOUETTE
+	_glow_mat.set_shader_parameter("radius", 10.0)
+	_glow.material = _glow_mat
+	_glow.visible = false
+	add_child(_glow)
 	centered = false
 	region_enabled = true
 	play("idle")
@@ -83,10 +106,51 @@ func has_art() -> bool:
 	return not _anims.is_empty()
 
 
-## 0 = normal colours, 1 = solid white.
-func set_flash(amount: float) -> void:
+## Front-facing first idle frame, for the ultimate cut-in. Null without art.
+func portrait() -> Texture2D:
+	if _anims.is_empty():
+		return null
+	var a: Dictionary = _anims[_resolve("idle")]
+	var cell: Vector2 = a["cell"]
+	var at := AtlasTexture.new()
+	at.atlas = a["tex"]
+	at.region = Rect2(Vector2.ZERO, cell)
+	return at
+
+
+## 0 = normal colours, 1 = solid colour (white unless another colour is given).
+func set_flash(amount: float, color: Color = Color.WHITE) -> void:
 	if _flash_mat != null:
 		_flash_mat.set_shader_parameter("flash", amount)
+		_flash_mat.set_shader_parameter("flash_color", color)
+
+
+## Leaves a fading coloured afterimage of the current frame in the world.
+func ghost(color: Color, life: float = 0.25, strength: float = 0.4) -> void:
+	if not has_art() or not is_inside_tree():
+		return
+	var world := get_parent().get_parent()
+	if world == null:
+		return
+	var g := Sprite2D.new()
+	g.texture = texture
+	g.region_enabled = true
+	g.region_rect = region_rect
+	g.centered = false
+	g.offset = offset
+	g.flip_h = flip_h
+	g.global_position = global_position
+	g.scale = global_scale
+	g.z_index = 2
+	var mat := ShaderMaterial.new()
+	mat.shader = SILHOUETTE
+	mat.set_shader_parameter("tint", color)
+	mat.set_shader_parameter("strength", strength)
+	g.material = mat
+	world.add_child(g)
+	var tw := g.create_tween()
+	tw.tween_property(g, "modulate:a", 0.0, life)
+	tw.tween_callback(g.queue_free)
 
 
 ## Freeze on one frame of an animation until release(). Facing still updates.
@@ -154,6 +218,26 @@ func _process(delta: float) -> void:
 	flip_h = picked[1]
 	region_rect = Rect2(frame * cell.x, int(picked[0]) * cell.y, cell.x, cell.y)
 	offset = Vector2(-cell.x * 0.5, -(cell.y - _feet_from_bottom))
+	_juice(delta, anim_name)
+
+
+func _juice(delta: float, anim_name: String) -> void:
+	squash = squash.lerp(Vector2.ONE, 1.0 - exp(-delta * 12.0))
+	hop = lerpf(hop, 0.0, 1.0 - exp(-delta * 14.0))
+	var breath := Vector2.ONE
+	if anim_name == "idle" and _hold_anim == "":
+		_breath += delta * 2.6
+		breath = Vector2(1.0 - sin(_breath) * 0.012, 1.0 + sin(_breath) * 0.018)
+	scale = _base_scale * squash * breath
+	position.y = hop
+	_glow.visible = glow_amount > 0.01
+	if _glow.visible:
+		_glow.texture = texture
+		_glow.region_rect = region_rect
+		_glow.offset = offset
+		_glow.flip_h = flip_h
+		_glow_mat.set_shader_parameter("tint", glow_color)
+		_glow_mat.set_shader_parameter("strength", glow_amount)
 
 
 ## Returns [row, flip_h] for the current facing, depending on how many direction rows exist.
