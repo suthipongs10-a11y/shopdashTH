@@ -376,3 +376,4 @@
 - Demo tenant fixed UUID: tenant `...0001`, store `...0002`, category `...0003` (slug `demo`, แพลน pro)
 - @supabase/ssr ต้องใช้ ^0.12.0 (0.6.x มีปัญหา type ของ cookies setAll กับ Next 15 + TS strict)
 - pnpm 11.5: อนุญาต build script ของ sharp ผ่าน `pnpm-workspace.yaml` (`allowBuilds`)
+- **โฟลเดอร์ `game/` ไม่ใช่ส่วนของ ShopDash (2026-11-12)**: โปรเจ็กต์เกม Godot 4 ที่เจ้าของให้ฝากไว้ใน repo นี้ชั่วคราว — ถูกกันออกจาก deploy ด้วย `.vercelignore` สถานะของเกมดูที่ `game/README.md` (ดู DECISIONS.md 2026-11-12) เซสชัน 2026-11-12 ไม่ได้แตะโค้ด ShopDash

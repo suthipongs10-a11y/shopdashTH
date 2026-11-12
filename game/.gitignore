@@ -1,0 +1,5 @@
+# Godot 4 import cache and local editor state
+.godot/
+*.translation
+export_presets.cfg
+/build/
