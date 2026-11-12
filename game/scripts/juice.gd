@@ -18,8 +18,11 @@ var _flash_a := 0.0
 var _dim_target := 0.0
 var _zoom_target := 1.0
 var _focus: Array[Node2D] = []
-var _stop_until := 0
-var _stop_ready_at := 0
+## Unscaled game time in seconds; hit-stop is timed on this, not the wall clock, so it
+## behaves the same in real play, fixed-step runs and recordings.
+var _clock := 0.0
+var _stop_until := 0.0
+var _stop_ready_at := 0.0
 var _cut: Control
 var _cut_strip: Polygon2D
 var _cut_label: Label
@@ -54,9 +57,9 @@ func _exit_tree() -> void:
 func _process(_delta: float) -> void:
 	# Real (unscaled) time so effects keep fading during hit-stop.
 	var dt := minf(0.05, get_process_delta_time() / maxf(Engine.time_scale, 0.01))
-	var now := Time.get_ticks_msec()
-	if _stop_until > 0 and now >= _stop_until:
-		_stop_until = 0
+	_clock += dt
+	if _stop_until > 0.0 and _clock >= _stop_until:
+		_stop_until = 0.0
 		Engine.time_scale = 1.0
 	_flash_a = maxf(0.0, _flash_a - dt * 2.2)
 	_flash.color.a = _flash_a
@@ -74,11 +77,11 @@ func _process(_delta: float) -> void:
 static func hitstop(seconds: float) -> void:
 	if instance == null:
 		return
-	var now := Time.get_ticks_msec()
+	var now := instance._clock
 	if now < instance._stop_ready_at:
 		return
-	instance._stop_until = now + int(seconds * 1000.0)
-	instance._stop_ready_at = instance._stop_until + 120
+	instance._stop_until = now + seconds
+	instance._stop_ready_at = instance._stop_until + 0.12
 	Engine.time_scale = 0.06
 	if Vfx.instance != null:
 		Vfx.instance.slow = seconds

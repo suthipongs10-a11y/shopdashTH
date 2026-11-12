@@ -1,6 +1,7 @@
 class_name Spawner
 extends Node
 ## Keeps the field populated: spawns packs of monsters around (but not on top of) the player.
+## In training mode it keeps only a couple of unkillable dummies next to the player instead.
 
 signal monster_killed(monster: Monster)
 
@@ -8,22 +9,48 @@ const MAX_MONSTERS := 70
 const SPAWN_INTERVAL := 0.8
 const MIN_PLAYER_DIST := 520.0
 const MAX_PLAYER_DIST := 1100.0
+## Training dummies: kind and offset from the player (screen pixels).
+const DUMMIES := [["golem", Vector2(240.0, -30.0)], ["imp", Vector2(170.0, 110.0)]]
 
 var world: Node2D
 var player: Player
 var fx_layer: Node
 var ground_layer: Node
+var training := true
 
 var _timer := 0.5
 
 
 func _process(delta: float) -> void:
+	if training:
+		return
 	_timer -= delta
 	if _timer > 0.0:
 		return
 	_timer = SPAWN_INTERVAL
 	if get_tree().get_nodes_in_group("monsters").size() < MAX_MONSTERS:
 		spawn_pack()
+
+
+## Clears the field and switches between training dummies and roaming packs.
+func set_training(on: bool) -> void:
+	training = on
+	for node in get_tree().get_nodes_in_group("monsters"):
+		node.queue_free()
+	if training:
+		spawn_dummies()
+	else:
+		prefill(5)
+
+
+func spawn_dummies() -> void:
+	for d in DUMMIES:
+		var m := Monster.new()
+		m.setup(String(d[0]), player.level, player)
+		m.make_dummy(player.global_position + Vector2(d[1]))
+		m.fx_layer = fx_layer
+		m.ground_layer = ground_layer
+		world.add_child(m)
 
 
 func prefill(packs: int) -> void:

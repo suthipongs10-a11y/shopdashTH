@@ -22,6 +22,8 @@ const PAL := {
 		"rune": Color("ffb35a"), "cut": Color("d9481c")},
 	"aegis": {"aura": Color("6fd2ff"), "core": Color("d2efff"), "hot": Color("ffffff"),
 		"rune": Color("7cd0ff"), "cut": Color("1f6fd0")},
+	"dragon": {"aura": Color("ffc53a"), "core": Color("fff1b8"), "hot": Color("ffffff"),
+		"rune": Color("ffd76a"), "cut": Color("b8860b")},
 	"dark": {"aura": Color("b061ff"), "core": Color("ead0ff"), "hot": Color("ffffff"),
 		"rune": Color("c890ff"), "cut": Color("6a2bb8")},
 }
@@ -57,6 +59,13 @@ class VfxParticle:
 	var vr := 0.0
 	var width := 6.0
 	var alpha := 1.0
+
+
+## The shared soft glow dot (created once).
+static func dot_texture() -> Texture2D:
+	if instance != null and instance._dot != null:
+		return instance._dot
+	return _make_dot()
 
 
 static func pal(name: String) -> Dictionary:

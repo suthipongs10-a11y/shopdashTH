@@ -31,6 +31,9 @@ var fx_layer: Node
 var ground_layer: Node
 var fire_chance := 0.0
 var palette: Dictionary = Vfx.pal("fire")
+## Training dummy: never dies, never attacks, walks back to home after knockback.
+var dummy := false
+var home := Vector2.ZERO
 
 var _death_t := 0.0
 
@@ -90,6 +93,26 @@ func _ready() -> void:
 	add_child(col)
 
 
+## Dummies face the player and stroll back to their spot.
+func _dummy_move() -> Vector2:
+	var back := GameData.to_ground(home - global_position)
+	if back.length() > 10.0:
+		return back.normalized() * minf(move_speed, 90.0)
+	if is_instance_valid(_player):
+		_face = GameData.to_ground(_player.global_position - global_position).normalized()
+	return Vector2.ZERO
+
+
+func make_dummy(at: Vector2) -> void:
+	dummy = true
+	home = at
+	position = at
+	max_hp *= 10
+	hp = max_hp
+	fire_chance = 0.0
+	display_name += " (หุ่นซ้อม)"
+
+
 ## Distance from the feet to the top of the head, in screen pixels.
 func visual_height() -> float:
 	return _sheet.screen_height if _sheet.has_art() else body_radius * 2.4
@@ -121,6 +144,8 @@ func _physics_process(delta: float) -> void:
 
 ## Returns the desired ground-plane velocity for this frame.
 func _think(delta: float) -> Vector2:
+	if dummy:
+		return _dummy_move()
 	var player_alive := is_instance_valid(_player) and not _player.dead
 	var dist := INF
 	if player_alive:
@@ -190,10 +215,16 @@ func take_damage(amount: int, knock: Vector2 = Vector2.ZERO, stun: float = 0.0) 
 		_stun_left = maxf(_stun_left, stun)
 		if state == State.WINDUP:
 			state = State.CHASE
-	if state == State.WANDER:
+	if state == State.WANDER and not dummy:
 		state = State.CHASE
 	if hp == 0:
-		_die()
+		if dummy:
+			# Unkillable: refill with a little flourish so the reset is readable.
+			hp = max_hp
+			Vfx.ring(global_position, 10.0, 120.0, palette["core"], 0.5, 6.0)
+			Vfx.burst(global_position, visual_height() * 0.5, 14, palette["aura"], 200.0, 12.0, 0.6)
+		else:
+			_die()
 
 
 func _die() -> void:

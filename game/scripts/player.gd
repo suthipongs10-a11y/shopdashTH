@@ -73,6 +73,12 @@ var _hit_fx_budget := HIT_FX_PER_FRAME
 var _charge_left := 0.0
 var _charge_pal: Dictionary = {}
 var _ember_left := 0.0
+## Chanting a cast-time skill: seconds left and what to release when it finishes.
+var _cast_left := 0.0
+var _cast_id := ""
+var _cast_mult := 1.0
+var _cast_pal: Dictionary = {}
+var _cast_tally: SkillTally
 var _ghost_left := 0.0
 
 
@@ -160,6 +166,9 @@ func _physics_process(delta: float) -> void:
 	_tick_aegis(delta)
 	_tick_juice(delta)
 	var move := input.move_vector(self)
+	if _cast_left > 0.0:
+		move = Vector2.ZERO
+		_tick_cast(delta)
 	_moving = move.length() > 0.05
 	var speed := MOVE_SPEED * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
 	velocity = GameData.to_screen(move * speed)
@@ -177,7 +186,7 @@ func _physics_process(delta: float) -> void:
 			_sheet.ghost(Vfx.pal("steel")["aura"], 0.22)
 		if _spin_left <= 0.0:
 			_sheet.release()
-	else:
+	elif _cast_left <= 0.0:
 		_handle_actions()
 		if _aim_face_left > 0.0:
 			_face = aim
@@ -214,7 +223,7 @@ func _handle_actions() -> void:
 func _try_use(id: String) -> void:
 	var data: Dictionary = GameData.SKILLS[id]
 	var cost := float(data["sp"])
-	if float(cooldowns[id]) > 0.0 or sp < cost or _spin_left > 0.0:
+	if float(cooldowns[id]) > 0.0 or sp < cost or _spin_left > 0.0 or _cast_left > 0.0:
 		return
 	sp -= cost
 	cooldowns[id] = float(data["cd"])
@@ -248,6 +257,90 @@ func _try_use(id: String) -> void:
 		"banner":
 			_ultimate_intro(String(data["name"]), palette)
 			_do_banner(mult, palette, tally)
+		"dragon":
+			_begin_cast(id, mult, palette, tally)
+
+
+## Starts chanting a cast-time skill: rooted in place, cast bar, rune circle, dim + cut-in.
+func _begin_cast(id: String, mult: float, palette: Dictionary, tally: SkillTally) -> void:
+	var data: Dictionary = GameData.SKILLS[id]
+	_cast_id = id
+	_cast_left = float(data.get("cast", 1.0))
+	_cast_mult = mult
+	_cast_pal = palette
+	_cast_tally = tally
+	_sheet.hold("attack", 0)
+	var bar := CastBar.new()
+	bar.anchor = self
+	bar.title = String(data["name"])
+	bar.color = palette["aura"]
+	bar.total = _cast_left
+	top_fx.add_child(bar)
+	Juice.spotlight([self] as Array[Node2D], 0.55, 1.1)
+	Juice.cutin(String(data["name"]), palette["cut"], _sheet.portrait())
+
+
+func _tick_cast(delta: float) -> void:
+	_cast_left -= delta
+	_sheet.glow_amount = 1.0
+	_sheet.glow_color = _cast_pal["aura"]
+	Vfx.charge(global_position, 80.0, _cast_pal, 3, 170.0)
+	if randf() < 0.5:
+		var spot := GameData.to_screen(Vector2.from_angle(randf() * TAU) * randf_range(60, 170))
+		Vfx.glow(global_position + spot, 4.0, randf_range(6, 12), _cast_pal["core"],
+			randf_range(0.5, 0.9), Vector3(0, 0, randf_range(60, 140)))
+	if _cast_left <= 0.0:
+		_release_cast()
+
+
+func _release_cast() -> void:
+	_sheet.release()
+	_sheet.play_once("attack")
+	match _cast_id:
+		"dragon":
+			var dragon := DragonFx.new()
+			dragon.caster = self
+			dragon.palette = _cast_pal
+			dragon.choose_target = _dragon_target
+			dragon.impact.connect(_dragon_impact.bind(_cast_mult, _cast_pal))
+			top_fx.add_child(dragon)
+			Juice.flash(0.2, _cast_pal["aura"])
+			Vfx.ring(global_position, 20.0, 220.0, _cast_pal["aura"], 0.6, 10.0)
+			Vfx.burst(global_position, 80.0, 30, _cast_pal["aura"], 360.0, 16.0, 0.6)
+
+
+## Where the dragon dives: the middle of the enemies around the warden, else ahead of them.
+func _dragon_target() -> Vector2:
+	var sum := Vector2.ZERO
+	var n := 0
+	for node in get_tree().get_nodes_in_group("monsters"):
+		var m := node as Monster
+		if m != null and GameData.ground_dist(global_position, m.global_position) <= 620.0:
+			sum += m.global_position
+			n += 1
+	if n == 0:
+		return global_position + GameData.to_screen(aim * 260.0)
+	return sum / float(n)
+
+
+func _dragon_impact(at: Vector2, mult: float, palette: Dictionary) -> void:
+	Juice.spotlight_end()
+	# The cast-time tally has usually faded by now; start a fresh one for the impact.
+	var tally: SkillTally = _cast_tally if is_instance_valid(_cast_tally) else null
+	if tally == null:
+		tally = SkillTally.new()
+		tally.anchor = self
+		tally.color = Color(1.0, 0.5, 0.65)
+		top_fx.add_child(tally)
+	var pulse := _new_pulse(AoePulse.Style.DRAGON, 300.0, mult, palette["aura"])
+	pulse.palette = palette
+	pulse.ticks = 3
+	pulse.interval = 0.18
+	pulse.knock = 300.0
+	pulse.shake = 16.0
+	pulse.tally = tally
+	pulse.position = at
+	ground_fx.add_child(pulse)
 
 
 ## Glow, embers and the ultimate charge-up.
@@ -558,6 +651,7 @@ func _die() -> void:
 	dead = true
 	hp = 0.0
 	_spin_left = 0.0
+	_cast_left = 0.0
 	_aegis_left = 0.0
 	_sheet.release()
 	if is_instance_valid(_aegis_fx):

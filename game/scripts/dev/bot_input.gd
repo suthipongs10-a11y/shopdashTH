@@ -39,11 +39,18 @@ func aim_vector(player: Player) -> Vector2:
 func is_pressed(action: String) -> bool:
 	if not is_instance_valid(_target) or _player == null:
 		return false
-	# Hold the small skills only while an ultimate is ready and nearly affordable,
-	# so footage shows both ultimates without starving everything else.
-	for ult in ["lion", "banner"]:
+	# Let the dragon finish its show before anything else is cast.
+	if not _player.get_tree().get_nodes_in_group("dragon").is_empty():
+		return action == "attack"
+	# Big skills first: when one is ready and affordable, press only that, so footage
+	# shows every ultimate; while one is nearly affordable, hold the small skills.
+	var ults := {"dragon": "skill_3", "lion": "skill_f", "banner": "skill_2"}
+	for ult in ults:
 		var cost := float(GameData.SKILLS[ult]["sp"])
-		var ready := float(_player.cooldowns[ult]) <= 0.0
-		if ready and _player.sp < cost and _player.sp > cost * 0.5:
-			return action in ["attack", "skill_f", "skill_2"]
+		if float(_player.cooldowns[ult]) > 0.0:
+			continue
+		if _player.sp >= cost:
+			return action == ults[ult] or action == "attack"
+		if _player.sp > cost * 0.5:
+			return action == "attack"
 	return true

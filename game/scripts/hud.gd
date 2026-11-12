@@ -51,7 +51,8 @@ func _ready() -> void:
 	_hint = _make_label(13, Color(1, 1, 1, 0.85))
 	_hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
 	_hint.add_theme_constant_override("outline_size", 4)
-	_hint.text = "WASD เดิน  ·  เมาส์เล็งทิศ  ·  คลิกซ้าย/Space ฟัน\nQ E R 1 สกิล  ·  F 2 ท่าไม้ตาย"
+	_hint.text = "WASD เดิน  ·  เมาส์เล็งทิศ  ·  คลิกซ้าย/Space ฟัน  ·  Q E R 1 สกิล\n" \
+		+ "F 2 ท่าไม้ตาย  ·  3 เรียกเทพมังกรทอง (ร่าย)  ·  T สลับโหมดฝึกซ้อม"
 	_root.add_child(_hint)
 
 	player.target_hit.connect(_on_target_hit)

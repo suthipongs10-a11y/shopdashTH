@@ -6,7 +6,7 @@ extends Node2D
 ## Painted art in art/fx/ (ring, explosion, cross, pillar) is used when present;
 ## otherwise the procedural effects in Fx stand in.
 
-enum Style { SHOCK, CIRCLE, WHIRL, ROAR, CROSS, BANNER }
+enum Style { SHOCK, CIRCLE, WHIRL, ROAR, CROSS, BANNER, DRAGON }
 
 var player: Player
 var top_fx: Node
@@ -84,8 +84,8 @@ func _fire() -> void:
 			bursts += 1
 			_impact_on(m, offset)
 		player.strike(m, mult, push, stun, tally if is_instance_valid(tally) else null)
-	if bursts > 0 and style in [Style.ROAR, Style.BANNER, Style.CROSS]:
-		Juice.hitstop(0.06)
+	if bursts > 0 and style in [Style.ROAR, Style.BANNER, Style.CROSS, Style.DRAGON]:
+		Juice.hitstop(0.08 if style == Style.DRAGON else 0.06)
 	if shake > 0.0:
 		player.shake(shake)
 	_fire_visuals()
@@ -102,9 +102,9 @@ func _impact_on(m: Monster, offset: Vector2) -> void:
 			Vfx.burst(at, 40.0, 8, palette["aura"], 320.0, 12.0, 0.4)
 		Style.CROSS:
 			Vfx.explode(at, palette, false)
-		Style.ROAR, Style.BANNER:
+		Style.ROAR, Style.BANNER, Style.DRAGON:
 			Vfx.explode(at, palette, true)
-			if style == Style.BANNER:
+			if style != Style.ROAR:
 				Vfx.beam(at, 34.0, palette["aura"], 0.45)
 		_:
 			Vfx.burst(at, 40.0, 6, palette["aura"], 260.0, 10.0, 0.35)
@@ -150,6 +150,18 @@ func _fire_visuals() -> void:
 			Vfx.beam(here, 50.0, palette["aura"], 0.5)
 			Vfx.ring(here, 10.0, radius * 1.1, palette["aura"], 0.45, 8.0)
 			Vfx.burst(here, 40.0, 24, palette["aura"], 360.0, 16.0, 0.55)
+		Style.DRAGON:
+			Juice.flash(0.35, palette["aura"])
+			Vfx.ring(here, 20.0, radius * 1.3, palette["aura"], 0.6, 16.0)
+			Vfx.ring(here, 10.0, radius * 0.9, palette["hot"], 0.4, 8.0)
+			Vfx.burst(here, 40.0, 60, palette["aura"], 700.0, 30.0, 0.7)
+			Vfx.burst(here, 40.0, 30, palette["hot"], 420.0, 16.0, 0.5)
+			Vfx.beam(here, 120.0, palette["aura"], 0.6)
+			for i in 18:
+				Vfx.flame(here + GameData.to_screen(Vector2.from_angle(TAU * i / 18.0) * radius * 0.55),
+					palette["aura"], randf_range(24, 40), randf_range(140, 280), randf_range(0.5, 0.9))
+			Vfx.smoke(here, 30.0, 80.0, 200.0, Color(0.3, 0.24, 0.16), 1.4, 0.35)
+			Fx.streaks(top_fx, here + Vector2(0.0, -40.0), palette["aura"], radius * 2.6, 26, 0.55, 1.3)
 		Style.BANNER:
 			Juice.flash(0.2, palette["aura"])
 			_painted_ring(here, radius * 2.4, 0.5)

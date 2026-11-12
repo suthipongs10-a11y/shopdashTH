@@ -11,10 +11,12 @@ const DEF_K := 400.0
 const MAP_SIZE := Vector2(3600.0, 2400.0)
 
 ## Hotbar order. Index 0 is the basic attack; the rest follow SKILL_KEYS.
-const SKILL_ORDER: Array[String] = ["attack", "wave", "aegis", "whirl", "lion", "cross", "banner"]
+const SKILL_ORDER: Array[String] = [
+	"attack", "wave", "aegis", "whirl", "lion", "cross", "banner", "dragon",
+]
 ## Input action for each entry of SKILL_ORDER after the basic attack.
 const SKILL_ACTIONS: Array[String] = [
-	"skill_q", "skill_e", "skill_r", "skill_f", "skill_1", "skill_2",
+	"skill_q", "skill_e", "skill_r", "skill_f", "skill_1", "skill_2", "skill_3",
 ]
 
 const SKILLS := {
@@ -45,6 +47,12 @@ const SKILLS := {
 	"banner": {
 		"name": "ธงศักดิ์สิทธิ์", "short": "ธงทอง", "key": "2",
 		"mult": 1.2, "cd": 45.0, "sp": 70.0, "pal": "holy", "color": Color(1.0, 0.8, 0.35),
+	},
+	"dragon": {
+		"name": "เรียกเทพมังกรทอง", "short": "มังกรทอง", "key": "3",
+		"mult": 3.2, "cd": 50.0, "sp": 90.0, "pal": "dragon", "color": Color(1.0, 0.77, 0.23),
+		# Seconds of chanting before the dragon appears; the warden cannot move meanwhile.
+		"cast": 1.6,
 	},
 }
 

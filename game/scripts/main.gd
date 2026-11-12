@@ -5,6 +5,7 @@ extends Node2D
 var _player: Player
 var _hud: Hud
 var _top_fx: Node2D
+var _spawner: Spawner
 
 
 func _ready() -> void:
@@ -53,7 +54,9 @@ func _ready() -> void:
 	spawner.ground_layer = ground_fx
 	add_child(spawner)
 	spawner.monster_killed.connect(_on_monster_killed)
-	spawner.prefill(5)
+	_spawner = spawner
+	# Training (two unkillable dummies) by default; "-- --horde" starts with roaming packs.
+	spawner.set_training(not ("--horde" in OS.get_cmdline_user_args()))
 
 	var juice := Juice.new()
 	juice.name = "Juice"
@@ -84,6 +87,8 @@ func _setup_input() -> void:
 	_add_keys("skill_f", [KEY_F])
 	_add_keys("skill_1", [KEY_1])
 	_add_keys("skill_2", [KEY_2])
+	_add_keys("skill_3", [KEY_3])
+	_add_keys("toggle_mode", [KEY_T])
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	InputMap.action_add_event("attack", click)
@@ -105,6 +110,13 @@ func _on_monster_killed(monster: Monster) -> void:
 	_player.gain_rewards(xp_gain, gold_gain)
 	var at := monster.global_position + Vector2(0.0, -monster.body_radius * 3.2)
 	DamageNumber.spawn_text(_top_fx, at, "+%d EXP" % xp_gain, 20, Color(0.7, 0.95, 1.0))
+
+
+func _process(_delta: float) -> void:
+	if Input.is_action_just_pressed("toggle_mode"):
+		_spawner.set_training(not _spawner.training)
+		var label := "โหมดฝึกซ้อม" if _spawner.training else "โหมดล่ามอนสเตอร์"
+		_hud.show_banner(label, Color(0.7, 0.95, 1.0))
 
 
 func _on_leveled_up(new_level: int) -> void:
