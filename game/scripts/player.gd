@@ -82,7 +82,7 @@ func _ready() -> void:
 	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_name_label.size = Vector2(240.0, 22.0)
-	_name_label.position = Vector2(-120.0, -128.0)
+	_name_label.position = Vector2(-120.0, -146.0)
 	_name_label.add_theme_font_size_override("font_size", 14)
 	_name_label.add_theme_color_override("font_color", Color(0.75, 1.0, 0.8))
 	_name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.1, 0.05))
@@ -128,6 +128,7 @@ func _physics_process(delta: float) -> void:
 			_respawn()
 		return
 	modulate = Color(1.0, 0.55, 0.55) if _hurt_flash > 0.0 else Color.WHITE
+	_sheet.set_flash(0.0)
 
 	for id in cooldowns:
 		cooldowns[id] = maxf(0.0, cooldowns[id] - delta)
@@ -324,9 +325,9 @@ func strike(
 		amount *= crit_mult
 	amount *= 1.0 + Combo.damage_bonus()
 	var dmg := maxi(1, roundi(amount))
-	var body := m.global_position + Vector2(0.0, -m.body_radius * 1.2)
+	var body := m.global_position + Vector2(0.0, -m.visual_height() * 0.45)
 	m.take_damage(dmg, knock, stun)
-	var head := m.global_position + Vector2(0.0, -m.body_radius * 2.6 - 18.0)
+	var head := m.global_position + Vector2(0.0, -m.visual_height() - 22.0)
 	DamageNumber.spawn(top_fx, head, dmg, is_crit, m.get_instance_id())
 	Combo.register_hit(dmg)
 	if tally != null and is_instance_valid(tally):

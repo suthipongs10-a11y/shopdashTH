@@ -8,6 +8,10 @@ const ANIM_NAMES: Array[String] = ["idle", "walk", "attack"]
 const DEFAULT_FPS := {"idle": 6.0, "walk": 10.0, "attack": 14.0}
 ## Default on-screen height of one cell, in pixels.
 const DEFAULT_CELL_SCREEN_HEIGHT := 150.0
+const FLASH_SHADER := preload("res://shaders/flash.gdshader")
+
+## Height of the drawn body on screen, in pixels (0 until art is loaded).
+var screen_height := 0.0
 
 ## name -> {tex, rows, cols, cell: Vector2, fps}
 var _anims := {}
@@ -17,6 +21,7 @@ var _once := ""
 var _time := 0.0
 var _facing := Vector2.DOWN
 var _feet_from_bottom := -1.0
+var _flash_mat: ShaderMaterial
 
 
 ## Loads every animation found in dir (e.g. "res://art/characters/warden").
@@ -28,7 +33,9 @@ func load_dir(dir: String) -> bool:
 	var sheet_scale := -1.0
 	var cell_w := -1.0
 	var cell_h := -1.0
+	var body_height := -1.0
 	if has_cfg:
+		body_height = float(cfg.get_value("sheet", "body_height", -1.0))
 		sheet_scale = float(cfg.get_value("sheet", "scale", -1.0))
 		cell_w = float(cfg.get_value("sheet", "cell_width", -1.0))
 		cell_h = float(cfg.get_value("sheet", "cell_height", -1.0))
@@ -57,6 +64,12 @@ func load_dir(dir: String) -> bool:
 	if _feet_from_bottom < 0.0:
 		_feet_from_bottom = cell.y * 0.1
 	scale = Vector2(sheet_scale, sheet_scale)
+	if body_height <= 0.0:
+		body_height = cell.y * 0.75
+	screen_height = body_height * sheet_scale
+	_flash_mat = ShaderMaterial.new()
+	_flash_mat.shader = FLASH_SHADER
+	material = _flash_mat
 	centered = false
 	region_enabled = true
 	play("idle")
@@ -65,6 +78,12 @@ func load_dir(dir: String) -> bool:
 
 func has_art() -> bool:
 	return not _anims.is_empty()
+
+
+## 0 = normal colours, 1 = solid white.
+func set_flash(amount: float) -> void:
+	if _flash_mat != null:
+		_flash_mat.set_shader_parameter("flash", amount)
 
 
 func play(anim: String) -> void:

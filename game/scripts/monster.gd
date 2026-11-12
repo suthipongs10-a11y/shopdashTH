@@ -70,14 +70,20 @@ func _ready() -> void:
 	# Layer 2 = monsters. They push each other apart but never block the player.
 	collision_layer = 2
 	collision_mask = 2
-	var shape := CircleShape2D.new()
-	shape.radius = body_radius * 0.75
-	var col := CollisionShape2D.new()
-	col.shape = shape
-	add_child(col)
 	_sheet = SheetSprite.new()
 	_sheet.load_dir("res://art/monsters/%s" % kind)
 	add_child(_sheet)
+	# Spacing follows the drawn size so packs do not pile into one blob.
+	var shape := CircleShape2D.new()
+	shape.radius = maxf(body_radius * 0.75, visual_height() * 0.3)
+	var col := CollisionShape2D.new()
+	col.shape = shape
+	add_child(col)
+
+
+## Distance from the feet to the top of the head, in screen pixels.
+func visual_height() -> float:
+	return _sheet.screen_height if _sheet.has_art() else body_radius * 2.4
 
 
 func _physics_process(delta: float) -> void:
@@ -128,6 +134,7 @@ func _think(delta: float) -> Vector2:
 				if _cooldown_left <= 0.0:
 					state = State.WINDUP
 					_windup_left = windup_time
+					_sheet.play_once("attack")
 				return Vector2.ZERO
 			var to_player := GameData.to_ground(_player.global_position - global_position)
 			return to_player.normalized() * move_speed
@@ -137,7 +144,6 @@ func _think(delta: float) -> Vector2:
 				# The player can dodge by stepping out of reach during the wind-up.
 				if player_alive and dist <= reach * 1.35:
 					_player.take_damage(attack_power)
-				_sheet.play_once("attack")
 				_cooldown_left = attack_cooldown
 				state = State.CHASE
 			return Vector2.ZERO
@@ -170,8 +176,9 @@ func _die() -> void:
 	died.emit(self)
 	queue_redraw()
 	if fx_layer != null:
-		var at := global_position + Vector2(0.0, -body_radius)
-		Fx.flash(fx_layer, at, body_color.lightened(0.4), body_radius * 3.0, 0.3)
+		var at := global_position + Vector2(0.0, -visual_height() * 0.45)
+		var size := maxf(body_radius * 3.0, visual_height() * 0.7)
+		Fx.flash(fx_layer, at, body_color.lightened(0.4), size, 0.3)
 		Fx.burst(fx_layer, at, body_color.lightened(0.3), 10, 240.0, 0.5, 18.0)
 	var tw := create_tween()
 	tw.set_parallel(true)
@@ -182,11 +189,13 @@ func _die() -> void:
 
 func _draw() -> void:
 	var r := body_radius
-	draw_colored_polygon(GameData.ellipse_points(r * 1.1, 20), Color(0, 0, 0, 0.3))
 	if _sheet.has_art():
-		_sheet.modulate = Color(3.0, 3.0, 3.0) if _flash > 0.0 else Color.WHITE
+		var shadow := maxf(r * 1.1, visual_height() * 0.36)
+		draw_colored_polygon(GameData.ellipse_points(shadow, 24), Color(0.15, 0.05, 0.0, 0.32))
+		_sheet.set_flash(0.85 if _flash > 0.0 else 0.0)
 		_draw_hp_bar(r)
 		return
+	draw_colored_polygon(GameData.ellipse_points(r * 1.1, 20), Color(0, 0, 0, 0.3))
 	# Squash-and-stretch when hit, plus a small hop while walking.
 	var p := _punch / 0.14
 	var hop := -absf(sin(Time.get_ticks_msec() * 0.012 + float(get_instance_id() % 7))) * 4.0
@@ -227,7 +236,7 @@ func _draw() -> void:
 
 func _draw_hp_bar(r: float) -> void:
 	if hp < max_hp and state != State.DEAD:
-		var w := r * 2.2
-		var top := Vector2(-w * 0.5, -r * 2.75)
+		var w := maxf(r * 2.2, 44.0)
+		var top := Vector2(-w * 0.5, -maxf(r * 2.75, visual_height() + 10.0))
 		draw_rect(Rect2(top, Vector2(w, 5.0)), Color(0, 0, 0, 0.7))
 		draw_rect(Rect2(top, Vector2(w * float(hp) / float(max_hp), 5.0)), Color(0.9, 0.2, 0.15))
