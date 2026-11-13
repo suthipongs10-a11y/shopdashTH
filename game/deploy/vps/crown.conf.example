@@ -1,0 +1,20 @@
+# /srv/crown/crown.conf - settings for update.sh (owned by crown, read by the updater).
+
+# Where the game source comes from. github-crown is an SSH alias that uses the read-only
+# deploy key in /srv/crown/home/.ssh/crown_deploy (set up by install.sh).
+REPO_URL="git@github-crown:suthipongs10-a11y/shopdashTH.git"
+BRANCH="claude/upbeat-ride-pwo0uk"
+# Folder inside the repository that holds project.godot.
+PROJECT_SUBDIR="game"
+
+# Skip a scheduled run when the machine is busy (EggPact tests, builds):
+# - when the 1-minute load average is above MAX_LOAD (the machine has 4 cores), or
+# - when BUSY_FILE exists (set it to a lock file the EggPact jobs create, if any), or
+# - when BUSY_CMD exits with status 0 (any shell command; empty = not used).
+MAX_LOAD="2.5"
+BUSY_FILE=""
+BUSY_CMD=""
+
+# Run a short headless check of the new build before publishing it; a build whose scripts
+# fail to compile is never published.
+SMOKE_TEST="yes"

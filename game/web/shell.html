@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<title>ปกป้องมงกุฎ · Ashen Crown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&family=Sarabun:wght@400;500&display=swap">
+<style>
+/* Godot web shell for Ashen Crown: the canvas fills the screen; a loading card covers it until
+   the engine starts. One dark look on purpose (the game's night-and-lava palette). */
+:root {
+  --night: #120d14; --ember: #2a1717; --gold: #e9b949; --gold-soft: #f6dc95;
+  --text: #f3ece2; --muted: #b9aa9d; --line: rgba(233, 185, 73, 0.35); --danger: #ff8a72;
+  --display: "Kanit", "Sarabun", system-ui, sans-serif;
+  --body: "Sarabun", "Kanit", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; margin: 0; }
+body { background: var(--night); color: var(--text); font-family: var(--body); overflow: hidden;
+  touch-action: none; }
+#canvas { position: fixed; inset: 0; display: block; width: 100%; height: 100%; outline: none;
+  background: var(--night); }
+#loader { position: fixed; inset: 0; display: grid; place-items: center; z-index: 2;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
+    max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: radial-gradient(120% 90% at 50% 110%, var(--ember), var(--night) 70%); }
+#loader[hidden] { display: none; }
+.card { width: min(520px, 100%); display: grid; gap: 18px; text-align: center; }
+.crown { width: 84px; height: 56px; margin: 0 auto; }
+h1 { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 7vw, 3rem);
+  letter-spacing: 0.02em; color: var(--gold-soft); text-wrap: balance; }
+.tag { margin: 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
+.bar { height: 10px; border-radius: 999px; border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.4); overflow: hidden; }
+.bar > span { display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, #b8792a, var(--gold)); transition: width 0.2s linear; }
+#status { margin: 0; font-size: 0.95rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+#status.error { color: var(--danger); }
+.keys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 18px; margin: 0;
+  padding: 14px 16px; border-top: 1px solid var(--line); text-align: left; font-size: 0.9rem;
+  color: var(--muted); }
+.keys dt { font-family: var(--display); color: var(--gold); letter-spacing: 0.04em; }
+.keys dd { margin: 0 0 6px; }
+@media (max-width: 420px) { .keys { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+</style>
+$GODOT_HEAD_INCLUDE
+</head>
+<body>
+<canvas id="canvas" tabindex="0">เบราว์เซอร์นี้แสดงเกมไม่ได้</canvas>
+<div id="loader">
+  <div class="card">
+    <svg class="crown" viewBox="0 0 84 56" aria-hidden="true">
+      <path d="M6 44 L10 12 L26 28 L42 6 L58 28 L74 12 L78 44 Z" fill="#e9b949" stroke="#7a4b12" stroke-width="2"/>
+      <rect x="6" y="44" width="72" height="9" rx="2" fill="#c8922f" stroke="#7a4b12" stroke-width="2"/>
+      <circle cx="24" cy="48.5" r="3" fill="#d8434f"/><circle cx="42" cy="48.5" r="3" fill="#4d8fe8"/>
+      <circle cx="60" cy="48.5" r="3" fill="#47c27a"/>
+    </svg>
+    <h1>ปกป้องมงกุฎ</h1>
+    <p class="tag">เดโม Ashen Crown · 10 เวฟ · บอสที่เวฟ 5 และ 10<br>มอนสเตอร์มาจากประตูสีม่วง ห้ามให้ศาลมงกุฎแตก · เลเวลอัปเลือกพร 1 ใน 3</p>
+    <div class="bar" role="progressbar" aria-label="กำลังโหลดเกม" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="fill"></span></div>
+    <p id="status">กำลังโหลดเกม…</p>
+    <dl class="keys">
+      <div><dt>คอมพิวเตอร์</dt><dd>WASD เดิน · เมาส์เล็ง · คลิกซ้าย ฟัน · Shift หลบ</dd></div>
+      <div><dt>สกิล</dt><dd>Q E R 1 · ท่าไม้ตาย F 2 · มังกรทอง 3</dd></div>
+      <div><dt>สร้างป้อม</dt><dd>ยืนบนฐานหินแล้วกด Z X C V หรือแตะปุ่ม · ใช้ทองจากมอน</dd></div>
+      <div><dt>มือถือ</dt><dd>แตะค้างซ้ายจอเพื่อเดิน · ปุ่มขวาจอใช้สกิล (เล็งเป้าให้อัตโนมัติ)</dd></div>
+    </dl>
+  </div>
+</div>
+<script src="$GODOT_URL"></script>
+<script>
+(function () {
+  const GODOT_CONFIG = $GODOT_CONFIG;
+  const fill = document.getElementById("fill");
+  const bar = fill.parentElement;
+  const status = document.getElementById("status");
+  function fail(message) {
+    status.textContent = message;
+    status.classList.add("error");
+  }
+  const missing = Engine.getMissingFeatures({ threads: $GODOT_THREADS_ENABLED });
+  if (missing.length) {
+    fail("เบราว์เซอร์นี้ยังเล่นไม่ได้: ขาด " + missing.join(", ") + " ลองใช้ Chrome, Edge หรือ Safari รุ่นล่าสุด");
+    return;
+  }
+  const engine = new Engine(GODOT_CONFIG);
+  engine.startGame({
+    onProgress: function (current, total) {
+      if (total > 0) {
+        const pct = Math.min(100, Math.round((current / total) * 100));
+        fill.style.width = pct + "%";
+        bar.setAttribute("aria-valuenow", String(pct));
+        status.textContent = "กำลังโหลดเกม " + pct + "%";
+      }
+    }
+  }).then(function () {
+    document.getElementById("loader").hidden = true;
+    document.getElementById("canvas").focus();
+  }).catch(function (err) {
+    fail("เริ่มเกมไม่สำเร็จ: " + (err && err.message ? err.message : err));
+  });
+})();
+</script>
+</body>
+</html>

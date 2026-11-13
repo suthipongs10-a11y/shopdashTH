@@ -1,0 +1,32 @@
+[Unit]
+Description=Ashen Crown web build update (runs as crown, low priority, limited resources)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=crown
+Group=crown
+Environment=HOME=/srv/crown/home
+ExecStart=/srv/crown/bin/update.sh
+TimeoutStartSec=40min
+
+# Stay out of EggPact's way.
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=100%
+MemoryMax=1536M
+TasksMax=256
+
+# Sandbox: only /srv/crown is writable; /home (eggbound) and /root are invisible.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/srv/crown
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
