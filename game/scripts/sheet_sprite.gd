@@ -4,6 +4,9 @@ extends Sprite2D
 ## One PNG per animation (idle.png, walk.png, attack.png): rows = directions, columns = frames.
 ## Optional sheet.cfg overrides the defaults. See ART_GUIDE.md for the exact format.
 
+## A foot touched the ground during the walk cycle (for dust and footstep sounds).
+signal stepped
+
 ## bash: shield bash, slam: leaping sword slam, cast: sword raised to the sky, guard: shield up.
 ## Missing animations fall back to the caller's choice (see Player._pose).
 const ANIM_NAMES: Array[String] = ["idle", "walk", "attack", "bash", "slam", "cast", "guard"]
@@ -18,6 +21,11 @@ const SILHOUETTE := preload("res://shaders/silhouette.gdshader")
 
 ## Height of the drawn body on screen, in pixels (0 until art is loaded).
 var screen_height := 0.0
+## Screen pixels the body travels during one full walk cycle (sheet.cfg [sheet] stride).
+## With it, the walk plays exactly as fast as the character moves, so feet do not slide.
+var stride := 0.0
+## Vertical body bob per step, as a share of the body height.
+var bob_amount := 0.022
 ## Outline glow strength (0 = off) and colour.
 var glow_amount := 0.0
 var glow_color := Color(1.0, 0.8, 0.4)
@@ -28,6 +36,8 @@ var hop := 0.0
 
 ## name -> {tex, rows, cols, cell: Vector2, fps}
 var _portrait: Texture2D
+var _move_speed := -1.0
+var _last_frame := -1
 var _anims := {}
 var _current := ""
 ## Animation that plays once and then returns to _current.
@@ -61,6 +71,7 @@ func load_dir(dir: String) -> bool:
 		cell_w = float(cfg.get_value("sheet", "cell_width", -1.0))
 		cell_h = float(cfg.get_value("sheet", "cell_height", -1.0))
 		_feet_from_bottom = float(cfg.get_value("sheet", "feet_from_bottom", -1.0))
+		stride = float(cfg.get_value("sheet", "stride", 0.0))
 	var portrait_path := dir + "/portrait.png"
 	if ResourceLoader.exists(portrait_path):
 		_portrait = load(portrait_path)
@@ -171,6 +182,12 @@ func resize(k: float) -> void:
 	_base_scale *= k
 	scale = _base_scale
 	screen_height *= k
+	stride *= k
+
+
+## Ground speed in screen px/s, so the walk cycle keeps pace with the body.
+func set_move_speed(px_per_second: float) -> void:
+	_move_speed = px_per_second
 
 
 func has_anim(anim: String) -> bool:
@@ -219,9 +236,12 @@ func _resolve(anim: String) -> String:
 func _process(delta: float) -> void:
 	if _anims.is_empty():
 		return
-	_time += delta
 	var anim_name := _once if _once != "" else _current
 	var a: Dictionary = _anims[anim_name]
+	var rate := 1.0
+	if anim_name == "walk" and stride > 0.0 and _move_speed >= 0.0:
+		rate = _move_speed / stride * float(a["cols"]) / float(a["fps"])
+	_time += delta * rate
 	var cols := int(a["cols"])
 	var frame := int(_time * float(a["fps"]))
 	if _once != "" and frame >= cols:
@@ -235,6 +255,9 @@ func _process(delta: float) -> void:
 		a = _anims[_hold_anim]
 		frame = mini(_hold_frame, int(a["cols"]) - 1)
 
+	if anim_name == "walk" and _hold_anim == "" and frame != _last_frame and frame % 2 == 0:
+		stepped.emit()
+	_last_frame = frame if anim_name == "walk" else -1
 	var picked := _pick_row(int(a["rows"]))
 	var cell: Vector2 = a["cell"]
 	texture = a["tex"]
@@ -252,7 +275,12 @@ func _juice(delta: float, anim_name: String) -> void:
 		_breath += delta * 2.6
 		breath = Vector2(1.0 - sin(_breath) * 0.012, 1.0 + sin(_breath) * 0.018)
 	scale = _base_scale * squash * breath
-	position.y = hop
+	var bob := 0.0
+	if anim_name == "walk" and _hold_anim == "":
+		# Body is lowest when a foot lands (frames 0, 2) and highest while passing (1, 3).
+		var p := _time * float(_anims["walk"]["fps"])
+		bob = -(0.5 - 0.5 * cos(PI * p)) * bob_amount * screen_height
+	position.y = hop + bob
 	_glow.visible = glow_amount > 0.01
 	if _glow.visible:
 		_glow.texture = texture

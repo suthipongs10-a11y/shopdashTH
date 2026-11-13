@@ -115,6 +115,7 @@ func _ready() -> void:
 	if size_mult != 1.0:
 		_sheet.resize(size_mult)
 	_sheet.self_modulate = tint
+	_sheet.stepped.connect(_on_step)
 	# Spacing follows the drawn size so packs do not pile into one blob.
 	var shape := CircleShape2D.new()
 	shape.radius = maxf(body_radius * 0.75, visual_height() * 0.3)
@@ -131,6 +132,18 @@ func _dummy_move() -> Vector2:
 	if is_instance_valid(_player):
 		_face = GameData.to_ground(_player.global_position - global_position).normalized()
 	return Vector2.ZERO
+
+
+## Heavy monsters kick up dust as they walk; the boss's footfalls shake the screen nearby.
+func _on_step() -> void:
+	if body_radius < 30.0 or state == State.DEAD:
+		return
+	Vfx.smoke(global_position, 4.0, body_radius * 0.6, body_radius * 1.6, Color(0.6, 0.5, 0.42),
+		0.6, 0.3)
+	if self is Boss and is_instance_valid(_player):
+		var d := GameData.ground_dist(global_position, _player.global_position)
+		if d < 700.0:
+			_player.shake(4.0 * (1.0 - d / 700.0))
 
 
 ## Crown Defense: later waves are tougher than the level alone makes them.
@@ -176,6 +189,7 @@ func _physics_process(delta: float) -> void:
 	if _sheet.has_art():
 		_sheet.set_facing(GameData.to_screen(_face))
 		_sheet.play("walk" if _moving else "idle")
+		_sheet.set_move_speed(move.length())
 	queue_redraw()
 
 

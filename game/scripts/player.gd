@@ -11,6 +11,9 @@ signal respawned
 
 const ART_DIR := "res://art/characters/warden"
 const MOVE_SPEED := 270.0
+## Ground-plane acceleration (px/s^2): a quick but weighted start and stop.
+const ACCEL := 2600.0
+const DECEL := 3400.0
 const ATTACK_REACH := 112.0
 const ATTACK_CONE_DEG := 140.0
 const AEGIS_TIME := 4.0
@@ -69,7 +72,8 @@ var _name_label: Label
 var _face := Vector2.DOWN
 var _moving := false
 var _walk_t := 0.0
-var _dust_left := 0.0
+## Walking velocity on the ground plane (without knockback), eased by ACCEL / DECEL.
+var _walk_vel := Vector2.ZERO
 var _aim_face_left := 0.0
 var _aegis_left := 0.0
 var _aegis_fx: AegisFx
@@ -126,6 +130,7 @@ func _ready() -> void:
 	_sheet = SheetSprite.new()
 	_sheet.load_dir(ART_DIR)
 	add_child(_sheet)
+	_sheet.stepped.connect(_on_step)
 
 	_name_label = Label.new()
 	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -212,9 +217,12 @@ func _physics_process(delta: float) -> void:
 		_pose_left -= delta
 		if _pose_left <= 0.0 and _spin_left <= 0.0 and _cast_left <= 0.0 and _leap_left <= 0.0:
 			_sheet.release()
-	_moving = move.length() > 0.05
 	var speed := MOVE_SPEED * (1.0 + 0.12 * mod("speed")) * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
-	var ground_vel := move * speed + _knock
+	var want := move * speed
+	var rate := ACCEL if want.length() >= _walk_vel.length() else DECEL
+	_walk_vel = _walk_vel.move_toward(want, rate * delta)
+	_moving = _walk_vel.length() > 25.0
+	var ground_vel := _walk_vel + _knock
 	if _dodge_left > 0.0:
 		_dodge_left -= delta
 		ground_vel = _dodge_dir * DODGE_SPEED
@@ -226,7 +234,7 @@ func _physics_process(delta: float) -> void:
 		_start_dodge(move)
 	velocity = GameData.to_screen(ground_vel)
 	move_and_slide()
-	if _moving:
+	if move.length() > 0.05:
 		_face = move.normalized()
 	if _spin_left > 0.0:
 		# Spin: sweep the facing through every direction while holding the slash pose.
@@ -253,16 +261,21 @@ func _physics_process(delta: float) -> void:
 func _animate(delta: float) -> void:
 	if _moving:
 		_walk_t += delta * 11.0
-		_dust_left -= delta
-		if _dust_left <= 0.0:
-			_dust_left = 0.2
-			Vfx.smoke(global_position + Vector2(randf_range(-8, 8), 0.0), 4.0, 10.0, 22.0,
-				Color(0.85, 0.75, 0.6), 0.5, 0.35)
 	else:
 		_walk_t = 0.0
 	if _sheet.has_art():
 		_sheet.set_facing(GameData.to_screen(_face))
 		_sheet.play("walk" if _moving else "idle")
+		_sheet.set_move_speed(_walk_vel.length())
+		# A slight lean into sideways movement, pivoting on the feet.
+		var lean := clampf(_walk_vel.x / MOVE_SPEED, -1.0, 1.0) * 0.045
+		_sheet.rotation = lerpf(_sheet.rotation, lean, 1.0 - exp(-delta * 10.0))
+
+
+## A foot landed: a small puff of dust where it hit the ground.
+func _on_step() -> void:
+	var side := GameData.to_screen(_face.orthogonal()).normalized() * randf_range(-10.0, 10.0)
+	Vfx.smoke(global_position + side, 2.0, 8.0, 24.0, Color(0.85, 0.75, 0.6), 0.45, 0.3)
 
 
 func _handle_actions() -> void:
@@ -948,7 +961,12 @@ func _respawn() -> void:
 
 
 func _draw() -> void:
-	draw_colored_polygon(GameData.ellipse_points(26.0, 20), Color(0, 0, 0, 0.3))
+	# Soft wide shadow plus a darker core under the feet; both shrink when the body is in the air.
+	var lift := clampf(-_sheet.hop / 160.0, 0.0, 0.6) if _sheet != null else 0.0
+	draw_colored_polygon(GameData.ellipse_points(34.0 * (1.0 - lift * 0.5), 24),
+		Color(0, 0, 0, 0.2 * (1.0 - lift)))
+	draw_colored_polygon(GameData.ellipse_points(17.0 * (1.0 - lift * 0.5), 20),
+		Color(0, 0, 0, 0.32 * (1.0 - lift)))
 	if _sheet.has_art():
 		return
 	PlaceholderKnight.draw(self, _face, _moving, _walk_t, aim, _swing)

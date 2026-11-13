@@ -258,7 +258,26 @@ def compose(frames: list, fig_h: int, multiplier: float = 1.0, per_row: bool = F
     return sheet, float(np.median(row_scales)), clipped
 
 
-def write_cfg(out_dir: str, screen_h: int, fig_h: int, fps: dict) -> None:
+def measure_stride(walk: Image.Image) -> float:
+    """Cell pixels the body travels per walk cycle, from the side-view row (row 3).
+    Feet spread widest when a foot lands and narrowest while passing; a step is about the
+    widest spread minus one foot length (~half the narrowest spread)."""
+    a = np.array(walk)[..., 3]
+    spreads = []
+    for c in range(a.shape[1] // CELL):
+        cell = a[2 * CELL:3 * CELL, c * CELL:(c + 1) * CELL]
+        ys = np.nonzero(cell.any(1))[0]
+        if ys.size == 0:
+            continue
+        band = cell[ys[-1] - int((ys[-1] - ys[0]) * 0.08):ys[-1] + 1]
+        xs = np.nonzero(band.any(0))[0]
+        spreads.append(float(xs[-1] - xs[0]))
+    if len(spreads) < 2:
+        return 0.0
+    return 2.0 * (max(spreads) - 0.45 * min(spreads))
+
+
+def write_cfg(out_dir: str, screen_h: int, fig_h: int, fps: dict, stride: float = 0.0) -> None:
     lines = [
         "[sheet]",
         f"directions={ROWS}",
@@ -266,6 +285,7 @@ def write_cfg(out_dir: str, screen_h: int, fig_h: int, fps: dict) -> None:
         f"cell_height={CELL}",
         f"scale={screen_h / fig_h:.4f}",
         f"feet_from_bottom={FEET_FROM_BOTTOM}",
+        f"stride={round(stride * screen_h / fig_h)}",
         f"body_height={fig_h}",
         "",
         "[fps]",
@@ -434,7 +454,9 @@ def main() -> None:
             idle.save(os.path.join(out_dir, "idle.png"))
             fps["idle"] = 1
             print(f"{key}/idle.png  from {anim} frame {col + 1}")
-        write_cfg(out_dir, ch["screen_h"], ch["fig_h"], fps)
+        walk_path = os.path.join(out_dir, "walk.png")
+        stride = measure_stride(Image.open(walk_path).convert("RGBA")) if os.path.exists(walk_path) else 0.0
+        write_cfg(out_dir, ch["screen_h"], ch["fig_h"], fps, stride)
 
     for key, ch in CHARACTERS.items():
         if args.only and key != args.only:
