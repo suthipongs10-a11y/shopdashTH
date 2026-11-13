@@ -1,0 +1,33 @@
+OUTPUT FILE NAMES: crown_base.png AND crown_top.png (two separate images)
+ATTACH WITH THIS PROMPT: warden_concept.png (for style and colours)
+
+Create two game assets that together form the Crown Shrine, the sacred object the player defends.
+The game draws the crown floating and bobbing above the base, so they are separate pictures.
+
+IMAGE 1, crown_base.png: the shrine's base.
+- An octagonal two-step dais of pale carved stone with gold trim, four short pillars at its
+  corners holding small braziers of golden light, and a royal-blue cloth with gold embroidery
+  draped over the top step. The top of the dais is empty (the crown floats above it).
+- Seen from the three-quarter top-down camera. Wider than tall. Fills about 85% of the canvas width.
+- Square canvas, 1:1, 1024x1024 or larger.
+
+IMAGE 2, crown_top.png: the crown on its own.
+- A magnificent golden royal crown with five points, set with a red ruby, a blue sapphire and a
+  green emerald, glowing softly with golden-white holy light and a faint halo behind it.
+- Three-quarter view from slightly above, the same angle as the base.
+- Fills about 80% of the canvas. Square canvas, 1:1, 1024x1024 or larger.
+
+STYLE:
+- The same hand-painted dark high-fantasy style as the attached warden_concept.png: richly
+  detailed painted illustration, thin dark outline, painterly shading, crisp highlights on metal
+  and stone. Light comes from the top-left. NOT pixel art, NOT a 3D render, NOT a photo.
+- Palette of the Crown's defenders: pale weathered stone, polished silver, warm gold trim,
+  royal-blue cloth and banners, golden-white holy light. No red, no purple (those belong to
+  the enemies).
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, the same angle as
+  the characters, so the round base of every structure is seen as a flat ellipse.
+- Background: fully transparent. If transparency is not possible, use one flat pure green
+  (#00FF00) with no gradient, and do not use that green anywhere in the picture.
+- No ground, no grass, no cast shadow on the floor, no scenery behind (the game draws those).
+- No text, no labels, no numbers, no watermark, no frame.
+- Output: PNG.

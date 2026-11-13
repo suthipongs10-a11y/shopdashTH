@@ -15,11 +15,18 @@ var top_fx: Node
 
 var _flash := 0.0
 var _t := 0.0
+## Painted shrine (art/props/crown_base.png + crown_top.png), else drawn in code.
+var _base_tex: Texture2D
+var _top_tex: Texture2D
 var _hurt_text_left := 0.0
 
 
 func _ready() -> void:
 	add_to_group("crown")
+	if ResourceLoader.exists("res://art/props/crown_base.png"):
+		_base_tex = load("res://art/props/crown_base.png")
+	if ResourceLoader.exists("res://art/props/crown_top.png"):
+		_top_tex = load("res://art/props/crown_top.png")
 	var halo := FxSprite.play(self, "sigil", Vector2.ZERO, 300.0, 1.0e6, true,
 		Color(1.0, 0.78, 0.3) * 0.55)
 	if halo != null:
@@ -63,6 +70,10 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	draw_colored_polygon(GameData.ellipse_points(RADIUS * 1.15, 32), Color(0, 0, 0, 0.35))
+	if _base_tex != null:
+		_draw_painted()
+		_draw_hp_bar()
+		return
 	var stone := Color(0.42, 0.38, 0.36)
 	if _flash > 0.0:
 		stone = stone.lerp(Color(1, 0.4, 0.3), 0.6)
@@ -103,7 +114,22 @@ func _draw() -> void:
 	for i in 5:
 		draw_circle(c + Vector2(-25.5 + 17.0 * i, -30.0 if i % 2 == 0 else -22.0), 3.0,
 			Color(1.0, 0.95, 0.8))
-	# HP bar.
+	_draw_hp_bar()
+
+
+func _draw_painted() -> void:
+	var tint := Color(1.6, 0.8, 0.7) if _flash > 0.0 else Color.WHITE
+	var w := 190.0
+	var h := w * _base_tex.get_height() / _base_tex.get_width()
+	draw_texture_rect(_base_tex, Rect2(Vector2(-w * 0.5, -h + 30.0), Vector2(w, h)), false, tint)
+	if _top_tex != null:
+		var tw := 92.0
+		var th := tw * _top_tex.get_height() / _top_tex.get_width()
+		var y := -h - 30.0 + sin(_t * 2.2) * 6.0
+		draw_texture_rect(_top_tex, Rect2(Vector2(-tw * 0.5, y - th * 0.5), Vector2(tw, th)), false)
+
+
+func _draw_hp_bar() -> void:
 	var bw := 140.0
 	var at := Vector2(-bw * 0.5, -170.0)
 	draw_rect(Rect2(at, Vector2(bw, 8.0)), Color(0, 0, 0, 0.7))

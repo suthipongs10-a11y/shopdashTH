@@ -1,0 +1,39 @@
+OUTPUT FILE NAME: golem_concept.png
+ATTACH WITH THIS PROMPT: templates/template_turnaround.png
+
+Create a character turnaround sheet for a 2D game: the Magma Golem (monster).
+This image becomes the design reference for every later sprite of this character.
+
+CHARACTER - the Magma Golem:
+- A towering, menacing golem, about 1.5 times as tall as a human knight, with a broad hunched torso.
+- Body made of jagged black basalt plates. Bright molten magma glows through deep cracks and
+  pools in a burning core in the chest.
+- Small head sunk between massive shoulders, two burning orange eyes.
+- Huge rock fists, thick legs. Heat haze and embers drift from the shoulders (part of the body).
+
+STYLE (same for every asset in this project):
+- Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
+  classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
+- Heroic semi-realistic anime proportions: a human is about 6 heads tall, with long legs and an
+  athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (gold, violet, ember orange) and polished metals and
+  fabrics. Strong rim light that separates the figure from any background.
+- Thin dark outline, painterly shading with crisp highlights on metal.
+- Light comes from the top-left.
+- NOT pixel art, NOT a 3D render, NOT a photo.
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, like a classic isometric MMORPG.
+
+LAYOUT:
+- Landscape canvas, aspect ratio 3:2 (1536x1024, or larger at the same ratio).
+- One row of 5 full-body views of the SAME character, evenly spaced, same size, standing in a
+  relaxed ready pose, left to right:
+  1 FRONT (facing the viewer), 2 FRONT-LEFT (turned 45 degrees to the left),
+  3 LEFT (side profile facing left), 4 BACK-LEFT (three-quarter back, facing up-left), 5 BACK.
+- The attached template_turnaround.png shows this layout. Use it ONLY to place the views.
+  Do NOT copy its lines, labels or white background into the result.
+
+HARD RULES:
+- Identical design, colours and proportions in all 5 views.
+- Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00).
+- No ground shadow, no scenery, no text, no labels, no watermark.
+- Output: PNG.

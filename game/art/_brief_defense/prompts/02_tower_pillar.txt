@@ -1,0 +1,40 @@
+OUTPUT FILE NAME: tower_pillar.png
+ATTACH WITH THIS PROMPT: warden_concept.png (for style and colours) AND templates/template_row_3.png
+
+Create a game asset sheet for a 2D isometric action RPG: the Holy Pillar (bursts with holy light around itself), at three upgrade levels.
+It is a defensive structure built by the player's holy knight (see warden_concept.png) to protect
+a sacred crown shrine. It must look like it belongs to the same order as that knight.
+
+THE STRUCTURE:
+- LEVEL 1: a carved obelisk of white stone with glowing gold runes running up its faces and a
+  small golden orb of light floating above its tip.
+- LEVEL 2: a taller obelisk on a stepped base, two thin gold rings slowly orbiting the glowing
+  orb, the runes brighter.
+- LEVEL 3: a cathedral-like spire with gold wing-shaped ornaments on both sides and a blazing
+  sun-like orb of golden-white light crowning it, rays of light around the orb.
+
+LAYOUT:
+- Landscape canvas, aspect ratio 3:2 (1536x1024, or larger at the same ratio).
+- Three versions of the SAME structure side by side, one per third of the canvas, left to right:
+  LEVEL 1, LEVEL 2, LEVEL 3. The attached templates/template_row_3.png shows the thirds and the
+  shared baseline. Use it ONLY for placement; do not copy its lines or labels.
+- The base of all three stands on the same baseline, about 12% above the bottom edge.
+- All three have the SAME footprint width at the base (they are built on the same round stone
+  platform). Level 2 is about 15% taller than level 1, level 3 about 30% taller.
+- Each version is centred in its third and nothing crosses into the neighbouring third.
+- Each level is clearly a richer upgrade of the previous one: more gold, more stone, more light.
+
+STYLE:
+- The same hand-painted dark high-fantasy style as the attached warden_concept.png: richly
+  detailed painted illustration, thin dark outline, painterly shading, crisp highlights on metal
+  and stone. Light comes from the top-left. NOT pixel art, NOT a 3D render, NOT a photo.
+- Palette of the Crown's defenders: pale weathered stone, polished silver, warm gold trim,
+  royal-blue cloth and banners, golden-white holy light. No red, no purple (those belong to
+  the enemies).
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, the same angle as
+  the characters, so the round base of every structure is seen as a flat ellipse.
+- Background: fully transparent. If transparency is not possible, use one flat pure green
+  (#00FF00) with no gradient, and do not use that green anywhere in the picture.
+- No ground, no grass, no cast shadow on the floor, no scenery behind (the game draws those).
+- No text, no labels, no numbers, no watermark, no frame.
+- Output: PNG.

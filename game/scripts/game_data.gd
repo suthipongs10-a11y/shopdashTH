@@ -96,6 +96,37 @@ const MONSTERS := {
 	},
 }
 
+## Crown Defense towers, built on stone slots with gold. Values per level 1..3.
+## cost: gold to build (level 1) or to upgrade to that level.
+const TOWERS := {
+	"archer": {
+		"name": "หอธนูแสง", "desc": "ยิงศัตรูตัวที่ใกล้ที่สุด", "key": "Z",
+		"cost": [100, 120, 200], "damage": [420, 700, 1100], "rate": [0.75, 0.65, 0.55],
+		"range": [420.0, 470.0, 520.0], "shots": [1, 1, 2],
+		"color": Color(1.0, 0.85, 0.45),
+	},
+	"pillar": {
+		"name": "เสาแสงศักดิ์สิทธิ์", "desc": "ระเบิดแสงเป็นวงรอบตัวเป็นระยะ", "key": "X",
+		"cost": [150, 150, 240], "damage": [800, 1300, 2000], "rate": [2.6, 2.3, 2.0],
+		"range": [180.0, 210.0, 240.0],
+		"color": Color(1.0, 0.75, 0.3),
+	},
+	"wall": {
+		"name": "กำแพงหนาม", "desc": "มอนต้องหยุดตีกำแพงก่อน โดนหนามสวนกลับ", "key": "C",
+		"cost": [80, 100, 160], "hp": [6000, 12000, 20000], "thorns": [150, 260, 400],
+		"range": [230.0, 250.0, 270.0],
+		"color": Color(0.8, 0.65, 0.5),
+	},
+	"font": {
+		"name": "น้ำพุรักษา", "desc": "ฟื้นเลือดเราและศาลมงกุฎที่อยู่ใกล้", "key": "V",
+		"cost": [120, 120, 200], "heal": [0.04, 0.06, 0.09], "crown_heal": [0.003, 0.005, 0.008],
+		"range": [230.0, 270.0, 310.0],
+		"color": Color(0.5, 1.0, 0.75),
+	},
+}
+const TOWER_ORDER := ["archer", "pillar", "wall", "font"]
+const START_GOLD := 160
+
 ## Crown Defense: level-up blessings, pick 1 of 3. "max" is how many times one can be taken.
 const BOONS := {
 	"atk": {"name": "คมดาบศักดิ์สิทธิ์", "desc": "พลังโจมตี +20%", "max": 5},

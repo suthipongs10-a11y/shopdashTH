@@ -36,10 +36,13 @@ func _think(delta: float) -> Vector2:
 			_meteors()
 		return Vector2.ZERO
 	var target: Node2D = _player if dist < 650.0 else objective
+	var wall := _wall_in_way()
+	if wall != null and dist >= 650.0:
+		target = wall
 	if not is_instance_valid(target):
 		return Vector2.ZERO
 	var gap := GameData.ground_dist(global_position, target.global_position)
-	if target is Crown and gap < Crown.RADIUS + body_radius + 120.0:
+	if (target is Crown or target is Tower) and gap < Crown.RADIUS + body_radius + 120.0:
 		if _pattern_left <= 0.6:
 			_pattern_left = 2.6
 			_slam(target.global_position)
@@ -94,6 +97,10 @@ func _slam_hit(at: Vector2) -> void:
 		var crown := node as Crown
 		if GameData.ground_dist(at, crown.global_position) <= SLAM_RADIUS + Crown.RADIUS:
 			crown.take_damage(attack_power * 1.5)
+	for node in get_tree().get_nodes_in_group("walls"):
+		var wall := node as Tower
+		if GameData.ground_dist(at, wall.global_position) <= SLAM_RADIUS + Tower.RADIUS:
+			wall.take_damage(attack_power * 3.0)
 
 
 func _meteors() -> void:
@@ -109,7 +116,7 @@ func _meteors() -> void:
 		t.position = _player.global_position + GameData.to_screen(offset)
 		ground_layer.add_child(t)
 	_busy_left = 0.6
-	_sheet.play_once("attack")
+	_sheet.play_once("cast" if _sheet.has_anim("cast") else "attack")
 	Vfx.burst(global_position, visual_height(), 24, palette["aura"], 300.0, 14.0, 0.6)
 
 
@@ -133,7 +140,7 @@ func _meteor_hit(at: Vector2) -> void:
 
 func _enrage() -> void:
 	enraged = true
-	tint = Color(1.25, 0.6, 0.5)
+	tint = tint * Color(1.25, 0.75, 0.7)
 	_sheet.self_modulate = tint
 	Vfx.ring(global_position, 30.0, 320.0, palette["aura"], 0.7, 14.0)
 	Vfx.burst(global_position, visual_height() * 0.6, 50, palette["aura"], 500.0, 18.0, 0.8)

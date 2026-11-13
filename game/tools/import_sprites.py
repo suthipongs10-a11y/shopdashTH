@@ -60,6 +60,18 @@ CHARACTERS = {
         },
         "idle_from": ("walk", 1),
     },
+    # Crown Defense boss (brief art/_brief_defense/). Until it exists the golem art stands in.
+    "boss": {
+        "out": "art/monsters/boss",
+        "fig_h": 200,
+        "screen_h": 270,
+        "anims": {
+            "walk": {"file": "boss_walk.png", "fps": 6},
+            "attack": {"file": "boss_attack.png", "fps": 5},
+            "cast": {"file": "boss_cast.png", "fps": 5},
+        },
+        "idle_from": ("walk", 1),
+    },
     "imp": {
         "out": "art/monsters/imp",
         "fig_h": 170,
@@ -318,6 +330,66 @@ def import_fx(path: str, name: str, layout: str, fps: int, blend: str) -> None:
     print(f"fx/{name}.png  {frames} frame(s), {blend}")
 
 
+TOWER_KINDS = ["archer", "pillar", "wall", "font"]
+PROP_SINGLES = {
+    "build_slot.png": "art/props/build_slot.png",
+    "crown_base.png": "art/props/crown_base.png",
+    "crown_top.png": "art/props/crown_top.png",
+    "gate_portal.png": "art/props/gate.png",
+}
+
+
+def _cut(arr: np.ndarray, cols: int) -> np.ndarray:
+    """Background removed (alpha 0) the same way as the sprite sheets."""
+    arr = arr.copy()
+    arr[..., 3] = np.where(foreground_mask(arr, cols, 1), arr[..., 3], 0)
+    return arr
+
+
+def _trimmed(img: Image.Image, max_side: int) -> Image.Image:
+    box = img.getchannel("A").point(lambda v: 255 if v > 24 else 0).getbbox()
+    if box is not None:
+        img = img.crop(box)
+    img.thumbnail((max_side, max_side), Image.LANCZOS)
+    return img
+
+
+def import_defense_art(src: str) -> None:
+    """Crown Defense: towers (3 levels side by side), props and the tower icon sheet."""
+    for kind in TOWER_KINDS:
+        path = os.path.join(src, f"tower_{kind}.png")
+        if not os.path.exists(path):
+            continue
+        arr = _cut(load_rgba(path), 3)
+        w = arr.shape[1] / 3.0
+        dst_dir = os.path.join(GAME_DIR, "art/towers")
+        os.makedirs(dst_dir, exist_ok=True)
+        for lv in range(3):
+            part = Image.fromarray(arr[:, round(lv * w):round((lv + 1) * w)])
+            _trimmed(part, 512).save(os.path.join(dst_dir, f"{kind}_{lv + 1}.png"))
+        print(f"towers/{kind}_1..3.png")
+    for raw, dst in PROP_SINGLES.items():
+        path = os.path.join(src, raw)
+        if not os.path.exists(path):
+            continue
+        out = os.path.join(GAME_DIR, dst)
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        _trimmed(Image.fromarray(_cut(load_rgba(path), 1)), 640).save(out)
+        print(dst)
+    icons = os.path.join(src, "icons_towers.png")
+    if os.path.exists(icons):
+        sheet = Image.open(icons).convert("RGB")
+        dst_dir = os.path.join(GAME_DIR, "art/ui/towers")
+        os.makedirs(dst_dir, exist_ok=True)
+        w, h = sheet.width / 2, sheet.height / 2
+        for i, kind in enumerate(TOWER_KINDS):
+            r, c = divmod(i, 2)
+            box = (round(c * w + w * 0.03), round(r * h + h * 0.03),
+                   round((c + 1) * w - w * 0.03), round((r + 1) * h - h * 0.03))
+            sheet.crop(box).resize((128, 128), Image.LANCZOS).save(os.path.join(dst_dir, f"{kind}.png"))
+        print("ui/towers/*.png")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
@@ -334,6 +406,7 @@ def main() -> None:
         os.makedirs(out_dir, exist_ok=True)
         fps = {}
         built = {}
+        imported = False
         for anim, spec in ch["anims"].items():
             sheet_file = spec["file"].replace("_row{row}", "")
             row_file = sheet_file.replace(".png", "_row1.png")
@@ -342,6 +415,7 @@ def main() -> None:
                 fps[anim] = spec["fps"]
                 continue
             frames, per_row = load_anim(args.src, spec)
+            imported = True
             sheet, scale, clipped = compose(frames, ch["fig_h"], spec.get("scale", 1.0), per_row)
             sheet.save(os.path.join(out_dir, f"{anim}.png"))
             built[anim] = sheet
@@ -350,6 +424,9 @@ def main() -> None:
             print(f"{key}/{anim}.png  scale {scale:.3f}{note}")
             if args.preview:
                 preview(sheet, os.path.join(args.preview, f"{key}_{anim}.jpg"))
+        if not imported:
+            # Nothing new for this character: keep its sheets and sheet.cfg as they are.
+            continue
         if "idle_from" in ch:
             anim, col = ch["idle_from"]
             src_sheet = built[anim]
@@ -374,6 +451,8 @@ def main() -> None:
             img.thumbnail((512, 512), Image.LANCZOS)
             img.save(os.path.join(GAME_DIR, ch["out"], "portrait.png"))
             print(f"{key}/portrait.png  {img.width}x{img.height}")
+
+    import_defense_art(args.src)
 
     ground_src = os.path.join(args.src, "map_volcano.png")
     if os.path.exists(ground_src):

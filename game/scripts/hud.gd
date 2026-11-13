@@ -38,6 +38,10 @@ var _boss_panel: PanelContainer
 var _boss_label: Label
 var _boss_bar: ProgressBar
 var _results: Control
+var _build_panel: PanelContainer
+var _build_title: Label
+var _build_buttons: Array[Button] = []
+var _slot: BuildSlot
 
 var _target: Monster
 var _target_left := 0.0
@@ -93,6 +97,7 @@ func _process(delta: float) -> void:
 	]
 
 	_update_crown_widgets()
+	_update_build_panel()
 	_target_left -= delta
 	var show_target := _target_left > 0.0 and is_instance_valid(_target) \
 		and _target.state != Monster.State.DEAD
@@ -117,6 +122,10 @@ func _process(delta: float) -> void:
 			_boss_panel.position = Vector2((view.x - _boss_panel.size.x) * 0.5, top)
 			top += _boss_panel.size.y + 8.0
 	_target_panel.position = Vector2((view.x - _target_panel.size.x) * 0.5, top)
+	if _build_panel != null:
+		var above := _hotbar.position.y if _hotbar.visible else view.y - 20.0
+		_build_panel.position = Vector2((view.x - _build_panel.size.x) * 0.5,
+			above - _build_panel.size.y - 12.0)
 	_hotbar.position = Vector2((view.x - _hotbar.size.x) * 0.5, view.y - _hotbar.size.y - 18.0)
 	_combo.position = Vector2(view.x - _combo.size.x - 28.0, view.y * 0.3)
 	# Below the player, so it never covers the skill tallies above their head.
@@ -155,6 +164,99 @@ func setup_crown(director: WaveDirector, crown: Crown) -> void:
 	bbox.add_child(_boss_label)
 	_boss_bar = _make_bar(Color(0.85, 0.15, 0.1), Vector2(560.0, 18.0))
 	bbox.add_child(_boss_bar)
+	_make_build_panel()
+
+
+func _make_build_panel() -> void:
+	_build_panel = _make_panel()
+	_build_panel.visible = false
+	_root.add_child(_build_panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	_build_panel.add_child(box)
+	_build_title = _make_label(17, GOLD)
+	_build_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(_build_title)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	box.add_child(row)
+	for i in 4:
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(150.0, 78.0)
+		b.focus_mode = Control.FOCUS_NONE
+		b.add_theme_font_size_override("font_size", 14)
+		b.pressed.connect(_on_build_button.bind(i))
+		var icon_path := "res://art/ui/towers/%s.png" % GameData.TOWER_ORDER[i]
+		if ResourceLoader.exists(icon_path):
+			b.icon = load(icon_path)
+			b.add_theme_constant_override("icon_max_width", 44)
+		row.add_child(b)
+		_build_buttons.append(b)
+
+
+## Shows build choices for the slot the warden stands on (or upgrade/sell for a built one).
+func _update_build_panel() -> void:
+	if _build_panel == null or not is_instance_valid(player):
+		return
+	var slot := _director.slot_near(player.global_position) if not player.dead else null
+	if slot != _slot:
+		if is_instance_valid(_slot):
+			_slot.selected = false
+		_slot = slot
+		if slot != null:
+			slot.selected = true
+	_build_panel.visible = slot != null and _director.phase != WaveDirector.Phase.OVER
+	if not _build_panel.visible:
+		return
+	for i in 4:
+		if Input.is_action_just_pressed("build_%d" % (i + 1)):
+			_on_build_button(i)
+	if slot.is_empty():
+		_build_title.text = "ฐานสร้างป้อม   ·   ทอง %d" % player.gold
+		for i in 4:
+			var kind: String = GameData.TOWER_ORDER[i]
+			var t: Dictionary = GameData.TOWERS[kind]
+			var icon_path := "res://art/ui/towers/%s.png" % kind
+			if _build_buttons[i].icon == null and ResourceLoader.exists(icon_path):
+				_build_buttons[i].icon = load(icon_path)
+			var cost := WaveDirector.build_cost(kind, 1)
+			_set_button(i, "[%s] %s\n%d ทอง\n%s" % [t["key"], t["name"], cost, t["desc"]],
+				player.gold >= cost)
+		return
+	var tower := slot.tower
+	var data: Dictionary = GameData.TOWERS[tower.kind]
+	_build_title.text = "%s  Lv.%d   ·   ทอง %d" % [data["name"], tower.level, player.gold]
+	if tower.level < 3:
+		var cost := WaveDirector.build_cost(tower.kind, tower.level + 1)
+		_set_button(0, "[Z] อัปเกรดเป็น Lv.%d\n%d ทอง" % [tower.level + 1, cost], player.gold >= cost)
+	else:
+		_set_button(0, "เลเวลสูงสุดแล้ว", false)
+	_set_button(1, "[X] ขาย\n+%d ทอง" % WaveDirector.sell_value(tower), true)
+	_build_buttons[2].visible = false
+	_build_buttons[3].visible = false
+	for b in _build_buttons:
+		b.icon = null
+
+
+func _set_button(i: int, label: String, enabled: bool) -> void:
+	var b := _build_buttons[i]
+	b.visible = true
+	b.text = label
+	b.disabled = not enabled
+
+
+func _on_build_button(i: int) -> void:
+	if not is_instance_valid(_slot) or _director.phase == WaveDirector.Phase.OVER:
+		return
+	if _slot.is_empty():
+		var kind: String = GameData.TOWER_ORDER[i]
+		if _director.build(_slot, kind):
+			show_banner("สร้าง%s!" % GameData.TOWERS[kind]["name"], Color(1.0, 0.85, 0.4))
+	elif i == 0:
+		if _director.upgrade(_slot):
+			show_banner("อัปเกรดเป็น Lv.%d" % _slot.tower.level, Color(1.0, 0.85, 0.4))
+	elif i == 1:
+		_director.sell(_slot)
 
 
 func track_boss(boss: Boss) -> void:
@@ -164,7 +266,8 @@ func track_boss(boss: Boss) -> void:
 func _update_crown_widgets() -> void:
 	if _director == null:
 		return
-	_wave_label.text = "เวฟ %d / %d" % [maxi(1, _director.wave), WaveDirector.WAVES]
+	_wave_label.text = "เวฟ %d / %d     ทอง %d" % [maxi(1, _director.wave), WaveDirector.WAVES,
+		player.gold]
 	if is_instance_valid(_crown):
 		_crown_bar.max_value = _crown.max_hp
 		_crown_bar.value = _crown.hp
@@ -175,7 +278,8 @@ func _update_crown_widgets() -> void:
 	if prep:
 		var next := _director.wave + 1
 		var boss_note := "  บอส!" if next in WaveDirector.BOSS_WAVES else ""
-		_count_label.text = "เวฟ %d%s มาใน %d" % [next, boss_note, ceili(_director.countdown)]
+		var tip := "เดินไปที่ฐานหินเพื่อสร้างป้อม" if next == 1 else "Enter = เริ่มทันที"
+		_count_label.text = "เวฟ %d%s มาใน %d\n%s" % [next, boss_note, ceili(_director.countdown), tip]
 	var boss_alive := is_instance_valid(_boss) and _boss.state != Monster.State.DEAD
 	_boss_panel.visible = boss_alive
 	if boss_alive:

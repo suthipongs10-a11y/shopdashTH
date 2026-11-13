@@ -10,12 +10,13 @@ signal wave_started(number: int)
 signal wave_cleared(number: int)
 signal boss_spawned(boss: Boss)
 signal finished(won: bool)
+signal built(slot: BuildSlot)
 
 enum Phase { PREP, WAVE, OVER }
 
 const WAVES := 10
 const BOSS_WAVES := [5, 10]
-const FIRST_PREP := 6.0
+const FIRST_PREP := 14.0
 const PREP_TIME := 8.0
 ## Gates around the edge of the map (the shrine stands in the middle).
 const GATES := [
@@ -35,6 +36,7 @@ var wave := 0
 var countdown := FIRST_PREP
 var kills := 0
 var elapsed := 0.0
+var slots: Array[BuildSlot] = []
 
 var _queue: Array = []
 var _wave_t := 0.0
@@ -44,11 +46,23 @@ var _gates_open := 2
 
 func _ready() -> void:
 	z_index = -5
+	_make_slots()
+	var arch: Texture2D = null
+	if ResourceLoader.exists("res://art/props/gate.png"):
+		arch = load("res://art/props/gate.png")
 	for i in GATES.size():
 		var portal := FxSprite.play(self, "swirl", GATES[i], 230.0, 1.0e6, true,
 			Color(0.75, 0.25, 0.9))
 		if portal != null:
 			portal.spin = -1.2
+		if arch != null:
+			# The painted arch stands just behind the spawn swirl.
+			var s := Sprite2D.new()
+			s.texture = arch
+			var k := 240.0 / arch.get_height()
+			s.scale = Vector2(k, k)
+			s.position = GATES[i] + Vector2(0.0, -120.0 - 40.0)
+			add_child(s)
 
 
 func _process(delta: float) -> void:
@@ -71,6 +85,82 @@ func _process(delta: float) -> void:
 		var g: Vector2 = GATES[randi() % _gates_open]
 		Vfx.glow(g + Vector2(randf_range(-60, 60), randf_range(-20, 20)), 10.0, randf_range(6, 12),
 			Color(0.8, 0.3, 1.0), 0.8, Vector3(0, 0, randf_range(40, 90)))
+
+
+## Two slots beside each lane: one near the shrine, one further out.
+func _make_slots() -> void:
+	var center := crown.global_position
+	for i in GATES.size():
+		var gate: Vector2 = GATES[i]
+		var lane := GameData.to_ground(gate - center).normalized()
+		var side := lane.orthogonal()
+		for step: Array in [[330.0, 1.0], [620.0, -1.0]]:
+			var ground := lane * float(step[0]) + side * 135.0 * float(step[1])
+			var slot := BuildSlot.new()
+			slot.player = player
+			slot.position = center + GameData.to_screen(ground)
+			add_child(slot)
+			slots.append(slot)
+
+
+## The empty or built slot the warden stands on, if any.
+func slot_near(at: Vector2) -> BuildSlot:
+	for slot in slots:
+		if GameData.ground_dist(at, slot.global_position) <= BuildSlot.USE_RANGE:
+			return slot
+	return null
+
+
+static func build_cost(kind: String, level: int) -> int:
+	return int(GameData.TOWERS[kind]["cost"][level - 1])
+
+
+## Builds a tower on an empty slot. Returns false when the warden cannot afford it.
+func build(slot: BuildSlot, kind: String) -> bool:
+	var cost := build_cost(kind, 1)
+	if not slot.is_empty() or player.gold < cost:
+		return false
+	player.gold -= cost
+	var t := Tower.new()
+	t.kind = kind
+	t.player = player
+	t.top_fx = fx_layer
+	t.ground_fx = ground_layer
+	t.position = slot.global_position
+	world.add_child(t)
+	slot.tower = t
+	Vfx.smoke(t.position, 10.0, 40.0, 100.0, Color(0.8, 0.72, 0.6), 0.6, 0.3)
+	Vfx.burst(t.position, 50.0, 26, GameData.TOWERS[kind]["color"], 320.0, 10.0, 0.6)
+	built.emit(slot)
+	return true
+
+
+func upgrade(slot: BuildSlot) -> bool:
+	if slot.is_empty() or slot.tower.level >= 3:
+		return false
+	var cost := build_cost(slot.tower.kind, slot.tower.level + 1)
+	if player.gold < cost:
+		return false
+	player.gold -= cost
+	slot.tower.upgrade()
+	return true
+
+
+## Refund of half of everything spent on the tower.
+static func sell_value(t: Tower) -> int:
+	var spent := 0
+	for lv in t.level:
+		spent += build_cost(t.kind, lv + 1)
+	return int(spent * 0.5)
+
+
+func sell(slot: BuildSlot) -> void:
+	if slot.is_empty():
+		return
+	player.gold += sell_value(slot.tower)
+	Vfx.smoke(slot.global_position, 10.0, 40.0, 100.0, Color(0.8, 0.72, 0.6), 0.6, 0.3)
+	slot.tower.queue_free()
+	slot.tower = null
 
 
 func lose() -> void:
@@ -144,6 +234,11 @@ func _clear_wave() -> void:
 	phase = Phase.PREP
 	countdown = PREP_TIME
 	crown.heal(0.2)
+	# Bounty for holding the wave, and walls are patched up for the next one.
+	player.gold += 40 + 10 * wave
+	for slot in slots:
+		if not slot.is_empty():
+			slot.tower.repair()
 
 
 func _on_died(m: Monster) -> void:

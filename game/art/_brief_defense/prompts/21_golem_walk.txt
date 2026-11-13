@@ -1,0 +1,61 @@
+OUTPUT FILE NAME: golem_walk.png
+ATTACH WITH THIS PROMPT: the approved golem_concept.png AND templates/template_sheet_5x4.png
+
+Create a 2D game sprite sheet of the Magma Golem (monster).
+
+CHARACTER - the Magma Golem:
+- A towering, menacing golem, about 1.5 times as tall as a human knight, with a broad hunched torso.
+- Body made of jagged black basalt plates. Bright molten magma glows through deep cracks and
+  pools in a burning core in the chest.
+- Small head sunk between massive shoulders, two burning orange eyes.
+- Huge rock fists, thick legs. Heat haze and embers drift from the shoulders (part of the body).
+The design must match the attached golem_concept.png exactly.
+
+ANIMATION: heavy walk cycle, loops, 4 frames.
+- Frame 1: left foot forward, body leaning to the left, arms hanging low.
+- Frame 2: both feet under the body, body upright.
+- Frame 3: right foot forward, body leaning to the right.
+- Frame 4: both feet under the body, body upright.
+A slow, heavy, crushing stride.
+
+STYLE (same for every asset in this project):
+- Dark high-fantasy 2D game sprite, richly detailed hand-painted illustration, in the spirit of
+  classic isometric fantasy MMORPGs from the 2000s. Mysterious, powerful and cool. NOT cute, NOT chibi.
+- Heroic semi-realistic anime proportions: a human is about 6 heads tall, with long legs and an
+  athletic build. The head is small relative to the body.
+- Deep, rich colours with glowing accents (gold, violet, ember orange) and polished metals and
+  fabrics. Strong rim light that separates the figure from any background.
+- Thin dark outline, painterly shading with crisp highlights on metal.
+- Light comes from the top-left.
+- NOT pixel art, NOT a 3D render, NOT a photo.
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, like a classic isometric MMORPG.
+
+LAYOUT:
+- Portrait canvas, aspect ratio 2:3 (1024x1536, or larger at the same ratio).
+- A grid of 4 columns x 5 rows = 20 equal cells. No gaps, no margins.
+- COLUMNS = animation frames 1 to 4, left to right.
+ROWS = facing directions, top to bottom (5 rows):
+- Row 1 FRONT: facing the viewer. We see the face and chest.
+- Row 2 FRONT-LEFT: turned 45 degrees toward the left edge of the image. Three-quarter view of the face.
+- Row 3 LEFT: full side profile, facing the left edge of the image.
+- Row 4 BACK-LEFT: turned away from the viewer, facing up-left. Three-quarter view of the back.
+- Row 5 BACK: facing directly away from the viewer. We see the back only.
+(The game mirrors these rows to get the right-facing directions, so do not draw right-facing rows.)
+- The attached template_sheet_5x4.png shows this layout. Use it ONLY to place the poses.
+  Do NOT copy its grid lines, labels, arrows, ovals or white background into the result.
+
+HARD RULES:
+- Exactly 20 poses, one per cell. Never leave a cell empty, never merge cells.
+- The character is the same size in every cell: about 72% of the cell height.
+- Feet rest on the same baseline in every cell, about 10% above the bottom edge of the cell.
+- The character is centred horizontally in its cell. Nothing may cross into a neighbouring cell,
+  including weapons, capes, wings and tails.
+- Identical design, colours and proportions in all 20 poses. Match the attached concept image exactly.
+- Background: fully transparent. If transparency is not possible, use one flat pure green (#00FF00)
+  with no gradient, and do not use that green anywhere on the character.
+- No ground shadow, no floor, no scenery.
+- No motion trails, no slash arcs, no sparks or spell effects (the game draws those itself).
+  Glow that belongs to the character itself (energy wings, eyes, magma cracks, a glowing blade edge)
+  is part of the design and must be drawn.
+- No text, numbers, labels, borders, grid lines or watermark.
+- Output: PNG.

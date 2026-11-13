@@ -1,0 +1,29 @@
+OUTPUT FILE NAME: build_slot.png
+ATTACH WITH THIS PROMPT: warden_concept.png (for style and colours)
+
+Create a game asset: an empty round building platform where the player can build a tower.
+
+THE PLATFORM:
+- A round platform of fitted pale stone slabs, slightly raised, with a ring of gold runes inlaid
+  around its edge and a small gold crown symbol carved in the centre.
+- Seen from the three-quarter top-down camera, so it appears as a flat ellipse about twice as wide
+  as it is tall, with a little of its front edge visible.
+- It fills about 85% of the canvas width and is centred.
+
+LAYOUT:
+- Square canvas, 1:1, 1024x1024 or larger.
+
+STYLE:
+- The same hand-painted dark high-fantasy style as the attached warden_concept.png: richly
+  detailed painted illustration, thin dark outline, painterly shading, crisp highlights on metal
+  and stone. Light comes from the top-left. NOT pixel art, NOT a 3D render, NOT a photo.
+- Palette of the Crown's defenders: pale weathered stone, polished silver, warm gold trim,
+  royal-blue cloth and banners, golden-white holy light. No red, no purple (those belong to
+  the enemies).
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, the same angle as
+  the characters, so the round base of every structure is seen as a flat ellipse.
+- Background: fully transparent. If transparency is not possible, use one flat pure green
+  (#00FF00) with no gradient, and do not use that green anywhere in the picture.
+- No ground, no grass, no cast shadow on the floor, no scenery behind (the game draws those).
+- No text, no labels, no numbers, no watermark, no frame.
+- Output: PNG.

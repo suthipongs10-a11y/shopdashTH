@@ -92,6 +92,11 @@ func setup(kind_id: String, monster_level: int, player: Player) -> void:
 	art_kind = String(d.get("art", kind_id))
 	size_mult = float(d.get("size", 1.0))
 	tint = d.get("tint", Color.WHITE)
+	# Its own painted sheets (e.g. the boss) replace the stand-in art when they exist.
+	if art_kind != kind_id and ResourceLoader.exists("res://art/monsters/%s/walk.png" % kind_id):
+		art_kind = kind_id
+		size_mult = 1.0
+		tint = Color.WHITE
 	poise = float(d.get("poise", 1.0))
 	no_stun = bool(d.get("no_stun", false))
 	ignore_player = bool(d.get("ignore_player", false))
@@ -208,12 +213,25 @@ func _wander(delta: float, dist: float) -> Vector2:
 ## Crown Defense: march on the shrine, turning on the player when they come close.
 func _think_siege() -> Vector2:
 	var target: Node2D = objective if is_instance_valid(objective) else null
+	var wall := _wall_in_way()
+	if wall != null:
+		target = wall
 	if is_instance_valid(_player) and not _player.dead and not ignore_player:
 		if GameData.ground_dist(global_position, _player.global_position) <= SIEGE_AGGRO:
 			target = _player
 	if target == null:
 		return Vector2.ZERO
 	return _approach(target, GameData.ground_dist(global_position, target.global_position))
+
+
+## A thorn wall close enough to block this monster, if any.
+func _wall_in_way() -> Tower:
+	for node in get_tree().get_nodes_in_group("walls"):
+		var wall := node as Tower
+		if wall != null and wall.hp > 0.0 and GameData.ground_dist(global_position,
+				wall.global_position) <= float(wall.data("range")):
+			return wall
+	return null
 
 
 ## Walks at target; once in reach (and off cooldown) starts the wind-up of an attack.
@@ -232,6 +250,8 @@ func _reach(target: Node2D) -> float:
 	var r := attack_range + body_radius
 	if target is Crown:
 		r += Crown.RADIUS
+	elif target is Tower:
+		r += Tower.RADIUS
 	return r
 
 
@@ -257,6 +277,8 @@ func _tick_windup(delta: float) -> Vector2:
 				_leave_fire()
 	elif target is Crown:
 		(target as Crown).take_damage(attack_power * siege_mult)
+	elif target is Tower:
+		(target as Tower).take_damage(attack_power, self)
 	return Vector2.ZERO
 
 

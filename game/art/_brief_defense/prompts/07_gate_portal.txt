@@ -1,0 +1,27 @@
+OUTPUT FILE NAME: gate_portal.png
+ATTACH WITH THIS PROMPT: warden_concept.png (for style only)
+
+Create a game asset: an enemy spawn gate where monsters pour out of a demonic rift.
+
+THE GATE:
+- A ruined archway of black volcanic stone, cracked and leaning, with broken chains hanging from
+  it and glowing demonic runes carved into it.
+- Inside the arch a swirling vortex of violet and black energy with embers and sparks, glowing
+  brightest in the middle.
+- This is the ENEMY side: use violet, black and ember orange (not the gold and blue of the heroes).
+- Seen from the three-quarter top-down camera. The arch is about as wide as it is tall and fills
+  about 80% of the canvas height, centred.
+- Square canvas, 1:1, 1024x1024 or larger.
+
+STYLE:
+- The same hand-painted dark high-fantasy style as the attached warden_concept.png: richly
+  detailed painted illustration, thin dark outline, painterly shading, crisp highlights on metal
+  and stone. Light comes from the top-left. NOT pixel art, NOT a 3D render, NOT a photo.
+- Palette: black volcanic stone, violet and black energy, ember orange (the enemy side).
+- Camera: three-quarter top-down view, pitched about 35-40 degrees downward, the same angle as
+  the characters, so the round base of every structure is seen as a flat ellipse.
+- Background: fully transparent. If transparency is not possible, use one flat pure green
+  (#00FF00) with no gradient, and do not use that green anywhere in the picture.
+- No ground, no grass, no cast shadow on the floor, no scenery behind (the game draws those).
+- No text, no labels, no numbers, no watermark, no frame.
+- Output: PNG.

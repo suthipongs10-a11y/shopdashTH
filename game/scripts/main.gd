@@ -15,6 +15,7 @@ var _pending_boons := 0
 var _picker: BoonPicker
 var _min_hp := 1.0
 var _min_crown := 1.0
+var _bot_build_left := 1.0
 
 
 func _ready() -> void:
@@ -127,6 +128,7 @@ func _setup_crown(world: Node2D, ground_fx: Node2D) -> void:
 	_director.boss_spawned.connect(_on_boss_spawned)
 	_director.finished.connect(_on_finished)
 	_crown.destroyed.connect(_director.lose)
+	_player.gold = GameData.START_GOLD
 	# Dev: "-- --wave=5" starts at wave 5 with a matching level, for testing bosses.
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--wave="):
@@ -135,6 +137,7 @@ func _setup_crown(world: Node2D, ground_fx: Node2D) -> void:
 			_director.countdown = 2.0
 			while _player.level < start + 1:
 				_player.gain_rewards(GameData.xp_to_next(_player.level), 0)
+			_player.gold += 130 * (start - 1)
 
 
 ## Input actions are registered in code (physical keys, so they work on a Thai keyboard layout).
@@ -154,6 +157,10 @@ func _setup_input() -> void:
 	_add_keys("toggle_mode", [KEY_T])
 	_add_keys("dodge", [KEY_SHIFT])
 	_add_keys("ready", [KEY_ENTER, KEY_KP_ENTER])
+	_add_keys("build_1", [KEY_Z])
+	_add_keys("build_2", [KEY_X])
+	_add_keys("build_3", [KEY_C])
+	_add_keys("build_4", [KEY_V])
 	var right := InputEventMouseButton.new()
 	right.button_index = MOUSE_BUTTON_RIGHT
 	InputMap.action_add_event("dodge", right)
@@ -180,8 +187,9 @@ func _on_monster_killed(monster: Monster) -> void:
 	DamageNumber.spawn_text(_top_fx, at, "+%d EXP" % xp_gain, 20, Color(0.7, 0.95, 1.0))
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _crown_mode:
+		_bot_build(delta)
 		_min_hp = minf(_min_hp, _player.hp / _player.max_hp)
 		_min_crown = minf(_min_crown, _crown.hp / _crown.max_hp)
 	if Input.is_action_just_pressed("toggle_mode") and _spawner != null:
@@ -253,6 +261,27 @@ func _on_finished(won: bool) -> void:
 
 func _on_player_died() -> void:
 	_hud.show_banner("คุณล้มลง... กำลังฟื้นคืนชีพ", Color(1.0, 0.4, 0.35))
+
+
+## Dev autopilot: spends gold on towers along the open lanes, so test runs use them too.
+func _bot_build(delta: float) -> void:
+	if not (_player.input is BotInput) or _director.phase == WaveDirector.Phase.OVER:
+		return
+	_bot_build_left -= delta
+	if _bot_build_left > 0.0:
+		return
+	_bot_build_left = 2.0
+	var open := WaveDirector._gates_for(_director.wave + 1) * 2
+	for i in mini(open, _director.slots.size()):
+		var slot := _director.slots[i]
+		if slot.is_empty():
+			var kind: String = ["archer", "pillar", "wall", "archer", "font"][randi() % 5]
+			if _director.build(slot, kind):
+				_log("build %s" % kind)
+			return
+	var slot := _director.slots[randi() % mini(open, _director.slots.size())]
+	if _director.upgrade(slot):
+		_log("upgrade %s" % slot.tower.kind)
 
 
 ## Progress lines for automated balance runs ("-- --autopilot").

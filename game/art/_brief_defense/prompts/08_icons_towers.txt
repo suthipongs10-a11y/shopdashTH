@@ -1,0 +1,23 @@
+OUTPUT FILE NAME: icons_towers.png
+ATTACH WITH THIS PROMPT: warden_concept.png (for colours only) AND templates/template_icons_2x2.png
+
+Create a sheet of 4 build-menu icons for a dark fantasy tower defense action RPG.
+
+LAYOUT:
+- Square canvas, 1:1 (1024x1024). A grid of 2 columns x 2 rows = 4 equal square icons.
+- Each icon fills its whole cell edge to edge. No frames, no borders, no gaps, no text.
+
+ICONS, left to right, top row first:
+1. Archer Tower: a stone watchtower with a silver-and-gold ballista firing a bolt of golden light,
+   on a deep navy background.
+2. Holy Pillar: a white stone obelisk with gold runes and a blazing golden orb on top, rays of
+   light, on a deep purple-blue background.
+3. Thorn Wall: a palisade of sharpened stakes and iron spikes, seen from the front, on a dark
+   brown background.
+4. Healing Font: a stone fountain overflowing with glowing turquoise-green water, on a deep teal
+   background.
+
+STYLE:
+- Hand-painted dark fantasy game icons, bold shapes that read clearly at 64x64 pixels, strong
+  contrast, glowing accents. Same painting style and lighting (from the top-left) for all four.
+- Output: PNG.
