@@ -55,6 +55,7 @@ func _ready() -> void:
 	if "--autopilot" in OS.get_cmdline_user_args():
 		var bot := BotInput.new()
 		bot.demo = "--demo" in OS.get_cmdline_user_args()
+		bot.walk_test = "--walktest" in OS.get_cmdline_user_args()
 		_player.input = bot
 	world.add_child(_player)
 	# Phones and tablets get on-screen controls ("-- --touch" forces them on a PC).

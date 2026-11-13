@@ -12,6 +12,8 @@ const DEMO := [
 ]
 
 var demo := false
+## "-- --autopilot --walktest": walks a square (right, down, left, up) and uses no skills.
+var walk_test := false
 var _target: Monster
 var _player: Player
 
@@ -32,6 +34,10 @@ func _nearest(player: Player) -> Monster:
 
 func move_vector(player: Player) -> Vector2:
 	_player = player
+	if walk_test:
+		var t := Engine.get_physics_frames() / float(Engine.physics_ticks_per_second)
+		var leg := int(t / 1.6) % 5
+		return [Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT, Vector2.UP, Vector2.ZERO][leg]
 	_target = _nearest(player)
 	if _target == null:
 		return Vector2.ZERO
@@ -47,7 +53,7 @@ func aim_vector(player: Player) -> Vector2:
 
 
 func is_pressed(action: String) -> bool:
-	if not is_instance_valid(_target) or _player == null:
+	if walk_test or not is_instance_valid(_target) or _player == null:
 		return false
 	if demo:
 		return _demo_pressed(action)
