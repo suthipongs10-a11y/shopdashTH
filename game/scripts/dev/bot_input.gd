@@ -63,6 +63,8 @@ func _demo_pressed(action: String) -> bool:
 
 
 func _auto_pressed(action: String) -> bool:
+	if action in ["dodge", "ready", "toggle_mode"]:
+		return false
 	# Let the dragon finish its show before anything else is cast.
 	if not _player.get_tree().get_nodes_in_group("dragon").is_empty():
 		return action == "attack"

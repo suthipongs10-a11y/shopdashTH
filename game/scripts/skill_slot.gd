@@ -41,7 +41,7 @@ func _draw() -> void:
 	draw_string(font, Vector2(6.0, 17.0), String(data["key"]),
 		HORIZONTAL_ALIGNMENT_LEFT, -1.0, 13, gold)
 
-	var cd_total := float(data["cd"])
+	var cd_total := float(data["cd"]) * pow(0.88, player.mod("cdr"))
 	var cd_left := float(player.cooldowns[skill_id])
 	if cd_left > 0.0 and cd_total >= 1.0:
 		var h := size.y * clampf(cd_left / cd_total, 0.0, 1.0)

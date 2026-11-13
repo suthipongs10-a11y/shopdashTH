@@ -25,6 +25,20 @@ var _combo: ComboDisplay
 var _banner: Label
 var _hint: Label
 
+## Crown Defense widgets (null in the old training/horde modes).
+var _director: WaveDirector
+var _crown: Crown
+var _wave_panel: PanelContainer
+var _wave_label: Label
+var _crown_bar: ProgressBar
+var _crown_label: Label
+var _count_label: Label
+var _boss: Boss
+var _boss_panel: PanelContainer
+var _boss_label: Label
+var _boss_bar: ProgressBar
+var _results: Control
+
 var _target: Monster
 var _target_left := 0.0
 var _banner_tween: Tween
@@ -51,11 +65,15 @@ func _ready() -> void:
 	_hint = _make_label(13, Color(1, 1, 1, 0.85))
 	_hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
 	_hint.add_theme_constant_override("outline_size", 4)
-	_hint.text = "WASD เดิน  ·  เมาส์เล็งทิศ  ·  คลิกซ้าย/Space ฟัน  ·  Q E R 1 สกิล\n" \
-		+ "F 2 ท่าไม้ตาย  ·  3 เรียกเทพมังกรทอง (ร่าย)  ·  T สลับโหมดฝึกซ้อม"
+	_hint.text = "WASD เดิน  ·  เมาส์เล็งทิศ  ·  คลิกซ้าย/Space ฟัน  ·  Shift/คลิกขวา หลบ\n" \
+		+ "Q E R 1 สกิล  ·  F 2 ท่าไม้ตาย  ·  3 เทพมังกรทอง (ร่าย)  ·  Enter เริ่มเวฟทันที"
 	_root.add_child(_hint)
 
 	player.target_hit.connect(_on_target_hit)
+	if player.input is TouchInput:
+		# Touch buttons show the skills; the keyboard hints and hotbar would only crowd the screen.
+		_hint.visible = false
+		_hotbar.visible = false
 
 
 func _process(delta: float) -> void:
@@ -74,6 +92,7 @@ func _process(delta: float) -> void:
 		roundi(player.attack_power), roundi(player.defense), GameData.format_int(player.gold),
 	]
 
+	_update_crown_widgets()
 	_target_left -= delta
 	var show_target := _target_left > 0.0 and is_instance_valid(_target) \
 		and _target.state != Monster.State.DEAD
@@ -88,13 +107,117 @@ func _process(delta: float) -> void:
 
 	# Manual layout so everything follows the window size.
 	var view := get_viewport().get_visible_rect().size
-	_target_panel.position = Vector2((view.x - _target_panel.size.x) * 0.5, 14.0)
+	var top := 14.0
+	if _wave_panel != null:
+		_wave_panel.position = Vector2((view.x - _wave_panel.size.x) * 0.5, 10.0)
+		top = _wave_panel.position.y + _wave_panel.size.y + 8.0
+		_count_label.position = Vector2(0.0, view.y * 0.22)
+		_count_label.size = Vector2(view.x, 60.0)
+		if _boss_panel.visible:
+			_boss_panel.position = Vector2((view.x - _boss_panel.size.x) * 0.5, top)
+			top += _boss_panel.size.y + 8.0
+	_target_panel.position = Vector2((view.x - _target_panel.size.x) * 0.5, top)
 	_hotbar.position = Vector2((view.x - _hotbar.size.x) * 0.5, view.y - _hotbar.size.y - 18.0)
 	_combo.position = Vector2(view.x - _combo.size.x - 28.0, view.y * 0.3)
 	# Below the player, so it never covers the skill tallies above their head.
 	_banner.position = Vector2(0.0, view.y * 0.66)
 	_banner.size = Vector2(view.x, 70.0)
 	_hint.position = Vector2(16.0, view.y - 56.0)
+
+
+## Crown Defense: wave number, shrine HP, countdown and the boss bar.
+func setup_crown(director: WaveDirector, crown: Crown) -> void:
+	_director = director
+	_crown = crown
+	_wave_panel = _make_panel()
+	_root.add_child(_wave_panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	_wave_panel.add_child(box)
+	_wave_label = _make_label(20, GOLD)
+	_wave_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(_wave_label)
+	_crown_bar = _make_bar(Color(1.0, 0.78, 0.28), Vector2(360.0, 16.0))
+	box.add_child(_crown_bar)
+	_crown_label = _make_bar_label(_crown_bar)
+	_count_label = _make_label(40, Color(1.0, 0.9, 0.6))
+	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_count_label.add_theme_color_override("font_outline_color", Color(0.15, 0.05, 0.0))
+	_count_label.add_theme_constant_override("outline_size", 10)
+	_root.add_child(_count_label)
+	_boss_panel = _make_panel()
+	_boss_panel.visible = false
+	_root.add_child(_boss_panel)
+	var bbox := VBoxContainer.new()
+	_boss_panel.add_child(bbox)
+	_boss_label = _make_label(18, Color(1.0, 0.55, 0.45))
+	_boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	bbox.add_child(_boss_label)
+	_boss_bar = _make_bar(Color(0.85, 0.15, 0.1), Vector2(560.0, 18.0))
+	bbox.add_child(_boss_bar)
+
+
+func track_boss(boss: Boss) -> void:
+	_boss = boss
+
+
+func _update_crown_widgets() -> void:
+	if _director == null:
+		return
+	_wave_label.text = "เวฟ %d / %d" % [maxi(1, _director.wave), WaveDirector.WAVES]
+	if is_instance_valid(_crown):
+		_crown_bar.max_value = _crown.max_hp
+		_crown_bar.value = _crown.hp
+		_crown_label.text = "ศาลมงกุฎ  %s / %s" % [
+			GameData.format_int(ceili(_crown.hp)), GameData.format_int(roundi(_crown.max_hp))]
+	var prep := _director.phase == WaveDirector.Phase.PREP
+	_count_label.visible = prep
+	if prep:
+		var next := _director.wave + 1
+		var boss_note := "  บอส!" if next in WaveDirector.BOSS_WAVES else ""
+		_count_label.text = "เวฟ %d%s มาใน %d" % [next, boss_note, ceili(_director.countdown)]
+	var boss_alive := is_instance_valid(_boss) and _boss.state != Monster.State.DEAD
+	_boss_panel.visible = boss_alive
+	if boss_alive:
+		var mood := "  (คลั่ง!)" if _boss.enraged else ""
+		_boss_label.text = "%s%s   %s / %s" % [_boss.display_name, mood,
+			GameData.format_int(_boss.hp), GameData.format_int(_boss.max_hp)]
+		_boss_bar.max_value = _boss.max_hp
+		_boss_bar.value = _boss.hp
+
+
+## End-of-run panel with a replay button.
+func show_results(won: bool, lines: Array[String]) -> void:
+	if _results != null:
+		return
+	var panel := _make_panel()
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.add_child(panel)
+	_results = panel
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	panel.add_child(box)
+	var title := _make_label(40, Color(1.0, 0.85, 0.35) if won else Color(1.0, 0.4, 0.35))
+	title.text = "ปกป้องมงกุฎสำเร็จ!" if won else "ศาลมงกุฎพังทลาย..."
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	for line in lines:
+		var l := _make_label(20, Color.WHITE)
+		l.text = line
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(l)
+	var again := Button.new()
+	again.text = "เล่นอีกครั้ง"
+	again.add_theme_font_size_override("font_size", 24)
+	again.custom_minimum_size = Vector2(260.0, 56.0)
+	again.pressed.connect(func() -> void:
+		Engine.time_scale = 1.0
+		get_tree().paused = false
+		get_tree().reload_current_scene())
+	box.add_child(again)
+	await get_tree().process_frame
+	var view := get_viewport().get_visible_rect().size
+	panel.position = (view - panel.size) * 0.5
 
 
 func show_banner(text: String, color: Color = Color.WHITE) -> void:

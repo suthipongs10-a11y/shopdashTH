@@ -65,6 +65,7 @@ const MONSTERS := {
 		"xp": 22, "gold": 6, "color": Color(0.62, 0.45, 0.42), "pal": "fire",
 		# Chance that a slam leaves a burning patch on the ground.
 		"fire_chance": 0.8,
+		"poise": 0.6, "siege_mult": 0.7,
 	},
 	"imp": {
 		"name": "อิมป์เถ้าธุลี", "shape": "round",
@@ -73,6 +74,44 @@ const MONSTERS := {
 		"aggro": 720.0, "range": 28.0, "windup": 0.35, "cooldown": 1.1,
 		"xp": 10, "gold": 3, "color": Color(0.78, 0.36, 0.85), "pal": "dark",
 	},
+	# Crown Defense: fast spirits that ignore the warden and run straight for the shrine.
+	"wisp": {
+		"name": "อิมป์วิญญาณ", "shape": "round", "art": "imp", "size": 0.85,
+		"tint": Color(0.55, 0.85, 1.4), "ignore_player": true,
+		"hp": 1600, "hp_per_level": 400, "atk": 380, "atk_per_level": 90,
+		"def": 10.0, "speed": 215.0, "radius": 18.0,
+		"aggro": 0.0, "range": 26.0, "windup": 0.3, "cooldown": 0.9,
+		"xp": 12, "gold": 4, "color": Color(0.5, 0.8, 1.0), "pal": "aegis",
+	},
+	# Crown Defense boss: the golem art drawn larger and darker (until it has its own sheets).
+	"boss": {
+		"name": "ยักษ์หินลาวา", "shape": "block", "art": "golem", "size": 1.75,
+		"tint": Color(1.0, 0.72, 0.62),
+		"hp": 90000, "hp_per_level": 30000, "atk": 900, "atk_per_level": 200,
+		"def": 120.0, "speed": 62.0, "radius": 60.0,
+		"aggro": 900.0, "range": 60.0, "windup": 0.9, "cooldown": 2.0,
+		"xp": 600, "gold": 150, "color": Color(0.62, 0.35, 0.3), "pal": "fire",
+		# Bosses barely budge and cannot be stunned.
+		"poise": 0.1, "no_stun": true,
+	},
+}
+
+## Crown Defense: level-up blessings, pick 1 of 3. "max" is how many times one can be taken.
+const BOONS := {
+	"atk": {"name": "คมดาบศักดิ์สิทธิ์", "desc": "พลังโจมตี +20%", "max": 5},
+	"hp": {"name": "เกราะหนาขึ้น", "desc": "เลือดสูงสุด +25%", "max": 4},
+	"cdr": {"name": "จิตแน่วแน่", "desc": "คูลดาวน์ทุกสกิล -12%", "max": 4},
+	"speed": {"name": "ฝีเท้าเทพ", "desc": "วิ่งเร็วขึ้น 12%", "max": 3},
+	"crit": {"name": "ตาเหยี่ยว", "desc": "โอกาสคริติคอล +8%", "max": 4},
+	"leech": {"name": "ดาบดูดเลือด", "desc": "ฟื้นเลือด 1.5% ของดาเมจที่ทำ", "max": 3},
+	"sp": {"name": "ลมหายใจแสง", "desc": "SP ฟื้นเร็วขึ้น 40%", "max": 3},
+	"wave": {"name": "คลื่นดาบห้าสาย", "desc": "Q ปล่อยคลื่นดาบเพิ่ม 2 สาย", "max": 2},
+	"lion": {"name": "สิงโตคำรามคู่", "desc": "F ระเบิดด้านหน้าเพิ่ม 2 ครั้ง", "max": 2},
+	"spears": {"name": "ฝนหอกแสง", "desc": "1 หอกแสงเพิ่ม 4 เล่ม วงกว้างขึ้น", "max": 2},
+	"whirl": {"name": "พายุไม่สิ้นสุด", "desc": "R หมุนนานขึ้น 50%", "max": 2},
+	"aegis": {"name": "เกราะแตกระเบิด", "desc": "E ตอนเกราะแตก ระเบิดแรงขึ้น 80%", "max": 2},
+	"dragon": {"name": "เสียงเรียกมังกร", "desc": "3 ร่ายเร็วขึ้น 30%", "max": 2},
+	"crown": {"name": "พรแห่งมงกุฎ", "desc": "ศาลมงกุฎฟื้น 30% เลือดสูงสุด +15%", "max": 99},
 }
 
 

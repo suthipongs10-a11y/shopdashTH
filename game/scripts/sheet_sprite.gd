@@ -166,6 +166,13 @@ func ghost(color: Color, life: float = 0.25, strength: float = 0.4) -> void:
 
 
 ## Freeze on one frame of an animation until release(). Facing still updates.
+## Draws the sheets k times larger (e.g. a boss made from a normal monster's art).
+func resize(k: float) -> void:
+	_base_scale *= k
+	scale = _base_scale
+	screen_height *= k
+
+
 func has_anim(anim: String) -> bool:
 	return _anims.has(anim)
 

@@ -26,6 +26,11 @@ const ULT_CHARGE := 0.9
 const LEAP_TIME := 0.42
 const LEAP_HEIGHT := 150.0
 const RESPAWN_DELAY := 3.0
+## Shift / right mouse: a quick dash with a moment of invulnerability.
+const DODGE_TIME := 0.2
+const DODGE_SPEED := 760.0
+const DODGE_IFRAMES := 0.32
+const DODGE_COOLDOWN := 0.9
 ## Max hit-spark effects per physics frame, so huge packs do not flood the scene.
 const HIT_FX_PER_FRAME := 10
 
@@ -48,6 +53,10 @@ var aim := Vector2.RIGHT
 var cooldowns := {}
 ## Command source; swapped for touch controls or the dev autopilot.
 var input: PlayerInput = PlayerInput.new()
+## Crown Defense blessings taken: boon id -> times taken (see GameData.BOONS).
+var mods := {}
+## Cooldown left on the dodge dash (read by the touch button).
+var dodge_cooldown := 0.0
 
 ## Set by main.gd before the player enters the tree.
 var ground_fx: Node2D
@@ -68,6 +77,11 @@ var _aegis_tally: SkillTally
 var _spin_left := 0.0
 var _spin_angle := 0.0
 var _respawn_left := 0.0
+## Knockback from hits, ground-plane velocity that decays.
+var _knock := Vector2.ZERO
+var _dodge_left := 0.0
+var _dodge_dir := Vector2.ZERO
+var _iframes := 0.0
 var _hurt_flash := 0.0
 var _swing := 0.0
 var _shake := 0.0
@@ -146,10 +160,13 @@ func get_camera() -> Camera2D:
 
 
 func _recalc_stats() -> void:
-	max_hp = 8400.0 + 1600.0 * (level - 1)
+	var hp_ratio := hp / max_hp if max_hp > 0.0 else 1.0
+	max_hp = (8400.0 + 1600.0 * (level - 1)) * (1.0 + 0.25 * mod("hp"))
 	# Generous SP so skills can be chained like the reference clip; potions come with items.
 	max_sp = 300.0 + 20.0 * (level - 1)
-	attack_power = 800.0 + 180.0 * (level - 1)
+	attack_power = (800.0 + 180.0 * (level - 1)) * (1.0 + 0.2 * mod("atk"))
+	crit_chance = 0.15 + 0.08 * mod("crit")
+	hp = max_hp * hp_ratio
 	defense = 15.0 + 4.0 * (level - 1)
 	_name_label.text = "%s  Lv.%d" % [char_name, level]
 
@@ -173,7 +190,10 @@ func _physics_process(delta: float) -> void:
 	for id in cooldowns:
 		cooldowns[id] = maxf(0.0, cooldowns[id] - delta)
 	hp = minf(max_hp, hp + max_hp * 0.008 * delta)
-	sp = minf(max_sp, sp + max_sp * 0.06 * delta)
+	sp = minf(max_sp, sp + max_sp * 0.06 * (1.0 + 0.4 * mod("sp")) * delta)
+	_knock = _knock.move_toward(Vector2.ZERO, 1800.0 * delta)
+	_iframes = maxf(0.0, _iframes - delta)
+	dodge_cooldown = maxf(0.0, dodge_cooldown - delta)
 
 	var to_aim := input.aim_vector(self)
 	if to_aim.length() > 4.0:
@@ -193,8 +213,18 @@ func _physics_process(delta: float) -> void:
 		if _pose_left <= 0.0 and _spin_left <= 0.0 and _cast_left <= 0.0 and _leap_left <= 0.0:
 			_sheet.release()
 	_moving = move.length() > 0.05
-	var speed := MOVE_SPEED * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
-	velocity = GameData.to_screen(move * speed)
+	var speed := MOVE_SPEED * (1.0 + 0.12 * mod("speed")) * (WHIRL_MOVE if _spin_left > 0.0 else 1.0)
+	var ground_vel := move * speed + _knock
+	if _dodge_left > 0.0:
+		_dodge_left -= delta
+		ground_vel = _dodge_dir * DODGE_SPEED
+		_ghost_left -= delta
+		if _ghost_left <= 0.0:
+			_ghost_left = 0.04
+			_sheet.ghost(Color(0.7, 0.85, 1.0), 0.2, 0.5)
+	elif _can_dodge() and input.is_pressed("dodge"):
+		_start_dodge(move)
+	velocity = GameData.to_screen(ground_vel)
 	move_and_slide()
 	if _moving:
 		_face = move.normalized()
@@ -250,7 +280,7 @@ func _try_use(id: String) -> void:
 			or _leap_left > 0.0):
 		return
 	sp -= cost
-	cooldowns[id] = float(data["cd"])
+	cooldowns[id] = float(data["cd"]) * pow(0.88, mod("cdr"))
 	_aim_face_left = 0.35
 	_face = aim
 	_sheet.play_once("attack")
@@ -289,7 +319,7 @@ func _try_use(id: String) -> void:
 func _begin_cast(id: String, mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	var data: Dictionary = GameData.SKILLS[id]
 	_cast_id = id
-	_cast_left = float(data.get("cast", 1.0))
+	_cast_left = float(data.get("cast", 1.0)) * pow(0.7, mod("dragon"))
 	_cast_mult = mult
 	_cast_pal = palette
 	_cast_tally = tally
@@ -478,7 +508,9 @@ func _do_attack(mult: float, palette: Dictionary) -> void:
 func _do_wave(mult: float, palette: Dictionary, tally: SkillTally) -> void:
 	_swing = 0.2
 	_sheet.ghost(palette["aura"], 0.2)
-	for spread in [-0.28, 0.0, 0.28]:
+	var blades := 3 + 2 * mod("wave")
+	for i in blades:
+		var spread := (i - (blades - 1) * 0.5) * 0.28
 		var wave := BladeWave.new()
 		wave.player = self
 		wave.tally = tally
@@ -534,7 +566,8 @@ func _tick_aegis(delta: float) -> void:
 	var palette := Vfx.pal("aegis")
 	Vfx.explode(global_position, palette, true)
 	Juice.flash(0.12, palette["aura"])
-	var pulse := _new_pulse(AoePulse.Style.SHOCK, 190.0, float(data["mult"]), palette["aura"])
+	var pulse := _new_pulse(AoePulse.Style.SHOCK, 190.0 + 50.0 * mod("aegis"),
+		float(data["mult"]) * (1.0 + 0.8 * mod("aegis")), palette["aura"])
 	pulse.palette = palette
 	pulse.knock = 300.0
 	pulse.shake = 8.0
@@ -551,13 +584,14 @@ func _tick_aegis(delta: float) -> void:
 
 ## R: spin in place (still able to walk slowly), slashing everything around.
 func _do_whirl(mult: float, palette: Dictionary, tally: SkillTally) -> void:
-	_spin_left = WHIRL_TIME
+	var whirl_time := WHIRL_TIME * (1.0 + 0.5 * mod("whirl"))
+	_spin_left = whirl_time
 	_spin_angle = aim.angle()
 	_sheet.hold("attack", 2)
 	var pulse := _new_pulse(AoePulse.Style.WHIRL, 165.0, mult, palette["aura"])
 	pulse.palette = palette
 	pulse.follow = self
-	pulse.ticks = WHIRL_TICKS
+	pulse.ticks = roundi(WHIRL_TICKS * whirl_time / WHIRL_TIME)
 	pulse.interval = WHIRL_TIME / float(WHIRL_TICKS)
 	pulse.knock = 60.0
 	pulse.tally = tally
@@ -588,7 +622,7 @@ func _lion_bash(ground_dir: Vector2, mult: float, palette: Dictionary) -> void:
 	top_fx.add_child(lion)
 	var pulse := _new_pulse(AoePulse.Style.ROAR, 280.0, mult, palette["aura"])
 	pulse.palette = palette
-	pulse.ticks = 3
+	pulse.ticks = 3 + 2 * mod("lion")
 	pulse.interval = 0.26
 	pulse.delay = LionFx.ROAR_AT * 0.6
 	pulse.knock = 300.0
@@ -683,7 +717,9 @@ func _land_slam() -> void:
 		crack.grow_to = 1.1
 	Vfx.smoke(global_position, 10.0, 60.0, 140.0, Color(0.85, 0.75, 0.6), 0.8, 0.3)
 	Vfx.burst(global_position, 10.0, 30, aura, 520.0, 14.0, 0.5)
-	var pulse := _new_pulse(AoePulse.Style.CROSS, 170.0, _leap_mult, aura)
+	var pulse := _new_pulse(AoePulse.Style.CROSS, 170.0 * (1.0 + 0.25 * mod("spears")),
+		_leap_mult, aura)
+	pulse.spears = 4 + 4 * mod("spears")
 	pulse.palette = palette
 	pulse.ticks = 2
 	pulse.interval = 0.22
@@ -747,6 +783,8 @@ func strike(
 	var head := m.global_position + Vector2(0.0, -m.visual_height() - 22.0)
 	DamageNumber.spawn(top_fx, head, dmg, is_crit, m.get_instance_id())
 	Combo.register_hit(dmg)
+	if mod("leech") > 0:
+		hp = minf(max_hp, hp + dmg * 0.015 * mod("leech"))
 	if tally != null and is_instance_valid(tally):
 		tally.add(dmg)
 	if _hit_fx_budget > 0:
@@ -776,9 +814,19 @@ func _hit_effect(at: Vector2, is_crit: bool) -> void:
 		Vfx.twinkle(ground + jitter, 50.0, 40.0, Color(1.0, 0.92, 0.6), 0.35)
 
 
-func take_damage(raw: int) -> void:
+## knock: ground-plane velocity pushing the warden away from the blow.
+func take_damage(raw: int, knock: Vector2 = Vector2.ZERO) -> void:
 	if dead:
 		return
+	if _iframes > 0.0:
+		DamageNumber.spawn_text(top_fx, global_position + Vector2(0.0, -120.0), "หลบ!", 22,
+			Color(0.7, 0.9, 1.0))
+		return
+	if _leap_left <= 0.0 and _cast_left <= 0.0:
+		_knock += knock
+		if knock.length() > 500.0:
+			_sheet.squash = Vector2(1.25, 0.8)
+			_sheet.ghost(Color(1.0, 0.3, 0.25), 0.2, 0.5)
 	var reduced := float(raw) * (1.0 - defense / (defense + GameData.DEF_K))
 	if _aegis_left > 0.0:
 		reduced *= 1.0 - AEGIS_BLOCK
@@ -814,6 +862,35 @@ func gain_rewards(xp_amount: int, gold_amount: int) -> void:
 
 func shake(amount: float) -> void:
 	_shake = maxf(_shake, amount)
+
+
+func mod(id: String) -> int:
+	return int(mods.get(id, 0))
+
+
+## Takes a level-up blessing and applies its stat changes.
+func add_boon(id: String) -> void:
+	mods[id] = mod(id) + 1
+	var was_max := max_hp
+	_recalc_stats()
+	if max_hp > was_max:
+		hp += max_hp - was_max
+
+
+func _can_dodge() -> bool:
+	return (dodge_cooldown <= 0.0 and _cast_left <= 0.0 and _leap_left <= 0.0
+		and _charge_left <= 0.0 and _spin_left <= 0.0)
+
+
+func _start_dodge(move: Vector2) -> void:
+	_dodge_dir = move.normalized() if move.length() > 0.1 else aim
+	_dodge_left = DODGE_TIME
+	_iframes = DODGE_IFRAMES
+	dodge_cooldown = DODGE_COOLDOWN
+	_knock = Vector2.ZERO
+	_face = _dodge_dir
+	_sheet.squash = Vector2(1.2, 0.85)
+	Vfx.smoke(global_position, 6.0, 20.0, 60.0, Color(0.85, 0.75, 0.6), 0.45, 0.3)
 
 
 ## The skill's damage tally if it is still on screen, else a fresh one (tallies fade out
@@ -865,7 +942,7 @@ func _respawn() -> void:
 	dead = false
 	hp = max_hp
 	sp = max_sp
-	global_position = GameData.MAP_SIZE * 0.5
+	global_position = GameData.MAP_SIZE * 0.5 + Vector2(0.0, 150.0)
 	modulate = Color.WHITE
 	respawned.emit()
 
@@ -874,54 +951,4 @@ func _draw() -> void:
 	draw_colored_polygon(GameData.ellipse_points(26.0, 20), Color(0, 0, 0, 0.3))
 	if _sheet.has_art():
 		return
-	_draw_placeholder()
-
-
-## Stand-in knight until real sprite sheets exist: bobbing body, swinging legs and cape.
-func _draw_placeholder() -> void:
-	var steel := Color(0.72, 0.78, 0.9)
-	var steel_dark := Color(0.4, 0.45, 0.6)
-	var gold_trim := Color(0.98, 0.8, 0.32)
-	var cape := Color(0.85, 0.2, 0.25)
-	var screen_face := GameData.to_screen(_face).normalized()
-	var side := 1.0 if screen_face.x >= 0.0 else -1.0
-	var away := screen_face.y < -0.35
-	var stride := sin(_walk_t)
-	var bob := -absf(stride) * 3.0 if _moving else sin(Time.get_ticks_msec() * 0.004) * 1.2
-	var up := Vector2(0.0, bob)
-
-	# Cape sways opposite to the stride.
-	var sway := -side * (5.0 + stride * 4.0) if _moving else -side * 2.0
-	var cape_pts := PackedVector2Array([
-		up + Vector2(-15.0, -58.0), up + Vector2(15.0, -58.0),
-		Vector2(20.0 + sway, -10.0), Vector2(-20.0 + sway, -10.0),
-	])
-	if not away:
-		draw_colored_polygon(cape_pts, cape)
-	# Legs alternate.
-	draw_rect(Rect2(-11.0, -24.0 + maxf(0.0, stride) * -6.0, 9.0, 24.0), steel_dark)
-	draw_rect(Rect2(2.0, -24.0 + maxf(0.0, -stride) * -6.0, 9.0, 24.0), steel_dark)
-	# Torso, belt
-	draw_rect(Rect2(up + Vector2(-15.0, -58.0), Vector2(30.0, 36.0)), steel)
-	draw_rect(Rect2(up + Vector2(-15.0, -30.0), Vector2(30.0, 5.0)), gold_trim)
-	# Helmet, face, plume
-	draw_circle(up + Vector2(0.0, -70.0), 14.0, steel)
-	if not away:
-		draw_circle(up + Vector2(screen_face.x * 4.0, -67.0), 8.0, Color(0.99, 0.84, 0.7))
-	draw_rect(Rect2(up + Vector2(-3.0, -92.0), Vector2(6.0, 10.0)), cape)
-	if away:
-		draw_colored_polygon(cape_pts, cape)
-	# Shield on the off-hand side
-	var shield_at := up + Vector2(-side * 19.0, -40.0)
-	draw_circle(shield_at, 15.0, gold_trim)
-	draw_circle(shield_at, 11.0, Color(0.25, 0.42, 0.85))
-	# Sword: rests along the facing, sweeps across the aim while swinging.
-	var hand := up + Vector2(side * 17.0, -42.0)
-	var blade_dir := screen_face
-	var blade := 46.0
-	if _swing > 0.0:
-		blade = 74.0
-		var sweep := aim.angle() + (0.5 - _swing / 0.2) * 1.6
-		blade_dir = GameData.to_screen(Vector2.from_angle(sweep)).normalized()
-	draw_line(hand, hand + blade_dir * blade, Color(0.95, 0.97, 1.0), 5.0)
-	draw_line(hand - blade_dir * 6.0, hand + blade_dir * 8.0, gold_trim, 7.0)
+	PlaceholderKnight.draw(self, _face, _moving, _walk_t, aim, _swing)

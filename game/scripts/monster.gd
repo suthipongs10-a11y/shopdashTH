@@ -7,6 +7,9 @@ signal died(monster: Monster)
 enum State { WANDER, CHASE, WINDUP, DEAD }
 
 const DISSOLVE_TIME := 0.9
+const SIEGE_AGGRO := 300.0
+## Knockback (ground px/s) a normal hit gives the player.
+const HIT_KNOCK := 260.0
 
 var kind := ""
 var display_name := ""
@@ -34,6 +37,17 @@ var palette: Dictionary = Vfx.pal("fire")
 ## Training dummy: never dies, never attacks, walks back to home after knockback.
 var dummy := false
 var home := Vector2.ZERO
+## Crown Defense: the shrine this monster marches on. It fights the player only when the
+## player comes close (SIEGE_AGGRO).
+var objective: Node2D
+var art_kind := ""
+var size_mult := 1.0
+var tint := Color.WHITE
+## Multiplier on knockback taken; no_stun ignores stuns; siege_mult scales damage to the shrine.
+var poise := 1.0
+var no_stun := false
+var ignore_player := false
+var siege_mult := 0.5
 
 var _death_t := 0.0
 
@@ -45,6 +59,7 @@ var _moving := false
 var _wander_dir := Vector2.ZERO
 var _wander_time := 0.0
 var _windup_left := 0.0
+var _windup_target: Node2D
 var _cooldown_left := 0.0
 var _stun_left := 0.0
 ## Knockback velocity on the ground plane.
@@ -74,6 +89,13 @@ func setup(kind_id: String, monster_level: int, player: Player) -> void:
 	fire_chance = float(d.get("fire_chance", 0.0))
 	palette = Vfx.pal(String(d.get("pal", "fire")))
 	body_color = d["color"]
+	art_kind = String(d.get("art", kind_id))
+	size_mult = float(d.get("size", 1.0))
+	tint = d.get("tint", Color.WHITE)
+	poise = float(d.get("poise", 1.0))
+	no_stun = bool(d.get("no_stun", false))
+	ignore_player = bool(d.get("ignore_player", false))
+	siege_mult = float(d.get("siege_mult", 0.5))
 
 
 func _ready() -> void:
@@ -83,8 +105,11 @@ func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 2
 	_sheet = SheetSprite.new()
-	_sheet.load_dir("res://art/monsters/%s" % kind)
+	_sheet.load_dir("res://art/monsters/%s" % art_kind)
 	add_child(_sheet)
+	if size_mult != 1.0:
+		_sheet.resize(size_mult)
+	_sheet.self_modulate = tint
 	# Spacing follows the drawn size so packs do not pile into one blob.
 	var shape := CircleShape2D.new()
 	shape.radius = maxf(body_radius * 0.75, visual_height() * 0.3)
@@ -101,6 +126,13 @@ func _dummy_move() -> Vector2:
 	if is_instance_valid(_player):
 		_face = GameData.to_ground(_player.global_position - global_position).normalized()
 	return Vector2.ZERO
+
+
+## Crown Defense: later waves are tougher than the level alone makes them.
+func scale_for_wave(wave: int) -> void:
+	max_hp = roundi(max_hp * (1.0 + 0.15 * (wave - 1)))
+	hp = max_hp
+	attack_power = roundi(attack_power * (1.0 + 0.1 * (wave - 1)))
 
 
 func make_dummy(at: Vector2) -> void:
@@ -146,44 +178,85 @@ func _physics_process(delta: float) -> void:
 func _think(delta: float) -> Vector2:
 	if dummy:
 		return _dummy_move()
+	if state == State.WINDUP:
+		return _tick_windup(delta)
+	if objective != null:
+		return _think_siege()
 	var player_alive := is_instance_valid(_player) and not _player.dead
 	var dist := INF
 	if player_alive:
 		dist = GameData.ground_dist(global_position, _player.global_position)
-	var reach := attack_range + body_radius
-	match state:
-		State.WANDER:
-			if dist <= aggro_range:
-				state = State.CHASE
-				return Vector2.ZERO
-			_wander_time -= delta
-			if _wander_time <= 0.0:
-				_wander_time = randf_range(1.0, 3.0)
-				_wander_dir = Vector2.ZERO if randf() < 0.4 else Vector2.from_angle(randf() * TAU)
-			return _wander_dir * move_speed * 0.4
-		State.CHASE:
-			if not player_alive or dist > aggro_range * 1.6:
-				state = State.WANDER
-				return Vector2.ZERO
-			if dist <= reach:
-				if _cooldown_left <= 0.0:
-					state = State.WINDUP
-					_windup_left = windup_time
-					_sheet.play_once("attack")
-				return Vector2.ZERO
-			var to_player := GameData.to_ground(_player.global_position - global_position)
-			return to_player.normalized() * move_speed
-		State.WINDUP:
-			_windup_left -= delta
-			if _windup_left <= 0.0:
-				# The player can dodge by stepping out of reach during the wind-up.
-				if player_alive and dist <= reach * 1.35:
-					_player.take_damage(attack_power)
-				if randf() < fire_chance:
-					_leave_fire()
-				_cooldown_left = attack_cooldown
-				state = State.CHASE
-			return Vector2.ZERO
+	if state == State.WANDER:
+		return _wander(delta, dist)
+	if not player_alive or dist > aggro_range * 1.6:
+		state = State.WANDER
+		return Vector2.ZERO
+	return _approach(_player, dist)
+
+
+func _wander(delta: float, dist: float) -> Vector2:
+	if dist <= aggro_range:
+		state = State.CHASE
+		return Vector2.ZERO
+	_wander_time -= delta
+	if _wander_time <= 0.0:
+		_wander_time = randf_range(1.0, 3.0)
+		_wander_dir = Vector2.ZERO if randf() < 0.4 else Vector2.from_angle(randf() * TAU)
+	return _wander_dir * move_speed * 0.4
+
+
+## Crown Defense: march on the shrine, turning on the player when they come close.
+func _think_siege() -> Vector2:
+	var target: Node2D = objective if is_instance_valid(objective) else null
+	if is_instance_valid(_player) and not _player.dead and not ignore_player:
+		if GameData.ground_dist(global_position, _player.global_position) <= SIEGE_AGGRO:
+			target = _player
+	if target == null:
+		return Vector2.ZERO
+	return _approach(target, GameData.ground_dist(global_position, target.global_position))
+
+
+## Walks at target; once in reach (and off cooldown) starts the wind-up of an attack.
+func _approach(target: Node2D, dist: float) -> Vector2:
+	if dist <= _reach(target):
+		if _cooldown_left <= 0.0:
+			state = State.WINDUP
+			_windup_left = windup_time
+			_windup_target = target
+			_sheet.play_once("attack")
+		return Vector2.ZERO
+	return GameData.to_ground(target.global_position - global_position).normalized() * move_speed
+
+
+func _reach(target: Node2D) -> float:
+	var r := attack_range + body_radius
+	if target is Crown:
+		r += Crown.RADIUS
+	return r
+
+
+func _tick_windup(delta: float) -> Vector2:
+	_windup_left -= delta
+	if _windup_left > 0.0:
+		return Vector2.ZERO
+	_cooldown_left = attack_cooldown
+	state = State.CHASE
+	var target := _windup_target
+	if not is_instance_valid(target):
+		return Vector2.ZERO
+	# The player can dodge by stepping out of reach during the wind-up.
+	var dist := GameData.ground_dist(global_position, target.global_position)
+	if dist > _reach(target) * 1.35:
+		return Vector2.ZERO
+	if target is Player:
+		var p := target as Player
+		if not p.dead:
+			var away := GameData.to_ground(p.global_position - global_position).normalized()
+			p.take_damage(attack_power, away * HIT_KNOCK)
+			if randf() < fire_chance:
+				_leave_fire()
+	elif target is Crown:
+		(target as Crown).take_damage(attack_power * siege_mult)
 	return Vector2.ZERO
 
 
@@ -210,8 +283,8 @@ func take_damage(amount: int, knock: Vector2 = Vector2.ZERO, stun: float = 0.0) 
 	_flash = 0.1
 	_punch = 0.14
 	_sheet.squash = Vector2(1.18, 0.86)
-	_knock += knock
-	if stun > 0.0:
+	_knock += knock * poise
+	if stun > 0.0 and not no_stun:
 		_stun_left = maxf(_stun_left, stun)
 		if state == State.WINDUP:
 			state = State.CHASE

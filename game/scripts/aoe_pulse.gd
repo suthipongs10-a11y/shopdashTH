@@ -25,6 +25,8 @@ var shake := 0.0
 var color := Color(1.0, 0.9, 0.5)
 var palette: Dictionary = Vfx.pal("holy")
 var tally: SkillTally
+## Holy Cross: spears of light that drop around the blast.
+var spears := 4
 
 var _timer := 0.0
 var _age := 0.0
@@ -178,8 +180,8 @@ func _fire_visuals() -> void:
 				dawn.grow_to = 1.4
 			Vfx.ring(here, 10.0, radius * 1.1, palette["aura"], 0.45, 8.0)
 			Vfx.burst(here, 40.0, 24, palette["aura"], 360.0, 16.0, 0.55)
-			for i in 4:
-				_light_spear(here + GameData.to_screen(Vector2.from_angle(TAU * (i + randf()) / 4.0)
+			for i in spears:
+				_light_spear(here + GameData.to_screen(Vector2.from_angle(TAU * (i + randf()) / spears)
 					* randf_range(0.35, 0.85) * radius), 0.04 * i)
 		Style.DRAGON:
 			_fired += 1
@@ -246,9 +248,12 @@ func _light_spear(at: Vector2, wait: float) -> void:
 	var tw := spear.create_tween()
 	tw.tween_interval(wait)
 	tw.tween_property(spear, "position", at + Vector2(0.0, -80.0), 0.12).set_ease(Tween.EASE_IN)
+	# The pulse may be gone when the spear lands, so only captured values are used here.
+	var core: Color = palette["core"]
+	var aura: Color = palette["aura"]
 	tw.tween_callback(func() -> void:
-		Vfx.ring(at, 4.0, 50.0, palette["core"], 0.25, 4.0)
-		Vfx.burst(at, 10.0, 8, palette["aura"], 220.0, 8.0, 0.35))
+		Vfx.ring(at, 4.0, 50.0, core, 0.25, 4.0)
+		Vfx.burst(at, 10.0, 8, aura, 220.0, 8.0, 0.35))
 
 
 ## Expanding painted ring on the ground. Returns false when there is no ring art.
