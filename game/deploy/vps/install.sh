@@ -125,8 +125,11 @@ CF_RANGES="$(cf_list v4; cf_list v6)"
   while read -r net; do echo "set_real_ip_from $net;"; done <<<"$CF_RANGES"
   echo "real_ip_header CF-Connecting-IP;"
 } >/etc/nginx/snippets/cloudflare-realip.conf
-install -m 0644 "$KIT/nginx/00-deny-unknown.conf" /etc/nginx/conf.d/00-deny-unknown.conf
-install -m 0644 "$KIT/nginx/crown.conf" /etc/nginx/sites-available/crown.conf
+# Machines without IPv6 cannot open [::] sockets; drop those listen lines there.
+if [[ -f /proc/net/if_inet6 ]]; then V6_FILTER="cat"; else V6_FILTER="grep -v listen.\[::\]"; fi
+$V6_FILTER "$KIT/nginx/00-deny-unknown.conf" >/etc/nginx/conf.d/00-deny-unknown.conf
+$V6_FILTER "$KIT/nginx/crown.conf" >/etc/nginx/sites-available/crown.conf
+chmod 0644 /etc/nginx/conf.d/00-deny-unknown.conf /etc/nginx/sites-available/crown.conf
 if [[ -L /etc/nginx/sites-enabled/default ]]; then
   rm /etc/nginx/sites-enabled/default   # the stock "Welcome to nginx" page
 fi
