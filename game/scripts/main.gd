@@ -127,6 +127,14 @@ func _setup_crown(world: Node2D, ground_fx: Node2D) -> void:
 	_director.boss_spawned.connect(_on_boss_spawned)
 	_director.finished.connect(_on_finished)
 	_crown.destroyed.connect(_director.lose)
+	# Dev: "-- --wave=5" starts at wave 5 with a matching level, for testing bosses.
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--wave="):
+			var start := clampi(int(arg.trim_prefix("--wave=")), 1, WaveDirector.WAVES)
+			_director.wave = start - 1
+			_director.countdown = 2.0
+			while _player.level < start + 1:
+				_player.gain_rewards(GameData.xp_to_next(_player.level), 0)
 
 
 ## Input actions are registered in code (physical keys, so they work on a Thai keyboard layout).
