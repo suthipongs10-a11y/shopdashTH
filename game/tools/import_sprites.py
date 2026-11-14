@@ -87,6 +87,8 @@ CHARACTERS = {
 # 3x3 icon sheet (brief v3) and the older 3x2 sheet.
 ICON_NAMES_3X3 = ["attack", "wave", "aegis", "whirl", "lion", "cross", "banner", "potion", "potion_sp"]
 ICON_NAMES_3X2 = ["attack", "wave", "aegis", "whirl", "lion", "potion"]
+# Second 3x2 sheet: the icons the first sheet left blank, plus dodge for a later touch button.
+ICON_NAMES_2 = ["whirl", "lion", "cross", "banner", "dragon", "dodge"]
 
 # Raw file -> (game name, layout, fps, blend). "add" art is painted on black and drawn additively.
 FX_SPECS = {
@@ -491,22 +493,30 @@ def main() -> None:
     icons_src = os.path.join(args.src, "icons_skills.png")
     if os.path.exists(icons_src):
         sheet = Image.open(icons_src).convert("RGB")
-        dst_dir = os.path.join(GAME_DIR, "art/ui/skills")
-        os.makedirs(dst_dir, exist_ok=True)
         square = abs(sheet.width - sheet.height) < sheet.width * 0.1
-        names = ICON_NAMES_3X3 if square else ICON_NAMES_3X2
-        rows = 3 if square else 2
-        w, h = sheet.width / 3, sheet.height / rows
-        inset = 0.03
-        for i, name in enumerate(names):
-            r, c = divmod(i, 3)
-            box = (
-                round(c * w + w * inset), round(r * h + h * inset),
-                round((c + 1) * w - w * inset), round((r + 1) * h - h * inset),
-            )
-            sheet.crop(box).resize((128, 128), Image.LANCZOS).save(
-                os.path.join(dst_dir, f"{name}.png"))
+        slice_icons(sheet, ICON_NAMES_3X3 if square else ICON_NAMES_3X2, 3 if square else 2)
         print("ui/skills/*.png")
+    # After the first sheet, so these replace its older versions.
+    icons2_src = os.path.join(args.src, "icons_skills_2.png")
+    if os.path.exists(icons2_src):
+        slice_icons(Image.open(icons2_src).convert("RGB"), ICON_NAMES_2, 2)
+        print("ui/skills/*.png (sheet 2)")
+
+
+def slice_icons(sheet, names: list, rows: int) -> None:
+    """Cuts a 3-column icon sheet into 128px icons named after the skills."""
+    dst_dir = os.path.join(GAME_DIR, "art/ui/skills")
+    os.makedirs(dst_dir, exist_ok=True)
+    w, h = sheet.width / 3, sheet.height / rows
+    inset = 0.03
+    for i, name in enumerate(names):
+        r, c = divmod(i, 3)
+        box = (
+            round(c * w + w * inset), round(r * h + h * inset),
+            round((c + 1) * w - w * inset), round((r + 1) * h - h * inset),
+        )
+        sheet.crop(box).resize((128, 128), Image.LANCZOS).save(
+            os.path.join(dst_dir, f"{name}.png"))
 
 
 if __name__ == "__main__":

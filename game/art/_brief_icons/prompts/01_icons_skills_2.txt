@@ -1,0 +1,38 @@
+OUTPUT FILE NAME: icons_skills_2.png
+ATTACH WITH THIS PROMPT: style_reference_icons.png AND templates/template_icons_3x2.png
+AND warden_concept.png (for colours only)
+
+Create a sheet of 6 skill icons for a fantasy action RPG. They join three icons that
+already exist in the game, shown in the attached style_reference_icons.png (sword slash, blade
+wave, shield). The new icons MUST look like the same set: same painting style, same detail
+level, same glow, same edge-to-edge square framing, same lighting from the top-left.
+
+LAYOUT:
+- Landscape canvas, aspect ratio 3:2 (1536x1024). A grid of 3 columns x 2 rows = 6 equal
+  square icons. The attached template shows the cells; use it ONLY for placement, do not copy
+  its lines or labels.
+- Each icon fills its whole cell edge to edge. No frames, no borders, no gaps between icons,
+  no text, no numbers, no key letters.
+
+ICONS, left to right, top row first:
+1. Blade Storm: a silver-and-gold longsword spinning flat in a circle, leaving bright white
+   ring trails and sparks, on a dark steel-blue background.
+2. Golden Lion: a roaring lion head made of golden fire bursting out of a silver kite shield,
+   on a deep crimson background.
+3. Holy Cross Strike: a knight's sword plunging down, a huge white-gold cross of light
+   flaring where it strikes, on a dark royal-purple background.
+4. Sacred Banner: a royal-blue war banner with a gold lion emblem planted in the ground,
+   golden light rays radiating from it, on a deep emerald-green background.
+5. Golden Dragon God: the head and coiled neck of a majestic golden eastern dragon roaring
+   upward, wreathed in golden-white holy flame, on a deep midnight-blue background. This is
+   the ultimate skill: make it the most dazzling icon of the set.
+6. Dodge: a silver armoured boot mid-step with three motion streaks of blue-white light behind
+   it, on a dark slate background.
+
+STYLE:
+- Bright, saturated, glossy hand-painted game icons exactly like the reference: bold shapes
+  that read clearly at 64x64 pixels, strong contrast, glowing light streaks and sparks. One clear subject per icon, centred, nothing tiny.
+- Silver, gold and royal blue for the knight's things; each icon keeps its own background
+  colour so the six are easy to tell apart.
+- NOT pixel art, NOT a 3D render, NOT a photo. No watermark.
+- Output: PNG.
