@@ -1,0 +1,41 @@
+[Unit]
+Description=Ashen Crown web build, forced (same limits and sandbox as crown-update.service)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=crown
+Group=crown
+Environment=HOME=/srv/crown/home
+ExecStart=/srv/crown/bin/update.sh --force
+TimeoutStartSec=40min
+
+# Stay out of EggPact's way.
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=100%
+MemoryMax=1536M
+TasksMax=256
+
+# Sandbox: only /srv/crown is writable; /home (eggbound) and /root are invisible.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/srv/crown
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictNamespaces=yes
+RestrictRealtime=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK

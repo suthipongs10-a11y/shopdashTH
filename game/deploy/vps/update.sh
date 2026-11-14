@@ -119,6 +119,10 @@ for f in index.html index.js index.wasm index.pck; do
   [[ -s "$BUILD/$f" ]] || die "export is missing $f (see $SRC/last-export.log)"
 done
 printf '%s\n%s\n' "$REV" "$(date -u '+%FT%TZ')" >"$BUILD/version.txt"
+# Compress once here (nginx gzip_static serves the .gz), not on every download: the wasm is ~40 MB.
+for f in "$BUILD"/*.wasm "$BUILD"/*.pck "$BUILD"/*.js "$BUILD"/*.html; do
+  if [[ -f "$f" ]]; then nice -n 19 ionice -c3 gzip -9 -k -n -f "$f"; fi  # (an if, not &&: set -e)
+done
 
 # --- publish -------------------------------------------------------------------------------
 rm -rf "$BASE/www-next"

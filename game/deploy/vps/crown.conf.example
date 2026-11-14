@@ -13,7 +13,10 @@ PROJECT_SUBDIR="game"
 # - when BUSY_CMD exits with status 0 (any shell command; empty = not used).
 MAX_LOAD="2.5"
 BUSY_FILE=""
-BUSY_CMD=""
+# EggPact's heavy jobs on this machine (from the EggPact chat, 2026-11-13): the full test run,
+# the scheduled deploy / backup pull, headless Chromium (screen tests), a Gradle build (Android; an idle daemon does not count),
+# the screen-test scripts, image upscaling.
+BUSY_CMD="pgrep -u eggbound -f 'test-and-ship[.]sh|deploy-at[.]sh|pull-db[.]sh|headless_shell|chrome|GradleWrapperMain|tools/sim/|upscale/up[.]py' "
 
 # Run a short headless check of the new build before publishing it; a build whose scripts
 # fail to compile is never published.

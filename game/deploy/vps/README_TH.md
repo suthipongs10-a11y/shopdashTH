@@ -40,7 +40,7 @@
 | ดูบันทึก | `journalctl -u crown-update.service -n 50` |
 | ดูว่าตอนนี้เกมเวอร์ชันไหน | `cat /srv/crown/www/version.txt` |
 | ย้อนกลับเวอร์ชันก่อน | `sudo -u crown -H /srv/crown/bin/update.sh --rollback` |
-| สร้างใหม่แม้โค้ดไม่เปลี่ยน | `sudo -u crown -H /srv/crown/bin/update.sh --force` |
+| สร้างใหม่แม้โค้ดไม่เปลี่ยน (ใช้ข้อจำกัดทรัพยากรเดียวกัน) | `sudo systemctl start crown-update-force.service` |
 | หยุดอัปเดตอัตโนมัติ | `sudo systemctl disable --now crown-update.timer` |
 
 ## ถ้า GitHub ใช้ไม่ได้ (สำรอง)
@@ -93,3 +93,14 @@ sudo userdel crown && sudo rm -rf /srv/crown /etc/ssl/crown
 | 9 | Godot รันด้วย nice + จำกัด 1 คอร์ RAM 1.5 GB, ไม่ฝาก GitHub ที่เดียว | service `CPUQuota=100%` `MemoryMax=1536M` `Nice=19` `IOSchedulingClass=idle`, `--from-tar` |
 | 10 | fetch ก่อน build เฉพาะเมื่อเปลี่ยน, ข้ามเมื่อเทสต์รัน, ห้าม 04:30–05:30, | `update.sh`, `crown.conf` (MAX_LOAD/BUSY_FILE/BUSY_CMD), timer ข้ามชั่วโมง 05 เวลาไทย |
 | 11 | ห้ามเสิร์ฟนอก www, autoindex ปิด, firewall เปิด 80/443 เฉพาะ Cloudflare, SSH เหมือนเดิม, ไม่ใช้ thread, wasm mime + gzip | `nginx/*.conf`, `install.sh` ขั้น 6, ส่งออกแบบ nothreads |
+
+## ตรวจโดยแชท EggPact (2026-11-13) — แก้แล้ว 6 จุด
+
+1. **บีบอัด wasm ตอน build แทนทุกครั้งที่มีคนโหลด** (`update.sh` + `gzip_static on` ใน nginx) เดิม nginx บีบอัดไฟล์ 40 MB ใหม่ทุกครั้งที่มีคนเปิดเกม (Cloudflare ส่งต่อมาทุกครั้งเพราะ no-cache) กิน CPU เครื่องที่รันเทสต์ EggPact
+2. **ผู้ใช้ crown ไม่มี shell สำหรับล็อกอิน** (`/usr/sbin/nologin`) `sudo -u crown คำสั่ง` ยังใช้ได้
+3. **sandbox ของ service แน่นขึ้น** (ไม่มี capability ใดๆ · ห้าม namespace/realtime · ห้ามแตะนาฬิกา/hostname/kernel log · เฉพาะ socket เครือข่ายปกติ)
+4. **สร้างใหม่แบบบังคับใช้ข้อจำกัดเดียวกัน** `crown-update-force.service` (เดิม README ให้รัน `sudo -u crown update.sh --force` ตรงๆ ซึ่งไม่ผ่านข้อจำกัด CPU/RAM)
+5. **BUSY_CMD สำหรับงาน EggPact** ใน `crown.conf` (เทสต์ชุดเต็ม · deploy/ดึงสำรองตามเวลา · Chromium ทดสอบหน้าจอ · build Android · สคริปต์ tools/sim · ขยายภาพ)
+6. ลูปบีบอัดใช้ `if` ไม่ใช่ `&&` (ภายใต้ `set -e` ลูปที่จบด้วยเงื่อนไขเท็จจะทำให้สคริปต์หยุด)
+
+ช่วงห้าม 04:30–05:30 ถูกต้อง (เวลาไทย) ตัวตั้งเวลาข้ามชั่วโมง 05 ทั้งชั่วโมงใช้ได้ · nginx ลบหน้า Welcome ได้ เครื่องนี้ไม่มีแผนใช้ nginx กับงานอื่น

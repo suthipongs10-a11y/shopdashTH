@@ -45,7 +45,7 @@ echo "ok: nginx curl unzip git ufw"
 # --- 2. user and folders ----------------------------------------------------------------------
 say "2. user $CROWN_USER and $BASE"
 if ! id "$CROWN_USER" >/dev/null 2>&1; then
-  useradd --system --user-group --home-dir "$BASE/home" --shell /bin/bash "$CROWN_USER"
+  useradd --system --user-group --home-dir "$BASE/home" --shell /usr/sbin/nologin "$CROWN_USER"
   echo "created user $CROWN_USER (no password, no SSH login)"
 fi
 install -d -o "$CROWN_USER" -g "$CROWN_USER" -m 0711 "$BASE"
@@ -179,7 +179,7 @@ fi
 
 # --- 7. updater timer -----------------------------------------------------------------------------
 say "7. hourly updater"
-install -m 0644 "$KIT/systemd/crown-update.service" "$KIT/systemd/crown-update.timer" \
+install -m 0644 "$KIT/systemd/crown-update.service" "$KIT/systemd/crown-update-force.service" "$KIT/systemd/crown-update.timer" \
   /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now --quiet crown-update.timer
