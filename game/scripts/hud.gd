@@ -116,11 +116,14 @@ func _process(delta: float) -> void:
 	if _wave_panel != null:
 		_wave_panel.position = Vector2((view.x - _wave_panel.size.x) * 0.5, 10.0)
 		top = _wave_panel.position.y + _wave_panel.size.y + 8.0
-		_count_label.position = Vector2(0.0, view.y * 0.22)
-		_count_label.size = Vector2(view.x, 60.0)
 		if _boss_panel.visible:
 			_boss_panel.position = Vector2((view.x - _boss_panel.size.x) * 0.5, top)
 			top += _boss_panel.size.y + 8.0
+		# Just under the top panels, so it never covers the hero or the shrine.
+		_count_label.position = Vector2(0.0, top)
+		_count_label.size = Vector2(view.x, 0.0)
+		if _count_label.visible:
+			top += _count_label.get_combined_minimum_size().y + 6.0
 	_target_panel.position = Vector2((view.x - _target_panel.size.x) * 0.5, top)
 	if _build_panel != null:
 		var above := _hotbar.position.y if _hotbar.visible else view.y - 20.0
@@ -143,16 +146,18 @@ func setup_crown(director: WaveDirector, crown: Crown) -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
 	_wave_panel.add_child(box)
-	_wave_label = _make_label(20, GOLD)
+	_wave_label = _make_label(22, GOLD)
 	_wave_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_wave_label)
-	_crown_bar = _make_bar(Color(1.0, 0.78, 0.28), Vector2(360.0, 16.0))
+	_crown_bar = _make_bar(Color(1.0, 0.78, 0.28), Vector2(400.0, 24.0))
 	box.add_child(_crown_bar)
-	_crown_label = _make_bar_label(_crown_bar)
-	_count_label = _make_label(40, Color(1.0, 0.9, 0.6))
+	_crown_label = _make_bar_label(_crown_bar, 17)
+	_crown_label.add_theme_color_override("font_outline_color", Color(0.2, 0.08, 0.0))
+	_crown_label.add_theme_constant_override("outline_size", 5)
+	_count_label = _make_label(26, Color(1.0, 0.9, 0.6))
 	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_count_label.add_theme_color_override("font_outline_color", Color(0.15, 0.05, 0.0))
-	_count_label.add_theme_constant_override("outline_size", 10)
+	_count_label.add_theme_constant_override("outline_size", 8)
 	_root.add_child(_count_label)
 	_boss_panel = _make_panel()
 	_boss_panel.visible = false
@@ -428,8 +433,8 @@ func _make_bar(color: Color, min_size: Vector2) -> ProgressBar:
 
 
 ## Centered text drawn over a bar.
-func _make_bar_label(bar: ProgressBar) -> Label:
-	var label := _make_label(12, Color.WHITE)
+func _make_bar_label(bar: ProgressBar, font_size: int = 12) -> Label:
+	var label := _make_label(font_size, Color.WHITE)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	bar.add_child(label)
